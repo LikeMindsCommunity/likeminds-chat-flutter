@@ -1,0 +1,1 @@
+library likeminds_chat_flutter;
