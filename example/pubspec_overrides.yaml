@@ -1,0 +1,8 @@
+
+dependency_overrides:
+  likeminds_chat_fl:
+    path: ../../LikeMinds-Flutter-GroupChat-SDK
+  likeminds_chat_flutter_core:
+    path: ../lib/packages/core
+  likeminds_chat_flutter_ui:
+    path: ../lib/packages/ui
