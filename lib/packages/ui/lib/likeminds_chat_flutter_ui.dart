@@ -1,7 +1,4 @@
 library likeminds_chat_flutter_ui;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'src/widgets/widgets.dart';
+export 'src/utils/utils.dart';
