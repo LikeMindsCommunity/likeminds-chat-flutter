@@ -1,5 +1,8 @@
+# melos_managed_dependency_overrides: js
 
 dependency_overrides:
+  extended_text_field: ^15.0.0
+  js: ^0.7.1
   likeminds_chat_fl:
     path: ../../LikeMinds-Flutter-GroupChat-SDK
   likeminds_chat_flutter_core:

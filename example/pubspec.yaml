@@ -1,27 +1,32 @@
 name: likeminds_chat_flutter_sample
 description: Master sample app for LikeMinds Chat SDK, showcasing the latest features available.
-publish_to: 'none' 
+publish_to: "none"
 version: 0.5.0
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
-  flutter: '>=3.10.2'
+  sdk: ">=3.1.0 <4.0.0"
+  flutter: ">=3.10.2"
 
 dependencies:
   flutter:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
+  firebase_core:
 
   likeminds_chat_flutter_core: 0.5.0
   likeminds_chat_flutter_ui: 0.5.0
+  likeminds_chat_fl: 1.6.0
+  google_fonts: ^6.2.1
+  realm:
+
+dependency_overrides:
+  js: ^0.7.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^2.0.0
 
 flutter:
-
   uses-material-design: true
