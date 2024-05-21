@@ -1,7 +1,9 @@
 library likeminds_chat_flutter_core;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'src/views/views.dart';
+export 'src/blocs/blocs.dart';
+export 'src/core/core.dart';
+export 'src/core/configurations.dart';
+export 'src/utils/constants/enums.dart';
+
+const bool isDebug = bool.fromEnvironment('DEBUG');
