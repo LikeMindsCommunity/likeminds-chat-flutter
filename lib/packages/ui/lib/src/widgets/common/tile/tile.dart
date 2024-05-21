@@ -25,53 +25,55 @@ class LMChatTile extends StatelessWidget {
     final inStyle = style ?? LMChatTileStyle.basic();
 
     return GestureDetector(
-      onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        height: inStyle.height,
-        width: inStyle.width,
-        decoration: BoxDecoration(
-          color: inStyle.backgroundColor,
-          border: inStyle.border,
-          borderRadius: BorderRadius.all(
-            Radius.circular(inStyle.borderRadius ?? 0),
-          ),
-        ),
-        padding: inStyle.padding ?? const EdgeInsets.all(8),
-        child: Row(
-          mainAxisAlignment:
-              inStyle.mainAxisAlignment ?? MainAxisAlignment.start,
-          crossAxisAlignment:
-              inStyle.crossAxisAlignment ?? CrossAxisAlignment.center,
-          children: [
-            leading ??
-                Container(
-                  height: 48,
-                  width: 48,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey,
-                  ),
-                ),
-            SizedBox(width: inStyle.margin ?? 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  title ??
-                      Container(
-                        height: 14,
-                        width: 120,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                        ),
-                      ),
-                  subtitle ?? const SizedBox(),
-                ],
-              ),
+      onTap: onTap,
+      child: SizedBox(
+        child: Container(
+          height: inStyle.height,
+          width: inStyle.width,
+          decoration: BoxDecoration(
+            color: inStyle.backgroundColor,
+            border: inStyle.border,
+            borderRadius: BorderRadius.all(
+              Radius.circular(inStyle.borderRadius ?? 0),
             ),
-            trailing ?? const SizedBox()
-          ],
+          ),
+          padding: inStyle.padding ?? const EdgeInsets.all(8),
+          child: Row(
+            mainAxisAlignment:
+                inStyle.mainAxisAlignment ?? MainAxisAlignment.start,
+            crossAxisAlignment:
+                inStyle.crossAxisAlignment ?? CrossAxisAlignment.center,
+            children: [
+              leading ??
+                  Container(
+                    height: 48,
+                    width: 48,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey,
+                    ),
+                  ),
+              SizedBox(width: inStyle.margin ?? 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    title ??
+                        Container(
+                          height: 14,
+                          width: 120,
+                          decoration: const BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                        ),
+                    subtitle ?? const SizedBox(),
+                  ],
+                ),
+              ),
+              trailing ?? const SizedBox()
+            ],
+          ),
         ),
       ),
     );

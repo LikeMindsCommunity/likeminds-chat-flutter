@@ -1,10 +1,10 @@
-class LMSDKClientInfoViewData {
+class LMChatSDKClientInfoViewData {
   int community;
   int user;
   String uuid;
   String? widgetId;
 
-  LMSDKClientInfoViewData._({
+  LMChatSDKClientInfoViewData._({
     required this.community,
     required this.user,
     required this.uuid,
@@ -34,8 +34,8 @@ class LMSDKClientInfoViewDataBuilder {
     _widgetId = widgetId;
   }
 
-  LMSDKClientInfoViewData build() {
-    return LMSDKClientInfoViewData._(
+  LMChatSDKClientInfoViewData build() {
+    return LMChatSDKClientInfoViewData._(
       community: _community!,
       user: _user!,
       uuid: _uuid!,

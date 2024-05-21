@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// A simple text widget to be used throughout the Feed experience
-/// Provides high level customisability through [LMFeedTextStyle]
+/// Provides high level customisability through [LMChatTextStyle]
 /// Also, can add onTap functionality
 class LMChatText extends StatelessWidget {
   /// text to be shown as [String]
@@ -88,7 +88,7 @@ class LMChatTextStyle {
     );
   }
 
-  /// copyWith function to get a new object of [LMFeedTextStyle]
+  /// copyWith function to get a new object of [LMChatTextStyle]
   /// with specific single values passed
   LMChatTextStyle copyWith({
     bool? selectable,

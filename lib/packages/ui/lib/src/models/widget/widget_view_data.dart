@@ -1,4 +1,4 @@
-class LMWidgetViewData {
+class LMChatWidgetViewData {
   final String id;
   Map<String, dynamic>? lmMeta;
   int createdAt;
@@ -7,7 +7,7 @@ class LMWidgetViewData {
   String parentEntityType;
   int updatedAt;
 
-  LMWidgetViewData._({
+  LMChatWidgetViewData._({
     required this.id,
     this.lmMeta,
     required this.createdAt,
@@ -55,8 +55,8 @@ class LMWidgetViewDataBuilder {
     _updatedAt = updatedAt;
   }
 
-  LMWidgetViewData build() {
-    return LMWidgetViewData._(
+  LMChatWidgetViewData build() {
+    return LMChatWidgetViewData._(
       id: _id!,
       lmMeta: _lmMeta,
       createdAt: _createdAt!,

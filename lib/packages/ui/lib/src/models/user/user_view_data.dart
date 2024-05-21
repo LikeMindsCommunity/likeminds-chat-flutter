@@ -17,7 +17,7 @@ class LMChatUserViewData {
   bool? isDeleted;
   String uuid;
   String? organisationName;
-  LMSDKClientInfoViewData sdkClientInfo;
+  LMChatSDKClientInfoViewData sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
 
@@ -35,7 +35,7 @@ class LMChatUserViewData {
   int? createdAt;
 
   /// widget for storing custom data
-  LMWidgetViewData? widget;
+  LMChatWidgetViewData? widget;
 
   /// {@macro user_view_data}
   LMChatUserViewData._({
@@ -70,7 +70,7 @@ class LMChatUserViewDataBuilder {
   bool? _isDeleted;
   String? _uuid;
   String? _organisationName;
-  LMSDKClientInfoViewData? _sdkClientInfo;
+  LMChatSDKClientInfoViewData? _sdkClientInfo;
   int? _updatedAt;
   bool? _isOwner;
   String? _customTitle;
@@ -79,7 +79,7 @@ class LMChatUserViewDataBuilder {
   int? _state;
   int? _communityId;
   int? _createdAt;
-  LMWidgetViewData? _widget;
+  LMChatWidgetViewData? _widget;
 
   void id(int id) {
     _id = id;
@@ -109,7 +109,7 @@ class LMChatUserViewDataBuilder {
     _organisationName = organisationName;
   }
 
-  void sdkClientInfo(LMSDKClientInfoViewData sdkClientInfo) {
+  void sdkClientInfo(LMChatSDKClientInfoViewData sdkClientInfo) {
     _sdkClientInfo = sdkClientInfo;
   }
 
@@ -145,7 +145,7 @@ class LMChatUserViewDataBuilder {
     _createdAt = createdAt;
   }
 
-  void widget(LMWidgetViewData widget) {
+  void widget(LMChatWidgetViewData widget) {
     _widget = widget;
   }
 
