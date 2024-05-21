@@ -1,5 +1,6 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/firebase/firebase.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/notifications/notification_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -45,6 +46,7 @@ class LMChatCore {
     if (widgets != null) _widgetUtility = widgets;
     await LMChatPreferences.instance.initialize();
     LMChatTheme.instance.initialise();
+    await initFirebase();
   }
 
   Future<void> closeBlocs() async {

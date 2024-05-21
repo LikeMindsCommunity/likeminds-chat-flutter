@@ -15,7 +15,7 @@ import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/helpers/tagging_helper.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
@@ -48,8 +48,8 @@ class LMChatroomBar extends StatefulWidget {
 }
 
 class _LMChatroomBarState extends State<LMChatroomBar> {
-  ConversationActionBloc? chatActionBloc;
-  ConversationBloc? conversationBloc;
+  LMChatConversationActionBloc? chatActionBloc;
+  LMChatConversationBloc? conversationBloc;
   ImagePicker? imagePicker;
   FilePicker? filePicker;
   Conversation? replyToConversation;
@@ -77,8 +77,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   @override
   void initState() {
     Bloc.observer = LMChatBlocObserver();
-    chatActionBloc = ConversationActionBloc.instance;
-    conversationBloc = ConversationBloc.instance;
+    chatActionBloc = LMChatConversationActionBloc.instance;
+    conversationBloc = LMChatConversationBloc.instance;
     _popupMenuController = CustomPopupMenuController();
     _textEditingController = TextEditingController();
     _focusNode = FocusNode();
@@ -312,6 +312,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                       Expanded(
                         child: LMChatTextField(
                           isDown: false,
+                          enabled: false,
                           isSecret: widget.chatroom.isSecret ?? false,
                           chatroomId: widget.chatroom.id,
                           style: Theme.of(context)
@@ -328,7 +329,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                               'tagged_user_name': tag.name,
                             });
                           },
-                          onChange: _onTextChanged,
+                          onChange: (t) {},
                           controller: _textEditingController,
                           decoration: InputDecoration(
                             border: InputBorder.none,
@@ -343,358 +344,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                           focusNode: _focusNode,
                         ),
                       ),
-                      // checkIfAnnouncementChannel()
-                      //     ? CustomPopupMenu(
-                      //         controller: _popupMenuController,
-                      //         enablePassEvent: false,
-                      //         arrowColor: Colors.white,
-                      //         showArrow: false,
-                      //         menuBuilder: () => Container(
-                      //           margin: EdgeInsets.only(bottom: 1.h),
-                      //           child: ClipRRect(
-                      //             borderRadius: BorderRadius.circular(8),
-                      //             child: Container(
-                      //               width: 100.w,
-                      //               // height: ,
-                      //               color: Colors.white,
-                      //               child: Padding(
-                      //                 padding: EdgeInsets.symmetric(
-                      //                   vertical: 6.w,
-                      //                   horizontal: 5.w,
-                      //                 ),
-                      //                 child: Column(
-                      //                   mainAxisAlignment:
-                      //                       MainAxisAlignment.spaceEvenly,
-                      //                   children: [
-                      //                     Row(
-                      //                       mainAxisAlignment:
-                      //                           MainAxisAlignment.start,
-                      //                       children: [
-                      //                         SizedBox(width: 12.w),
-                      //                         LMIconButton(
-                      //                           onTap: (bool active) async {
-                      //                             _popupMenuController
-                      //                                 .hideMenu();
-                      //                             try {
-                      //                               if (await handlePermissions(
-                      //                                   1)) {
-                      //                                 XFile? pickedImage =
-                      //                                     await imagePicker!
-                      //                                         .pickImage(
-                      //                                             source: ImageSource
-                      //                                                 .camera);
-                      //                                 List<Media> mediaList =
-                      //                                     [];
-                      //                                 if (pickedImage !=
-                      //                                     null) {
-                      //                                   File file = File(
-                      //                                       pickedImage.path);
-                      //                                   ui.Image image =
-                      //                                       await decodeImageFromList(
-                      //                                           file.readAsBytesSync());
-                      //                                   Media media = Media(
-                      //                                     mediaType:
-                      //                                         MediaType.photo,
-                      //                                     height:
-                      //                                         image.height,
-                      //                                     width: image.width,
-                      //                                     mediaFile: file,
-                      //                                   );
-                      //                                   mediaList.add(media);
-                      //                                   if (mediaList
-                      //                                       .isNotEmpty) {
-                      //                                     debugPrint(
-                      //                                         "mediaList: ${_textEditingController.text}");
-                      //                                     Navigator.push(
-                      //                                       context,
-                      //                                       MaterialPageRoute(
-                      //                                         builder:
-                      //                                             (context) =>
-                      //                                                 MediaForward(
-                      //                                           media:
-                      //                                               mediaList,
-                      //                                           chatroomId:
-                      //                                               widget
-                      //                                                   .chatroom
-                      //                                                   .id,
-                      //                                           textEditingController:
-                      //                                               _textEditingController,
-                      //                                           tags: tags,
-                      //                                         ),
-                      //                                       ),
-                      //                                     );
-                      //                                   }
-                      //                                 }
-                      //                               }
-                      //                             } catch (e) {
-                      //                               toast(
-                      //                                   'Something went wrong, try again');
-                      //                               return;
-                      //                             }
-                      //                           },
-                      //                           icon: const LMIcon(
-                      //                             type: LMIconType.svg,
-                      //                             assetPath: ssCameraIcon,
-                      //                             color: kWhiteColor,
-                      //                             size: 32,
-                      //                           ),
-                      //                           containerSize: 48,
-                      //                           borderRadius: 24,
-                      //                           backgroundColor:
-                      //                               const Color.fromRGBO(
-                      //                                   229, 162, 86, 1),
-                      //                           title: LMTextView(
-                      //                             text: 'Camera',
-                      //                             textStyle: Theme.of(context)
-                      //                                 .textTheme
-                      //                                 .bodyMedium,
-                      //                           ),
-                      //                         ),
-                      //                         const Spacer(),
-                      //                         LMIconButton(
-                      //                           onTap: (bool isActive) async {
-                      //                             _popupMenuController
-                      //                                 .hideMenu();
-                      //                             if (await handlePermissions(
-                      //                                 2)) {
-                      //                               try {
-                      //                                 List<Media>
-                      //                                     pickedMediaFiles =
-                      //                                     await pickImageFiles();
-                      //                                 if (pickedMediaFiles
-                      //                                         .length >
-                      //                                     10) {
-                      //                                   toast(
-                      //                                       'Only 10 attachments can be sent');
-                      //                                   return;
-                      //                                 }
-
-                      //                                 if (pickedMediaFiles
-                      //                                     .isNotEmpty) {
-                      //                                   for (Media mediaFile
-                      //                                       in pickedMediaFiles) {
-                      //                                     if (getFileSizeInDouble(
-                      //                                             mediaFile
-                      //                                                 .size!) >
-                      //                                         100) {
-                      //                                       toast(
-                      //                                           'File size should be smaller than 100 MB');
-                      //                                       pickedMediaFiles
-                      //                                           .remove(
-                      //                                               mediaFile);
-                      //                                     }
-                      //                                   }
-                      //                                 }
-                      //                                 if (pickedMediaFiles
-                      //                                     .isNotEmpty) {
-                      //                                   Navigator.push(
-                      //                                     context,
-                      //                                     MaterialPageRoute(
-                      //                                         builder:
-                      //                                             (context) =>
-                      //                                                 MediaForward(
-                      //                                                   media:
-                      //                                                       pickedMediaFiles,
-                      //                                                   chatroomId: widget
-                      //                                                       .chatroom
-                      //                                                       .id,
-                      //                                                   textEditingController:
-                      //                                                       _textEditingController,
-                      //                                                   tags:
-                      //                                                       tags,
-                      //                                                 )),
-                      //                                   );
-                      //                                 }
-                      //                               } catch (e) {
-                      //                                 toast(
-                      //                                     'Something went wrong, try again');
-                      //                                 return;
-                      //                               }
-                      //                             }
-                      //                           },
-                      //                           icon: const LMIcon(
-                      //                             type: LMIconType.svg,
-                      //                             assetPath: ssGalleryIcon,
-                      //                             color: kWhiteColor,
-                      //                             size: 32,
-                      //                           ),
-                      //                           containerSize: 48,
-                      //                           borderRadius: 24,
-                      //                           backgroundColor:
-                      //                               const Color.fromRGBO(
-                      //                                   154, 123, 186, 1),
-                      //                           title: LMTextView(
-                      //                             text: 'Image',
-                      //                             textStyle: Theme.of(context)
-                      //                                 .textTheme
-                      //                                 .bodyMedium,
-                      //                           ),
-                      //                         ),
-                      //                         const Spacer(),
-                      //                         LMIconButton(
-                      //                           onTap: (bool isActive) async {
-                      //                             _popupMenuController
-                      //                                 .hideMenu();
-                      //                             if (await handlePermissions(
-                      //                                 2)) {
-                      //                               try {
-                      //                                 List<Media>
-                      //                                     pickedMediaFiles =
-                      //                                     await pickVideoFiles();
-                      //                                 if (pickedMediaFiles
-                      //                                         .length >
-                      //                                     10) {
-                      //                                   toast(
-                      //                                       'Only 10 attachments can be sent');
-                      //                                   return;
-                      //                                 }
-
-                      //                                 if (pickedMediaFiles
-                      //                                     .isNotEmpty) {
-                      //                                   for (Media mediaFile
-                      //                                       in pickedMediaFiles) {
-                      //                                     if (getFileSizeInDouble(
-                      //                                             mediaFile
-                      //                                                 .size!) >
-                      //                                         100) {
-                      //                                       toast(
-                      //                                           'File size should be smaller than 100 MB');
-                      //                                       pickedMediaFiles
-                      //                                           .remove(
-                      //                                               mediaFile);
-                      //                                     }
-                      //                                   }
-                      //                                 }
-                      //                                 if (pickedMediaFiles
-                      //                                     .isNotEmpty) {
-                      //                                   Navigator.push(
-                      //                                     context,
-                      //                                     MaterialPageRoute(
-                      //                                         builder: (context) => MediaForward(
-                      //                                             media:
-                      //                                                 pickedMediaFiles,
-                      //                                             chatroomId:
-                      //                                                 widget
-                      //                                                     .chatroom
-                      //                                                     .id,
-                      //                                             textEditingController:
-                      //                                                 _textEditingController,
-                      //                                             tags:
-                      //                                                 tags)),
-                      //                                   );
-                      //                                 }
-                      //                               } catch (e) {
-                      //                                 toast(
-                      //                                     'Something went wrong, try again');
-                      //                                 return;
-                      //                               }
-                      //                             }
-                      //                           },
-                      //                           icon: const LMIcon(
-                      //                             type: LMIconType.svg,
-                      //                             assetPath: ssVideoIcon,
-                      //                             color: kWhiteColor,
-                      //                             size: 24,
-                      //                           ),
-                      //                           containerSize: 48,
-                      //                           borderRadius: 24,
-                      //                           backgroundColor:
-                      //                               const ui.Color.fromARGB(
-                      //                                   255, 151, 188, 98),
-                      //                           title: LMTextView(
-                      //                             text: 'Video',
-                      //                             textStyle: Theme.of(context)
-                      //                                 .textTheme
-                      //                                 .bodyMedium,
-                      //                           ),
-                      //                         ),
-                      //                         SizedBox(width: 12.w),
-                      //                       ],
-                      //                     ),
-                      //                     SizedBox(height: 2.h),
-                      //                     Row(
-                      //                       mainAxisAlignment:
-                      //                           MainAxisAlignment.start,
-                      //                       children: [
-                      //                         SizedBox(width: 11.w),
-                      //                         LMIconButton(
-                      //                           onTap: (bool active) async {
-                      //                             _popupMenuController
-                      //                                 .hideMenu();
-                      //                             try {
-                      //                               if (await handlePermissions(
-                      //                                   3)) {
-                      //                                 List<Media>
-                      //                                     pickedMediaFiles =
-                      //                                     await pickDocumentFiles();
-                      //                                 if (pickedMediaFiles
-                      //                                     .isNotEmpty) {
-                      //                                   Navigator.push(
-                      //                                     context,
-                      //                                     MaterialPageRoute(
-                      //                                         builder:
-                      //                                             (context) =>
-                      //                                                 MediaForward(
-                      //                                                   media:
-                      //                                                       pickedMediaFiles,
-                      //                                                   chatroomId: widget
-                      //                                                       .chatroom
-                      //                                                       .id,
-                      //                                                   textEditingController:
-                      //                                                       _textEditingController,
-                      //                                                   tags:
-                      //                                                       tags,
-                      //                                                 )),
-                      //                                   );
-                      //                                 }
-                      //                               }
-                      //                             } catch (e) {
-                      //                               toast(
-                      //                                   'Something went wrong, try again');
-                      //                               return;
-                      //                             }
-                      //                           },
-                      //                           icon: const LMIcon(
-                      //                             type: LMIconType.svg,
-                      //                             assetPath: ssDocumentIcon,
-                      //                             color: kWhiteColor,
-                      //                             size: 32,
-                      //                           ),
-                      //                           containerSize: 48,
-                      //                           borderRadius: 24,
-                      //                           backgroundColor:
-                      //                               const Color.fromRGBO(
-                      //                                   73, 183, 204, 1),
-                      //                           title: LMTextView(
-                      //                             text: 'Document',
-                      //                             textStyle: Theme.of(context)
-                      //                                 .textTheme
-                      //                                 .bodyMedium,
-                      //                           ),
-                      //                         ),
-                      //                         const Spacer(),
-                      //                       ],
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         pressType: PressType.singleClick,
-                      //         child: Container(
-                      //           padding: EdgeInsets.symmetric(
-                      //             horizontal: 2.w,
-                      //             vertical: 3.w,
-                      //           ),
-                      //           child: const LMIcon(
-                      //             type: LMIconType.svg,
-                      //             assetPath: ssAttachmentIcon,
-                      //             size: 24,
-                      //           ),
-                      //         ),
-                      //       )
-                      //     : const SizedBox(),
                     ],
                   ),
                 ),
@@ -785,9 +434,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                       }
                                       conversationBloc!.add(
                                         PostConversation(
-                                            postConversationRequest:
-                                                requestBuilder.build(),
-                                            repliedTo: replyToConversation),
+                                          postConversationRequest:
+                                              requestBuilder.build(),
+                                          repliedTo: replyToConversation,
+                                        ),
                                       );
                                     }
                                     linkModel = null;
@@ -841,22 +491,18 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                 ? LMChatTheme.theme.container
                                 : LMChatDefaultTheme.greyColor,
                             borderRadius: BorderRadius.circular(6.w),
-                            // boxShadow: [
-                            //   BoxShadow(
-                            //     offset: const Offset(0, 4),
-                            //     blurRadius: 25,
-                            //     color: kBlackColor.withOpacity(0.3),
-                            //   )
-                            // ]),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: LMChatIcon(
                               type: LMChatIconType.icon,
                               icon: Icons.send,
-
-                              // assetPath: ssSendIcon,
-                              // color: kBlackColor,
-                              // size: 18,
+                              style: LMChatIconStyle(
+                                backgroundColor: LMChatTheme.theme.primaryColor,
+                                color: LMChatTheme.theme.onPrimary,
+                                boxSize: 10.w,
+                                size: 6.w,
+                                boxBorderRadius: 45.w,
+                              ),
                             ),
                           ),
                         ),
@@ -869,114 +515,4 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       ],
     );
   }
-
-  // Container _getReplyConversation() {
-  //   if (replyToConversation == null) {
-  //     return Container();
-  //   }
-  //   return Container(
-  //     height: 10.h,
-  //     width: 100.w,
-  //     color: kGreyColor.withOpacity(0.1),
-  //     child: Padding(
-  //       padding: EdgeInsets.symmetric(horizontal: 3.w),
-  //       child: Row(
-  //         children: [
-  //           Expanded(
-  //             child: Padding(
-  //               padding: const EdgeInsets.all(10),
-  //               child: LMReplyItem(
-  //                 replyToConversation: replyToConversation,
-  //                 borderRadius: 10,
-  //                 backgroundColor:
-  //                     Theme.of(context).colorScheme.onPrimary.withOpacity(0.9),
-  //                 subtitle: replyToConversation != null
-  //                     ? getChatItemAttachmentTile(
-  //                         replyConversationAttachments ?? [],
-  //                         replyToConversation!,
-  //                       )
-  //                     : null,
-  //               ),
-  //             ),
-  //           ),
-  //           IconButton(
-  //             onPressed: () {
-  //               chatActionBloc!.add(ReplyRemove());
-  //             },
-  //             icon: const Icon(
-  //               Icons.close,
-  //               color: kGreyColor,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Container _getEditConversation() {
-  //   return Container(
-  //     height: 8.h,
-  //     width: 100.w,
-  //     color: kGreyColor.withOpacity(0.1),
-  //     child: Padding(
-  //       padding: EdgeInsets.symmetric(horizontal: 3.w),
-  //       child: Row(
-  //         children: [
-  //           Expanded(
-  //             child: Padding(
-  //               padding: const EdgeInsets.all(10),
-  //               child: Container(
-  //                 color: kGreyColor.withOpacity(0.2),
-  //                 child: Row(
-  //                   children: [
-  //                     Container(
-  //                       width: 1.w,
-  //                       color: primary,
-  //                     ),
-  //                     kHorizontalPaddingMedium,
-  //                     Column(
-  //                       mainAxisAlignment: MainAxisAlignment.center,
-  //                       crossAxisAlignment: CrossAxisAlignment.start,
-  //                       children: [
-  //                         Text(
-  //                           "Edit message",
-  //                           overflow: TextOverflow.ellipsis,
-  //                           maxLines: 1,
-  //                           style: Theme.of(context).textTheme.bodyLarge,
-  //                         ),
-  //                         kVerticalPaddingSmall,
-  //                         SizedBox(
-  //                           width: 70.w,
-  //                           child: Text(
-  //                             LMChatTaggingHelper.convertRouteToTag(
-  //                                 editConversation?.answer,
-  //                                 withTilde: false)!,
-  //                             overflow: TextOverflow.ellipsis,
-  //                             maxLines: 1,
-  //                             style: Theme.of(context).textTheme.bodySmall,
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //           IconButton(
-  //             onPressed: () {
-  //               chatActionBloc!.add(EditRemove());
-  //               _textEditingController.clear();
-  //             },
-  //             icon: const Icon(
-  //               Icons.close,
-  //               color: kGreyColor,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

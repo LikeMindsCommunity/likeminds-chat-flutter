@@ -15,6 +15,7 @@ class LMChatTextField extends StatefulWidget {
   final Function(String)? onChange;
   final int chatroomId;
   final bool isSecret;
+  final bool enabled;
 
   const LMChatTextField({
     super.key,
@@ -23,6 +24,7 @@ class LMChatTextField extends StatefulWidget {
     required this.onTagSelected,
     required this.controller,
     required this.focusNode,
+    this.enabled = true,
     this.isSecret = false,
     this.style,
     this.decoration,
@@ -206,6 +208,9 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
         ),
         direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
         suggestionsCallback: (suggestion) async {
+          if (!widget.enabled) {
+            return Future.value(const Iterable.empty());
+          }
           return await _getSuggestions(suggestion);
         },
         keepSuggestionsOnSuggestionSelected: true,

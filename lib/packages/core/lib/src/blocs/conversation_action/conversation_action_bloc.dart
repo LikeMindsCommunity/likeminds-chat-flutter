@@ -7,12 +7,12 @@ import 'package:meta/meta.dart';
 part 'conversation_action_event.dart';
 part 'conversation_action_state.dart';
 
-class ConversationActionBloc
+class LMChatConversationActionBloc
     extends Bloc<ConversationActionEvent, ConversationActionState> {
-  static ConversationActionBloc? _instance;
-  static ConversationActionBloc get instance =>
-      _instance ??= ConversationActionBloc._();
-  ConversationActionBloc._() : super(ConversationActionInitial()) {
+  static LMChatConversationActionBloc? _instance;
+  static LMChatConversationActionBloc get instance =>
+      _instance ??= LMChatConversationActionBloc._();
+  LMChatConversationActionBloc._() : super(ConversationActionInitial()) {
     on<EditConversation>(
       (event, emit) async {
         await mapEditConversation(

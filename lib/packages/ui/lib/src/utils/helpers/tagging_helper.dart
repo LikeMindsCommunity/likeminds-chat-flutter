@@ -156,6 +156,23 @@ class LMChatTaggingHelper {
     return input;
   }
 
+  static String extractFirstDMStateMessage(Conversation input, User user) {
+    String result = input.answer;
+    final RegExp tagRegex = RegExp(r"<<(?<=\<\<).+?(?=\>\>)>>");
+    final Iterable<RegExpMatch> matches = tagRegex.allMatches(input.answer);
+    for (RegExpMatch match in matches) {
+      final String? routeTag = match.group(0);
+      final String? userName = routeRegExp.firstMatch(routeTag!)?.group(1);
+      final String? userId = routeRegExp.firstMatch(routeTag)?.group(3);
+      if (user.id == int.parse(userId!)) {
+        result = result.replaceAll(routeTag, '$userName');
+      } else {
+        result = result.replaceAll(routeTag, '');
+      }
+    }
+    return result;
+  }
+
   static List<String> extractLinkFromString(String text) {
     RegExp exp = RegExp(linkRoute);
     Iterable<RegExpMatch> matches = exp.allMatches(text);

@@ -1,8 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -15,11 +17,11 @@ class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
   static LMChatHomeBloc get instance => _instance ??= LMChatHomeBloc._();
 
   LMChatHomeBloc._() : super(LMChatHomeInitial()) {
-    // final DatabaseReference realTime = LMRealtime.instance.homeFeed();
-    // realTime.onValue.listen((event) {
-    //   debugPrint(event.toString());
-    //   add(UpdateHomeEvent());
-    // });
+    final DatabaseReference realTime = LMChatRealtime.instance.homeFeed();
+    realTime.onValue.listen((event) {
+      debugPrint(event.toString());
+      add(LMChatUpdateHomeEvent());
+    });
     on<LMChatHomeEvent>(
       (event, emit) async {
         if (event is LMChatInitHomeEvent) {

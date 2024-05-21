@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:likeminds_chat_flutter_core/packages/linkify/linkify.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/helpers/tagging_helper.dart';
+import 'package:likeminds_chat_flutter_ui/packages/linkify/linkify.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 
 List<String> extractLinkFromString(String text) {
   RegExp exp = RegExp(LMChatTaggingHelper.linkRoute);

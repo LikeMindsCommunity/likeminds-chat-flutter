@@ -31,15 +31,15 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     final inStyle = style ?? LMChatAppBarStyle.basic();
 
     return Container(
-      decoration: BoxDecoration(
-        color: inStyle.backgroundColor ?? Colors.white,
-        border: inStyle.border,
-        boxShadow: inStyle.shadow,
-      ),
       child: Container(
         height: inStyle.height,
         width: inStyle.width ?? double.infinity,
         margin: inStyle.margin ?? EdgeInsets.zero,
+        decoration: BoxDecoration(
+          color: inStyle.backgroundColor ?? Colors.white,
+          border: inStyle.border,
+          boxShadow: inStyle.shadow,
+        ),
         padding: inStyle.padding ??
             const EdgeInsets.symmetric(
               horizontal: 16.0,
@@ -48,34 +48,37 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           children: [
             leading ??
-                LMChatButton(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    backButtonCallback?.call();
-                  },
-                  style: LMChatButtonStyle(
-                    height: 28,
-                    width: 28,
-                    borderRadius: 6,
-                    padding: EdgeInsets.zero,
-                    icon: LMChatIcon(
-                      type: LMChatIconType.icon,
-                      icon: Icons.arrow_back,
-                      style: LMChatIconStyle(
-                        color: LMChatTheme.theme.onPrimary,
-                        size: 20,
-                        boxSize: 28,
-                      ),
-                    ),
-                    backgroundColor: LMChatTheme.theme.primaryColor,
-                  ),
-                ),
-            SizedBox(width: inStyle.gap ?? 12),
-            banner ??
-                const LMChatProfilePicture(
-                  fallbackText: "L M",
-                ),
-            SizedBox(width: inStyle.gap ?? 12),
+                (inStyle.showBackButton
+                    ? LMChatButton(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          backButtonCallback?.call();
+                        },
+                        style: LMChatButtonStyle(
+                          height: 28,
+                          width: 28,
+                          borderRadius: 6,
+                          padding: EdgeInsets.zero,
+                          icon: LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.arrow_back,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.onPrimary,
+                              size: 20,
+                              boxSize: 28,
+                            ),
+                          ),
+                          backgroundColor: LMChatTheme.theme.primaryColor,
+                        ),
+                      )
+                    : const SizedBox.shrink()),
+            banner != null
+                ? SizedBox(width: inStyle.gap ?? 12)
+                : const SizedBox.shrink(),
+            banner ?? const SizedBox.shrink(),
+            leading != null || inStyle.showBackButton
+                ? SizedBox(width: inStyle.gap ?? 12)
+                : const SizedBox.shrink(),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -124,6 +127,7 @@ class LMChatAppBarStyle {
   final EdgeInsets? margin;
   final List<BoxShadow>? shadow;
   final bool centerTitle;
+  final bool showBackButton;
 
   const LMChatAppBarStyle({
     this.backgroundColor,
@@ -135,6 +139,7 @@ class LMChatAppBarStyle {
     this.shadow,
     this.gap,
     this.centerTitle = false,
+    this.showBackButton = true,
   });
 
   LMChatAppBarStyle copyWith({
@@ -147,6 +152,7 @@ class LMChatAppBarStyle {
     List<BoxShadow>? shadow,
     bool? centerTitle,
     double? gap,
+    bool? showBackButton,
   }) {
     return LMChatAppBarStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -158,12 +164,13 @@ class LMChatAppBarStyle {
       shadow: shadow ?? this.shadow,
       centerTitle: centerTitle ?? this.centerTitle,
       gap: gap ?? this.gap,
+      showBackButton: showBackButton ?? this.showBackButton,
     );
   }
 
   factory LMChatAppBarStyle.basic() {
-    return LMChatAppBarStyle(
-      backgroundColor: LMChatTheme.theme.container,
+    return const LMChatAppBarStyle(
+      backgroundColor: LMChatDefaultTheme.container,
       width: double.infinity,
     );
   }

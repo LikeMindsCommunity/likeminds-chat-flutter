@@ -14,35 +14,37 @@ import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 part 'conversation_event.dart';
 part 'conversation_state.dart';
 
-class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
+class LMChatConversationBloc
+    extends Bloc<ConversationEvent, ConversationState> {
   final mediaService = LMChatAWSUtility(!isDebug);
-  // final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
+  final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
   int? lastConversationId;
-  static ConversationBloc? _instance;
-  static ConversationBloc get instance => _instance ??= ConversationBloc._();
-  ConversationBloc._() : super(ConversationInitial()) {
+  static LMChatConversationBloc? _instance;
+  static LMChatConversationBloc get instance =>
+      _instance ??= LMChatConversationBloc._();
+  LMChatConversationBloc._() : super(ConversationInitial()) {
     on<InitConversations>(
       (event, emit) {
         debugPrint("Conversations initiated");
         int chatroomId = event.chatroomId;
         lastConversationId = event.conversationId;
 
-        // realTime.onValue.listen(
-        //   (event) {
-        //     if (event.snapshot.value != null) {
-        //       final response = event.snapshot.value as Map;
-        //       final conversationId =
-        //           int.parse(response["collabcard"]["answer_id"]);
-        //       if (lastConversationId != null &&
-        //           conversationId != lastConversationId) {
-        //         add(UpdateConversations(
-        //           chatroomId: chatroomId,
-        //           conversationId: conversationId,
-        //         ));
-        //       }
-        //     }
-        //   },
-        // );
+        realTime.onValue.listen(
+          (event) {
+            if (event.snapshot.value != null) {
+              final response = event.snapshot.value as Map;
+              final conversationId =
+                  int.parse(response["collabcard"]["answer_id"]);
+              if (lastConversationId != null &&
+                  conversationId != lastConversationId) {
+                add(UpdateConversations(
+                  chatroomId: chatroomId,
+                  conversationId: conversationId,
+                ));
+              }
+            }
+          },
+        );
       },
     );
     on<ConversationEvent>((event, emit) async {
