@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -20,6 +22,7 @@ class LMChatBubble extends StatefulWidget {
   final LMChatIcon? replyIcon;
   final LMChatProfilePicture? avatar;
   final Function(Conversation)? onReply;
+  final Function(String tag) onTagTap;
   final bool? isSent;
 
   final LMChatBubbleContentBuilder? contentBuilder;
@@ -30,6 +33,7 @@ class LMChatBubble extends StatefulWidget {
     required this.conversation,
     required this.currentUser,
     required this.conversationUser,
+    required this.onTagTap,
     this.style,
     this.contentBuilder,
     this.onReply,
@@ -55,6 +59,15 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(LMChatBubble old) {
+    conversation = widget.conversation;
+    currentUser = widget.currentUser;
+    conversationUser = widget.conversationUser;
+    isSent = currentUser.id == conversationUser.id;
+    super.didUpdateWidget(old);
   }
 
   @override
@@ -104,13 +117,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             children: [
               Padding(
                 padding: EdgeInsets.only(
-                  left: widget.avatar != null ? 48.0 : 28.0,
+                  left: widget.avatar != null ? 48.0 : 18.0,
                 ),
               ),
               const SizedBox(height: 2),
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: 1.w,
                   vertical: 0.6.h,
                 ),
                 child: Row(
@@ -127,7 +139,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       child: Container(
                         constraints: BoxConstraints(
                           minHeight: 2.h,
-                          minWidth: 10.w,
+                          minWidth: 5.w,
                           maxWidth: 50.w,
                         ),
                         padding: EdgeInsets.all(
@@ -141,25 +153,30 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const LMChatBubbleHeader(),
-                            LMChatText(
-                              conversation.deletedByUserId != null
-                                  ? "Deleted message"
-                                  : conversation.answer,
-                              style: LMChatTextStyle(
-                                textStyle: conversation.deletedByUserId != null
-                                    ? const TextStyle(
-                                        fontStyle: FontStyle.italic,
-                                      )
-                                    : const TextStyle(
-                                        fontSize: 14,
-                                      ),
-                              ),
-                            ),
+                            conversation.deletedByUserId != null
+                                ? LMChatText(
+                                    "Deleted message",
+                                    style: LMChatTextStyle(
+                                      textStyle:
+                                          conversation.deletedByUserId != null
+                                              ? const TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                )
+                                              : const TextStyle(
+                                                  fontSize: 14,
+                                                ),
+                                    ),
+                                  )
+                                : LMChatBubbleContent(
+                                    conversation: conversation,
+                                    onTagTap: widget.onTagTap,
+                                  ),
                             const LMChatBubbleMedia(),
                             Padding(
                               padding: const EdgeInsets.only(top: 4.0),
                               child: LMChatBubbleFooter(
-                                  conversation: conversation),
+                                conversation: conversation,
+                              ),
                             ),
                           ],
                         ),
@@ -172,13 +189,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   ],
                 ),
               ),
-              // Padding(
-              //   padding: EdgeInsets.only(
-              //     right: widget.avatar != null ? 48.0 : 24.0,
-              //     left: widget.avatar != null ? 48.0 : 28.0,
-              //   ),
-              // child: widget.outsideFooter ?? const SizedBox.shrink(),
-              // ),
             ],
           ),
         ],

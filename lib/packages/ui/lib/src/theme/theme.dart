@@ -30,6 +30,7 @@ class LMChatThemeData {
 
   final LMChatBubbleStyle bubbleStyle;
   final LMChatBubbleReplyStyle replyStyle;
+  final LMChatBubbleContentStyle contentStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -70,6 +71,7 @@ class LMChatThemeData {
     required this.imageStyle,
     required this.bubbleStyle,
     required this.replyStyle,
+    required this.contentStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -112,6 +114,7 @@ class LMChatThemeData {
     LMChatImageStyle? imageStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
+    LMChatBubbleContentStyle? contentStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
@@ -147,6 +150,7 @@ class LMChatThemeData {
       imageStyle: imageStyle ?? LMChatImageStyle.basic(),
       replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
+      contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
     );
   }
 
@@ -175,6 +179,7 @@ class LMChatThemeData {
     LMChatImageStyle? imageStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
+    LMChatBubbleContentStyle? contentStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -201,6 +206,7 @@ class LMChatThemeData {
       imageStyle: imageStyle ?? this.imageStyle,
       replyStyle: replyStyle ?? this.replyStyle,
       bubbleStyle: bubbleStyle ?? this.bubbleStyle,
+      contentStyle: contentStyle ?? this.contentStyle,
     );
   }
 }

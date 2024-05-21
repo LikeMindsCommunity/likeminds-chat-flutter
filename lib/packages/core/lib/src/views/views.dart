@@ -1,2 +1,2 @@
-export 'chatroom.dart';
+export 'chatroom/chatroom.dart';
 export 'home_feed.dart';

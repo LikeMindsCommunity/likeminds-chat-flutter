@@ -1,4 +1,4 @@
-import 'package:likeminds_chat_flutter_core/packages/linkify/linkify.dart';
+import 'package:likeminds_chat_flutter_ui/packages/linkify/linkify.dart';
 
 final _urlRegex = RegExp(
   r'^(.*?)((?:https?:\/\/|www\.)[^\s/$.?#].[^\s]*)',

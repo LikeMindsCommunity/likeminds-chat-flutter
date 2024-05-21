@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +9,7 @@ import 'package:likeminds_chat_flutter_core/src/blocs/home/home_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/helpers/tagging_helper.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -19,9 +20,14 @@ import 'package:shimmer/shimmer.dart';
 
 class LMChatHomeScreen extends StatefulWidget {
   final LMChatroomType chatroomType;
+  final LMChatHomeAppBarBuilder? appbarBuilder;
+  final LMChatroomTileBuilder? chatroomTileBuilder;
+
   const LMChatHomeScreen({
     super.key,
     required this.chatroomType,
+    this.appbarBuilder,
+    this.chatroomTileBuilder,
   });
 
   @override
@@ -100,111 +106,239 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return Scaffold(
-      backgroundColor: LMChatDefaultTheme.whiteColor,
-      body: Column(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: LMChatTheme.theme.backgroundColor,
+        body: SafeArea(
+          child: Column(
+            children: [
+              widget.appbarBuilder?.call(
+                    user!,
+                    _defaultAppBar(),
+                  ) ??
+                  _defaultAppBar(),
+              Expanded(
+                child: Container(
+                  color: LMChatTheme.theme.container,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: BlocConsumer<LMChatHomeBloc, LMChatHomeState>(
+                      bloc: homeBloc,
+                      listener: (context, state) {
+                        updatePagingControllers(state);
+                      },
+                      buildWhen: (previous, current) {
+                        if (previous is LMChatHomeLoaded &&
+                            current is LMChatHomeLoading) {
+                          return false;
+                        } else if (previous is LMChatUpdateHomeFeed &&
+                            current is LMChatHomeLoading) {
+                          return false;
+                        }
+                        return true;
+                      },
+                      builder: (context, state) {
+                        if (state is LMChatHomeLoading) {
+                          return const LMChatSkeletonChatList();
+                        } else if (state is LMChatHomeError) {
+                          return Center(
+                            child: Text(state.message),
+                          );
+                        } else if (state is LMChatHomeLoaded ||
+                            state is LMChatUpdateHomeFeed ||
+                            state is LMChatUpdatedHomeFeed) {
+                          return _defaultChatroomList();
+                        }
+                        return const SizedBox();
+                      },
+                    ),
+                  ),
+                ),
               ),
-              child: SafeArea(
-                bottom: false,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        LMChatText(
-                          "Direct Messages",
-                          style: LMChatTextStyle(
-                            textStyle: Theme.of(context)
-                                .textTheme
-                                .headlineSmall!
-                                .copyWith(
-                                  color: LMChatDefaultTheme.blackColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // const Spacer(),
-                    LMChatProfilePicture(
-                      fallbackText: user!.name,
-                      imageUrl: user?.imageUrl,
-                      style: const LMChatProfilePictureStyle(
-                        size: 36,
-                      ),
-                    ),
-                  ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  LMChatAppBar _defaultAppBar() {
+    return LMChatAppBar(
+      style: LMChatAppBarStyle(
+        height: 72,
+        showBackButton: false,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        backgroundColor: LMChatTheme.theme.container,
+      ),
+      title: LMChatText(
+        "Direct Messages",
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            color: LMChatTheme.theme.onContainer,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      trailing: [
+        LMChatProfilePicture(
+          fallbackText: user!.name,
+          imageUrl: user?.imageUrl,
+          style: const LMChatProfilePictureStyle(
+            size: 42,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _defaultChatroomList() {
+    return ValueListenableBuilder(
+        valueListenable: rebuildPagedList,
+        builder: (context, _, __) {
+          debugPrint("Chatroom List rebuilt");
+          return PagedListView<int, LMChatTile>(
+            pagingController: homeFeedPagingController,
+            padding: EdgeInsets.zero,
+            physics: const ClampingScrollPhysics(),
+            builderDelegate: PagedChildBuilderDelegate<LMChatTile>(
+              newPageProgressIndicatorBuilder: (_) => const SizedBox(),
+              noItemsFoundIndicatorBuilder: (context) => const SizedBox(),
+              itemBuilder: (context, item, index) {
+                return item;
+              },
+            ),
+          );
+        });
+  }
+
+  LMChatTile _defaultChatroomTile(
+    ChatRoom chatroom,
+    Conversation conversation,
+    User chatroomWithUser,
+    User chatroomUser,
+    User conversationUser,
+    List<LMChatMedia> attachmentMeta,
+  ) {
+    String message = conversation.deletedByUserId == null
+        ? '${conversationUser.id == chatroomWithUser.id ? 'You: ' : ''}${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+            conversation.answer,
+          ) : LMChatTaggingHelper.convertRouteToTag(
+            conversation.answer,
+            withTilde: false,
+          )}'
+        : getDeletedText(conversation, user!);
+    return LMChatTile(
+      onTap: () {
+        // LMChatRealtime.instance.chatroomId = chatrooms[i].id;
+        final route = MaterialPageRoute(
+          builder: (context) {
+            return LMChatroomScreen(
+              chatroomId: chatroom.id,
+            );
+          },
+        );
+        Navigator.of(context).push(route);
+      },
+      leading: LMChatProfilePicture(
+        fallbackText: user != null && user!.id != chatroomWithUser.id
+            ? chatroomWithUser.name
+            : chatroomUser.name,
+        imageUrl: user != null && user!.id != chatroomWithUser.id
+            ? chatroomWithUser.imageUrl
+            : chatroomUser.imageUrl,
+        style: const LMChatProfilePictureStyle(size: 48),
+      ),
+      title: LMChatText(
+        user != null && user!.id != chatroomWithUser.id
+            ? chatroomWithUser.name
+            : chatroomUser.name,
+        style: const LMChatTextStyle(
+          maxLines: 1,
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+      subtitle: ((conversation.hasFiles ?? false) &&
+              conversation.deletedByUserId == null)
+          ? getChatItemAttachmentTile(
+              attachmentMeta,
+              conversation,
+            )
+          : LMChatText(
+              conversation.state != 0
+                  ? LMChatTaggingHelper.extractStateMessage(message)
+                  : message,
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
-          ),
-          const Divider(),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
+      trailing: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          chatroom.muteStatus != null && chatroom.muteStatus!
+              ? const LMChatIcon(
+                  type: LMChatIconType.icon,
+                  icon: Icons.volume_off_outlined,
+                )
+              : const SizedBox.shrink(),
+          const SizedBox(width: 8),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              LMChatText(
+                getTime(conversation.createdEpoch!.toString()),
+                style: const LMChatTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
               ),
-              child: BlocConsumer<LMChatHomeBloc, LMChatHomeState>(
-                bloc: homeBloc,
-                listener: (context, state) {
-                  updatePagingControllers(state);
-                },
-                buildWhen: (previous, current) {
-                  if (previous is LMChatHomeLoaded &&
-                      current is LMChatHomeLoading) {
-                    return false;
-                  } else if (previous is LMChatUpdateHomeFeed &&
-                      current is LMChatHomeLoading) {
-                    return false;
-                  }
-                  return true;
-                },
-                builder: (context, state) {
-                  if (state is LMChatHomeLoading) {
-                    return const LMChatSkeletonChatList();
-                  } else if (state is LMChatHomeError) {
-                    return Center(
-                      child: Text(state.message),
-                    );
-                  } else if (state is LMChatHomeLoaded ||
-                      state is LMChatUpdateHomeFeed ||
-                      state is LMChatUpdatedHomeFeed) {
-                    return SafeArea(
-                      top: false,
-                      child: ValueListenableBuilder(
-                          valueListenable: rebuildPagedList,
-                          builder: (context, _, __) {
-                            return PagedListView<int, LMChatTile>(
-                              pagingController: homeFeedPagingController,
-                              padding: EdgeInsets.zero,
-                              physics: const ClampingScrollPhysics(),
-                              builderDelegate:
-                                  PagedChildBuilderDelegate<LMChatTile>(
-                                newPageProgressIndicatorBuilder: (_) =>
-                                    const SizedBox(),
-                                noItemsFoundIndicatorBuilder: (context) =>
-                                    const SizedBox(),
-                                itemBuilder: (context, item, index) {
-                                  return item;
-                                },
-                              ),
-                            );
-                          }),
-                    );
-                  }
-                  return const SizedBox();
-                },
+              const SizedBox(height: 6),
+              Visibility(
+                visible: chatroom.unseenCount! > 0,
+                child: Container(
+                  height: 24,
+                  width: 24,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    color: LMChatTheme.theme.primaryColor,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 4,
+                  ),
+                  child: Center(
+                    child: LMChatText(
+                      chatroom.unseenCount! > 99
+                          ? "99+"
+                          : chatroom.unseenCount.toString(),
+                      style: const LMChatTextStyle(
+                        textStyle: TextStyle(
+                          color: LMChatDefaultTheme.whiteColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -226,141 +360,34 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     for (int i = 0; i < chatrooms.length; i++) {
       final Conversation conversation =
           lastConversations[chatrooms[i].lastConversationId.toString()]!;
+      final User chatroomUser = userMeta[chatrooms[i].userId]!;
       final User chatroomWithUser = userMeta[chatrooms[i].chatroomWithUserId]!;
       final User conversationUser =
           userMeta[conversation.member?.id ?? conversation.userId]!;
       final List<dynamic>? attachment =
           attachmentDynamic?[conversation.id.toString()];
 
-      final List<LMChatMedia>? attachmentMeta =
-          attachment?.map((e) => LMChatMedia.fromJson(e)).toList();
-      String message = conversation.deletedByUserId == null
-          ? '${conversationUser.id == chatroomWithUser.id ? 'You: ' : ''}${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-              conversation.answer,
-            ) : LMChatTaggingHelper.convertRouteToTag(
-              conversation.answer,
-              withTilde: false,
-            )}'
-          : getDeletedText(conversation, user!);
-      chats.add(
-        LMChatTile(
-          onTap: () {
-            // LMChatRealtime.instance.chatroomId = chatrooms[i].id;
-            final route = MaterialPageRoute(
-              builder: (context) {
-                return LMChatroomScreen(
-                  chatroomId: chatrooms[i].id,
-                );
-              },
-            );
-            Navigator.of(context)
-                .push(route)
-                .whenComplete(() => homeBloc?.add(LMChatUpdateHomeEvent(
-                    request: (GetHomeFeedRequestBuilder()
-                          ..page(1)
-                          ..pageSize(pageSize)
-                          ..minTimestamp(0)
-                          ..maxTimestamp(currentTime)
-                          ..chatroomTypes(chatroomTypes ?? [0, 7]))
-                        .build())));
-          },
-          leading: LMChatProfilePicture(
-            // fallbackText: chatrooms[i].header,
-            // imageUrl: chatrooms[i].chatroomImageUrl,
-            fallbackText: chatroomWithUser.name,
-            imageUrl: chatroomWithUser.imageUrl,
-            style: const LMChatProfilePictureStyle(size: 48),
-          ),
-          title: LMChatText(
-            chatroomWithUser.name,
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          subtitle: ((conversation.hasFiles ?? false) &&
-                  conversation.deletedByUserId == null)
-              ? getChatItemAttachmentTile(
-                  attachmentMeta ?? <LMChatMedia>[], conversation)
-              : LMChatText(
-                  conversation.state != 0
-                      ? LMChatTaggingHelper.extractStateMessage(message)
-                      : message,
-                  style: const LMChatTextStyle(
-                    maxLines: 1,
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-          trailing: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              chatrooms[i].muteStatus != null && chatrooms[i].muteStatus!
-                  ? const LMChatIcon(
-                      type: LMChatIconType.icon,
-                      icon: Icons.volume_off_outlined,
-                    )
-                  : const SizedBox.shrink(),
-              const SizedBox(width: 8),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  LMChatText(
-                    getTime(conversation.createdEpoch!.toString()),
-                    style: const LMChatTextStyle(
-                      textStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Visibility(
-                    visible: chatrooms[i].unseenCount! > 0,
-                    child: Center(
-                      child: Container(
-                        height: 28,
-                        width: 28,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(14)),
-                          color: LMChatTheme.theme.primaryColor,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 8,
-                        ),
-                        child: LMChatText(
-                          chatrooms[i].unseenCount! > 99
-                              ? "99+"
-                              : chatrooms[i].unseenCount.toString(),
-                          style: const LMChatTextStyle(
-                            textStyle: TextStyle(
-                              color: LMChatDefaultTheme.whiteColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+      final List<LMChatMedia> attachmentMeta =
+          attachment?.map((e) => LMChatMedia.fromJson(e)).toList() ?? [];
 
-          // user: userMeta[conversation.member?.id ?? conversation.userId],
-        ),
-      );
+      chats.add(widget.chatroomTileBuilder?.call(
+              chatrooms[i],
+              _defaultChatroomTile(
+                chatrooms[i],
+                conversation,
+                chatroomWithUser,
+                chatroomUser,
+                conversationUser,
+                attachmentMeta,
+              )) ??
+          _defaultChatroomTile(
+            chatrooms[i],
+            conversation,
+            chatroomWithUser,
+            chatroomUser,
+            conversationUser,
+            attachmentMeta,
+          ));
     }
 
     return chats;
@@ -376,29 +403,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     }
     return DateFormat('kk:mm').format(messageTime);
   }
-
-  // String getAttachmentText(AttachmentMeta? attachmentMeta, ) {
-  //   if (attachmentMeta != null &&
-  //       attachmentMeta?.first.mediaType == MediaType.document) {
-  //     return "${conversation!.attachmentCount} ${conversation!.attachmentCount! > 1 ? "Documents" : "Document"}";
-  //   } else if (attachmentMeta != null &&
-  //       attachmentMeta?.first.mediaType == MediaType.video) {
-  //     return "${conversation!.attachmentCount} ${conversation!.attachmentCount! > 1 ? "Videos" : "Video"}";
-  //   } else {
-  //     return "${conversation!.attachmentCount} ${conversation!.attachmentCount! > 1 ? "Images" : "Image"}";
-  //   }
-  // }
-
-  // IconData getAttachmentIcon() {
-  //   if (attachmentMeta != null &&
-  //       attachmentMeta?.first.mediaType == MediaType.document) {
-  //     return Icons.insert_drive_file;
-  //   } else if (attachmentMeta != null &&
-  //       attachmentMeta?.first.mediaType == MediaType.video) {
-  //     return Icons.video_camera_back;
-  //   }
-  //   return Icons.camera_alt;
-  // }
 }
 
 Widget getShimmer() => Shimmer.fromColors(

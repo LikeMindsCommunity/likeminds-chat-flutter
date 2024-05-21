@@ -76,19 +76,23 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   Widget? getListTile(ChatroomAction action) {
     return ListTile(
+      style: ListTileStyle.list,
       onTap: () {
-        print("Performing action");
         performAction(action);
       },
-      title: LMChatText(
-        action.title,
-        style: const LMChatTextStyle(
-          maxLines: 1,
-          textStyle: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Colors.black,
-            overflow: TextOverflow.ellipsis,
+      tileColor: Colors.transparent,
+      title: AbsorbPointer(
+        absorbing: true,
+        child: LMChatText(
+          action.title,
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
       ),
@@ -121,6 +125,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       default:
         unimplemented();
     }
+    _controller!.hideMenu();
   }
 
   void unimplemented() {

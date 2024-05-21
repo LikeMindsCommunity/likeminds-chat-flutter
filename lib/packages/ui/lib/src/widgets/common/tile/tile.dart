@@ -27,7 +27,8 @@ class LMChatTile extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: SizedBox(
+      child: AbsorbPointer(
+        absorbing: true,
         child: Container(
           height: inStyle.height,
           width: inStyle.width,

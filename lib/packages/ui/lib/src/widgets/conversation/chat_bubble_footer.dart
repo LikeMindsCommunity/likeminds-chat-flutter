@@ -14,10 +14,20 @@ class LMChatBubbleFooter extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        LMChatText(
-          conversation.createdAt,
-          style: const LMChatTextStyle(textStyle: TextStyle(fontSize: 10)),
-        ),
+        conversation.createdAt.isNotEmpty
+            ? LMChatText(
+                conversation.createdAt,
+                style:
+                    const LMChatTextStyle(textStyle: TextStyle(fontSize: 10)),
+              )
+            : LMChatIcon(
+                type: LMChatIconType.icon,
+                icon: Icons.timer_outlined,
+                style: LMChatIconStyle(
+                  size: 10,
+                  color: LMChatTheme.theme.onContainer,
+                ),
+              ),
       ],
     );
   }

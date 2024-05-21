@@ -17,9 +17,14 @@ class LMChatSkeletonChatPage extends StatelessWidget {
             const LMChatSkeletonAppBar(),
             const SizedBox(height: 18),
             Expanded(
-              child: Container(
-                color: LMChatTheme.theme.backgroundColor,
-                child: const LMChatSkeletonChatList(),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 2.w,
+                ),
+                child: Container(
+                  color: LMChatTheme.theme.backgroundColor,
+                  child: const LMChatSkeletonChatList(),
+                ),
               ),
             ),
             // const Spacer(),
@@ -178,8 +183,7 @@ class LMChatSkeletonChatList extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: 1.h,
-        horizontal: 4.w,
+        vertical: 1.4.h,
       ),
       child: Column(
         children: list,

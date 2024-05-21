@@ -349,13 +349,11 @@ class _CredScreenState extends State<CredScreen> {
               GestureDetector(
                 onTap: () async {
                   String username = _usernameController.text.isEmpty
-                      ? "UserName"
+                      ? "divi"
                       : _usernameController.text;
                   String userId = _userIdController.text.isEmpty &&
                           _usernameController.text.isEmpty
-                      ? isDebug
-                          ? EnvProd.botId
-                          : EnvDev.botId
+                      ? 'divi'
                       : _userIdController.text;
                   int? defaultChatroom = int.tryParse(_chatroomController.text);
                   if (username.isEmpty || userId.isEmpty) {
@@ -367,7 +365,7 @@ class _CredScreenState extends State<CredScreen> {
                   } else {
                     final response = await LMChatCore.instance.initiateUser(
                         initiateUserRequest: (InitiateUserRequestBuilder()
-                              ..userId('google')
+                              ..userId(userId)
                               ..userName(username))
                             .build());
                     if (response.success) {
