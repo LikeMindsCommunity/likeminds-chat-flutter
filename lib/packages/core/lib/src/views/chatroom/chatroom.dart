@@ -19,12 +19,24 @@ import 'package:overlay_support/overlay_support.dart';
 class LMChatroomScreen extends StatefulWidget {
   final int chatroomId;
 
-  final LMChatroomAppBarbuilder? appbarbuilder;
+  final LMChatroomAppBarBuilder? appbarbuilder;
+  final LMChatBubbleBuilder? chatBubbleBuilder;
+  final LMChatStateBubbleBuilder? stateBubbleBuilder;
+  final LMChatContextWidgetBuilder? loadingPageWidget;
+  final LMChatContextWidgetBuilder? loadingListWidget;
+  final LMChatContextWidgetBuilder? paginatedLoadingWidget;
+  final LMChatroomChatBarBuilder? chatBarBuilder;
 
   const LMChatroomScreen({
     super.key,
     required this.chatroomId,
     this.appbarbuilder,
+    this.chatBarBuilder,
+    this.chatBubbleBuilder,
+    this.stateBubbleBuilder,
+    this.loadingListWidget,
+    this.loadingPageWidget,
+    this.paginatedLoadingWidget,
   });
 
   @override
@@ -35,7 +47,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   late LMChatConversationBloc _conversationBloc;
   late LMChatConversationActionBloc _convActionBloc;
   late LMChatroomBloc _chatroomBloc;
-  late ChatroomActionBloc _chatroomActionBloc;
+  late LMChatroomActionBloc _chatroomActionBloc;
 
   late ChatRoom chatroom;
   User? user;
@@ -72,7 +84,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _conversationBloc = LMChatConversationBloc.instance;
     _chatroomBloc = LMChatroomBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
-    _chatroomActionBloc = ChatroomActionBloc.instance;
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
     _chatroomBloc.add(LMChatInitChatroomEvent(
         (GetChatroomRequestBuilder()..chatroomId(widget.chatroomId)).build()));
     _addPaginationListener();
@@ -368,6 +380,68 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                           bloc: _conversationBloc,
                           listener: (context, state) {
                             updatePagingControllers(state);
+                            if (state is ConversationPosted) {
+                              Map<String, String> userTags =
+                                  LMChatTaggingHelper.decodeString(state
+                                          .postConversationResponse
+                                          .conversation
+                                          ?.answer ??
+                                      "");
+                              LMAnalytics.get().track(
+                                AnalyticsKeys.chatroomResponded,
+                                {
+                                  "chatroom_type": chatroom.type,
+                                  "community_id": chatroom.communityId,
+                                  "chatroom_name": chatroom.header,
+                                  "chatroom_last_conversation_type": state
+                                          .postConversationResponse
+                                          .conversation
+                                          ?.attachments
+                                          ?.first
+                                          .type ??
+                                      "text",
+                                  "tagged_users": userTags.isNotEmpty,
+                                  "count_tagged_users": userTags.length,
+                                  "name_tagged_users": userTags.keys
+                                      .map((e) => e.replaceFirst("@", ""))
+                                      .toList(),
+                                  "is_group_tag": false,
+                                },
+                              );
+                            }
+                            if (state is ConversationError) {
+                              LMAnalytics.get().track(
+                                AnalyticsKeys.messageSendingError,
+                                {
+                                  "chatroom_id": chatroom.id,
+                                  "chatroom_type": chatroom.type,
+                                  "clicked_resend": false,
+                                },
+                              );
+                            }
+                            if (state is MultiMediaConversationError) {
+                              LMAnalytics.get().track(
+                                AnalyticsKeys.attachmentUploadedError,
+                                {
+                                  "chatroom_id": chatroom.id,
+                                  "chatroom_type": chatroom.type,
+                                  "clicked_retry": false
+                                },
+                              );
+                            }
+                            if (state is MultiMediaConversationPosted) {
+                              LMAnalytics.get().track(
+                                AnalyticsKeys.attachmentUploaded,
+                                {
+                                  "chatroom_id": chatroom.id,
+                                  "chatroom_type": chatroom.type,
+                                  "message_id": state.postConversationResponse
+                                      .conversation?.id,
+                                  "type": mapMediaTypeToString(
+                                      state.putMediaResponse.first.mediaType),
+                                },
+                              );
+                            }
                           },
                           builder: (context, state) {
                             return ValueListenableBuilder(
@@ -385,30 +459,16 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                   builderDelegate:
                                       PagedChildBuilderDelegate<Conversation>(
                                     noItemsFoundIndicatorBuilder: (context) =>
-                                        const SizedBox(height: 10),
+                                        const Center(
+                                      child: LMChatText('No chats found!'),
+                                    ),
                                     firstPageProgressIndicatorBuilder:
                                         (context) =>
                                             const LMChatSkeletonChatList(),
-                                    newPageProgressIndicatorBuilder:
-                                        (context) => Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 1.h),
-                                      child: const Column(
-                                        children: [
-                                          LMChatSkeletonChatBubble(
-                                              isSent: true),
-                                          LMChatSkeletonChatBubble(
-                                              isSent: false),
-                                          LMChatSkeletonChatBubble(
-                                              isSent: true),
-                                        ],
-                                      ),
-                                    ),
                                     animateTransitions: true,
                                     transitionDuration:
                                         const Duration(milliseconds: 500),
                                     itemBuilder: (context, item, index) {
-                                      print("$index: ${item.answer}");
                                       if (item.isTimeStamp != null &&
                                               item.isTimeStamp! ||
                                           item.state != 0 &&
@@ -476,6 +536,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   }
 
   LMChatAppBar _defaultAppBar(ChatRoom chatroom) {
+    final dynamic chatUser;
+    chatUser = user!.id == chatroom.chatroomWithUser!.id
+        ? chatroom.member!
+        : chatroom.chatroomWithUser!;
     return LMChatAppBar(
       style: LMChatAppBarStyle(
         height: 72,
@@ -483,8 +547,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         backgroundColor: LMChatTheme.theme.container,
       ),
       banner: LMChatProfilePicture(
-        imageUrl:
-            chatroom.chatroomWithUser?.imageUrl ?? chatroom.chatroomImageUrl,
+        imageUrl: chatUser.imageUrl ?? chatroom.chatroomImageUrl,
         fallbackText: chatroom.header,
         style: LMChatProfilePictureStyle(
           size: 42,
@@ -492,11 +555,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         ),
       ),
       title: LMChatText(
-        chatroom.chatroomWithUser?.name ?? chatroom.title,
+        chatUser.name ?? chatroom.title,
         style: LMChatTextStyle(
           textStyle: TextStyle(
             color: LMChatTheme.theme.onContainer,
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
         ),

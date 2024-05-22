@@ -1,12 +1,7 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui' as ui;
-
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:image_picker/image_picker.dart';
@@ -15,15 +10,12 @@ import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-
 import 'package:overlay_support/overlay_support.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LMChatroomBar extends StatefulWidget {
   final ChatRoom chatroom;
@@ -211,81 +203,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     userMeta = widget.userMeta;
     return Column(
       children: [
-        // replyToConversation != null && checkIfAnnouncementChannel()
-        //     ? _getReplyConversation()
-        //     : const SizedBox(),
-        // editConversation != null && checkIfAnnouncementChannel()
-        //     ? _getEditConversation()
-        //     : const SizedBox(),
         ValueListenableBuilder(
             valueListenable: rebuildLinkPreview,
             builder: ((context, value, child) {
               return Container(color: Colors.red);
-              // return linkModel != null && showLinkPreview && isActiveLink
-              //     ? Padding(
-              //         padding: const EdgeInsets.symmetric(horizontal: 18.0),
-              //         child: Stack(
-              //           children: [
-              //             LMLinkPreview(
-              //               height: 120,
-              //               linkModel: linkModel,
-              //               backgroundColor: secondary.shade100,
-              //               showLinkUrl: false,
-              //               onTap: () {
-              //                 launchUrl(
-              //                   Uri.parse(linkModel?.ogTags?.url ?? ''),
-              //                   mode: LaunchMode.externalApplication,
-              //                 );
-              //               },
-              //               border: Border.all(
-              //                 width: 1,
-              //                 color: secondary.shade100,
-              //               ),
-              //               title: LMTextView(
-              //                 text: linkModel?.ogTags?.title ?? "--",
-              //                 maxLines: 1,
-              //                 overflow: TextOverflow.ellipsis,
-              //                 textStyle: const TextStyle(
-              //                   fontWeight: FontWeight.w600,
-              //                   color: kBlackColor,
-              //                   height: 1.30,
-              //                 ),
-              //               ),
-              //               subtitle: LMTextView(
-              //                 text: linkModel?.ogTags?.description ?? "--",
-              //                 maxLines: 1,
-              //                 overflow: TextOverflow.ellipsis,
-              //                 textStyle: const TextStyle(
-              //                   color: kBlackColor,
-              //                   fontWeight: FontWeight.w400,
-              //                   height: 1.30,
-              //                 ),
-              //               ),
-              //             ),
-              //             Positioned(
-              //               top: 5,
-              //               right: 5,
-              //               child: GestureDetector(
-              //                 onTap: () {
-              //                   showLinkPreview = false;
-              //                   linkModel = null;
-              //                   rebuildLinkPreview.value =
-              //                       !rebuildLinkPreview.value;
-              //                 },
-              //                 child: const CloseButtonIcon(),
-              //               ),
-              //             )
-              //           ],
-              //         ),
-              //       )
-              //     : const SizedBox();
             })),
         Container(
           width: double.infinity,
           color: LMChatTheme.theme.container,
-          padding: EdgeInsets.symmetric(
-            horizontal: 4.w,
-            vertical: 2.h,
+          padding: EdgeInsets.fromLTRB(
+            4.w,
+            2.h,
+            4.w,
+            2.h,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -305,6 +235,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: kPaddingSmall,
+                    vertical: kPaddingSmall,
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -480,6 +411,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   }
                                   editConversation = null;
                                   replyToConversation = null;
+                                  FocusScope.of(context).unfocus();
                                 }
                               }
                             : () {},
@@ -488,7 +420,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                           width: 10.w,
                           decoration: BoxDecoration(
                             color: checkIfAnnouncementChannel()
-                                ? LMChatTheme.theme.container
+                                ? LMChatTheme.theme.primaryColor
                                 : LMChatDefaultTheme.greyColor,
                             borderRadius: BorderRadius.circular(6.w),
                           ),
@@ -497,7 +429,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                               type: LMChatIconType.icon,
                               icon: Icons.send,
                               style: LMChatIconStyle(
-                                backgroundColor: LMChatTheme.theme.primaryColor,
+                                // backgroundColor: LMChatTheme.theme.primaryColor,
                                 color: LMChatTheme.theme.onPrimary,
                                 boxSize: 10.w,
                                 size: 6.w,

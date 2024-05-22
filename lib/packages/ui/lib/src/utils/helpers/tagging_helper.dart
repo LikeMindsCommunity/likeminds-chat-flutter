@@ -164,10 +164,10 @@ class LMChatTaggingHelper {
       final String? routeTag = match.group(0);
       final String? userName = routeRegExp.firstMatch(routeTag!)?.group(1);
       final String? userId = routeRegExp.firstMatch(routeTag)?.group(3);
-      if (user.id == int.parse(userId!)) {
-        result = result.replaceAll(routeTag, '$userName');
+      if (user.id != int.parse(userId!)) {
+        result = result.replaceAll(" $routeTag", ' $userName');
       } else {
-        result = result.replaceAll(routeTag, '');
+        result = result.replaceAll(" $routeTag", '');
       }
     }
     return result;

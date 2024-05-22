@@ -25,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -58,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCp2HimWufInSMnLc7ndFBEpeSDTj7Fxsw',
-    appId: '1:317419981427:android:4757825d0545cff4d2f806',
+    appId: '1:317419981427:android:383c84d581bad91bd2f806',
     messagingSenderId: '317419981427',
     projectId: 'likeminds-sdk-app',
     storageBucket: 'likeminds-sdk-app.appspot.com',
@@ -66,11 +60,30 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAVmbe-8jgnO2MUnFotMdp2tmDVnwTZqfE',
-    appId: '1:317419981427:ios:648517d79e1f8f9ad2f806',
+    appId: '1:317419981427:ios:5c2e7053ed57f4b2d2f806',
     messagingSenderId: '317419981427',
     projectId: 'likeminds-sdk-app',
     storageBucket: 'likeminds-sdk-app.appspot.com',
-    iosClientId: '317419981427-n15dn1g4kfr3hrrg55qs7ojt6q1venrf.apps.googleusercontent.com',
-    iosBundleId: 'com.example.likemindsChatSsSample',
+    iosBundleId: 'com.likeminds.chat.flutter.sample',
   );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAVmbe-8jgnO2MUnFotMdp2tmDVnwTZqfE',
+    appId: '1:317419981427:ios:5c2e7053ed57f4b2d2f806',
+    messagingSenderId: '317419981427',
+    projectId: 'likeminds-sdk-app',
+    storageBucket: 'likeminds-sdk-app.appspot.com',
+    iosBundleId: 'com.likeminds.chat.flutter.sample',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBoKIOckkZHY6MmBrEE59LtKpzeSglt53Y',
+    appId: '1:317419981427:web:4437716c13e11f97d2f806',
+    messagingSenderId: '317419981427',
+    projectId: 'likeminds-sdk-app',
+    authDomain: 'likeminds-sdk-app.firebaseapp.com',
+    storageBucket: 'likeminds-sdk-app.appspot.com',
+    measurementId: 'G-597NEX8YCE',
+  );
+
 }

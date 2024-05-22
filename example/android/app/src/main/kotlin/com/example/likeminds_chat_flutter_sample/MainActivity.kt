@@ -1,4 +1,4 @@
-package com.example.likeminds_chat_flutter_sample
+package com.likeminds.chat.flutter.sample
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -7,27 +7,30 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/home/home_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/shimmers/chatroom_skeleton.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LMChatHomeScreen extends StatefulWidget {
   final LMChatroomType chatroomType;
+
   final LMChatHomeAppBarBuilder? appbarBuilder;
   final LMChatroomTileBuilder? chatroomTileBuilder;
+  final LMChatContextWidgetBuilder? loadingPageWidget;
+  final LMChatContextWidgetBuilder? loadingListWidget;
 
   const LMChatHomeScreen({
     super.key,
     required this.chatroomType,
     this.appbarBuilder,
     this.chatroomTileBuilder,
+    this.loadingListWidget,
+    this.loadingPageWidget,
   });
 
   @override
@@ -37,9 +40,8 @@ class LMChatHomeScreen extends StatefulWidget {
 class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   List<int>? chatroomTypes;
   int currentTime = DateTime.now().millisecondsSinceEpoch;
-  final int pageSize = 20;
   User? user;
-  LMChatHomeBloc? homeBloc;
+  LMChatHomeBloc homeBloc = LMChatHomeBloc.instance;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
   PagingController<int, LMChatTile> homeFeedPagingController =
       PagingController(firstPageKey: 1);
@@ -48,27 +50,33 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   @override
   void initState() {
-    super.initState();
     Bloc.observer = LMChatBlocObserver();
     user = LMChatPreferences.instance.getCurrentUser;
     homeFeedPagingController.itemList?.clear();
     chatroomTypes = getChatroomTypes(widget.chatroomType);
-    homeBloc = LMChatHomeBloc.instance
-      ..add(LMChatInitHomeEvent(
-          request: (GetHomeFeedRequestBuilder()
-                ..page(1)
-                ..pageSize(pageSize)
-                ..minTimestamp(0)
-                ..maxTimestamp(currentTime)
-                ..chatroomTypes(chatroomTypes ?? [0, 7]))
-              .build()));
     _addPaginationListener();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    homeBloc.close();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(LMChatHomeScreen oldWidget) {
+    user = LMChatPreferences.instance.getCurrentUser;
+    homeFeedPagingController.itemList?.clear();
+    chatroomTypes = getChatroomTypes(widget.chatroomType);
+    _addPaginationListener();
+    super.didUpdateWidget(oldWidget);
   }
 
   _addPaginationListener() {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
-        homeBloc!.add(
+        homeBloc.add(
           LMChatInitHomeEvent(
             request: (GetHomeFeedRequestBuilder()
                   ..page(pageKey)
@@ -99,7 +107,13 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       _pageKey = 2;
       homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _pageKey;
-      homeFeedPagingController.itemList = chatItems;
+      if (state.response.chatroomsData == null ||
+          state.response.chatroomsData!.isEmpty ||
+          state.response.chatroomsData!.length < pageSize) {
+        homeFeedPagingController.appendLastPage(chatItems);
+      } else {
+        homeFeedPagingController.appendPage(chatItems, _pageKey);
+      }
     }
   }
 
@@ -111,6 +125,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       child: Scaffold(
         backgroundColor: LMChatTheme.theme.backgroundColor,
         body: SafeArea(
+          bottom: false,
           child: Column(
             children: [
               widget.appbarBuilder?.call(
@@ -142,18 +157,12 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
                         return true;
                       },
                       builder: (context, state) {
-                        if (state is LMChatHomeLoading) {
-                          return const LMChatSkeletonChatList();
-                        } else if (state is LMChatHomeError) {
+                        if (state is LMChatHomeError) {
                           return Center(
                             child: Text(state.message),
                           );
-                        } else if (state is LMChatHomeLoaded ||
-                            state is LMChatUpdateHomeFeed ||
-                            state is LMChatUpdatedHomeFeed) {
-                          return _defaultChatroomList();
                         }
-                        return const SizedBox();
+                        return _defaultChatroomList();
                       },
                     ),
                   ),
@@ -200,13 +209,14 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return ValueListenableBuilder(
         valueListenable: rebuildPagedList,
         builder: (context, _, __) {
-          debugPrint("Chatroom List rebuilt");
           return PagedListView<int, LMChatTile>(
             pagingController: homeFeedPagingController,
             padding: EdgeInsets.zero,
             physics: const ClampingScrollPhysics(),
             builderDelegate: PagedChildBuilderDelegate<LMChatTile>(
-              newPageProgressIndicatorBuilder: (_) => const SizedBox(),
+              firstPageProgressIndicatorBuilder: (context) =>
+                  widget.loadingPageWidget?.call(context) ??
+                  const LMChatSkeletonChatroomList(),
               noItemsFoundIndicatorBuilder: (context) => const SizedBox(),
               itemBuilder: (context, item, index) {
                 return item;
@@ -224,17 +234,18 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     User conversationUser,
     List<LMChatMedia> attachmentMeta,
   ) {
-    String message = conversation.deletedByUserId == null
-        ? '${conversationUser.id == chatroomWithUser.id ? 'You: ' : ''}${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-            conversation.answer,
-          ) : LMChatTaggingHelper.convertRouteToTag(
-            conversation.answer,
-            withTilde: false,
-          )}'
-        : getDeletedText(conversation, user!);
+    bool whichUser = user != null && user!.id != chatroomWithUser.id;
+    String message = getChatroomPreviewMessage(
+      conversation,
+      conversationUser,
+      chatroomUser,
+      chatroomWithUser,
+    );
     return LMChatTile(
+      style: LMChatTileStyle.basic()
+          .copyWith(backgroundColor: LMChatTheme.theme.container),
       onTap: () {
-        // LMChatRealtime.instance.chatroomId = chatrooms[i].id;
+        LMChatRealtime.instance.chatroomId = chatroom.id;
         final route = MaterialPageRoute(
           builder: (context) {
             return LMChatroomScreen(
@@ -242,25 +253,22 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
             );
           },
         );
-        Navigator.of(context).push(route);
+        Navigator.of(context).push(route).whenComplete(
+              () => homeBloc.add(LMChatUpdateHomeEvent()),
+            );
       },
       leading: LMChatProfilePicture(
-        fallbackText: user != null && user!.id != chatroomWithUser.id
-            ? chatroomWithUser.name
-            : chatroomUser.name,
-        imageUrl: user != null && user!.id != chatroomWithUser.id
-            ? chatroomWithUser.imageUrl
-            : chatroomUser.imageUrl,
+        fallbackText: whichUser ? chatroomWithUser.name : chatroomUser.name,
+        imageUrl: whichUser ? chatroomWithUser.imageUrl : chatroomUser.imageUrl,
         style: const LMChatProfilePictureStyle(size: 48),
       ),
       title: LMChatText(
-        user != null && user!.id != chatroomWithUser.id
-            ? chatroomWithUser.name
-            : chatroomUser.name,
-        style: const LMChatTextStyle(
+        whichUser ? chatroomWithUser.name : chatroomUser.name,
+        style: LMChatTextStyle(
           maxLines: 1,
           textStyle: TextStyle(
             fontSize: 16,
+            color: LMChatTheme.theme.onContainer,
             fontWeight: FontWeight.w500,
             overflow: TextOverflow.ellipsis,
           ),
@@ -276,10 +284,11 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               conversation.state != 0
                   ? LMChatTaggingHelper.extractStateMessage(message)
                   : message,
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   fontSize: 14,
+                  color: LMChatTheme.theme.onContainer,
                   fontWeight: FontWeight.w400,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -301,9 +310,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
             children: [
               LMChatText(
                 getTime(conversation.createdEpoch!.toString()),
-                style: const LMChatTextStyle(
+                style: LMChatTextStyle(
                   textStyle: TextStyle(
                     fontSize: 12,
+                    color: LMChatTheme.theme.onContainer,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -312,25 +322,24 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               Visibility(
                 visible: chatroom.unseenCount! > 0,
                 child: Container(
-                  height: 24,
+                  constraints: const BoxConstraints(
+                    minHeight: 24,
+                    maxHeight: 24,
+                  ),
                   width: 24,
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
                     color: LMChatTheme.theme.primaryColor,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 4,
                   ),
                   child: Center(
                     child: LMChatText(
                       chatroom.unseenCount! > 99
                           ? "99+"
                           : chatroom.unseenCount.toString(),
-                      style: const LMChatTextStyle(
+                      style: LMChatTextStyle(
                         textStyle: TextStyle(
-                          color: LMChatDefaultTheme.whiteColor,
                           fontSize: 12,
+                          color: LMChatTheme.theme.onPrimary,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -370,7 +379,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       final List<LMChatMedia> attachmentMeta =
           attachment?.map((e) => LMChatMedia.fromJson(e)).toList() ?? [];
 
-      chats.add(widget.chatroomTileBuilder?.call(
+      chats.add(
+        widget.chatroomTileBuilder?.call(
               chatrooms[i],
               _defaultChatroomTile(
                 chatrooms[i],
@@ -379,15 +389,17 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
                 chatroomUser,
                 conversationUser,
                 attachmentMeta,
-              )) ??
-          _defaultChatroomTile(
-            chatrooms[i],
-            conversation,
-            chatroomWithUser,
-            chatroomUser,
-            conversationUser,
-            attachmentMeta,
-          ));
+              ),
+            ) ??
+            _defaultChatroomTile(
+              chatrooms[i],
+              conversation,
+              chatroomWithUser,
+              chatroomUser,
+              conversationUser,
+              attachmentMeta,
+            ),
+      );
     }
 
     return chats;

@@ -27,8 +27,11 @@ class LMChatThemeData {
   final LMChatBottomSheetStyle bottomSheetStyle;
   final LMChatSnackBarStyle snackBarTheme;
   final LMChatImageStyle imageStyle;
+  final LMChatTileStyle chatTileStyle;
+  final LMChatAppBarStyle appBarStyle;
 
   final LMChatBubbleStyle bubbleStyle;
+  final LMChatStateBubbleStyle stateBubbleStyle;
   final LMChatBubbleReplyStyle replyStyle;
   final LMChatBubbleContentStyle contentStyle;
 
@@ -72,6 +75,9 @@ class LMChatThemeData {
     required this.bubbleStyle,
     required this.replyStyle,
     required this.contentStyle,
+    required this.chatTileStyle,
+    required this.stateBubbleStyle,
+    required this.appBarStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -115,6 +121,9 @@ class LMChatThemeData {
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
+    LMChatTileStyle? chatTileStyle,
+    LMChatStateBubbleStyle? stateBubbleStyle,
+    LMChatAppBarStyle? appBarStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
@@ -151,6 +160,9 @@ class LMChatThemeData {
       replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
+      chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
+      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(),
+      appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
     );
   }
 
@@ -180,6 +192,9 @@ class LMChatThemeData {
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
+    LMChatTileStyle? chatTileStyle,
+    LMChatStateBubbleStyle? stateBubbleStyle,
+    LMChatAppBarStyle? appBarStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -207,6 +222,9 @@ class LMChatThemeData {
       replyStyle: replyStyle ?? this.replyStyle,
       bubbleStyle: bubbleStyle ?? this.bubbleStyle,
       contentStyle: contentStyle ?? this.contentStyle,
+      chatTileStyle: chatTileStyle ?? this.chatTileStyle,
+      stateBubbleStyle: stateBubbleStyle ?? this.stateBubbleStyle,
+      appBarStyle: appBarStyle ?? this.appBarStyle,
     );
   }
 }

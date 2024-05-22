@@ -63,7 +63,7 @@ class LMChatProfilePicture extends StatelessWidget {
                         textAlign: TextAlign.center,
                         textStyle: TextStyle(
                           overflow: TextOverflow.clip,
-                          color: Colors.white,
+                          color: LMChatTheme.theme.onPrimary,
                           fontSize:
                               inStyle.size != null ? inStyle.size! / 2 : 18,
                           fontWeight: FontWeight.w600,

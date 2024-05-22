@@ -72,6 +72,7 @@ class LMChatTile extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               trailing ?? const SizedBox()
             ],
           ),

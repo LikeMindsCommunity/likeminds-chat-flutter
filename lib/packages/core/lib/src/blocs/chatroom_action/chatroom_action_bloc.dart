@@ -7,12 +7,12 @@ import 'package:meta/meta.dart';
 part 'chatroom_action_event.dart';
 part 'chatroom_action_state.dart';
 
-class ChatroomActionBloc
+class LMChatroomActionBloc
     extends Bloc<ChatroomActionEvent, ChatroomActionState> {
-  static ChatroomActionBloc? _instance;
-  static ChatroomActionBloc get instance =>
-      _instance ??= ChatroomActionBloc._();
-  ChatroomActionBloc._() : super(ChatroomActionInitial()) {
+  static LMChatroomActionBloc? _instance;
+  static LMChatroomActionBloc get instance =>
+      _instance ??= LMChatroomActionBloc._();
+  LMChatroomActionBloc._() : super(ChatroomActionInitial()) {
     on<ChatroomActionEvent>((event, emit) async {
       if (event is MarkReadChatroomEvent) {
         // ignore: unused_local_variable
