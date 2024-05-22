@@ -9,7 +9,7 @@ typedef LMChatHomeAppBarBuilder = LMChatAppBar Function(
   LMChatAppBar oldAppBar,
 );
 
-typedef LMChatroomAppBarbuilder = LMChatAppBar Function(
+typedef LMChatroomAppBarBuilder = LMChatAppBar Function(
   ChatRoom chatrooom,
   LMChatAppBar oldAppBar,
 );
@@ -28,4 +28,11 @@ typedef LMChatBubbleBuilder = Widget Function(
 typedef LMChatStateBubbleBuilder = Widget Function(
   String message,
   LMChatStateBubble oldStateBubble,
+);
+
+typedef LMChatContextWidgetBuilder = Widget Function(BuildContext context);
+
+typedef LMChatroomChatBarBuilder = Widget Function(
+  ChatRoom chatroom,
+  Function onMessageSent,
 );

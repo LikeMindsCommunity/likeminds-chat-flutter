@@ -12,16 +12,16 @@ import 'package:overlay_support/overlay_support.dart';
 /// It handles the notification when it is received and shows it
 /// It routes the notification to the appropriate screen
 /// Since this is a singleton class, it is initialized on the client side
-class LMNotificationHandler {
+class LMChatNotificationHandler {
   String? deviceId;
   String? fcmToken;
   int? memberId;
 
-  static LMNotificationHandler? _instance;
-  static LMNotificationHandler get instance =>
-      _instance ??= LMNotificationHandler._();
+  static LMChatNotificationHandler? _instance;
+  static LMChatNotificationHandler get instance =>
+      _instance ??= LMChatNotificationHandler._();
 
-  LMNotificationHandler._();
+  LMChatNotificationHandler._();
 
   /// Initialize the notification handler
   /// This is called from the client side

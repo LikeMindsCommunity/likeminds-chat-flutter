@@ -143,7 +143,7 @@ class LMChatSkeletonChatBar extends StatelessWidget {
                   decoration: const BoxDecoration(
                     color: LMChatDefaultTheme.greyColor,
                     borderRadius: BorderRadius.all(
-                      Radius.circular(8),
+                      Radius.circular(12),
                     ),
                   ),
                 ),
@@ -157,7 +157,7 @@ class LMChatSkeletonChatBar extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: LMChatDefaultTheme.greyColor,
                   borderRadius: BorderRadius.all(
-                    Radius.circular(15),
+                    Radius.circular(21),
                   ),
                 ),
               ),

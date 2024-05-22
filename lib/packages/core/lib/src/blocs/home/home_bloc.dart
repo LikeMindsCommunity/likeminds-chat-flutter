@@ -9,6 +9,8 @@ import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 part 'home_event.dart';
 part 'home_state.dart';
 
+const int pageSize = 20;
+
 class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
   int currentTime = DateTime.now().millisecondsSinceEpoch;
   final int pageSize = 20;
