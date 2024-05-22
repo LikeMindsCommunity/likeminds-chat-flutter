@@ -7,19 +7,17 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/home/home_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/shimmers/chatroom_skeleton.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LMChatHomeScreen extends StatefulWidget {
   final LMChatroomType chatroomType;
+
   final LMChatHomeAppBarBuilder? appbarBuilder;
   final LMChatroomTileBuilder? chatroomTileBuilder;
 
@@ -37,7 +35,6 @@ class LMChatHomeScreen extends StatefulWidget {
 class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   List<int>? chatroomTypes;
   int currentTime = DateTime.now().millisecondsSinceEpoch;
-  final int pageSize = 20;
   User? user;
   LMChatHomeBloc? homeBloc;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
@@ -63,6 +60,24 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
                 ..chatroomTypes(chatroomTypes ?? [0, 7]))
               .build()));
     _addPaginationListener();
+  }
+
+  @override
+  void didUpdateWidget(LMChatHomeScreen oldWidget) {
+    user = LMChatPreferences.instance.getCurrentUser;
+    homeFeedPagingController.itemList?.clear();
+    chatroomTypes = getChatroomTypes(widget.chatroomType);
+    homeBloc = LMChatHomeBloc.instance
+      ..add(LMChatInitHomeEvent(
+          request: (GetHomeFeedRequestBuilder()
+                ..page(1)
+                ..pageSize(pageSize)
+                ..minTimestamp(0)
+                ..maxTimestamp(currentTime)
+                ..chatroomTypes(chatroomTypes ?? [0, 7]))
+              .build()));
+    _addPaginationListener();
+    super.didUpdateWidget(oldWidget);
   }
 
   _addPaginationListener() {
@@ -370,7 +385,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       final List<LMChatMedia> attachmentMeta =
           attachment?.map((e) => LMChatMedia.fromJson(e)).toList() ?? [];
 
-      chats.add(widget.chatroomTileBuilder?.call(
+      chats.add(
+        widget.chatroomTileBuilder?.call(
               chatrooms[i],
               _defaultChatroomTile(
                 chatrooms[i],
@@ -379,15 +395,17 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
                 chatroomUser,
                 conversationUser,
                 attachmentMeta,
-              )) ??
-          _defaultChatroomTile(
-            chatrooms[i],
-            conversation,
-            chatroomWithUser,
-            chatroomUser,
-            conversationUser,
-            attachmentMeta,
-          ));
+              ),
+            ) ??
+            _defaultChatroomTile(
+              chatrooms[i],
+              conversation,
+              chatroomWithUser,
+              chatroomUser,
+              conversationUser,
+              attachmentMeta,
+            ),
+      );
     }
 
     return chats;

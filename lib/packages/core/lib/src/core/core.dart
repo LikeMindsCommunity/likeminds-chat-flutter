@@ -45,7 +45,7 @@ class LMChatCore {
     chatConfig = config ?? LMChatConfig();
     if (widgets != null) _widgetUtility = widgets;
     await LMChatPreferences.instance.initialize();
-    LMChatTheme.instance.initialise();
+    LMChatTheme.instance.initialise(theme: theme);
     await initFirebase();
   }
 
@@ -86,7 +86,7 @@ class LMChatCore {
         await LMChatPreferences.instance
             .storeCommunityData(response.data!.initiateUser!.community);
         await LMChatPreferences.instance.storeMemberRights(memberRights.data!);
-        LMNotificationHandler.instance.registerDevice(user.id);
+        LMChatNotificationHandler.instance.registerDevice(user.id);
         return response;
       }
     }

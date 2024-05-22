@@ -19,12 +19,24 @@ import 'package:overlay_support/overlay_support.dart';
 class LMChatroomScreen extends StatefulWidget {
   final int chatroomId;
 
-  final LMChatroomAppBarbuilder? appbarbuilder;
+  final LMChatroomAppBarBuilder? appbarbuilder;
+  final LMChatBubbleBuilder? chatBubbleBuilder;
+  final LMChatStateBubbleBuilder? stateBubbleBuilder;
+  final LMChatContextWidgetBuilder? loadingPageWidget;
+  final LMChatContextWidgetBuilder? loadingListWidget;
+  final LMChatContextWidgetBuilder? paginatedLoadingWidget;
+  final LMChatroomChatBarBuilder? chatBarBuilder;
 
   const LMChatroomScreen({
     super.key,
     required this.chatroomId,
     this.appbarbuilder,
+    this.chatBarBuilder,
+    this.chatBubbleBuilder,
+    this.stateBubbleBuilder,
+    this.loadingListWidget,
+    this.loadingPageWidget,
+    this.paginatedLoadingWidget,
   });
 
   @override
@@ -35,7 +47,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   late LMChatConversationBloc _conversationBloc;
   late LMChatConversationActionBloc _convActionBloc;
   late LMChatroomBloc _chatroomBloc;
-  late ChatroomActionBloc _chatroomActionBloc;
+  late LMChatroomActionBloc _chatroomActionBloc;
 
   late ChatRoom chatroom;
   User? user;
@@ -72,7 +84,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _conversationBloc = LMChatConversationBloc.instance;
     _chatroomBloc = LMChatroomBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
-    _chatroomActionBloc = ChatroomActionBloc.instance;
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
     _chatroomBloc.add(LMChatInitChatroomEvent(
         (GetChatroomRequestBuilder()..chatroomId(widget.chatroomId)).build()));
     _addPaginationListener();
@@ -408,7 +420,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                     transitionDuration:
                                         const Duration(milliseconds: 500),
                                     itemBuilder: (context, item, index) {
-                                      print("$index: ${item.answer}");
                                       if (item.isTimeStamp != null &&
                                               item.isTimeStamp! ||
                                           item.state != 0 &&
