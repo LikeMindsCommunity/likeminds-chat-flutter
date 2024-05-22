@@ -110,7 +110,13 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       _pageKey = 2;
       homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _pageKey;
-      homeFeedPagingController.itemList = chatItems;
+      if (state.response.chatroomsData == null ||
+          state.response.chatroomsData!.isEmpty ||
+          state.response.chatroomsData!.length < pageSize) {
+        homeFeedPagingController.appendLastPage(chatItems);
+      } else {
+        homeFeedPagingController.appendPage(chatItems, _pageKey);
+      }
     }
   }
 
@@ -241,6 +247,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       chatroomWithUser,
     );
     return LMChatTile(
+      style: LMChatTileStyle.basic()
+          .copyWith(backgroundColor: LMChatTheme.theme.container),
       onTap: () {
         LMChatRealtime.instance.chatroomId = chatroom.id;
         final route = MaterialPageRoute(
@@ -261,10 +269,11 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       ),
       title: LMChatText(
         whichUser ? chatroomWithUser.name : chatroomUser.name,
-        style: const LMChatTextStyle(
+        style: LMChatTextStyle(
           maxLines: 1,
           textStyle: TextStyle(
             fontSize: 16,
+            color: LMChatTheme.theme.onContainer,
             fontWeight: FontWeight.w500,
             overflow: TextOverflow.ellipsis,
           ),
@@ -280,10 +289,11 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               conversation.state != 0
                   ? LMChatTaggingHelper.extractStateMessage(message)
                   : message,
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   fontSize: 14,
+                  color: LMChatTheme.theme.onContainer,
                   fontWeight: FontWeight.w400,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -305,9 +315,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
             children: [
               LMChatText(
                 getTime(conversation.createdEpoch!.toString()),
-                style: const LMChatTextStyle(
+                style: LMChatTextStyle(
                   textStyle: TextStyle(
                     fontSize: 12,
+                    color: LMChatTheme.theme.onContainer,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -331,10 +342,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
                       chatroom.unseenCount! > 99
                           ? "99+"
                           : chatroom.unseenCount.toString(),
-                      style: const LMChatTextStyle(
+                      style: LMChatTextStyle(
                         textStyle: TextStyle(
-                          color: LMChatDefaultTheme.whiteColor,
                           fontSize: 12,
+                          color: LMChatTheme.theme.onPrimary,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

@@ -117,10 +117,11 @@ class LMChatRoomTopic extends StatelessWidget {
                                 conversation.member != null
                                     ? conversation.member!.name
                                     : "Chatroom topic",
-                                style: const LMChatTextStyle(
+                                style: LMChatTextStyle(
                                   textStyle: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
+                                    color: LMChatTheme.theme.onContainer,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -135,7 +136,6 @@ class LMChatRoomTopic extends StatelessWidget {
                                       "\u2022 ",
                                       style: LMChatTextStyle(
                                         textStyle: TextStyle(
-                                          color: LMChatDefaultTheme.greyColor,
                                           fontSize: 12,
                                         ),
                                       ),

@@ -8,10 +8,6 @@ export 'common/buttons/floating_action_button.dart';
 export 'common/extras/appbar.dart';
 export 'common/extras/loader.dart';
 
-export 'common/shimmer/document_shimmer.dart';
-export 'common/shimmer/tile_shimmer.dart';
-export 'common/shimmer/user_tile_shimmer.dart';
-
 export 'common/snackbar/snackbar.dart';
 
 export 'common/sheets/bottom_sheet.dart';

@@ -85,12 +85,12 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         absorbing: true,
         child: LMChatText(
           action.title,
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: Colors.black,
+              color: LMChatTheme.theme.onContainer,
               overflow: TextOverflow.ellipsis,
             ),
           ),

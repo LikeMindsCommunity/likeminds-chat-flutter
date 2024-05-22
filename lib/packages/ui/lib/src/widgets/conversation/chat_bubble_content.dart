@@ -22,25 +22,39 @@ class LMChatBubbleContent extends StatelessWidget {
     final LMChatBubbleContentStyle inStyle =
         style ?? LMChatTheme.theme.contentStyle;
 
-    return conversation.answer.isNotEmpty
-        ? LMChatExpandableText(
-            conversation.answer,
-            expandText: "see more",
-            animation: inStyle.animation ?? true,
-            maxLines: inStyle.visibleLines ?? 4,
-            mentionStyle: inStyle.tagStyle,
-            linkStyle: inStyle.linkStyle ??
-                TextStyle(
-                  color: LMChatTheme.theme.linkColor,
-                  fontSize: 14,
-                ),
-            textAlign: TextAlign.left,
-            style: inStyle.textStyle ??
-                const TextStyle(fontSize: 14, color: Colors.red),
-            linkEllipsis: true,
-            onTagTap: onTagTap,
-          )
-        : const SizedBox();
+    return Padding(
+      padding: inStyle.padding ?? EdgeInsets.zero,
+      child: conversation.answer.isNotEmpty
+          ? LMChatExpandableText(
+              conversation.answer,
+              expandText: "see more",
+              animation: inStyle.animation ?? true,
+              maxLines: inStyle.visibleLines ?? 4,
+              mentionStyle: inStyle.tagStyle,
+              linkStyle: inStyle.linkStyle ??
+                  TextStyle(
+                    color: LMChatTheme.theme.linkColor,
+                    fontSize: 14,
+                  ),
+              textAlign: TextAlign.left,
+              style: inStyle.textStyle ?? const TextStyle(fontSize: 14),
+              linkEllipsis: true,
+              onTagTap: onTagTap,
+            )
+          : const SizedBox(),
+    );
+  }
+
+  LMChatBubbleContent copyWith({
+    Conversation? conversation,
+    Function(String tag)? onTagTap,
+    LMChatBubbleContentStyle? style,
+  }) {
+    return LMChatBubbleContent(
+      conversation: conversation ?? this.conversation,
+      onTagTap: onTagTap ?? this.onTagTap,
+      style: style ?? this.style,
+    );
   }
 }
 
@@ -53,8 +67,6 @@ class LMChatBubbleContentStyle {
   final TextStyle? expandTextStyle;
   final TextAlign? textAlign;
   final String? expandText;
-  final double? width;
-  final double? height;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
 
@@ -66,8 +78,6 @@ class LMChatBubbleContentStyle {
     this.animation,
     this.visibleLines,
     this.textAlign,
-    this.width,
-    this.height,
     this.padding,
     this.margin,
     this.tagStyle,
@@ -95,8 +105,6 @@ class LMChatBubbleContentStyle {
       animation: animation ?? this.animation,
       visibleLines: visibleLines ?? this.visibleLines,
       textAlign: textAlign ?? this.textAlign,
-      width: width ?? this.width,
-      height: height ?? this.height,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
     );
@@ -104,7 +112,6 @@ class LMChatBubbleContentStyle {
 
   factory LMChatBubbleContentStyle.basic({Color? onContainer}) =>
       LMChatBubbleContentStyle(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         textStyle: TextStyle(
           color: onContainer ?? LMChatDefaultTheme.blackColor,
           fontSize: 14,

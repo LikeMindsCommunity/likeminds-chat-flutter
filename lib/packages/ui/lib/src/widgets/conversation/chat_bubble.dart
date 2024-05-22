@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
-import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -19,12 +18,14 @@ class LMChatBubble extends StatefulWidget {
   final Conversation conversation;
   final User currentUser;
   final User conversationUser;
+
+  final bool? isSent;
   final LMChatIcon? replyIcon;
   final LMChatProfilePicture? avatar;
   final Function(Conversation)? onReply;
   final Function(String tag) onTagTap;
-  final bool? isSent;
 
+  final LMChatText? deletedText;
   final LMChatBubbleContentBuilder? contentBuilder;
   final LMChatBubbleStyle? style;
 
@@ -40,6 +41,7 @@ class LMChatBubble extends StatefulWidget {
     this.replyIcon,
     this.avatar,
     this.isSent,
+    this.deletedText,
   });
 
   @override
@@ -72,6 +74,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   @override
   Widget build(BuildContext context) {
+    final inStyle = widget.style ?? LMChatTheme.theme.bubbleStyle;
     return Swipeable(
       dismissThresholds: const {SwipeDirection.startToEnd: 0.2},
       movementDuration: const Duration(milliseconds: 50),
@@ -146,31 +149,41 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           conversation.attachmentCount != 0 ? 8.0 : 12.0,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
+                          color: inStyle.backgroundColor ??
+                              LMChatTheme.theme.container,
+                          borderRadius: inStyle.borderRadius ??
+                              BorderRadius.circular(
+                                inStyle.borderRadiusNum ?? 6,
+                              ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const LMChatBubbleHeader(),
                             conversation.deletedByUserId != null
-                                ? LMChatText(
-                                    "Deleted message",
-                                    style: LMChatTextStyle(
-                                      textStyle:
-                                          conversation.deletedByUserId != null
-                                              ? const TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                )
-                                              : const TextStyle(
-                                                  fontSize: 14,
-                                                ),
+                                ? widget.deletedText ??
+                                    LMChatText(
+                                      "Deleted message",
+                                      style: LMChatTextStyle(
+                                        textStyle:
+                                            conversation.deletedByUserId != null
+                                                ? TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    color: LMChatTheme
+                                                        .theme.disabledColor,
+                                                  )
+                                                : TextStyle(
+                                                    fontSize: 14,
+                                                    color: LMChatTheme
+                                                        .theme.disabledColor,
+                                                  ),
+                                      ),
+                                    )
+                                : widget.contentBuilder?.call(conversation) ??
+                                    LMChatBubbleContent(
+                                      conversation: conversation,
+                                      onTagTap: widget.onTagTap,
                                     ),
-                                  )
-                                : LMChatBubbleContent(
-                                    conversation: conversation,
-                                    onTagTap: widget.onTagTap,
-                                  ),
                             const LMChatBubbleMedia(),
                             IntrinsicWidth(
                               child: Padding(
@@ -201,199 +214,63 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 }
 
 class LMChatBubbleStyle {
-  final Color? background;
+  final double? width;
+  final double? height;
+  final double? borderWidth;
+  final double? borderRadiusNum;
+  final BorderRadius? borderRadius;
 
-  LMChatBubbleStyle({this.background});
+  final Color? borderColor;
+  final Color? backgroundColor;
+  final Color? sentColor;
+
+  final bool? showActions;
+
+  LMChatBubbleStyle({
+    this.backgroundColor,
+    this.borderColor,
+    this.borderRadius,
+    this.borderRadiusNum,
+    this.borderWidth,
+    this.height,
+    this.sentColor,
+    this.showActions,
+    this.width,
+  });
+
+  LMChatBubbleStyle copyWith({
+    double? width,
+    double? height,
+    double? borderWidth,
+    double? borderRadiusNum,
+    BorderRadius? borderRadius,
+    Color? borderColor,
+    Color? backgroundColor,
+    Color? sentColor,
+    bool? showActions,
+  }) {
+    return LMChatBubbleStyle(
+      width: width ?? this.width,
+      height: height ?? this.height,
+      borderWidth: borderWidth ?? this.borderWidth,
+      borderRadiusNum: borderRadiusNum ?? this.borderRadiusNum,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      sentColor: sentColor ?? this.sentColor,
+      showActions: showActions ?? this.showActions,
+    );
+  }
+
+  factory LMChatBubbleStyle.basic() {
+    return LMChatBubbleStyle(
+      backgroundColor: LMChatDefaultTheme.container,
+      borderRadiusNum: 16,
+    );
+  }
 }
 
-// // // lm_chat_bubble.dart
-// // import 'package:flutter/material.dart';
-// // import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-// // import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-// // import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
-// // import 'package:likeminds_chat_flutter_ui/src/widgets/profile/profile_picture.dart';
-// // import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
-// // import 'package:swipe_to_action/swipe_to_action.dart';
 
-// // // part 'chat_bubble_components.dart';
-
-// // /// {@template lm_chat_bubble}
-// // /// A widget that displays a chat bubble in a conversation.
-// // ///
-// // /// This widget provides a customizable chat bubble with various components
-// // /// such as header, content, footer, media, and reactions.
-// // ///
-// // /// It also supports features like replying, editing, and long-pressing.
-// // /// {@endtemplate}
-// // class LMChatBubble extends StatefulWidget {
-// //   /// {@macro lm_chat_bubble}
-// //   const LMChatBubble({
-// //     super.key,
-// //     required this.conversation,
-// //     required this.sender,
-// //     required this.currentUser,
-// //     // this.style,
-// //     this.replyingTo,
-// //     this.onReply,
-// //     this.onEdit,
-// //     this.onLongPress,
-// //     // this.headerBuilder,
-// //     // this.contentBuilder,
-// //     // this.footerBuilder,
-// //     // this.mediaBuilder,
-// //     // this.reactionBuilder,
-// //   });
-
-// //   final Conversation conversation;
-// //   final Conversation? replyingTo;
-// //   final User sender;
-// //   final User currentUser;
-// //   // final LMChatBubbleStyle? style;
-
-// //   final Function(Conversation replyingTo)? onReply;
-// //   final Function(Conversation editConversation)? onEdit;
-// //   final Function(Conversation conversation)? onLongPress;
-
-// //   // final LMChatBubbleHeaderBuilder? headerBuilder;
-// //   // final LMChatBubbleContentBuilder? contentBuilder;
-// //   // final LMChatBubbleFooterBuilder? footerBuilder;
-// //   // final LMChatBubbleMediaBuilder? mediaBuilder;
-// //   // final LMChatBubbleReactionBuilder? reactionBuilder;
-
-// //   @override
-// //   State<LMChatBubble> createState() => _LMChatBubbleState();
-// // }
-
-// // class _LMChatBubbleState extends State<LMChatBubble> {
-// //   late bool isSent;
-// //   late bool isDeleted;
-// //   late bool isEdited;
-
-// //   @override
-// //   void initState() {
-// //     super.initState();
-// //     isSent = widget.conversation.userId == widget.currentUser.id;
-// //     isDeleted = widget.conversation.deletedByUserId != null;
-// //     isEdited = widget.conversation.isEdited ?? false;
-// //   }
-
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return const Placeholder(
-// //       color: Colors.red,
-// //     );
-// //     //     dismissThresholds: const {SwipeDirection.startToEnd: 0.2},
-// //     //     movementDuration: const Duration(milliseconds: 50),
-// //     //     key: ValueKey(widget.conversation.id),
-// //     //     onSwipe: (direction) {
-// //     //       if (widget.onReply != null) {
-// //     //         widget.onReply!(widget.replyingTo ?? widget.conversation);
-// //     //       }
-// //     //     },
-// //     //     background: LMChatSwipeBackground(
-// //     //       onReply: widget.onReply,
-// //     //       replyingTo: widget.replyingTo,
-// //     //       conversation: widget.conversation,
-// //     //     ),
-// //     //     direction: SwipeDirection.startToEnd,
-// //     //     child: LMChatBubbleContent(
-// //     //       conversation: widget.conversation,
-// //     //       sender: widget.sender,
-// //     //       currentUser: widget.currentUser,
-// //     //       isSent: isSent,
-// //     //       isDeleted: isDeleted,
-// //     //       isEdited: isEdited,
-// //     //       replyingTo: widget.replyingTo,
-// //     //       style: widget.style,
-// //     //       headerBuilder: widget.headerBuilder,
-// //     //       contentBuilder: widget.contentBuilder,
-// //     //       footerBuilder: widget.footerBuilder,
-// //     //       mediaBuilder: widget.mediaBuilder,
-// //     //       reactionBuilder: widget.reactionBuilder,
-// //     //       onEdit: widget.onEdit,
-// //     //       onLongPress: widget.onLongPress,
-// //     //     ),
-// //     //   );
-// //     // }
-// //   }
-// // }
-
-// import 'package:flutter/material.dart';
-// import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-// import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
-// import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
-// import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
-// import 'package:swipe_to_action/swipe_to_action.dart';
-
-// class LMChatBubble extends StatefulWidget {
-//   const LMChatBubble({
-//     super.key,
-//     required this.conversation,
-//     required this.sender,
-//     required this.currentUser,
-//     this.title,
-//     this.content,
-//     this.footer,
-//     this.avatar,
-//     this.replyingTo,
-//     this.replyIcon,
-//     this.reactionButton,
-//     this.outsideTitle,
-//     this.outsideFooter,
-//     this.menuBuilder,
-//     this.onReply,
-//     this.onEdit,
-//     this.onLongPress,
-//     this.width,
-//     this.height,
-//     this.borderWidth,
-//     this.borderRadius,
-//     this.borderRadiusNum,
-//     this.borderColor,
-//     this.backgroundColor,
-//     this.sentColor,
-//     this.isSent,
-//     this.showActions,
-//     this.replyItem,
-//     this.mediaWidget,
-//     this.deletedText,
-//   });
-
-//   final Conversation conversation;
-//   final Conversation? replyingTo;
-//   final User sender;
-//   final User currentUser;
-
-//   final LMChatText? title;
-//   final LMChatContent? content;
-//   final List<LMChatText>? footer;
-//   final LMChatProfilePicture? avatar;
-//   final LMChatIcon? replyIcon;
-//   final LMChatIconButton? reactionButton;
-//   final LMReplyItem? replyItem;
-//   final LMChatText? outsideTitle;
-//   final Widget? outsideFooter;
-//   final Widget? mediaWidget;
-//   final LMMenu Function(Widget child)? menuBuilder;
-//   final Function(Conversation replyingTo)? onReply;
-//   final Function(Conversation editConversation)? onEdit;
-//   final Function(Conversation conversation)? onLongPress;
-
-//   final double? width;
-//   final double? height;
-//   final double? borderWidth;
-//   final double? borderRadiusNum;
-
-//   final BorderRadius? borderRadius;
-
-//   final Color? borderColor;
-//   final Color? backgroundColor;
-//   final Color? sentColor;
-
-//   final bool? isSent;
-//   final bool? showActions;
-
-//   final LMChatText? deletedText;
 
 //   @override
 //   State<LMChatBubble> createState() => _LMChatBubbleState();

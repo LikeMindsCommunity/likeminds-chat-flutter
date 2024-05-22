@@ -1,12 +1,7 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui' as ui;
-
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:image_picker/image_picker.dart';
@@ -15,15 +10,12 @@ import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-
 import 'package:overlay_support/overlay_support.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LMChatroomBar extends StatefulWidget {
   final ChatRoom chatroom;
@@ -489,7 +481,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                           width: 10.w,
                           decoration: BoxDecoration(
                             color: checkIfAnnouncementChannel()
-                                ? LMChatTheme.theme.container
+                                ? LMChatTheme.theme.primaryColor
                                 : LMChatDefaultTheme.greyColor,
                             borderRadius: BorderRadius.circular(6.w),
                           ),
@@ -498,7 +490,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                               type: LMChatIconType.icon,
                               icon: Icons.send,
                               style: LMChatIconStyle(
-                                backgroundColor: LMChatTheme.theme.primaryColor,
+                                // backgroundColor: LMChatTheme.theme.primaryColor,
                                 color: LMChatTheme.theme.onPrimary,
                                 boxSize: 10.w,
                                 size: 6.w,
