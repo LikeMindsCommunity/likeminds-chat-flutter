@@ -12,14 +12,12 @@ import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_chat_flutter_core/src/views/home/home_configuration.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LMChatHomeScreen extends StatefulWidget {
   final LMChatroomType chatroomType;
-  final LMChatHomeConfig? config;
 
   final LMChatHomeAppBarBuilder? appbarBuilder;
   final LMChatroomTileBuilder? chatroomTileBuilder;
@@ -29,7 +27,6 @@ class LMChatHomeScreen extends StatefulWidget {
   const LMChatHomeScreen({
     super.key,
     required this.chatroomType,
-    this.config,
     this.appbarBuilder,
     this.chatroomTileBuilder,
     this.loadingListWidget,
