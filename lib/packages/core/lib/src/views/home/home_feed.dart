@@ -10,22 +10,30 @@ import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_core/src/views/home/home_configuration.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LMChatHomeScreen extends StatefulWidget {
   final LMChatroomType chatroomType;
+  final LMChatHomeConfig? config;
 
   final LMChatHomeAppBarBuilder? appbarBuilder;
   final LMChatroomTileBuilder? chatroomTileBuilder;
+  final LMChatContextWidgetBuilder? loadingPageWidget;
+  final LMChatContextWidgetBuilder? loadingListWidget;
 
   const LMChatHomeScreen({
     super.key,
     required this.chatroomType,
+    this.config,
     this.appbarBuilder,
     this.chatroomTileBuilder,
+    this.loadingListWidget,
+    this.loadingPageWidget,
   });
 
   @override
@@ -36,7 +44,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   List<int>? chatroomTypes;
   int currentTime = DateTime.now().millisecondsSinceEpoch;
   User? user;
-  LMChatHomeBloc? homeBloc;
+  LMChatHomeBloc homeBloc = LMChatHomeBloc.instance;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
   PagingController<int, LMChatTile> homeFeedPagingController =
       PagingController(firstPageKey: 1);
@@ -45,21 +53,18 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   @override
   void initState() {
-    super.initState();
     Bloc.observer = LMChatBlocObserver();
     user = LMChatPreferences.instance.getCurrentUser;
     homeFeedPagingController.itemList?.clear();
     chatroomTypes = getChatroomTypes(widget.chatroomType);
-    homeBloc = LMChatHomeBloc.instance
-      ..add(LMChatInitHomeEvent(
-          request: (GetHomeFeedRequestBuilder()
-                ..page(1)
-                ..pageSize(pageSize)
-                ..minTimestamp(0)
-                ..maxTimestamp(currentTime)
-                ..chatroomTypes(chatroomTypes ?? [0, 7]))
-              .build()));
     _addPaginationListener();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    homeBloc.close();
+    super.dispose();
   }
 
   @override
@@ -67,15 +72,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     user = LMChatPreferences.instance.getCurrentUser;
     homeFeedPagingController.itemList?.clear();
     chatroomTypes = getChatroomTypes(widget.chatroomType);
-    homeBloc = LMChatHomeBloc.instance
-      ..add(LMChatInitHomeEvent(
-          request: (GetHomeFeedRequestBuilder()
-                ..page(1)
-                ..pageSize(pageSize)
-                ..minTimestamp(0)
-                ..maxTimestamp(currentTime)
-                ..chatroomTypes(chatroomTypes ?? [0, 7]))
-              .build()));
     _addPaginationListener();
     super.didUpdateWidget(oldWidget);
   }
@@ -83,7 +79,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   _addPaginationListener() {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
-        homeBloc!.add(
+        homeBloc.add(
           LMChatInitHomeEvent(
             request: (GetHomeFeedRequestBuilder()
                   ..page(pageKey)
@@ -157,18 +153,12 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
                         return true;
                       },
                       builder: (context, state) {
-                        if (state is LMChatHomeLoading) {
-                          return const LMChatSkeletonChatList();
-                        } else if (state is LMChatHomeError) {
+                        if (state is LMChatHomeError) {
                           return Center(
                             child: Text(state.message),
                           );
-                        } else if (state is LMChatHomeLoaded ||
-                            state is LMChatUpdateHomeFeed ||
-                            state is LMChatUpdatedHomeFeed) {
-                          return _defaultChatroomList();
                         }
-                        return const SizedBox();
+                        return _defaultChatroomList();
                       },
                     ),
                   ),
@@ -215,13 +205,17 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return ValueListenableBuilder(
         valueListenable: rebuildPagedList,
         builder: (context, _, __) {
-          debugPrint("Chatroom List rebuilt");
           return PagedListView<int, LMChatTile>(
             pagingController: homeFeedPagingController,
             padding: EdgeInsets.zero,
             physics: const ClampingScrollPhysics(),
             builderDelegate: PagedChildBuilderDelegate<LMChatTile>(
-              newPageProgressIndicatorBuilder: (_) => const SizedBox(),
+              firstPageProgressIndicatorBuilder: (context) =>
+                  widget.loadingPageWidget?.call(context) ??
+                  const LMChatSkeletonChatroomList(),
+              newPageProgressIndicatorBuilder: (_) =>
+                  widget.loadingListWidget?.call(context) ??
+                  const LMChatSkeletonChatroomList(),
               noItemsFoundIndicatorBuilder: (context) => const SizedBox(),
               itemBuilder: (context, item, index) {
                 return item;
@@ -239,17 +233,16 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     User conversationUser,
     List<LMChatMedia> attachmentMeta,
   ) {
-    String message = conversation.deletedByUserId == null
-        ? '${conversationUser.id == chatroomWithUser.id ? 'You: ' : ''}${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-            conversation.answer,
-          ) : LMChatTaggingHelper.convertRouteToTag(
-            conversation.answer,
-            withTilde: false,
-          )}'
-        : getDeletedText(conversation, user!);
+    bool whichUser = user != null && user!.id != chatroomWithUser.id;
+    String message = getChatroomPreviewMessage(
+      conversation,
+      conversationUser,
+      chatroomUser,
+      chatroomWithUser,
+    );
     return LMChatTile(
       onTap: () {
-        // LMChatRealtime.instance.chatroomId = chatrooms[i].id;
+        LMChatRealtime.instance.chatroomId = chatroom.id;
         final route = MaterialPageRoute(
           builder: (context) {
             return LMChatroomScreen(
@@ -257,21 +250,17 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
             );
           },
         );
-        Navigator.of(context).push(route);
+        Navigator.of(context).push(route).whenComplete(
+              () => homeBloc.add(LMChatUpdateHomeEvent()),
+            );
       },
       leading: LMChatProfilePicture(
-        fallbackText: user != null && user!.id != chatroomWithUser.id
-            ? chatroomWithUser.name
-            : chatroomUser.name,
-        imageUrl: user != null && user!.id != chatroomWithUser.id
-            ? chatroomWithUser.imageUrl
-            : chatroomUser.imageUrl,
+        fallbackText: whichUser ? chatroomWithUser.name : chatroomUser.name,
+        imageUrl: whichUser ? chatroomWithUser.imageUrl : chatroomUser.imageUrl,
         style: const LMChatProfilePictureStyle(size: 48),
       ),
       title: LMChatText(
-        user != null && user!.id != chatroomWithUser.id
-            ? chatroomWithUser.name
-            : chatroomUser.name,
+        whichUser ? chatroomWithUser.name : chatroomUser.name,
         style: const LMChatTextStyle(
           maxLines: 1,
           textStyle: TextStyle(

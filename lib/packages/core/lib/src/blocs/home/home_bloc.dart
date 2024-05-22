@@ -13,10 +13,15 @@ const int pageSize = 20;
 
 class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
   int currentTime = DateTime.now().millisecondsSinceEpoch;
-  final int pageSize = 20;
 
   static LMChatHomeBloc? _instance;
-  static LMChatHomeBloc get instance => _instance ??= LMChatHomeBloc._();
+  static LMChatHomeBloc get instance {
+    if (_instance == null || _instance!.isClosed) {
+      return LMChatHomeBloc._();
+    } else {
+      return _instance ?? LMChatHomeBloc._();
+    }
+  }
 
   LMChatHomeBloc._() : super(LMChatHomeInitial()) {
     final DatabaseReference realTime = LMChatRealtime.instance.homeFeed();

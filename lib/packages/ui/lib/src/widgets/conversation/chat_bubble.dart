@@ -172,10 +172,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                     onTagTap: widget.onTagTap,
                                   ),
                             const LMChatBubbleMedia(),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child: LMChatBubbleFooter(
-                                conversation: conversation,
+                            IntrinsicWidth(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: LMChatBubbleFooter(
+                                  conversation: conversation,
+                                ),
                               ),
                             ),
                           ],

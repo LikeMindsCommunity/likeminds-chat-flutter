@@ -192,6 +192,96 @@ class LMChatSkeletonChatList extends StatelessWidget {
   }
 }
 
+class LMChatSkeletonChatroomList extends StatelessWidget {
+  const LMChatSkeletonChatroomList({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> list = List.generate(
+      6,
+      (index) => const LMChatSkeletonChatroom(),
+    );
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 1.h,
+      ),
+      child: Column(
+        children: list,
+      ),
+    );
+  }
+}
+
+class LMChatSkeletonChatroom extends StatelessWidget {
+  const LMChatSkeletonChatroom({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: LMChatDefaultTheme.whiteColor,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 18,
+          right: 18,
+          bottom: 4.h,
+        ),
+        child: Row(
+          children: [
+            LMChatSkeletonAnimation(
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: const BoxDecoration(
+                  color: LMChatDefaultTheme.greyColor,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(21),
+                  ),
+                ),
+              ),
+            ),
+            LMChatDefaultTheme.kHorizontalPaddingMedium,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LMChatSkeletonAnimation(
+                    child: Container(
+                      width: 60.w,
+                      height: 14,
+                      decoration: const BoxDecoration(
+                        color: LMChatDefaultTheme.greyColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(6),
+                        ),
+                      ),
+                    ),
+                  ),
+                  LMChatDefaultTheme.kVerticalPaddingSmall,
+                  LMChatSkeletonAnimation(
+                    child: Container(
+                      width: 40.w,
+                      height: 10,
+                      decoration: const BoxDecoration(
+                        color: LMChatDefaultTheme.greyColor,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(4),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class LMChatSkeletonChatBubble extends StatelessWidget {
   final bool isSent;
   const LMChatSkeletonChatBubble({

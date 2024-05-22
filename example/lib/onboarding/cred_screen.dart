@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/utils/network_handling.dart';
 
@@ -143,6 +144,8 @@ class _CredScreenState extends State<CredScreen> {
                         ),
                       );
                       Navigator.push(context, route);
+                    } else {
+                      toast(response.errorMessage ?? "An error occured");
                     }
                   }
                 },

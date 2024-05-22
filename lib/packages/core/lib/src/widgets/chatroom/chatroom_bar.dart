@@ -282,6 +282,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
             })),
         Container(
           width: double.infinity,
+          height: 10.h,
           color: LMChatTheme.theme.container,
           padding: EdgeInsets.symmetric(
             horizontal: 4.w,
