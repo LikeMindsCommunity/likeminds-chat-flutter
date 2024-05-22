@@ -459,25 +459,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                   builderDelegate:
                                       PagedChildBuilderDelegate<Conversation>(
                                     noItemsFoundIndicatorBuilder: (context) =>
-                                        const SizedBox(height: 10),
+                                        const Center(
+                                      child: LMChatText('No chats found!'),
+                                    ),
                                     firstPageProgressIndicatorBuilder:
                                         (context) =>
                                             const LMChatSkeletonChatList(),
-                                    newPageProgressIndicatorBuilder:
-                                        (context) => Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 1.h),
-                                      child: const Column(
-                                        children: [
-                                          LMChatSkeletonChatBubble(
-                                              isSent: true),
-                                          LMChatSkeletonChatBubble(
-                                              isSent: false),
-                                          LMChatSkeletonChatBubble(
-                                              isSent: true),
-                                        ],
-                                      ),
-                                    ),
                                     animateTransitions: true,
                                     transitionDuration:
                                         const Duration(milliseconds: 500),

@@ -130,8 +130,8 @@ class LMChatSkeletonChatBar extends StatelessWidget {
         padding: EdgeInsets.only(
           left: 18,
           right: 18,
-          top: 12,
-          bottom: 4.h,
+          top: 2.h,
+          bottom: 3.h,
         ),
         child: Row(
           children: [
@@ -143,7 +143,7 @@ class LMChatSkeletonChatBar extends StatelessWidget {
                   decoration: const BoxDecoration(
                     color: LMChatDefaultTheme.greyColor,
                     borderRadius: BorderRadius.all(
-                      Radius.circular(12),
+                      Radius.circular(21),
                     ),
                   ),
                 ),

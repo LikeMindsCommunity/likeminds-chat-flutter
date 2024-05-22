@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -5,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('DEBUG');
@@ -30,7 +31,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
   await LMChatCore.instance.initialize(
-    apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
+    apiKey: "YOUR-API-KEY",
   );
   runApp(const LMChatSampleApp());
 }
@@ -95,28 +96,18 @@ Future<String> deviceId() async {
 /// 4. Return FCM token
 Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    final token = await messaging.getToken();
-    debugPrint('User granted permission: ${settings.authorizationStatus}');
-    debugPrint("Token - $token");
-    return token.toString();
-  } else {
-    rootScaffoldMessengerKey.currentState?.showSnackBar(
-      LMChatSnackBar(
-        content: const Text(
-          'User declined or has not accepted notification permissions',
-        ),
-      ),
+  if (Platform.isIOS) {
+    await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
     );
-    return null;
   }
+
+  final token = await messaging.getToken();
+  debugPrint("Token - $token");
+  return token.toString();
 }

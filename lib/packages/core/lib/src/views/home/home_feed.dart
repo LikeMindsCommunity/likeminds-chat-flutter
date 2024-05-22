@@ -128,6 +128,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       child: Scaffold(
         backgroundColor: LMChatTheme.theme.backgroundColor,
         body: SafeArea(
+          bottom: false,
           child: Column(
             children: [
               widget.appbarBuilder?.call(
@@ -218,9 +219,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
             builderDelegate: PagedChildBuilderDelegate<LMChatTile>(
               firstPageProgressIndicatorBuilder: (context) =>
                   widget.loadingPageWidget?.call(context) ??
-                  const LMChatSkeletonChatroomList(),
-              newPageProgressIndicatorBuilder: (_) =>
-                  widget.loadingListWidget?.call(context) ??
                   const LMChatSkeletonChatroomList(),
               noItemsFoundIndicatorBuilder: (context) => const SizedBox(),
               itemBuilder: (context, item, index) {
@@ -327,15 +325,14 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               Visibility(
                 visible: chatroom.unseenCount! > 0,
                 child: Container(
-                  height: 24,
+                  constraints: const BoxConstraints(
+                    minHeight: 24,
+                    maxHeight: 24,
+                  ),
                   width: 24,
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
                     color: LMChatTheme.theme.primaryColor,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4,
-                    horizontal: 4,
                   ),
                   child: Center(
                     child: LMChatText(

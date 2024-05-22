@@ -203,82 +203,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     userMeta = widget.userMeta;
     return Column(
       children: [
-        // replyToConversation != null && checkIfAnnouncementChannel()
-        //     ? _getReplyConversation()
-        //     : const SizedBox(),
-        // editConversation != null && checkIfAnnouncementChannel()
-        //     ? _getEditConversation()
-        //     : const SizedBox(),
         ValueListenableBuilder(
             valueListenable: rebuildLinkPreview,
             builder: ((context, value, child) {
               return Container(color: Colors.red);
-              // return linkModel != null && showLinkPreview && isActiveLink
-              //     ? Padding(
-              //         padding: const EdgeInsets.symmetric(horizontal: 18.0),
-              //         child: Stack(
-              //           children: [
-              //             LMLinkPreview(
-              //               height: 120,
-              //               linkModel: linkModel,
-              //               backgroundColor: secondary.shade100,
-              //               showLinkUrl: false,
-              //               onTap: () {
-              //                 launchUrl(
-              //                   Uri.parse(linkModel?.ogTags?.url ?? ''),
-              //                   mode: LaunchMode.externalApplication,
-              //                 );
-              //               },
-              //               border: Border.all(
-              //                 width: 1,
-              //                 color: secondary.shade100,
-              //               ),
-              //               title: LMTextView(
-              //                 text: linkModel?.ogTags?.title ?? "--",
-              //                 maxLines: 1,
-              //                 overflow: TextOverflow.ellipsis,
-              //                 textStyle: const TextStyle(
-              //                   fontWeight: FontWeight.w600,
-              //                   color: kBlackColor,
-              //                   height: 1.30,
-              //                 ),
-              //               ),
-              //               subtitle: LMTextView(
-              //                 text: linkModel?.ogTags?.description ?? "--",
-              //                 maxLines: 1,
-              //                 overflow: TextOverflow.ellipsis,
-              //                 textStyle: const TextStyle(
-              //                   color: kBlackColor,
-              //                   fontWeight: FontWeight.w400,
-              //                   height: 1.30,
-              //                 ),
-              //               ),
-              //             ),
-              //             Positioned(
-              //               top: 5,
-              //               right: 5,
-              //               child: GestureDetector(
-              //                 onTap: () {
-              //                   showLinkPreview = false;
-              //                   linkModel = null;
-              //                   rebuildLinkPreview.value =
-              //                       !rebuildLinkPreview.value;
-              //                 },
-              //                 child: const CloseButtonIcon(),
-              //               ),
-              //             )
-              //           ],
-              //         ),
-              //       )
-              //     : const SizedBox();
             })),
         Container(
           width: double.infinity,
-          height: 10.h,
           color: LMChatTheme.theme.container,
-          padding: EdgeInsets.symmetric(
-            horizontal: 4.w,
-            vertical: 2.h,
+          padding: EdgeInsets.fromLTRB(
+            4.w,
+            2.h,
+            4.w,
+            2.h,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -298,6 +235,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: kPaddingSmall,
+                    vertical: kPaddingSmall,
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -473,6 +411,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   }
                                   editConversation = null;
                                   replyToConversation = null;
+                                  FocusScope.of(context).unfocus();
                                 }
                               }
                             : () {},

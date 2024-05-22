@@ -28,9 +28,10 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = LMChatTheme.theme;
-    final inStyle = style ?? LMChatAppBarStyle.basic();
+    final inStyle = style ?? theme.appBarStyle;
 
-    return Container(
+    return SafeArea(
+      bottom: false,
       child: Container(
         height: inStyle.height,
         width: inStyle.width ?? double.infinity,

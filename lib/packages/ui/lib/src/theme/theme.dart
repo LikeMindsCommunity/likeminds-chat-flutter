@@ -28,6 +28,7 @@ class LMChatThemeData {
   final LMChatSnackBarStyle snackBarTheme;
   final LMChatImageStyle imageStyle;
   final LMChatTileStyle chatTileStyle;
+  final LMChatAppBarStyle appBarStyle;
 
   final LMChatBubbleStyle bubbleStyle;
   final LMChatStateBubbleStyle stateBubbleStyle;
@@ -76,6 +77,7 @@ class LMChatThemeData {
     required this.contentStyle,
     required this.chatTileStyle,
     required this.stateBubbleStyle,
+    required this.appBarStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -93,34 +95,36 @@ class LMChatThemeData {
     );
   }
 
-  factory LMChatThemeData.light(
-      {Color? primaryColor,
-      Color? backgroundColor,
-      Color? secondaryColor,
-      Color? shadowColor,
-      Color? disabledColor,
-      Color? errorColor,
-      Color? inActiveColor,
-      Color? tagColor,
-      Color? hashTagColor,
-      Color? linkColor,
-      LMChatButtonStyle? buttonStyle,
-      LMChatIconStyle? iconStyle,
-      LMChatTextFieldStyle? textFieldStyle,
-      LMChatDialogStyle? dialogStyle,
-      LMChatPopUpMenuStyle? popUpMenuStyle,
-      Color? container,
-      Color? onContainer,
-      Color? onPrimary,
-      LMChatLoaderStyle? loaderStyle,
-      LMChatBottomSheetStyle? bottomSheetStyle,
-      LMChatSnackBarStyle? snackBarTheme,
-      LMChatImageStyle? imageStyle,
-      LMChatBubbleReplyStyle? replyStyle,
-      LMChatBubbleStyle? bubbleStyle,
-      LMChatBubbleContentStyle? contentStyle,
-      LMChatTileStyle? chatTileStyle,
-      LMChatStateBubbleStyle? stateBubbleStyle}) {
+  factory LMChatThemeData.light({
+    Color? primaryColor,
+    Color? backgroundColor,
+    Color? secondaryColor,
+    Color? shadowColor,
+    Color? disabledColor,
+    Color? errorColor,
+    Color? inActiveColor,
+    Color? tagColor,
+    Color? hashTagColor,
+    Color? linkColor,
+    LMChatButtonStyle? buttonStyle,
+    LMChatIconStyle? iconStyle,
+    LMChatTextFieldStyle? textFieldStyle,
+    LMChatDialogStyle? dialogStyle,
+    LMChatPopUpMenuStyle? popUpMenuStyle,
+    Color? container,
+    Color? onContainer,
+    Color? onPrimary,
+    LMChatLoaderStyle? loaderStyle,
+    LMChatBottomSheetStyle? bottomSheetStyle,
+    LMChatSnackBarStyle? snackBarTheme,
+    LMChatImageStyle? imageStyle,
+    LMChatBubbleReplyStyle? replyStyle,
+    LMChatBubbleStyle? bubbleStyle,
+    LMChatBubbleContentStyle? contentStyle,
+    LMChatTileStyle? chatTileStyle,
+    LMChatStateBubbleStyle? stateBubbleStyle,
+    LMChatAppBarStyle? appBarStyle,
+  }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
       iconStyle: iconStyle ?? LMChatIconStyle.basic(),
@@ -158,6 +162,7 @@ class LMChatThemeData {
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
       chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
       stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(),
+      appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
     );
   }
 
@@ -189,6 +194,7 @@ class LMChatThemeData {
     LMChatBubbleContentStyle? contentStyle,
     LMChatTileStyle? chatTileStyle,
     LMChatStateBubbleStyle? stateBubbleStyle,
+    LMChatAppBarStyle? appBarStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -218,6 +224,7 @@ class LMChatThemeData {
       contentStyle: contentStyle ?? this.contentStyle,
       chatTileStyle: chatTileStyle ?? this.chatTileStyle,
       stateBubbleStyle: stateBubbleStyle ?? this.stateBubbleStyle,
+      appBarStyle: appBarStyle ?? this.appBarStyle,
     );
   }
 }
