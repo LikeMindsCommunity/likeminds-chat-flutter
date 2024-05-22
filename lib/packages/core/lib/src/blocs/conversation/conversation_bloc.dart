@@ -15,7 +15,7 @@ part 'conversation_event.dart';
 part 'conversation_state.dart';
 
 class LMChatConversationBloc
-    extends Bloc<ConversationEvent, ConversationState> {
+    extends Bloc<ConversationEvent, LMChatConversationState> {
   final mediaService = LMChatAWSUtility(!isDebug);
   final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
   int? lastConversationId;
@@ -154,7 +154,7 @@ class LMChatConversationBloc
 
   mapPostMultiMediaConversation(
     PostMultiMediaConversation event,
-    Emitter<ConversationState> emit,
+    Emitter<LMChatConversationState> emit,
   ) async {
     try {
       DateTime dateTime = DateTime.now();
@@ -299,7 +299,7 @@ class LMChatConversationBloc
   }
 
   mapPostConversationFunction(
-      PostConversation event, Emitter<ConversationState> emit) async {
+      PostConversation event, Emitter<LMChatConversationState> emit) async {
     try {
       DateTime dateTime = DateTime.now();
       User user = LMChatPreferences.instance.getUser()!;

@@ -184,7 +184,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     });
   }
 
-  void updatePagingControllers(ConversationState state) {
+  void updatePagingControllers(LMChatConversationState state) {
     if (state is ConversationLoaded) {
       _page++;
 
@@ -376,7 +376,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                         _defaultAppBar(chatroom),
                     Expanded(
                       child: BlocConsumer<LMChatConversationBloc,
-                              ConversationState>(
+                              LMChatConversationState>(
                           bloc: _conversationBloc,
                           listener: (context, state) {
                             updatePagingControllers(state);

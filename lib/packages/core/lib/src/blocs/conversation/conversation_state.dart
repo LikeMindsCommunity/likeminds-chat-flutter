@@ -1,23 +1,23 @@
 part of 'conversation_bloc.dart';
 
-abstract class ConversationState extends Equatable {}
+abstract class LMChatConversationState extends Equatable {}
 
-class ConversationInitial extends ConversationState {
+class ConversationInitial extends LMChatConversationState {
   @override
   List<Object> get props => [];
 }
 
-class ConversationLoading extends ConversationState {
+class ConversationLoading extends LMChatConversationState {
   @override
   List<Object> get props => [];
 }
 
-class ConversationPaginationLoading extends ConversationState {
+class ConversationPaginationLoading extends LMChatConversationState {
   @override
   List<Object> get props => [];
 }
 
-class ConversationLoaded extends ConversationState {
+class ConversationLoaded extends LMChatConversationState {
   final GetConversationResponse getConversationResponse;
 
   ConversationLoaded(this.getConversationResponse);
@@ -26,7 +26,7 @@ class ConversationLoaded extends ConversationState {
   List<Object> get props => [getConversationResponse];
 }
 
-class ConversationError extends ConversationState {
+class ConversationError extends LMChatConversationState {
   final String message;
   final String temporaryId;
 
@@ -39,7 +39,7 @@ class ConversationError extends ConversationState {
   List<Object> get props => [message];
 }
 
-class ConversationUpdated extends ConversationState {
+class ConversationUpdated extends LMChatConversationState {
   final Conversation response;
 
   ConversationUpdated({
@@ -52,7 +52,7 @@ class ConversationUpdated extends ConversationState {
       ];
 }
 
-class LocalConversation extends ConversationState {
+class LocalConversation extends LMChatConversationState {
   final Conversation conversation;
 
   LocalConversation(this.conversation);
@@ -63,7 +63,7 @@ class LocalConversation extends ConversationState {
       ];
 }
 
-class ConversationPosted extends ConversationState {
+class ConversationPosted extends LMChatConversationState {
   final PostConversationResponse postConversationResponse;
 
   ConversationPosted(
@@ -76,7 +76,7 @@ class ConversationPosted extends ConversationState {
       ];
 }
 
-class MultiMediaConversationLoading extends ConversationState {
+class MultiMediaConversationLoading extends LMChatConversationState {
   final Conversation postConversation;
   final List<LMChatMedia> mediaFiles;
 
@@ -91,7 +91,7 @@ class MultiMediaConversationLoading extends ConversationState {
       ];
 }
 
-class MultiMediaConversationPosted extends ConversationState {
+class MultiMediaConversationPosted extends LMChatConversationState {
   final PostConversationResponse postConversationResponse;
   final List<LMChatMedia> putMediaResponse;
 
@@ -107,7 +107,7 @@ class MultiMediaConversationPosted extends ConversationState {
       ];
 }
 
-class MultiMediaConversationError extends ConversationState {
+class MultiMediaConversationError extends LMChatConversationState {
   final String errorMessage;
   final String temporaryId;
 
