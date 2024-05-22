@@ -70,7 +70,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '317419981427',
     projectId: 'likeminds-sdk-app',
     storageBucket: 'likeminds-sdk-app.appspot.com',
-    iosClientId: '317419981427-n15dn1g4kfr3hrrg55qs7ojt6q1venrf.apps.googleusercontent.com',
-    iosBundleId: 'com.example.likemindsChatSsSample',
+    iosClientId:
+        '317419981427-n15dn1g4kfr3hrrg55qs7ojt6q1venrf.apps.googleusercontent.com',
+    iosBundleId: 'com.likeminds.chat.flutter.sample',
   );
 }
