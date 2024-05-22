@@ -14,7 +14,6 @@ class LMChatBubbleFooter extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Spacer(),
         conversation.createdAt.isNotEmpty
             ? LMChatText(
                 conversation.createdAt,
