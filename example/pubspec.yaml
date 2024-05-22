@@ -18,7 +18,6 @@ dependencies:
   likeminds_chat_flutter_ui: 0.5.0
   likeminds_chat_fl: 1.6.0
   google_fonts: ^6.2.1
-  realm:
   flutter_dotenv: ^5.1.0
   firebase_messaging: ^14.9.3
   device_info_plus: ^10.1.0
