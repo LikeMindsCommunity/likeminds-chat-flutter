@@ -1,0 +1,21 @@
+name: likeminds_chat_flutter
+
+packages:
+  - lib/packages/*
+  - example/
+
+scripts:
+  analyze:
+    exec: dart analyze .
+
+  clean:
+    exec: flutter clean .
+
+  dry-run:
+    exec: flutter pub publish --dry-run
+
+  test-dependencies:
+    run: fvm spawn 3.10.2 pub get; fvm spawn stable pub get
+
+  upgrade: 
+    exec: flutter pub upgrade
