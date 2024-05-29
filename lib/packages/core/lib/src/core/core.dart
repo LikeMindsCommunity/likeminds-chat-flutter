@@ -56,8 +56,8 @@ class LMChatCore {
     // await LMChatAnalyticsBloc.instance.close();
   }
 
-  Future<LMResponse<LogoutResponse>> logout(LogoutRequest? request) async {
-    LMResponse<LogoutResponse> response = await lmChatClient.logout(
+  Future<LMResponse<void>> logout(LogoutRequest? request) async {
+    LMResponse<void> response = await lmChatClient.logout(
       request ?? LogoutRequestBuilder().build(),
     );
     return response;

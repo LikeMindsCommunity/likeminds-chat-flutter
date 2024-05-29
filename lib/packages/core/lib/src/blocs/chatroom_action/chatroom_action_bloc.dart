@@ -22,19 +22,13 @@ class LMChatroomActionBloc
       } else if (event is SetChatroomTopicEvent) {
         try {
           emit(ChatroomActionLoading());
-          LMResponse<SetChatroomTopicResponse> response = await LMChatCore
-              .client
+          LMResponse<void> response = await LMChatCore.client
               .setChatroomTopic((SetChatroomTopicRequestBuilder()
                     ..chatroomId(event.chatroomId)
                     ..conversationId(event.conversationId))
                   .build());
           if (response.success) {
-            if (response.data!.success) {
-              emit(ChatroomTopicSet(event.topic));
-            } else {
-              emit(ChatroomTopicError(
-                  errorMessage: response.data!.errorMessage!));
-            }
+            emit(ChatroomTopicSet(event.topic));
           } else {
             emit(ChatroomTopicError(errorMessage: response.errorMessage!));
           }

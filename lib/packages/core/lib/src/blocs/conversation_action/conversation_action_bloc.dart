@@ -67,7 +67,6 @@ class LMChatConversationActionBloc
       );
 
       if (response.success) {
-        if (response.data!.success) {
           Conversation conversation = response.data!.conversation!;
           if (conversation.replyId != null ||
               conversation.replyConversation != null) {
@@ -76,15 +75,7 @@ class LMChatConversationActionBloc
           emit(
             ConversationEdited(response.data!),
           );
-        } else {
-          emit(
-            ConversationActionError(
-              response.data!.errorMessage!,
-              event.editConversationRequest.conversationId.toString(),
-            ),
-          );
-          return false;
-        }
+
       } else {
         emit(
           ConversationActionError(
