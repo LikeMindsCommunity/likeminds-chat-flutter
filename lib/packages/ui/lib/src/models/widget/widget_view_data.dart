@@ -27,35 +27,54 @@ class LMWidgetViewDataBuilder {
   String? _parentEntityType;
   int? _updatedAt;
 
-  void id(String id) {
+  void id(String? id) {
     _id = id;
   }
 
-  void lmMeta(Map<String, dynamic> lmMeta) {
+  void lmMeta(Map<String, dynamic>? lmMeta) {
     _lmMeta = lmMeta;
   }
 
-  void createdAt(int createdAt) {
+  void createdAt(int? createdAt) {
     _createdAt = createdAt;
   }
 
-  void metadata(Map<String, dynamic> metadata) {
+  void metadata(Map<String, dynamic>? metadata) {
     _metadata = metadata;
   }
 
-  void parentEntityId(String parentEntityId) {
+  void parentEntityId(String? parentEntityId) {
     _parentEntityId = parentEntityId;
   }
 
-  void parentEntityType(String parentEntityType) {
+  void parentEntityType(String? parentEntityType) {
     _parentEntityType = parentEntityType;
   }
 
-  void updatedAt(int updatedAt) {
+  void updatedAt(int? updatedAt) {
     _updatedAt = updatedAt;
   }
 
   LMChatWidgetViewData build() {
+    if (_id == null) {
+      throw Exception("Missing required parameter: id");
+    }
+    if (_createdAt == null) {
+      throw Exception("Missing required parameter: createdAt");
+    }
+    if (_metadata == null) {
+      throw Exception("Missing required parameter: metadata");
+    }
+    if (_parentEntityId == null) {
+      throw Exception("Missing required parameter: parentEntityId");
+    }
+    if (_parentEntityType == null) {
+      throw Exception("Missing required parameter: parentEntityType");
+    }
+    if (_updatedAt == null) {
+      throw Exception("Missing required parameter: updatedAt");
+    }
+
     return LMChatWidgetViewData._(
       id: _id!,
       lmMeta: _lmMeta,
@@ -66,4 +85,5 @@ class LMWidgetViewDataBuilder {
       updatedAt: _updatedAt!,
     );
   }
+
 }

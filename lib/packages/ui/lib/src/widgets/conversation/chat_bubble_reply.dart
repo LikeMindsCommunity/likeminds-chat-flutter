@@ -6,7 +6,7 @@
 part of 'chat_bubble.dart';
 
 class LMChatBubbleReply extends StatelessWidget {
-  final Conversation replyToConversation;
+  final LMChatConversationViewData replyToConversation;
 
   final Widget? title;
   final Widget? subtitle;

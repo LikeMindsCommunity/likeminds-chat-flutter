@@ -17,7 +17,7 @@ class LMChatUserViewData {
   bool? isDeleted;
   String uuid;
   String? organisationName;
-  LMChatSDKClientInfoViewData sdkClientInfo;
+  LMChatSDKClientInfoViewData? sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
 
@@ -80,12 +80,11 @@ class LMChatUserViewDataBuilder {
   int? _communityId;
   int? _createdAt;
   LMChatWidgetViewData? _widget;
-
-  void id(int id) {
+  void id(int? id) {
     _id = id;
   }
 
-  void name(String name) {
+  void name(String? name) {
     _name = name;
   }
 
@@ -93,64 +92,75 @@ class LMChatUserViewDataBuilder {
     _imageUrl = imageUrl;
   }
 
-  void isGuest(bool isGuest) {
+  void isGuest(bool? isGuest) {
     _isGuest = isGuest;
   }
 
-  void isDeleted(bool isDeleted) {
+  void isDeleted(bool? isDeleted) {
     _isDeleted = isDeleted;
   }
 
-  void uuid(String uuid) {
+  void uuid(String? uuid) {
     _uuid = uuid;
   }
 
-  void organisationName(String organisationName) {
+  void organisationName(String? organisationName) {
     _organisationName = organisationName;
   }
 
-  void sdkClientInfo(LMChatSDKClientInfoViewData sdkClientInfo) {
+  void sdkClientInfo(LMChatSDKClientInfoViewData? sdkClientInfo) {
     _sdkClientInfo = sdkClientInfo;
   }
 
-  void updatedAt(int updatedAt) {
+  void updatedAt(int? updatedAt) {
     _updatedAt = updatedAt;
   }
 
-  void isOwner(bool isOwner) {
+  void isOwner(bool? isOwner) {
     _isOwner = isOwner;
   }
 
-  void customTitle(String customTitle) {
+  void customTitle(String? customTitle) {
     _customTitle = customTitle;
   }
 
-  void memberSince(String memberSince) {
+  void memberSince(String? memberSince) {
     _memberSince = memberSince;
   }
 
-  void route(String route) {
+  void route(String? route) {
     _route = route;
   }
 
-  void state(int state) {
+  void state(int? state) {
     _state = state;
   }
 
-  void communityId(int communityId) {
+  void communityId(int? communityId) {
     _communityId = communityId;
   }
 
-  void createdAt(int createdAt) {
+  void createdAt(int? createdAt) {
     _createdAt = createdAt;
   }
 
-  void widget(LMChatWidgetViewData widget) {
+  void widget(LMChatWidgetViewData? widget) {
     _widget = widget;
   }
 
   /// {@macro user_view_data_builder}
   LMChatUserViewData build() {
+    if (_id == null) {
+      throw Exception('id must not be null');
+    }
+    if (_name == null) {
+      throw Exception('name must not be null');
+    }
+    if (_uuid == null) {
+      throw Exception('uuid must not be null');
+    }
+    
+
     return LMChatUserViewData._(
       id: _id!,
       name: _name!,
@@ -158,7 +168,7 @@ class LMChatUserViewDataBuilder {
       isGuest: _isGuest,
       uuid: _uuid!,
       organisationName: _organisationName,
-      sdkClientInfo: _sdkClientInfo!,
+      sdkClientInfo: _sdkClientInfo,
       updatedAt: _updatedAt,
       isOwner: _isOwner,
       customTitle: _customTitle,

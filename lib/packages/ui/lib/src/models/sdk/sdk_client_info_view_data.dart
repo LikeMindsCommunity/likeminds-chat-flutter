@@ -1,3 +1,5 @@
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+
 class LMChatSDKClientInfoViewData {
   int community;
   int user;
@@ -43,3 +45,10 @@ class LMSDKClientInfoViewDataBuilder {
     );
   }
 }
+
+
+final userBuilder = LMChatUserViewDataBuilder()
+  ..uuid('uuid');
+
+
+final user = userBuilder.build();

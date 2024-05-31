@@ -1,5 +1,3 @@
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-
 enum LMTagType { groupTag, userTag }
 
 class LMChatTagViewData {
@@ -31,31 +29,33 @@ class LMChatTagViewData {
     this.isGuest,
     this.userUniqueId,
   });
-
+  //TODO: remove this code to convertor class
   //factory constructor for groupTag
-  factory LMChatTagViewData.fromGroupTag(GroupTag groupTag) {
-    return (LMChatTagViewDataBuilder()
-          ..name(groupTag.name!)
-          ..imageUrl(groupTag.imageUrl!)
-          ..tagType(LMTagType.groupTag)
-          ..description(groupTag.description)
-          ..route(groupTag.route)
-          ..tag(groupTag.tag))
-        .build();
-  }
+  // factory LMChatTagViewData.fromGroupTag(GroupTag groupTag) {
+  //   return (LMChatTagViewDataBuilder()
+  //         ..name(groupTag.name!)
+  //         ..imageUrl(groupTag.imageUrl!)
+  //         ..tagType(LMTagType.groupTag)
+  //         ..description(groupTag.description)
+  //         ..route(groupTag.route)
+  //         ..tag(groupTag.tag))
+  //       .build();
+  // }
 
+
+  //TODO: remove this code to convertor class
   //factory constructor for userTag
-  factory LMChatTagViewData.fromUserTag(UserTag userTag) {
-    return (LMChatTagViewDataBuilder()
-          ..name(userTag.name!)
-          ..imageUrl(userTag.imageUrl!)
-          ..tagType(LMTagType.userTag)
-          ..customTitle(userTag.customTitle)
-          ..id(userTag.id)
-          ..isGuest(userTag.isGuest)
-          ..userUniqueId(userTag.userUniqueId))
-        .build();
-  }
+  // factory LMChatTagViewData.fromUserTag(UserTag userTag) {
+  //   return (LMChatTagViewDataBuilder()
+  //         ..name(userTag.name!)
+  //         ..imageUrl(userTag.imageUrl!)
+  //         ..tagType(LMTagType.userTag)
+  //         ..customTitle(userTag.customTitle)
+  //         ..id(userTag.id)
+  //         ..isGuest(userTag.isGuest)
+  //         ..userUniqueId(userTag.userUniqueId))
+  //       .build();
+  // }
 }
 
 // Builder class

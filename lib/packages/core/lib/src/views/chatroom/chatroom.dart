@@ -6,9 +6,11 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
@@ -370,7 +372,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 return Column(
                   children: [
                     widget.appbarbuilder?.call(
-                          chatroom,
+                          chatroom.toChatRoomViewData(),
                           _defaultAppBar(chatroom),
                         ) ??
                         _defaultAppBar(chatroom),
@@ -477,8 +479,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                           item.state == 1
                                               ? LMChatTaggingHelper
                                                   .extractFirstDMStateMessage(
-                                                  item,
-                                                  user!,
+                                                  item.toConversationViewData(),
+                                                  user!.toUserViewData(),
                                                 )
                                               : LMChatTaggingHelper
                                                   .extractStateMessage(
@@ -517,9 +519,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultSentChatBubble(Conversation conversation) {
     return LMChatBubble(
-      conversation: conversation,
-      currentUser: LMChatPreferences.instance.getCurrentUser,
-      conversationUser: conversation.member!,
+      conversation: conversation.toConversationViewData(),
+      currentUser:
+          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
     );
@@ -527,9 +530,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultReceivedChatBubble(Conversation conversation) {
     return LMChatBubble(
-      conversation: conversation,
-      currentUser: LMChatPreferences.instance.getCurrentUser,
-      conversationUser: conversation.member!,
+      conversation: conversation.toConversationViewData(),
+      currentUser:
+          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,
     );
