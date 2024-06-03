@@ -17,9 +17,9 @@ class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
   static LMChatHomeBloc? _instance;
   static LMChatHomeBloc get instance {
     if (_instance == null || _instance!.isClosed) {
-      return LMChatHomeBloc._();
+      return _instance ??= LMChatHomeBloc._();
     } else {
-      return _instance ?? LMChatHomeBloc._();
+      return _instance!;
     }
   }
 
@@ -46,7 +46,7 @@ class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
 
             emit(LMChatHomeLoaded(response: response.data!));
           } else {
-            LMChatHomeError(response.errorMessage!);
+            emit(LMChatHomeError(response.errorMessage!));
           }
         }
         if (event is LMChatUpdateHomeEvent) {
