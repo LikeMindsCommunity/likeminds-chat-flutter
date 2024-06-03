@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
+/// `LMChatConversationViewData` is a model class that holds the data for the conversation view.
+/// This class is used to display the conversation information in the chat screen.
 class LMChatConversationViewData {
   final bool? allowAddOption;
   final String answer;
@@ -101,8 +103,115 @@ class LMChatConversationViewData {
     this.conversationReactions,
     this.poll,
   });
+
+  /// copyWith method is used to create a new instance of `LMChatConversationViewData` with the updated values.
+  /// If the new values are not provided, the old values are used.
+  LMChatConversationViewData copyWith({
+    bool? allowAddOption,
+    String? answer,
+    int? apiVersion,
+    int? attachmentCount,
+    List<LMChatAttachmentViewData>? attachments,
+    bool? attachmentsUploaded,
+    int? chatroomId,
+    int? communityId,
+    String? createdAt,
+    int? createdEpoch,
+    String? date,
+    int? deletedByUserId,
+    String? deviceId,
+    int? endTime,
+    int? expiryTime,
+    bool? hasFiles,
+    bool? hasReactions,
+    String? header,
+    int? id,
+    String? internalLink,
+    bool? isAnonymous,
+    bool? isEdited,
+    int? lastUpdated,
+    String? location,
+    String? locationLat,
+    String? locationLong,
+    int? multipleSelectNo,
+    int? multipleSelectState,
+    dynamic ogTags,
+    int? onlineLinkEnableBefore,
+    String? pollAnswerText,
+    int? pollType,
+    int? replyChatroomId,
+    int? replyId,
+    int? startTime,
+    int? state,
+    String? temporaryId,
+    int? userId,
+    int? memberId,
+    bool? toShowResults,
+    String? pollTypeText,
+    String? submitTypeText,
+    bool? isTimeStamp,
+    LMChatUserViewData? member,
+    int? replyConversation,
+    LMChatConversationViewData? replyConversationObject,
+    List<LMChatReactionViewData>? conversationReactions,
+    LMChatPollInfoViewData? poll,
+  }) {
+    return LMChatConversationViewData._(
+      allowAddOption: allowAddOption ?? this.allowAddOption,
+      answer: answer ?? this.answer,
+      apiVersion: apiVersion ?? this.apiVersion,
+      attachmentCount: attachmentCount ?? this.attachmentCount,
+      attachments: attachments ?? this.attachments,
+      attachmentsUploaded: attachmentsUploaded ?? this.attachmentsUploaded,
+      chatroomId: chatroomId ?? this.chatroomId,
+      communityId: communityId ?? this.communityId,
+      createdAt: createdAt ?? this.createdAt,
+      createdEpoch: createdEpoch ?? this.createdEpoch,
+      date: date ?? this.date,
+      deletedByUserId: deletedByUserId ?? this.deletedByUserId,
+      deviceId: deviceId ?? this.deviceId,
+      endTime: endTime ?? this.endTime,
+      expiryTime: expiryTime ?? this.expiryTime,
+      hasFiles: hasFiles ?? this.hasFiles,
+      hasReactions: hasReactions ?? this.hasReactions,
+      header: header ?? this.header,
+      id: id ?? this.id,
+      internalLink: internalLink ?? this.internalLink,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
+      isEdited: isEdited ?? this.isEdited,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+      location: location ?? this.location,
+      locationLat: locationLat ?? this.locationLat,
+      locationLong: locationLong ?? this.locationLong,
+      multipleSelectNo: multipleSelectNo ?? this.multipleSelectNo,
+      multipleSelectState: multipleSelectState ?? this.multipleSelectState,
+      ogTags: ogTags ?? this.ogTags,
+      onlineLinkEnableBefore: onlineLinkEnableBefore ?? this.onlineLinkEnableBefore,
+      pollAnswerText: pollAnswerText ?? this.pollAnswerText,
+      pollType: pollType ?? this.pollType,
+      replyChatroomId: replyChatroomId ?? this.replyChatroomId,
+      replyId: replyId ?? this.replyId,
+      startTime: startTime ?? this.startTime,
+      state: state ?? this.state,
+      temporaryId: temporaryId ?? this.temporaryId,
+      userId: userId ?? this.userId,
+      memberId: memberId ?? this.memberId,
+      toShowResults: toShowResults ?? this.toShowResults,
+      pollTypeText: pollTypeText ?? this.pollTypeText,
+      submitTypeText: submitTypeText ?? this.submitTypeText,
+      isTimeStamp: isTimeStamp ?? this.isTimeStamp,
+      member: member ?? this.member,
+      replyConversation: replyConversation ?? this.replyConversation,
+      replyConversationObject: replyConversationObject ?? this.replyConversationObject,
+      conversationReactions: conversationReactions ?? this.conversationReactions,
+      poll: poll ?? this.poll,
+    );
+  }
+
 }
 
+/// `LMChatConversationViewDataBuilder` is a builder class used to create an instance of `LMChatConversationViewData`.
+/// This class is used to create an instance of `LMChatConversationViewData` with the provided values.
 class LMChatConversationViewDataBuilder {
   bool? _allowAddOption;
   String? _answer ;
@@ -338,6 +447,8 @@ class LMChatConversationViewDataBuilder {
     _poll = poll;
   }
 
+
+  /// Builds the `LMChatConversationViewData` object using the provided values.
   LMChatConversationViewData build() {
     return LMChatConversationViewData._(
       allowAddOption: _allowAddOption,

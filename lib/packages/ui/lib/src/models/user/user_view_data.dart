@@ -57,6 +57,48 @@ class LMChatUserViewData {
     this.isDeleted,
     this.widget,
   });
+
+  /// copyWith method is used to create a new instance of `LMChatUserViewData` with the updated values.
+  /// If the new values are not provided, the old values are used.
+  LMChatUserViewData copyWith({
+    int? id,
+    String? name,
+    String? imageUrl,
+    bool? isGuest,
+    bool? isDeleted,
+    String? uuid,
+    String? organisationName,
+    LMChatSDKClientInfoViewData? sdkClientInfo,
+    int? updatedAt,
+    bool? isOwner,
+    String? customTitle,
+    String? memberSince,
+    String? route,
+    int? state,
+    int? communityId,
+    int? createdAt,
+    LMChatWidgetViewData? widget,
+  }) {
+    return LMChatUserViewData._(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      imageUrl: imageUrl ?? this.imageUrl,
+      isGuest: isGuest ?? this.isGuest,
+      uuid: uuid ?? this.uuid,
+      organisationName: organisationName ?? this.organisationName,
+      sdkClientInfo: sdkClientInfo ?? this.sdkClientInfo,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isOwner: isOwner ?? this.isOwner,
+      customTitle: customTitle ?? this.customTitle,
+      memberSince: memberSince ?? this.memberSince,
+      route: route ?? this.route,
+      state: state ?? this.state,
+      communityId: communityId ?? this.communityId,
+      createdAt: createdAt ?? this.createdAt,
+      isDeleted: isDeleted ?? this.isDeleted,
+      widget: widget ?? this.widget,
+    );
+  }
 }
 
 /// {@template user_view_data_builder}

@@ -1,5 +1,8 @@
 import 'package:likeminds_chat_flutter_ui/src/models/attachment/poll_view_data.dart';
 
+
+/// `LMChatPollInfoViewData` is a model class that holds the data for the poll info view.
+/// This class is used to display the poll information in the chat screen.
 class LMChatPollInfoViewData {
   final bool? isAnonymous;
   final bool? allowAddOption;
@@ -30,8 +33,44 @@ class LMChatPollInfoViewData {
     required this.toShowResult,
     required this.conversationId,
   });
+
+  /// copyWith method is used to create a new instance of `LMChatPollInfoViewData` with the updated values.
+  /// If the new values are not provided, the old values are used.
+  LMChatPollInfoViewData copyWith({
+    bool? isAnonymous,
+    bool? allowAddOption,
+    int? pollType,
+    String? pollTypeText,
+    String? submitTypeText,
+    int? expiryTime,
+    int? multipleSelectNum,
+    int? multipleSelectState,
+    List<LMChatPollViewData>? pollViewDataList,
+    String? pollAnswerText,
+    bool? isPollSubmitted,
+    bool? toShowResult,
+    int? conversationId,
+  }) {
+    return LMChatPollInfoViewData._(
+      isAnonymous: isAnonymous ?? this.isAnonymous,
+      allowAddOption: allowAddOption ?? this.allowAddOption,
+      pollType: pollType ?? this.pollType,
+      pollTypeText: pollTypeText ?? this.pollTypeText,
+      submitTypeText: submitTypeText ?? this.submitTypeText,
+      expiryTime: expiryTime ?? this.expiryTime,
+      multipleSelectNum: multipleSelectNum ?? this.multipleSelectNum,
+      multipleSelectState: multipleSelectState ?? this.multipleSelectState,
+      pollViewDataList: pollViewDataList ?? this.pollViewDataList,
+      pollAnswerText: pollAnswerText ?? this.pollAnswerText,
+      isPollSubmitted: isPollSubmitted ?? this.isPollSubmitted,
+      toShowResult: toShowResult ?? this.toShowResult,
+      conversationId: conversationId ?? this.conversationId,
+    );
+  }
 }
 
+/// `LMChatPollInfoViewDataBuilder` is a builder class that is used to build the `LMChatPollInfoViewData` object.
+/// This class is used to set the values for the `LMChatPollInfoViewData` object.
 class LMChatPollInfoViewDataBuilder {
   bool? _isAnonymous;
   bool? _allowAddOption;

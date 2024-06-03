@@ -1,3 +1,5 @@
+/// `LMWidgetViewData` is a data class that represents the data of a widget view.
+/// This class is used to display the widget view in the chat screen.
 class LMChatWidgetViewData {
   final String id;
   Map<String, dynamic>? lmMeta;
@@ -16,8 +18,33 @@ class LMChatWidgetViewData {
     required this.parentEntityType,
     required this.updatedAt,
   });
+
+  /// copyWith method is used to create a new instance of `LMChatWidgetViewData` with the updated values.
+  /// If the new values are not provided, the old values are used.
+  LMChatWidgetViewData copyWith({
+    String? id,
+    Map<String, dynamic>? lmMeta,
+    int? createdAt,
+    Map<String, dynamic>? metadata,
+    String? parentEntityId,
+    String? parentEntityType,
+    int? updatedAt,
+  }) {
+    return LMChatWidgetViewData._(
+      id: id ?? this.id,
+      lmMeta: lmMeta ?? this.lmMeta,
+      createdAt: createdAt ?? this.createdAt,
+      metadata: metadata ?? this.metadata,
+      parentEntityId: parentEntityId ?? this.parentEntityId,
+      parentEntityType: parentEntityType ?? this.parentEntityType,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
 
+
+/// `LMWidgetViewDataBuilder` is a builder class used to create an instance of `LMChatWidgetViewData`.
+/// This class is used to create an instance of `LMChatWidgetViewData` with the provided values.
 class LMWidgetViewDataBuilder {
   String? _id;
   Map<String, dynamic>? _lmMeta;
