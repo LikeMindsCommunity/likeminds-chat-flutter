@@ -39,6 +39,14 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   }
 
   @override
+  void didUpdateWidget(LMChatroomMenu old) {
+    super.didUpdateWidget(old);
+    homeBloc = LMChatHomeBloc.instance;
+    chatroomActions = widget.chatroomActions;
+    _controller = CustomPopupMenuController();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CustomPopupMenu(
       pressType: PressType.singleClick,
