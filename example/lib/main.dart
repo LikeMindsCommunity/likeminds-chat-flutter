@@ -31,7 +31,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
   await LMChatCore.instance.initialize(
-    apiKey: "YOUR-API-KEY",
+    apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
   );
   runApp(const LMChatSampleApp());
 }

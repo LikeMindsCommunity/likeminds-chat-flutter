@@ -139,9 +139,10 @@ class _CredScreenState extends State<CredScreen> {
                             .build());
                     if (response.success) {
                       MaterialPageRoute route = MaterialPageRoute(
-                        builder: (context) => const LMChatHomeScreen(
-                          chatroomType: LMChatroomType.dm,
-                        ),
+                        builder: (context) => const LMChatHome(),
+                        // builder: (context) => const LMChatHomeScreen(
+                        //   chatroomType: LMChatroomType.dm,
+                        // ),
                       );
                       Navigator.push(context, route);
                     } else {

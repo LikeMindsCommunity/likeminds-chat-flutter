@@ -59,7 +59,6 @@ class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
                     ..chatroomTypes([10]))
                   .build());
           if (response.success) {
-            emit(LMChatUpdatedHomeFeed());
             response.data?.conversationMeta?.forEach((key, value) {
               String? userId = value.userId == null
                   ? value.memberId?.toString()

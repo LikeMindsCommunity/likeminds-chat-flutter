@@ -20,16 +20,6 @@ class LMChatUpdateHomeFeed extends LMChatHomeState {
   LMChatUpdateHomeFeed({required this.response});
 }
 
-class LMChatUpdatedHomeFeed extends LMChatHomeState {}
-
-class LMChatRealTimeHomeUpdate extends LMChatHomeState {
-  final int chatroomId;
-  final int conversationId;
-
-  LMChatRealTimeHomeUpdate(
-      {required this.chatroomId, required this.conversationId});
-}
-
 class LMChatHomeError extends LMChatHomeState {
   final String message;
 
