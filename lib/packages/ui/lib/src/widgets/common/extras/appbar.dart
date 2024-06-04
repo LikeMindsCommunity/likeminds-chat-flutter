@@ -88,7 +88,6 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Container(
                     constraints: BoxConstraints(
                       maxWidth: 60.w,
-                      maxHeight: 2.5.h,
                     ),
                     child: title ?? const SizedBox.shrink(),
                   ),
