@@ -557,10 +557,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       title: LMChatText(
         chatUser.name ?? chatroom.title,
         style: LMChatTextStyle(
+          maxLines: 1,
           textStyle: TextStyle(
-            color: LMChatTheme.theme.onContainer,
             fontSize: 16,
             fontWeight: FontWeight.w500,
+            overflow: TextOverflow.ellipsis,
+            color: LMChatTheme.theme.onContainer,
           ),
         ),
       ),
