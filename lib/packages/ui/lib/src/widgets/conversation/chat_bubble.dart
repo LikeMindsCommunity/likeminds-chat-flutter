@@ -144,7 +144,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     child: Container(
                       constraints: BoxConstraints(
                         minHeight: 2.h,
-                        minWidth: 5.w,
+                        // minWidth: 5.w,
+                        minWidth: conversation.answer.split('\n').length > 4
+                            ? 40.w
+                            : 5.w,
                         maxWidth: 50.w,
                       ),
                       padding: EdgeInsets.all(
@@ -159,7 +162,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                             ),
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: isSent
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.end,
                         children: [
                           const LMChatBubbleHeader(),
                           conversation.deletedByUserId != null
