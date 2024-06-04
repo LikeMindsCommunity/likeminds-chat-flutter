@@ -332,7 +332,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: LMChatTheme.theme.backgroundColor,
-        floatingActionButton: !showScrollButton ? _defaultScrollButton() : null,
+        floatingActionButton: showScrollButton ? _defaultScrollButton() : null,
         body: SafeArea(
           bottom: false,
           child: BlocConsumer<LMChatroomBloc, LMChatroomState>(
