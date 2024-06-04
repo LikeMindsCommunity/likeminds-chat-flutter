@@ -332,7 +332,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: LMChatTheme.theme.backgroundColor,
-        floatingActionButton: showScrollButton ? _defaultScrollButton() : null,
+        floatingActionButton: !showScrollButton ? _defaultScrollButton() : null,
         body: SafeArea(
           bottom: false,
           child: BlocConsumer<LMChatroomBloc, LMChatroomState>(
@@ -581,7 +581,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultScrollButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 72.0),
+      padding: const EdgeInsets.only(bottom: 96.0),
       child: LMChatButton(
         onTap: () {
           _scrollToBottom();
@@ -590,14 +590,17 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           height: 42,
           width: 42,
           borderRadius: 24,
+          border: Border.all(
+            color: LMChatTheme.theme.onContainer.withOpacity(0.2),
+          ),
           backgroundColor: LMChatTheme.theme.container,
           icon: LMChatIcon(
             type: LMChatIconType.icon,
             icon: Icons.keyboard_arrow_down,
             style: LMChatIconStyle(
-              size: 24,
-              boxSize: 30,
-              boxPadding: 6,
+              size: 28,
+              boxSize: 28,
+              boxPadding: 2,
               color: LMChatTheme.theme.onContainer,
             ),
           ),
