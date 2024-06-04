@@ -164,7 +164,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       child: Column(
                         crossAxisAlignment: isSent
                             ? CrossAxisAlignment.start
-                            : CrossAxisAlignment.end,
+                            : conversation.answer.length > 3
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
                         children: [
                           const LMChatBubbleHeader(),
                           conversation.deletedByUserId != null
