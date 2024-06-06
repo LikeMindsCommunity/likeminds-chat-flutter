@@ -16,6 +16,7 @@ class LMChatTextField extends StatefulWidget {
   final int chatroomId;
   final bool isSecret;
   final bool enabled;
+  final ScrollPhysics? scrollPhysics;
 
   const LMChatTextField({
     super.key,
@@ -29,6 +30,7 @@ class LMChatTextField extends StatefulWidget {
     this.style,
     this.decoration,
     this.onChange,
+    this.scrollPhysics,
   });
 
   @override
@@ -147,19 +149,20 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
         bottom: 4.0,
       ),
       child: TypeAheadField<LMChatTagViewData>(
+        scrollPhysics: widget.scrollPhysics ?? const FixedExtentScrollPhysics(),
         tagColor: LMChatTheme.theme.secondaryColor,
         onTagTap: (p) {
           // print(p);
         },
         suggestionsBoxController: _suggestionsBoxController,
-        suggestionsBoxDecoration: const SuggestionsBoxDecoration(
+        suggestionsBoxDecoration: SuggestionsBoxDecoration(
           offsetX: -2,
           elevation: 2,
-          color: LMChatDefaultTheme.whiteColor,
+          color: LMChatTheme.theme.container,
           clipBehavior: Clip.hardEdge,
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(12.0)),
           hasScrollbar: false,
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             maxHeight: 72,
             minWidth: 240,
           ),
@@ -178,6 +181,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           focusNode: _focusNode,
           minLines: 1,
           maxLines: 200,
+          scrollPadding: const EdgeInsets.all(2),
           enabled: widget.decoration?.enabled ?? true,
           decoration: widget.decoration ??
               InputDecoration(
