@@ -561,10 +561,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       title: LMChatText(
         chatUser.name ?? chatroom.title,
         style: LMChatTextStyle(
+          maxLines: 1,
           textStyle: TextStyle(
-            color: LMChatTheme.theme.onContainer,
             fontSize: 16,
             fontWeight: FontWeight.w500,
+            overflow: TextOverflow.ellipsis,
+            color: LMChatTheme.theme.onContainer,
           ),
         ),
       ),
@@ -583,7 +585,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultScrollButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 72.0),
+      padding: const EdgeInsets.only(bottom: 96.0),
       child: LMChatButton(
         onTap: () {
           _scrollToBottom();
@@ -592,14 +594,17 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           height: 42,
           width: 42,
           borderRadius: 24,
+          border: Border.all(
+            color: LMChatTheme.theme.onContainer.withOpacity(0.2),
+          ),
           backgroundColor: LMChatTheme.theme.container,
           icon: LMChatIcon(
             type: LMChatIconType.icon,
             icon: Icons.keyboard_arrow_down,
             style: LMChatIconStyle(
-              size: 24,
-              boxSize: 30,
-              boxPadding: 6,
+              size: 28,
+              boxSize: 28,
+              boxPadding: 2,
               color: LMChatTheme.theme.onContainer,
             ),
           ),

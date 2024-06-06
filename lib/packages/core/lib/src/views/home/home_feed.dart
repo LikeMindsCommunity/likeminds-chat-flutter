@@ -63,6 +63,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   @override
   void dispose() {
+    homeFeedPagingController.itemList?.clear();
     homeBloc.close();
     super.dispose();
   }
@@ -98,6 +99,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     if (state is LMChatHomeLoaded) {
       List<LMChatTile> chatItems = getChats(context, state.response);
       _pageKey++;
+      homeFeedPagingController.itemList?.clear();
+      homeFeedPagingController.nextPageKey = _pageKey;
       if (state.response.chatroomsData == null ||
           state.response.chatroomsData!.isEmpty ||
           state.response.chatroomsData!.length < pageSize) {

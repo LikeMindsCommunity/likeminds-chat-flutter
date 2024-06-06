@@ -233,45 +233,38 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                     horizontal: kPaddingSmall,
                     vertical: kPaddingSmall,
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: LMChatTextField(
-                          isDown: false,
-                          enabled: false,
-                          isSecret: widget.chatroom.isSecret ?? false,
-                          chatroomId: widget.chatroom.id,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(fontSize: 14),
-                          onTagSelected: (tag) {
-                            tags.add(tag);
-                            LMAnalytics.get()
-                                .track(AnalyticsKeys.userTagsSomeone, {
-                              'community_id': widget.chatroom.id,
-                              'chatroom_name': widget.chatroom.title,
-                              'tagged_user_id': tag.id,
-                              'tagged_user_name': tag.name,
-                            });
-                          },
-                          onChange: (t) {},
-                          controller: _textEditingController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            enabled: checkIfAnnouncementChannel(),
-                            hintMaxLines: 1,
-                            hintStyle: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontSize: 14),
-                            hintText: getChatBarHintText(),
-                          ),
-                          focusNode: _focusNode,
-                        ),
-                      ),
-                    ],
+                  child: LMChatTextField(
+                    isDown: false,
+                    enabled: false,
+                    scrollPhysics: const AlwaysScrollableScrollPhysics(),
+                    isSecret: widget.chatroom.isSecret ?? false,
+                    chatroomId: widget.chatroom.id,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(fontSize: 14),
+                    onTagSelected: (tag) {
+                      tags.add(tag);
+                      LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
+                        'community_id': widget.chatroom.id,
+                        'chatroom_name': widget.chatroom.title,
+                        'tagged_user_id': tag.id,
+                        'tagged_user_name': tag.name,
+                      });
+                    },
+                    onChange: (t) {},
+                    controller: _textEditingController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      enabled: checkIfAnnouncementChannel(),
+                      hintMaxLines: 1,
+                      hintStyle: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(fontSize: 14),
+                      hintText: getChatBarHintText(),
+                    ),
+                    focusNode: _focusNode,
                   ),
                 ),
               ),

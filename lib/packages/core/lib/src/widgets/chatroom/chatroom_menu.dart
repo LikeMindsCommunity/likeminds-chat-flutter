@@ -58,7 +58,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         child: Container(
           constraints: BoxConstraints(
             minWidth: 12.w,
-            maxWidth: 50.w,
+            maxWidth: 60.w,
           ),
           color: LMChatTheme.theme.container,
           child: ListView.builder(

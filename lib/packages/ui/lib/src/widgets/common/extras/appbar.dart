@@ -80,17 +80,24 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             leading != null || inStyle.showBackButton
                 ? SizedBox(width: inStyle.gap ?? 12)
                 : const SizedBox.shrink(),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                title ?? const SizedBox.shrink(),
-                subtitle != null
-                    ? const SizedBox(height: 4)
-                    : const SizedBox.shrink(),
-                subtitle ?? const SizedBox.shrink(),
-              ],
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: 60.w,
+                    ),
+                    child: title ?? const SizedBox.shrink(),
+                  ),
+                  subtitle != null
+                      ? const SizedBox(height: 1)
+                      : const SizedBox.shrink(),
+                  subtitle ?? const SizedBox.shrink(),
+                ],
+              ),
             ),
-            const Spacer(),
             if (trailing != null) ...trailing!
           ],
         ),
