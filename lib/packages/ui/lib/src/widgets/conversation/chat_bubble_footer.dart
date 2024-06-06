@@ -1,7 +1,7 @@
 part of 'chat_bubble.dart';
 
 class LMChatBubbleFooter extends StatelessWidget {
-  final Conversation conversation;
+  final LMChatConversationViewData conversation;
 
   final LMChatText? timeStamp;
   final LMChatIcon? pendingTimer;
@@ -46,7 +46,7 @@ class LMChatBubbleFooter extends StatelessWidget {
   }
 
   LMChatBubbleFooter copyWith({
-    Conversation? conversation,
+    LMChatConversationViewData? conversation,
     LMChatText? timeStamp,
     LMChatIcon? pendingTimer,
     LMChatBubbleFooterStyle? style,

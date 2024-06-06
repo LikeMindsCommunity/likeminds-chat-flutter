@@ -12,10 +12,10 @@ List<int> getChatroomTypes(LMChatroomType type) {
 }
 
 String getChatroomPreviewMessage(
-  Conversation conversation,
-  User conversationUser,
-  User chatroomUser,
-  User chatroomWithUser,
+  LMChatConversationViewData conversation,
+  LMChatUserViewData conversationUser,
+  LMChatUserViewData chatroomUser,
+  LMChatUserViewData chatroomWithUser,
 ) {
   String personLabel = "";
   final user = LMChatPreferences.instance.getCurrentUser;

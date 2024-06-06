@@ -3,7 +3,7 @@
 
 part of 'chat_bubble.dart';
 
-typedef LMChatBubbleContentBuilder = Widget Function(Conversation conversation);
+typedef LMChatBubbleContentBuilder = Widget Function(LMChatConversationViewData conversation);
 
 class LMChatBubbleContent extends StatelessWidget {
   const LMChatBubbleContent({
@@ -13,7 +13,7 @@ class LMChatBubbleContent extends StatelessWidget {
     this.style,
   });
 
-  final Conversation conversation;
+  final LMChatConversationViewData conversation;
   final Function(String tag) onTagTap;
   final LMChatBubbleContentStyle? style;
 
@@ -46,7 +46,7 @@ class LMChatBubbleContent extends StatelessWidget {
   }
 
   LMChatBubbleContent copyWith({
-    Conversation? conversation,
+    LMChatConversationViewData? conversation,
     Function(String tag)? onTagTap,
     LMChatBubbleContentStyle? style,
   }) {

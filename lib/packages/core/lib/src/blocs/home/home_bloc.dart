@@ -14,6 +14,12 @@ const int pageSize = 20;
 class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
   int currentTime = DateTime.now().millisecondsSinceEpoch;
 
+  @override
+  Future<void> close() {
+    _instance = null;
+    return super.close();
+  }
+
   static LMChatHomeBloc? _instance;
   static LMChatHomeBloc get instance {
     if (_instance == null || _instance!.isClosed) {

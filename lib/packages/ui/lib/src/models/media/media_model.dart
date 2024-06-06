@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 
 enum LMMediaType { video, image, document, link }
 
@@ -13,7 +13,7 @@ class LMChatMediaModel {
   int? duration; // required for video url
   String? format; // required for documents
   int? size; // required for documents
-  OgTags? ogTags; // required for links (attachment type 4)
+  LMChatOGTagsViewData? ogTags; // required for links (attachment type 4)
 
   LMChatMediaModel({
     required this.mediaType,

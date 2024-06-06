@@ -1,7 +1,11 @@
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-
+/// `LMTagType` is an enum class that holds the values for the tag type.
+/// This class is used to differentiate between the group tag and user tag.
+/// The values are `groupTag` and `userTag`.
 enum LMTagType { groupTag, userTag }
 
+
+/// `LMChatTagViewData` is a model class that holds the data for the tag view.
+/// This class is used to display the tag information in the chat screen.
 class LMChatTagViewData {
   //common values
   final String name;
@@ -32,33 +36,37 @@ class LMChatTagViewData {
     this.userUniqueId,
   });
 
-  //factory constructor for groupTag
-  factory LMChatTagViewData.fromGroupTag(GroupTag groupTag) {
-    return (LMChatTagViewDataBuilder()
-          ..name(groupTag.name!)
-          ..imageUrl(groupTag.imageUrl!)
-          ..tagType(LMTagType.groupTag)
-          ..description(groupTag.description)
-          ..route(groupTag.route)
-          ..tag(groupTag.tag))
-        .build();
-  }
-
-  //factory constructor for userTag
-  factory LMChatTagViewData.fromUserTag(UserTag userTag) {
-    return (LMChatTagViewDataBuilder()
-          ..name(userTag.name!)
-          ..imageUrl(userTag.imageUrl!)
-          ..tagType(LMTagType.userTag)
-          ..customTitle(userTag.customTitle)
-          ..id(userTag.id)
-          ..isGuest(userTag.isGuest)
-          ..userUniqueId(userTag.userUniqueId))
-        .build();
+  /// copyWith method is used to create a new instance of `LMChatTagViewData` with the updated values.
+  /// If the new values are not provided, the old values are used.
+  LMChatTagViewData copyWith({
+    String? name,
+    String? imageUrl,
+    LMTagType? tagType,
+    String? description,
+    String? route,
+    String? tag,
+    String? customTitle,
+    int? id,
+    bool? isGuest,
+    String? userUniqueId,
+  }) {
+    return LMChatTagViewData._(
+      name: name ?? this.name,
+      imageUrl: imageUrl ?? this.imageUrl,
+      tagType: tagType ?? this.tagType,
+      description: description ?? this.description,
+      route: route ?? this.route,
+      tag: tag ?? this.tag,
+      customTitle: customTitle ?? this.customTitle,
+      id: id ?? this.id,
+      isGuest: isGuest ?? this.isGuest,
+      userUniqueId: userUniqueId ?? this.userUniqueId,
+    );
   }
 }
 
-// Builder class
+/// `LMChatTagViewDataBuilder` is a builder class used to create an instance of `LMChatTagViewData`.
+/// This class is used to create an instance of `LMChatTagViewData` with the provided values.
 class LMChatTagViewDataBuilder {
   String? _name;
   String? _imageUrl;
@@ -111,6 +119,8 @@ class LMChatTagViewDataBuilder {
     _userUniqueId = userUniqueId;
   }
 
+
+  /// build method is used to create an instance of `LMChatTagViewData` with the provided values.
   LMChatTagViewData build() {
     if (_name == null) {
       throw StateError("name is required");

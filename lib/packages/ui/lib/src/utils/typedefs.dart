@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/chatroom/chatroom_view_data.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
 typedef LMChatErrorHandler = Function(String, StackTrace);
 
 typedef LMChatHomeAppBarBuilder = LMChatAppBar Function(
-  User currentUser,
+  LMChatUserViewData currentUser,
   LMChatAppBar oldAppBar,
 );
 
 typedef LMChatroomAppBarBuilder = LMChatAppBar Function(
-  ChatRoom chatrooom,
+  LMChatRoomViewData chatrooom,
   LMChatAppBar oldAppBar,
 );
 
 typedef LMChatroomTileBuilder = LMChatTile Function(
-  ChatRoom chatroom,
+  LMChatRoomViewData chatroom,
   LMChatTile oldTile,
 );
 
 typedef LMChatBubbleBuilder = Widget Function(
-  Conversation conversation,
-  User user,
+  LMChatConversationViewData conversation,
+  LMChatUserViewData user,
   LMChatBubble oldBubble,
 );
 
@@ -33,6 +34,6 @@ typedef LMChatStateBubbleBuilder = Widget Function(
 typedef LMChatContextWidgetBuilder = Widget Function(BuildContext context);
 
 typedef LMChatroomChatBarBuilder = Widget Function(
-  ChatRoom chatroom,
+  LMChatRoomViewData chatroom,
   Function onMessageSent,
 );

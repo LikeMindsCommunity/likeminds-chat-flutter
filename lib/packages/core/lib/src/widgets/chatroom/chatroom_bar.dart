@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/og_tag/og_tag_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
@@ -122,12 +123,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         linkModel = LMChatMediaModel(
           mediaType: LMMediaType.link,
           link: previewLink,
-          ogTags: OgTags(
-            description: responseTags!.description,
-            image: responseTags.image,
-            title: responseTags.title,
-            url: responseTags.url,
-          ),
+          ogTags: responseTags?.toLMChatOGTagViewData(),
         );
         LMAnalytics.get().track(
           AnalyticsKeys.attachmentsUploaded,
@@ -237,45 +233,38 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                     horizontal: kPaddingSmall,
                     vertical: kPaddingSmall,
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: LMChatTextField(
-                          isDown: false,
-                          enabled: false,
-                          isSecret: widget.chatroom.isSecret ?? false,
-                          chatroomId: widget.chatroom.id,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(fontSize: 14),
-                          onTagSelected: (tag) {
-                            tags.add(tag);
-                            LMAnalytics.get()
-                                .track(AnalyticsKeys.userTagsSomeone, {
-                              'community_id': widget.chatroom.id,
-                              'chatroom_name': widget.chatroom.title,
-                              'tagged_user_id': tag.id,
-                              'tagged_user_name': tag.name,
-                            });
-                          },
-                          onChange: (t) {},
-                          controller: _textEditingController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            enabled: checkIfAnnouncementChannel(),
-                            hintMaxLines: 1,
-                            hintStyle: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontSize: 14),
-                            hintText: getChatBarHintText(),
-                          ),
-                          focusNode: _focusNode,
-                        ),
-                      ),
-                    ],
+                  child: LMChatTextField(
+                    isDown: false,
+                    enabled: false,
+                    scrollPhysics: const AlwaysScrollableScrollPhysics(),
+                    isSecret: widget.chatroom.isSecret ?? false,
+                    chatroomId: widget.chatroom.id,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(fontSize: 14),
+                    onTagSelected: (tag) {
+                      tags.add(tag);
+                      LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
+                        'community_id': widget.chatroom.id,
+                        'chatroom_name': widget.chatroom.title,
+                        'tagged_user_id': tag.id,
+                        'tagged_user_name': tag.name,
+                      });
+                    },
+                    onChange: (t) {},
+                    controller: _textEditingController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      enabled: checkIfAnnouncementChannel(),
+                      hintMaxLines: 1,
+                      hintStyle: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(fontSize: 14),
+                      hintText: getChatBarHintText(),
+                    ),
+                    focusNode: _focusNode,
                   ),
                 ),
               ),
@@ -333,14 +322,14 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                                     ..text(result!)
                                                     ..replyId(
                                                         replyToConversation?.id)
-                                                    ..ogTags(linkModel!.ogTags!)
+                                                    ..ogTags(linkModel!.ogTags!.toOGTag())
                                                     ..shareLink(
                                                         linkModel!.link!))
                                                   .build(),
                                               [
                                             LMChatMedia(
                                                 mediaType: LMChatMediaType.link,
-                                                ogTags: linkModel!.ogTags)
+                                                ogTags: linkModel!.ogTags?.toOGTag())
                                           ]));
                                       linkModel = null;
                                       isActiveLink = false;

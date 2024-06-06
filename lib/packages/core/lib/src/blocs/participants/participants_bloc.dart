@@ -30,20 +30,12 @@ class LMChatParticipantsBloc
         );
         if (response.success) {
           GetParticipantsResponse getParticipantsResponse = response.data!;
-          if (getParticipantsResponse.success) {
-            emit(
-              LMChatParticipantsLoaded(
-                getParticipantsResponse: getParticipantsResponse,
-              ),
-            );
-          } else {
-            debugPrint(getParticipantsResponse.errorMessage);
-            emit(
-              LMChatParticipantsError(
-                getParticipantsResponse.errorMessage!,
-              ),
-            );
-          }
+
+          emit(
+            LMChatParticipantsLoaded(
+              getParticipantsResponse: getParticipantsResponse,
+            ),
+          );
         } else {
           debugPrint(response.errorMessage);
           emit(

@@ -7,6 +7,9 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/home/home_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
@@ -60,6 +63,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   @override
   void dispose() {
+    homeFeedPagingController.itemList?.clear();
     homeBloc.close();
     super.dispose();
   }
@@ -95,6 +99,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     if (state is LMChatHomeLoaded) {
       List<LMChatTile> chatItems = getChats(context, state.response);
       _pageKey++;
+      homeFeedPagingController.itemList?.clear();
+      homeFeedPagingController.nextPageKey = _pageKey;
       if (state.response.chatroomsData == null ||
           state.response.chatroomsData!.isEmpty ||
           state.response.chatroomsData!.length < pageSize) {
@@ -129,7 +135,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
           child: Column(
             children: [
               widget.appbarBuilder?.call(
-                    user!,
+                    user!.toUserViewData(),
                     _defaultAppBar(),
                   ) ??
                   _defaultAppBar(),
@@ -227,8 +233,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   }
 
   LMChatTile _defaultChatroomTile(
-    ChatRoom chatroom,
-    Conversation conversation,
+    LMChatRoomViewData chatroom,
+    LMChatConversationViewData conversation,
     User chatroomWithUser,
     User chatroomUser,
     User conversationUser,
@@ -237,9 +243,9 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     bool whichUser = user != null && user!.id != chatroomWithUser.id;
     String message = getChatroomPreviewMessage(
       conversation,
-      conversationUser,
-      chatroomUser,
-      chatroomWithUser,
+      conversationUser.toUserViewData(),
+      chatroomUser.toUserViewData(),
+      chatroomWithUser.toUserViewData(),
     );
     return LMChatTile(
       style: LMChatTileStyle.basic()
@@ -278,7 +284,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               conversation.deletedByUserId == null)
           ? getChatItemAttachmentTile(
               attachmentMeta,
-              conversation,
+              conversation.toConversation(),
             )
           : LMChatText(
               conversation.state != 0
@@ -359,7 +365,9 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     GetHomeFeedResponse response,
   ) {
     List<LMChatTile> chats = [];
-    final List<ChatRoom> chatrooms = response.chatroomsData ?? [];
+    final List<LMChatRoomViewData> chatrooms =
+        response.chatroomsData?.map((e) => e.toChatRoomViewData()).toList() ??
+            [];
     final Map<String, Conversation> lastConversations =
         response.conversationMeta ?? {};
     final Map<int, User> userMeta = response.userMeta ?? {};
@@ -384,7 +392,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               chatrooms[i],
               _defaultChatroomTile(
                 chatrooms[i],
-                conversation,
+                conversation.toConversationViewData(),
                 chatroomWithUser,
                 chatroomUser,
                 conversationUser,
@@ -393,7 +401,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
             ) ??
             _defaultChatroomTile(
               chatrooms[i],
-              conversation,
+              conversation.toConversationViewData(),
               chatroomWithUser,
               chatroomUser,
               conversationUser,

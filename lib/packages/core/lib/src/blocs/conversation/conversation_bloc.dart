@@ -188,93 +188,76 @@ class LMChatConversationBloc
 
       if (response.success) {
         PostConversationResponse postConversationResponse = response.data!;
-        if (postConversationResponse.success) {
-          if (event.mediaFiles.length == 1 &&
-              event.mediaFiles.first.mediaType == LMChatMediaType.link) {
-            emit(
-              MultiMediaConversationPosted(
-                postConversationResponse,
-                event.mediaFiles,
-              ),
+        if (event.mediaFiles.length == 1 &&
+            event.mediaFiles.first.mediaType == LMChatMediaType.link) {
+          emit(
+            MultiMediaConversationPosted(
+              postConversationResponse,
+              event.mediaFiles,
+            ),
+          );
+        } else {
+          List<LMChatMedia> fileLink = [];
+          int length = event.mediaFiles.length;
+          for (int i = 0; i < length; i++) {
+            LMChatMedia media = event.mediaFiles[i];
+            String? url = await mediaService.uploadFile(
+              media.mediaFile!,
+              event.postConversationRequest.chatroomId,
+              postConversationResponse.conversation!.id,
             );
-          } else {
-            List<LMChatMedia> fileLink = [];
-            int length = event.mediaFiles.length;
-            for (int i = 0; i < length; i++) {
-              LMChatMedia media = event.mediaFiles[i];
-              String? url = await mediaService.uploadFile(
-                media.mediaFile!,
+            String? thumbnailUrl;
+            if (media.mediaType == LMChatMediaType.video) {
+              // If the thumbnail file is not present in media object
+              // then generate the thumbnail and upload it to the server
+              if (media.thumbnailFile == null) {
+                await getVideoThumbnail(media);
+              }
+              thumbnailUrl = await mediaService.uploadFile(
+                media.thumbnailFile!,
                 event.postConversationRequest.chatroomId,
                 postConversationResponse.conversation!.id,
               );
-              String? thumbnailUrl;
-              if (media.mediaType == LMChatMediaType.video) {
-                // If the thumbnail file is not present in media object
-                // then generate the thumbnail and upload it to the server
-                if (media.thumbnailFile == null) {
-                  await getVideoThumbnail(media);
-                }
-                thumbnailUrl = await mediaService.uploadFile(
-                  media.thumbnailFile!,
-                  event.postConversationRequest.chatroomId,
-                  postConversationResponse.conversation!.id,
-                );
-              }
-
-              String attachmentType = mapMediaTypeToString(media.mediaType);
-              PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
-                    ..conversationId(postConversationResponse.conversation!.id)
-                    ..filesCount(length)
-                    ..index(i)
-                    ..height(media.height)
-                    ..width(media.width)
-                    ..meta({
-                      'size': media.size,
-                      'number_of_page': media.pageCount,
-                    })
-                    ..type(attachmentType)
-                    ..thumbnailUrl(thumbnailUrl)
-                    ..url(url!))
-                  .build();
-              LMResponse<PutMediaResponse> uploadFileResponse =
-                  await LMChatCore.client.putMultimedia(putMediaRequest);
-              if (!uploadFileResponse.success) {
-                emit(
-                  MultiMediaConversationError(
-                    uploadFileResponse.errorMessage!,
-                    event.postConversationRequest.temporaryId,
-                  ),
-                );
-              } else {
-                if (!uploadFileResponse.data!.success) {
-                  emit(
-                    MultiMediaConversationError(
-                      uploadFileResponse.data!.errorMessage!,
-                      event.postConversationRequest.temporaryId,
-                    ),
-                  );
-                } else {
-                  LMChatMedia mediaItem =
-                      LMChatMedia.fromJson(putMediaRequest.toJson());
-                  mediaItem.mediaFile = media.mediaFile;
-                  mediaItem.thumbnailFile = media.thumbnailFile;
-                  fileLink.add(mediaItem);
-                }
-              }
             }
-            lastConversationId = response.data!.conversation!.id;
-            emit(
-              MultiMediaConversationPosted(
-                postConversationResponse,
-                fileLink,
-              ),
-            );
+
+            String attachmentType = mapMediaTypeToString(media.mediaType);
+            PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
+                  ..conversationId(postConversationResponse.conversation!.id)
+                  ..filesCount(length)
+                  ..index(i)
+                  ..height(media.height)
+                  ..width(media.width)
+                  ..meta({
+                    'size': media.size,
+                    'number_of_page': media.pageCount,
+                  })
+                  ..type(attachmentType)
+                  ..thumbnailUrl(thumbnailUrl)
+                  ..url(url!))
+                .build();
+            LMResponse<PutMediaResponse> uploadFileResponse =
+                await LMChatCore.client.putMultimedia(putMediaRequest);
+            if (!uploadFileResponse.success) {
+              emit(
+                MultiMediaConversationError(
+                  uploadFileResponse.errorMessage!,
+                  event.postConversationRequest.temporaryId,
+                ),
+              );
+            } else {
+              emit(
+                MultiMediaConversationError(
+                  uploadFileResponse.errorMessage!,
+                  event.postConversationRequest.temporaryId,
+                ),
+              );
+            }
           }
-        } else {
+          lastConversationId = response.data!.conversation!.id;
           emit(
-            MultiMediaConversationError(
-              postConversationResponse.errorMessage!,
-              event.postConversationRequest.temporaryId,
+            MultiMediaConversationPosted(
+              postConversationResponse,
+              fileLink,
             ),
           );
         }
@@ -325,22 +308,14 @@ class LMChatConversationBloc
       );
 
       if (response.success) {
-        if (response.data!.success) {
-          Conversation conversation = response.data!.conversation!;
-          if (conversation.replyId != null ||
-              conversation.replyConversation != null) {
-            conversation.replyConversationObject = event.repliedTo;
-          }
-          emit(ConversationPosted(response.data!));
-        } else {
-          emit(
-            ConversationError(
-              response.data!.errorMessage!,
-              event.postConversationRequest.temporaryId,
-            ),
-          );
-          return false;
+        Conversation conversation = response.data!.conversation!;
+        if (conversation.replyId != null ||
+            conversation.replyConversation != null) {
+          conversation.replyConversationObject = event.repliedTo;
         }
+        emit(ConversationPosted(response.data!));
+
+        return false;
       } else {
         emit(
           ConversationError(

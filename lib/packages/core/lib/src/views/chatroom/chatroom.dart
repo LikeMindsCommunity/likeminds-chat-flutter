@@ -6,9 +6,11 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
@@ -370,7 +372,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 return Column(
                   children: [
                     widget.appbarbuilder?.call(
-                          chatroom,
+                          chatroom.toChatRoomViewData(),
                           _defaultAppBar(chatroom),
                         ) ??
                         _defaultAppBar(chatroom),
@@ -477,8 +479,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                           item.state == 1
                                               ? LMChatTaggingHelper
                                                   .extractFirstDMStateMessage(
-                                                  item,
-                                                  user!,
+                                                  item.toConversationViewData(),
+                                                  user!.toUserViewData(),
                                                 )
                                               : LMChatTaggingHelper
                                                   .extractStateMessage(
@@ -517,9 +519,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultSentChatBubble(Conversation conversation) {
     return LMChatBubble(
-      conversation: conversation,
-      currentUser: LMChatPreferences.instance.getCurrentUser,
-      conversationUser: conversation.member!,
+      conversation: conversation.toConversationViewData(),
+      currentUser:
+          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
     );
@@ -527,9 +530,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultReceivedChatBubble(Conversation conversation) {
     return LMChatBubble(
-      conversation: conversation,
-      currentUser: LMChatPreferences.instance.getCurrentUser,
-      conversationUser: conversation.member!,
+      conversation: conversation.toConversationViewData(),
+      currentUser:
+          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,
     );
@@ -557,10 +561,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       title: LMChatText(
         chatUser.name ?? chatroom.title,
         style: LMChatTextStyle(
+          maxLines: 1,
           textStyle: TextStyle(
-            color: LMChatTheme.theme.onContainer,
             fontSize: 16,
             fontWeight: FontWeight.w500,
+            overflow: TextOverflow.ellipsis,
+            color: LMChatTheme.theme.onContainer,
           ),
         ),
       ),
@@ -579,7 +585,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   Widget _defaultScrollButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 72.0),
+      padding: const EdgeInsets.only(bottom: 96.0),
       child: LMChatButton(
         onTap: () {
           _scrollToBottom();
@@ -588,14 +594,17 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           height: 42,
           width: 42,
           borderRadius: 24,
+          border: Border.all(
+            color: LMChatTheme.theme.onContainer.withOpacity(0.2),
+          ),
           backgroundColor: LMChatTheme.theme.container,
           icon: LMChatIcon(
             type: LMChatIconType.icon,
             icon: Icons.keyboard_arrow_down,
             style: LMChatIconStyle(
-              size: 24,
-              boxSize: 30,
-              boxPadding: 6,
+              size: 28,
+              boxSize: 28,
+              boxPadding: 2,
               color: LMChatTheme.theme.onContainer,
             ),
           ),

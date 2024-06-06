@@ -62,7 +62,7 @@ Conversation conversationToLocalTopicStateMessage(
   return stateMessage;
 }
 
-String getDeletedText(Conversation conversation, User user) {
+String getDeletedText(LMChatConversationViewData conversation, LMChatUserViewData user) {
   return conversation.deletedByUserId == conversation.userId
       ? conversation.deletedByUserId == user.id
           ? 'This message was deleted'
@@ -70,7 +70,7 @@ String getDeletedText(Conversation conversation, User user) {
       : "This message was deleted by Admin";
 }
 
-LMChatText getDeletedTextWidget(Conversation conversation, User user,
+LMChatText getDeletedTextWidget(LMChatConversationViewData conversation, LMChatUserViewData user,
     {int? maxLines}) {
   return LMChatText(
     getDeletedText(conversation, user),
