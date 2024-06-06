@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/tag/tag_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -109,12 +110,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           if (taggingData.groupTags != null &&
               taggingData.groupTags!.isNotEmpty) {
             tagViewData.addAll(taggingData.groupTags!
-                .map((e) => LMChatTagViewData.fromGroupTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           if (taggingData.members != null && taggingData.members!.isNotEmpty) {
             tagViewData.addAll(taggingData.members!
-                .map((e) => LMChatTagViewData.fromUserTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           return tagViewData;
@@ -122,12 +123,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           if (taggingData.groupTags != null &&
               taggingData.groupTags!.isNotEmpty) {
             tagViewData.addAll(taggingData.groupTags!
-                .map((e) => LMChatTagViewData.fromGroupTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           if (taggingData.members != null && taggingData.members!.isNotEmpty) {
             tagViewData.addAll(taggingData.members!
-                .map((e) => LMChatTagViewData.fromUserTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           return tagViewData;

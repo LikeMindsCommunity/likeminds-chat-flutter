@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -15,14 +15,14 @@ part 'chat_bubble_sides.dart';
 part 'chat_bubble_state.dart';
 
 class LMChatBubble extends StatefulWidget {
-  final Conversation conversation;
-  final User currentUser;
-  final User conversationUser;
+  final LMChatConversationViewData conversation;
+  final LMChatUserViewData currentUser;
+  final LMChatUserViewData conversationUser;
 
   final bool? isSent;
   final LMChatIcon? replyIcon;
   final LMChatProfilePicture? avatar;
-  final Function(Conversation)? onReply;
+  final Function(LMChatConversationViewData)? onReply;
   final Function(String tag) onTagTap;
 
   final LMChatText? deletedText;
@@ -50,9 +50,9 @@ class LMChatBubble extends StatefulWidget {
 
 class _LMChatBubbleState extends State<LMChatBubble> {
   bool isSent = false;
-  late Conversation conversation;
-  late User currentUser;
-  late User conversationUser;
+  late LMChatConversationViewData conversation;
+  late LMChatUserViewData currentUser;
+  late LMChatUserViewData conversationUser;
 
   @override
   void initState() {

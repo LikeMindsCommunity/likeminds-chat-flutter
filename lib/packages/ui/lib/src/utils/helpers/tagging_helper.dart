@@ -1,12 +1,11 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 // import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 
 class LMChatTaggingHelper {
-  UserTag? userTag;
+  LMChatTagViewData? userTag;
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
   static RegExp routeRegExp = RegExp(
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>|<<([^<>]+)\|route://([^<>]+)>>');
@@ -156,7 +155,7 @@ class LMChatTaggingHelper {
     return input;
   }
 
-  static String extractFirstDMStateMessage(Conversation input, User user) {
+  static String extractFirstDMStateMessage(LMChatConversationViewData input, LMChatUserViewData user) {
     String result = input.answer;
     final RegExp tagRegex = RegExp(r"<<(?<=\<\<).+?(?=\>\>)>>");
     final Iterable<RegExpMatch> matches = tagRegex.allMatches(input.answer);
