@@ -22,20 +22,17 @@ class LMChatPreferences extends ILMPreferenceService {
 
   LMChatPreferences._();
 
-  User? currentUser;
-
-  set setCurrentUser(User user) => currentUser = user;
-  get getCurrentUser => currentUser;
+  get getCurrentUser => getUser();
 
   @override
   Future<void> storeUserData(User user) async {
+    await LMChatCore.instance.lmChatClient.deleteLoggedInUser();
     await LMChatCore.instance.lmChatClient.insertOrUpdateLoggedInUser(user);
   }
 
   @override
   User? getUser() {
-    return currentUser =
-        LMChatCore.instance.lmChatClient.getLoggedInUser().data;
+    return LMChatCore.instance.lmChatClient.getLoggedInUser().data;
   }
 
   @override

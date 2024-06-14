@@ -88,11 +88,10 @@ class LMChatCore {
         // String refreshToken = initiateUserResponse.data!.refreshToken!;
         final user = response.data!.initiateUser!.user;
         final memberRights = await getMemberState();
-        await LMChatCore.instance.lmChatClient.insertOrUpdateLoggedInUser(user);
-        await LMChatCore.instance.lmChatClient
-            .insertOrUpdateLoggedInMemberState(memberRights.data!);
-        await LMChatCore.instance.lmChatClient
-            .insertOrUpdateCommunity(response.data!.initiateUser!.community);
+        await LMChatPreferences.instance.storeUserData(user);
+        await LMChatPreferences.instance
+            .storeCommunityData(response.data!.initiateUser!.community);
+        await LMChatPreferences.instance.storeMemberRights(memberRights.data!);
         LMChatNotificationHandler.instance.registerDevice(user.id);
         return response;
       }
