@@ -45,7 +45,6 @@ class LMChatCore {
     if (domain != null) _clientDomain = domain;
     chatConfig = config ?? LMChatConfig();
     if (widgets != null) _widgetUtility = widgets;
-    await LMChatPreferences.instance.initialize();
     LMChatTheme.instance.initialise(theme: theme);
     LMResponse initDB = await this.lmChatClient.initiateDB();
     if (!initDB.success) {
@@ -89,10 +88,11 @@ class LMChatCore {
         // String refreshToken = initiateUserResponse.data!.refreshToken!;
         final user = response.data!.initiateUser!.user;
         final memberRights = await getMemberState();
-        await LMChatPreferences.instance.storeUserData(user);
-        await LMChatPreferences.instance
-            .storeCommunityData(response.data!.initiateUser!.community);
-        await LMChatPreferences.instance.storeMemberRights(memberRights.data!);
+        await LMChatCore.instance.lmChatClient.insertOrUpdateLoggedInUser(user);
+        await LMChatCore.instance.lmChatClient
+            .insertOrUpdateLoggedInMemberState(memberRights.data!);
+        await LMChatCore.instance.lmChatClient
+            .insertOrUpdateCommunity(response.data!.initiateUser!.community);
         LMChatNotificationHandler.instance.registerDevice(user.id);
         return response;
       }

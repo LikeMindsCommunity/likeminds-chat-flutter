@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
 abstract class ILMPreferenceService {
-  Future<void> initialize();
   void storeUserData(User user);
   User? getUser();
   void clearUserData();
@@ -23,8 +20,6 @@ class LMChatPreferences extends ILMPreferenceService {
   static LMChatPreferences? _instance;
   static LMChatPreferences get instance => _instance ??= LMChatPreferences._();
 
-  late SharedPreferences _sharedPreferences;
-
   LMChatPreferences._();
 
   User? currentUser;
@@ -33,53 +28,30 @@ class LMChatPreferences extends ILMPreferenceService {
   get getCurrentUser => currentUser;
 
   @override
-  Future<void> initialize() async {
-    _sharedPreferences = await SharedPreferences.getInstance();
-  }
-
-  @override
   Future<void> storeUserData(User user) async {
-    setCurrentUser = user;
-    UserEntity userEntity = user.toEntity();
-    Map<String, dynamic> userData = userEntity.toJson();
-    String userString = jsonEncode(userData);
-    await _sharedPreferences.setString('user', userString);
+    await LMChatCore.instance.lmChatClient.insertOrUpdateLoggedInUser(user);
   }
 
   @override
   User? getUser() {
-    String? userString = _sharedPreferences.getString('user');
-    if (userString != null) {
-      Map<String, dynamic> userData = jsonDecode(userString);
-      UserEntity userEntity = UserEntity.fromJson(userData);
-      return User.fromEntity(userEntity);
-    }
-    return null;
+    return currentUser =
+        LMChatCore.instance.lmChatClient.getLoggedInUser().data;
   }
 
   @override
-  void clearUserData() {
-    _sharedPreferences.remove('user');
+  Future<void> clearUserData() async {
+    await LMChatCore.instance.lmChatClient.deleteLoggedInUser();
   }
 
   @override
   Future<void> storeMemberRights(MemberStateResponse memberState) async {
-    MemberStateResponseEntity memberStateEntity = memberState.toEntity();
-    Map<String, dynamic> memberStateData = memberStateEntity.toJson();
-    String memberStateString = jsonEncode(memberStateData);
-    await _sharedPreferences.setString('memberState', memberStateString);
+    await LMChatCore.instance.lmChatClient
+        .insertOrUpdateLoggedInMemberState(memberState);
   }
 
   @override
   MemberStateResponse? getMemberRights() {
-    String? memberStateString = _sharedPreferences.getString('memberState');
-    if (memberStateString != null) {
-      Map<String, dynamic> memberStateData = jsonDecode(memberStateString);
-      MemberStateResponseEntity memberStateEntity =
-          MemberStateResponseEntity.fromJson(memberStateData);
-      return MemberStateResponse.fromEntity(memberStateEntity);
-    }
-    return null;
+    return LMChatCore.instance.lmChatClient.getLoggedInMemberState().data;
   }
 
   @override
@@ -102,36 +74,29 @@ class LMChatPreferences extends ILMPreferenceService {
   }
 
   @override
-  void clearMemberRights() {
-    _sharedPreferences.remove('memberState');
+  Future<void> clearMemberRights() async {
+    await LMChatCore.instance.lmChatClient.deleteLoggedInMemberState();
   }
 
   @override
   Future<void> storeCommunityData(Community community) async {
-    CommunityEntity communityEntity = community.toEntity();
-    Map<String, dynamic> communityData = communityEntity.toJson();
-    String communityString = jsonEncode(communityData);
-    await _sharedPreferences.setString('community', communityString);
+    await LMChatCore.instance.lmChatClient.insertOrUpdateCommunity(community);
   }
 
   @override
   Community? getCommunity() {
-    String? communityString = _sharedPreferences.getString('community');
-    if (communityString != null) {
-      Map<String, dynamic> communityData = jsonDecode(communityString);
-      CommunityEntity communityEntity = CommunityEntity.fromJson(communityData);
-      return Community.fromEntity(communityEntity);
-    }
-    return null;
+    return LMChatCore.instance.lmChatClient.getCommunity().data;
   }
 
   @override
-  void clearCommunityData() {
-    _sharedPreferences.remove('community');
+  Future<void> clearCommunityData() async {
+    await LMChatCore.instance.lmChatClient.deleteCommunity();
   }
 
   @override
-  void clearLocalPrefs() {
-    _sharedPreferences.clear();
+  Future<void> clearLocalPrefs() async {
+    await clearUserData();
+    await clearMemberRights();
+    await clearCommunityData();
   }
 }
