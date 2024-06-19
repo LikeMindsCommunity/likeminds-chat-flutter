@@ -1,27 +1,37 @@
 part of 'home_bloc.dart';
 
+/// Base state class for [LMChatDMFeedBloc]
+/// Tracks all states related to DM home feed
 @immutable
-abstract class LMChatHomeState {}
+sealed class LMChatHomeFeedState {}
 
-class LMChatHomeInitial extends LMChatHomeState {}
+/// State class to represent initial state of DM home feed.
+class LMChatHomeInitial extends LMChatHomeFeedState {}
 
-class LMChatHomeLoading extends LMChatHomeState {}
+/// State class to represent loading state of DM home feed.
+class LMChatHomeFeedLoading extends LMChatHomeFeedState {}
 
-class LMChatHomeLoaded extends LMChatHomeState {
-  // final List<ChatItem> chats;
-  final GetHomeFeedResponse response;
+/// State class to represent loaded state of DM home feed.
+class LMChatHomeFeedLoaded extends LMChatHomeFeedState {
+  final List<LMChatRoomViewData> chatrooms;
 
-  LMChatHomeLoaded({required this.response});
+  LMChatHomeFeedLoaded({
+    required this.chatrooms,
+  });
 }
 
-class LMChatUpdateHomeFeed extends LMChatHomeState {
-  final GetHomeFeedResponse response;
+/// State class to represent updated state of DM home feed.
+class LMChatHomeFeedUpdated extends LMChatHomeFeedState {
+  final List<LMChatRoomViewData> chatrooms;
 
-  LMChatUpdateHomeFeed({required this.response});
+  LMChatHomeFeedUpdated({
+    required this.chatrooms,
+  });
 }
 
-class LMChatHomeError extends LMChatHomeState {
-  final String message;
+/// State class to represent error state of DM home feed.
+class LMChatHomeFeedError extends LMChatHomeFeedState {
+  final String errorMessage;
 
-  LMChatHomeError(this.message);
+  LMChatHomeFeedError({required this.errorMessage});
 }

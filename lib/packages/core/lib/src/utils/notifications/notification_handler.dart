@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
+// import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -114,9 +114,9 @@ class LMChatNotificationHandler {
     if (host == "collabcard") {
       rootNavigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => const LMChatHomeScreen(
-            chatroomType: LMChatroomType.dm,
-          ),
+          builder: (context) => const LMChatHome(
+              // chatroomType: LMChatroomType.dm,
+              ),
         ),
       );
 
@@ -130,9 +130,9 @@ class LMChatNotificationHandler {
     } else if (host == 'chatroom_detail') {
       rootNavigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => const LMChatHomeScreen(
-            chatroomType: LMChatroomType.dm,
-          ),
+          builder: (context) => const LMChatHome(
+              // chatroomType: LMChatroomType.dm,
+              ),
         ),
       );
       rootNavigatorKey.currentState!.push(MaterialPageRoute(

@@ -1,13 +1,13 @@
-part of '../dm_bloc.dart';
+part of '../home_bloc.dart';
 
-/// Function to handle fetch DM Feed events,
+/// Function to handle fetch Home Feed events,
 /// emits appropriate state based on response,
 /// and converts models to view data models
-void refreshDMFeedEventHandler(
-  LMChatRefreshDMFeedEvent event,
-  Emitter<LMChatDMFeedState> emit,
+void fetchHomeFeedEventHandler(
+  LMChatFetchHomeFeedEvent event,
+  Emitter<LMChatHomeFeedState> emit,
 ) async {
-  emit(LMChatDMFeedLoading());
+  emit(LMChatHomeFeedLoading());
 
   //Fetching the current time for the request
   int currentTime = DateTime.now().millisecondsSinceEpoch;
@@ -15,23 +15,23 @@ void refreshDMFeedEventHandler(
   //Building request and calling the `getHomeFeed` function of the client
   final response =
       await LMChatCore.client.getHomeFeed((GetHomeFeedRequestBuilder()
-            ..page(1)
+            ..page(event.page)
             ..pageSize(50)
             ..minTimestamp(0)
             ..maxTimestamp(currentTime)
-            ..chatroomTypes([10]))
+            ..chatroomTypes([0, 7]))
           .build());
 
   //Emit error state and fail gracefully
   if (!response.success) {
-    emit(LMChatDMFeedError(
+    emit(LMChatHomeFeedError(
       errorMessage: response.errorMessage ?? errorFallback,
     ));
   }
 
   //Success, now continue with parsing the response
-  final List<LMChatRoomViewData> chatrooms = parseDMResponse(response.data!);
+  final List<LMChatRoomViewData> chatrooms = parseHomeResponse(response.data!);
 
   //Finally, emit the loaded success state to show the DM Feed
-  emit(LMChatDMFeedUpdated(chatrooms: chatrooms));
+  emit(LMChatHomeFeedLoaded(chatrooms: chatrooms));
 }

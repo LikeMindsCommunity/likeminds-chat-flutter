@@ -30,7 +30,7 @@ void fetchDMFeedEventHandler(
   }
 
   //Success, now continue with parsing the response
-  final List<LMChatRoomViewData> chatrooms = parseResponse(response.data!);
+  final List<LMChatRoomViewData> chatrooms = parseDMResponse(response.data!);
 
   //Finally, emit the loaded success state to show the DM Feed
   emit(LMChatDMFeedLoaded(chatrooms: chatrooms));

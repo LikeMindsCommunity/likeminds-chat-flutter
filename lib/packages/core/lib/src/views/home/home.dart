@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/lists/chatroom/dm_chatroom_list.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 class LMChatHome extends StatefulWidget {
@@ -46,7 +46,7 @@ class _LMChatHomeState extends State<LMChatHome> {
             ),
             body: const TabBarView(
               children: [
-                Icon(Icons.directions_transit),
+                LMChatHomeFeedList(),
                 LMChatDMFeedList(),
               ],
             ),

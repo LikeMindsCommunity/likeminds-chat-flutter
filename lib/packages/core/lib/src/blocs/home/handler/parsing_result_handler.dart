@@ -1,20 +1,20 @@
-part of '../dm_bloc.dart';
+part of '../home_bloc.dart';
 
 /// Function to parse the response object into List<LMChatRoomViewData>
-List<LMChatRoomViewData> parseDMResponse(GetHomeFeedResponse response) {
-  return parseDMHomeFeedToChatrooms(response);
+List<LMChatRoomViewData> parseHomeResponse(GetHomeFeedResponse response) {
+  return parseHomeFeedToChatrooms(response);
 }
 
 /// Function to parse response, and update child models
-List<LMChatRoomViewData> parseDMHomeFeedToChatrooms(
+List<LMChatRoomViewData> parseHomeFeedToChatrooms(
   GetHomeFeedResponse response,
 ) {
   final List<LMChatRoomViewData> chatrooms = response.chatroomsData!.map(
     //Convert chatroom model to LMChatRoomViewData
     (chatroom) {
       LMChatRoomViewData chatroomViewData = chatroom.toChatRoomViewData();
-      chatroomViewData = parseDMLastConversation(response, chatroomViewData);
-      chatroomViewData = parseDMChatroomUsers(response, chatroomViewData);
+      chatroomViewData = parseLastConversation(response, chatroomViewData);
+      chatroomViewData = parseChatroomUsers(response, chatroomViewData);
       return chatroomViewData;
     },
   ).toList();
@@ -23,7 +23,7 @@ List<LMChatRoomViewData> parseDMHomeFeedToChatrooms(
 }
 
 /// Fucntion to parse chatroom users from response user meta
-LMChatRoomViewData parseDMChatroomUsers(
+LMChatRoomViewData parseChatroomUsers(
   GetHomeFeedResponse response,
   LMChatRoomViewData chatroom,
 ) {
@@ -33,16 +33,14 @@ LMChatRoomViewData parseDMChatroomUsers(
   );
   //Extract users from users list using IDs
   LMChatUserViewData chatroomUser = users[chatroom.userId]!;
-  LMChatUserViewData chatroomWithUser = users[chatroom.chatroomWithUserId]!;
   //Return a copy of passed chatroom with chatroom users updated
   return chatroom.copyWith(
-    chatroomWithUser: chatroomWithUser,
     member: chatroomUser,
   );
 }
 
 /// Function to parse the last conversation for this chatroom from conversationMeta
-LMChatRoomViewData parseDMLastConversation(
+LMChatRoomViewData parseLastConversation(
   GetHomeFeedResponse response,
   LMChatRoomViewData chatroom,
 ) {

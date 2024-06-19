@@ -11,7 +11,7 @@ List<int> getChatroomTypes(LMChatroomType type) {
   return chatrooms;
 }
 
-String getChatroomPreviewMessage(
+String getDMChatroomPreviewMessage(
   LMChatConversationViewData conversation,
   LMChatUserViewData conversationUser,
   LMChatUserViewData chatroomUser,
@@ -28,6 +28,24 @@ String getChatroomPreviewMessage(
       : b
           ? 'You: '
           : '';
+  String message = conversation.deletedByUserId == null
+      ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+          conversation.answer,
+        ) : LMChatTaggingHelper.convertRouteToTag(
+          conversation.answer,
+          withTilde: false,
+        )}'
+      : getDeletedText(conversation, user!);
+  return message;
+}
+
+String getHomeChatroomPreviewMessage(
+  LMChatConversationViewData conversation,
+) {
+  String personLabel = "";
+  final user = LMChatPreferences.instance.getCurrentUser;
+  bool a = conversation.member!.id == user.id;
+  personLabel = a ? 'You: ' : '${conversation.member!.name}: ';
   String message = conversation.deletedByUserId == null
       ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
           conversation.answer,

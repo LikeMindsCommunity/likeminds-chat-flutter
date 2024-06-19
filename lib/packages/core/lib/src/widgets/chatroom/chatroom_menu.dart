@@ -1,6 +1,5 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
@@ -29,11 +28,11 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
 
-  LMChatHomeBloc? homeBloc;
+  LMChatHomeFeedBloc? homeBloc;
   @override
   void initState() {
     super.initState();
-    homeBloc = LMChatHomeBloc.instance;
+    homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
     _controller = CustomPopupMenuController();
   }
@@ -41,7 +40,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   @override
   void didUpdateWidget(LMChatroomMenu old) {
     super.didUpdateWidget(old);
-    homeBloc = LMChatHomeBloc.instance;
+    homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
     _controller = CustomPopupMenuController();
   }
@@ -178,7 +177,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       }).toList();
       rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       _controller!.hideMenu();
-      homeBloc!.add(LMChatUpdateHomeEvent());
+      homeBloc!.add(LMChatRefreshHomeFeedEvent());
     } else {
       toast(response.errorMessage!);
     }
@@ -205,7 +204,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
         toast("Chatroom left");
         _controller!.hideMenu();
-        homeBloc?.add(LMChatUpdateHomeEvent());
+        homeBloc?.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
@@ -228,7 +227,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
         toast("Chatroom left");
         _controller!.hideMenu();
-        homeBloc?.add(LMChatUpdateHomeEvent());
+        homeBloc?.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);

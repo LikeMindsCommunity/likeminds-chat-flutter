@@ -130,7 +130,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList> {
       _page++;
       homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _page;
-      if (state.chatrooms.isEmpty || state.chatrooms.length < pageSize) {
+      if (state.chatrooms.isEmpty || state.chatrooms.length < 50) {
         homeFeedPagingController.appendLastPage(state.chatrooms);
       } else {
         homeFeedPagingController.appendPage(state.chatrooms, _page);
@@ -139,7 +139,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList> {
       _page = 2;
       homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _page;
-      if (state.chatrooms.isEmpty || state.chatrooms.length < pageSize) {
+      if (state.chatrooms.isEmpty || state.chatrooms.length < 50) {
         homeFeedPagingController.appendLastPage(state.chatrooms);
       } else {
         homeFeedPagingController.appendPage(state.chatrooms, _page);
@@ -156,7 +156,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList> {
     bool whichUser = user != null && user.id != chatroom.chatroomWithUserId;
     final chatroomUser =
         whichUser ? chatroom.chatroomWithUser! : chatroom.member!;
-    String message = getChatroomPreviewMessage(
+    String message = getDMChatroomPreviewMessage(
       chatroom.lastConversation!,
       chatroom.lastConversation!.member!,
       chatroom.member!,
