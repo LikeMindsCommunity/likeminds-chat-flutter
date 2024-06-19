@@ -1,6 +1,5 @@
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 
-
 /// `LMChatRoomViewData` is a model class that holds the data for the chat room view.
 /// This class is used to display the chat room information in the chat screen.
 class LMChatRoomViewData {
@@ -42,7 +41,7 @@ class LMChatRoomViewData {
   final bool? isSecret;
   final bool? isTagged;
   final bool? isPinned;
-  final LMChatRoomMemberViewData? member;
+  final LMChatUserViewData? member;
   final LMChatConversationViewData? topic;
   final bool? muteStatus;
   final int? onlineLinkEnableBefore;
@@ -63,12 +62,13 @@ class LMChatRoomViewData {
   final bool? externalSeen;
   final bool? memberCanMessage;
   final int? chatRequestState;
-  final LMChatRoomMemberViewData? chatRequestedBy;
+  final LMChatUserViewData? chatRequestedBy;
   final int? chatRequestedById;
-  final LMChatRoomMemberViewData? chatroomWithUser;
+  final LMChatUserViewData? chatroomWithUser;
   final int? chatroomWithUserId;
   final int? userId;
-  final List<LMChatRoomMemberViewData>? lastResponseMembers;
+  final List<LMChatUserViewData>? lastResponseMembers;
+  final LMChatConversationViewData? lastConversation;
 
   LMChatRoomViewData._({
     required this.access,
@@ -136,10 +136,11 @@ class LMChatRoomViewData {
     required this.externalSeen,
     required this.isGuest,
     required this.followStatus,
+    required this.lastConversation,
   });
 
-/// copyWith method is used to create a new instance of `LMChatRoomViewData` with the updated values.
-/// If the new values are not provided, the old values are used.
+  /// copyWith method is used to create a new instance of `LMChatRoomViewData` with the updated values.
+  /// If the new values are not provided, the old values are used.
   LMChatRoomViewData copyWith({
     bool? access,
     String? answerText,
@@ -179,7 +180,7 @@ class LMChatRoomViewData {
     bool? isSecret,
     bool? isTagged,
     bool? isPinned,
-    LMChatRoomMemberViewData? member,
+    LMChatUserViewData? member,
     LMChatConversationViewData? topic,
     bool? muteStatus,
     int? onlineLinkEnableBefore,
@@ -200,12 +201,13 @@ class LMChatRoomViewData {
     bool? externalSeen,
     bool? memberCanMessage,
     int? chatRequestState,
-    LMChatRoomMemberViewData? chatRequestedBy,
+    LMChatUserViewData? chatRequestedBy,
     int? chatRequestedById,
-    LMChatRoomMemberViewData? chatroomWithUser,
+    LMChatUserViewData? chatroomWithUser,
     int? chatroomWithUserId,
     int? userId,
-    List<LMChatRoomMemberViewData>? lastResponseMembers,
+    List<LMChatUserViewData>? lastResponseMembers,
+    LMChatConversationViewData? lastConversation,
   }) {
     return LMChatRoomViewData._(
       followStatus: followStatus ?? this.followStatus,
@@ -249,7 +251,8 @@ class LMChatRoomViewData {
       member: member ?? this.member,
       topic: topic ?? this.topic,
       muteStatus: muteStatus ?? this.muteStatus,
-      onlineLinkEnableBefore: onlineLinkEnableBefore ?? this.onlineLinkEnableBefore,
+      onlineLinkEnableBefore:
+          onlineLinkEnableBefore ?? this.onlineLinkEnableBefore,
       onlineLinkType: onlineLinkType ?? this.onlineLinkType,
       pdf: pdf ?? this.pdf,
       pdfCount: pdfCount ?? this.pdfCount,
@@ -273,9 +276,9 @@ class LMChatRoomViewData {
       chatroomWithUserId: chatroomWithUserId ?? this.chatroomWithUserId,
       userId: userId ?? this.userId,
       lastResponseMembers: lastResponseMembers ?? this.lastResponseMembers,
+      lastConversation: lastConversation ?? this.lastConversation,
     );
   }
-
 }
 
 class LMChatRoomViewDataBuilder {
@@ -317,7 +320,7 @@ class LMChatRoomViewDataBuilder {
   bool? _isSecret;
   bool? _isTagged;
   bool? _isPinned;
-  LMChatRoomMemberViewData? _member;
+  LMChatUserViewData? _member;
   LMChatConversationViewData? _topic;
   bool? _muteStatus;
   int? _onlineLinkEnableBefore;
@@ -338,12 +341,13 @@ class LMChatRoomViewDataBuilder {
   bool? _externalSeen;
   bool? _memberCanMessage;
   int? _chatRequestState;
-  LMChatRoomMemberViewData? _chatRequestedBy;
+  LMChatUserViewData? _chatRequestedBy;
   int? _chatRequestedById;
-  LMChatRoomMemberViewData? _chatroomWithUser;
+  LMChatUserViewData? _chatroomWithUser;
   int? _chatroomWithUserId;
   int? _userId;
-  List<LMChatRoomMemberViewData>? _lastResponseMembers;
+  List<LMChatUserViewData>? _lastResponseMembers;
+  LMChatConversationViewData? _lastConversation;
 
   void access(bool? access) {
     _access = access;
@@ -497,7 +501,7 @@ class LMChatRoomViewDataBuilder {
     _isPinned = isPinned;
   }
 
-  void member(LMChatRoomMemberViewData? member) {
+  void member(LMChatUserViewData? member) {
     _member = member;
   }
 
@@ -581,7 +585,7 @@ class LMChatRoomViewDataBuilder {
     _chatRequestState = chatRequestState;
   }
 
-  void chatRequestedBy(LMChatRoomMemberViewData? chatRequestedBy) {
+  void chatRequestedBy(LMChatUserViewData? chatRequestedBy) {
     _chatRequestedBy = chatRequestedBy;
   }
 
@@ -589,7 +593,7 @@ class LMChatRoomViewDataBuilder {
     _chatRequestedById = chatRequestedById;
   }
 
-  void chatroomWithUser(LMChatRoomMemberViewData? chatroomWithUser) {
+  void chatroomWithUser(LMChatUserViewData? chatroomWithUser) {
     _chatroomWithUser = chatroomWithUser;
   }
 
@@ -601,8 +605,12 @@ class LMChatRoomViewDataBuilder {
     _userId = userId;
   }
 
-  void lastResponseMember(List<LMChatRoomMemberViewData>? members) {
+  void lastResponseMember(List<LMChatUserViewData>? members) {
     _lastResponseMembers = members;
+  }
+
+  void lastConversation(LMChatConversationViewData? lastConversation) {
+    _lastConversation = lastConversation;
   }
 
   LMChatRoomViewData build() {
@@ -672,6 +680,7 @@ class LMChatRoomViewDataBuilder {
       externalSeen: _externalSeen,
       isGuest: _isGuest,
       followStatus: _followStatus,
+      lastConversation: _lastConversation,
     );
   }
 }

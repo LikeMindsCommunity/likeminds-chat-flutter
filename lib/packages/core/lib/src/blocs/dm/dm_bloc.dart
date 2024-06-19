@@ -1,4 +1,9 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 
@@ -11,6 +16,7 @@ part 'dm_state.dart';
 
 part 'handler/fetch_event_handler.dart';
 part 'handler/refresh_event_handler.dart';
+part 'handler/parsing_result_handler.dart';
 
 /// BLoC responsible for handling the DM Home Feed,
 /// Allows for users to fetch, and refresh the feed,
@@ -21,9 +27,9 @@ class LMChatDMFeedBloc extends Bloc<LMChatDMFeedEvent, LMChatDMFeedState> {
   // Creating a singleton instance of the LMChatDMFeedBloc
   static LMChatDMFeedBloc get instance {
     if (_instance == null || _instance!.isClosed) {
-      return LMChatDMFeedBloc._();
+      return _instance = LMChatDMFeedBloc._();
     } else {
-      return _instance ?? LMChatDMFeedBloc._();
+      return _instance!;
     }
   }
 

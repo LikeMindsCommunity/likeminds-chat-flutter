@@ -1,4 +1,4 @@
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
@@ -37,4 +37,15 @@ String getChatroomPreviewMessage(
         )}'
       : getDeletedText(conversation, user!);
   return message;
+}
+
+String getTime(String time) {
+  final int time0 = int.tryParse(time) ?? 0;
+  final DateTime now = DateTime.now();
+  final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(time0);
+  final Duration difference = now.difference(messageTime);
+  if (difference.inDays > 0 || now.day != messageTime.day) {
+    return DateFormat('dd/MM/yyyy').format(messageTime);
+  }
+  return DateFormat('kk:mm').format(messageTime);
 }

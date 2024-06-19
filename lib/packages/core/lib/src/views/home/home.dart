@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/lists/chatroom/dm_chatroom_list.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 class LMChatHome extends StatefulWidget {
@@ -27,6 +28,14 @@ class _LMChatHomeState extends State<LMChatHome> {
           child: Scaffold(
             appBar: AppBar(
               leading: const SizedBox.shrink(),
+              titleSpacing: -24,
+              centerTitle: false,
+              actions: const [
+                Icon(Icons.search),
+                SizedBox(width: 8),
+                CircleAvatar(),
+                SizedBox(width: 24),
+              ],
               bottom: const TabBar(
                 tabs: [
                   Tab(text: groupHomeTabTitle),
@@ -38,19 +47,13 @@ class _LMChatHomeState extends State<LMChatHome> {
             body: const TabBarView(
               children: [
                 Icon(Icons.directions_transit),
-                LMChatHomeScreen(chatroomType: LMChatroomType.dm),
+                LMChatDMFeedList(),
               ],
             ),
-            floatingActionButton:
-                DefaultTabController.maybeOf(context)?.index == 1
-                    ? FloatingActionButton(
-                        onPressed: () {},
-                        child: const Text("New Group"),
-                      )
-                    : FloatingActionButton(
-                        onPressed: () {},
-                        child: const Text("New DM"),
-                      ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {},
+              child: const Icon(Icons.message),
+            ),
           ),
         ),
       ),

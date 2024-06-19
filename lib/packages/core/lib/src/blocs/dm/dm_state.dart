@@ -13,27 +13,19 @@ class LMChatDMFeedLoading extends LMChatDMFeedState {}
 
 /// State class to represent loaded state of DM home feed.
 class LMChatDMFeedLoaded extends LMChatDMFeedState {
-  final List<ChatRoom> chatrooms;
-  final Map<String, Conversation> conversationMeta;
-  final Map<int, User> userMeta;
+  final List<LMChatRoomViewData> chatrooms;
 
   LMChatDMFeedLoaded({
     required this.chatrooms,
-    required this.conversationMeta,
-    required this.userMeta,
   });
 }
 
 /// State class to represent updated state of DM home feed.
 class LMChatDMFeedUpdated extends LMChatDMFeedState {
-  final List<ChatRoom> chatrooms;
-  final Map<String, Conversation>? conversationMeta;
-  final Map<int, User>? userMeta;
+  final List<LMChatRoomViewData> chatrooms;
 
   LMChatDMFeedUpdated({
     required this.chatrooms,
-    required this.conversationMeta,
-    required this.userMeta,
   });
 }
 

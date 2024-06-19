@@ -30,30 +30,8 @@ void fetchDMFeedEventHandler(
   }
 
   //Success, now continue with parsing the response
-  final List<ChatRoom> chatrooms;
-  final Map<String, Conversation> conversationMeta;
-  final Map<int, User>? users;
-  (chatrooms, users, conversationMeta) = parseResponse(response.data!);
+  final List<LMChatRoomViewData> chatrooms = parseResponse(response.data!);
 
   //Finally, emit the loaded success state to show the DM Feed
-  emit(LMChatDMFeedLoaded(
-    chatrooms: chatrooms,
-    conversationMeta: conversationMeta,
-    userMeta: users,
-  ));
-}
-
-/// Function to parse the response object into respective view model,
-/// Returns a pattern of required view models.
-(
-  List<ChatRoom> chatrooms,
-  Map<int, User> user,
-  Map<String, Conversation> conversationMeta,
-) parseResponse(GetHomeFeedResponse response) {
-  //TODO: Replace with view model implementation
-  return (
-    response.chatroomsData!,
-    response.userMeta!,
-    response.conversationMeta!,
-  );
+  emit(LMChatDMFeedLoaded(chatrooms: chatrooms));
 }
