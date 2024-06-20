@@ -96,7 +96,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     });
     // chatActionBloc = BlocProvider.of<ChatActionBloc>(context);
     // conversationBloc = ConversationBloc();
-    user = LMChatPreferences.instance.getUser();
+    user = LMChatLocalPreference.instance.getUser();
 
     debugPrint("Chatroom id is ${widget.chatroomId}");
   }
@@ -520,8 +520,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultSentChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser:
-          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      currentUser: LMChatLocalPreference.instance.getUser()!.toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
@@ -531,8 +530,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultReceivedChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser:
-          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      currentUser:  LMChatLocalPreference.instance.getUser()!.toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,

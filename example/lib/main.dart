@@ -4,9 +4,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
+import 'package:likeminds_chat_flutter_sample/utils/mock_intiate_user.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('DEBUG');
@@ -31,7 +33,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
   await LMChatCore.instance.initialize(
-    apiKey: "YOUR-API-KEY",
+    lmChatCallback: LMChatCoreCallback(
+        onAccessTokenExpiredAndRefreshed: (accessToken, refreshToken) async {
+      debugPrint(
+          "onAccessTokenExpiredAndRefreshed: $accessToken, $refreshToken");
+    }, onRefreshTokenExpired: () async {
+      debugPrint("onRefreshTokenExpired");
+      final (a, b) = await mockInitiateUser(
+        apiKey: "",
+        userName: "divi",
+        userId: "divi",
+      );
+      return (LMAuthTokenBuilder()
+            ..accessToken(a)
+            ..refreshToken(b))
+          .build();
+    }),
   );
   runApp(const LMChatSampleApp());
 }

@@ -1,4 +1,5 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
@@ -18,7 +19,7 @@ String getChatroomPreviewMessage(
   LMChatUserViewData chatroomWithUser,
 ) {
   String personLabel = "";
-  final user = LMChatPreferences.instance.getCurrentUser;
+  final user = LMChatLocalPreference.instance.getUser();
   bool a = conversationUser.id == chatroomWithUser.id &&
       user!.id == chatroomWithUser.id;
   bool b =
@@ -35,6 +36,6 @@ String getChatroomPreviewMessage(
           conversation.answer,
           withTilde: false,
         )}'
-      : getDeletedText(conversation, user!);
+      : getDeletedText(conversation, user!.toUserViewData());
   return message;
 }
