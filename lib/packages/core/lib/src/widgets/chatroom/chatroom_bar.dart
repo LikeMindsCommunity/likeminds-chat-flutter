@@ -52,9 +52,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   late CustomPopupMenuController _popupMenuController;
   late TextEditingController _textEditingController;
   late FocusNode _focusNode;
-  User? currentUser = LMChatPreferences.instance.getUser();
+  User? currentUser = LMChatLocalPreference.instance.getUser();
   MemberStateResponse? getMemberState =
-      LMChatPreferences.instance.getMemberRights();
+      LMChatLocalPreference.instance.getMemberRights();
 
   List<LMChatTagViewData> tags = [];
   String? result;

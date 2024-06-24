@@ -1,57 +1,37 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
-abstract class ILMPreferenceService {
-  void storeUserData(User user);
-  User? getUser();
-  void clearUserData();
-  void storeMemberRights(MemberStateResponse memberState);
-  MemberStateResponse? getMemberRights();
-  bool fetchMemberRight(int id);
-  void clearMemberRights();
-  void storeCommunityData(Community community);
-  Community? getCommunity();
-  void clearCommunityData();
-  void clearLocalPrefs();
-}
-
-class LMChatPreferences extends ILMPreferenceService {
+class LMChatLocalPreference {
   // Singleton instance of LMChatPreference class
-  static LMChatPreferences? _instance;
-  static LMChatPreferences get instance => _instance ??= LMChatPreferences._();
+  static LMChatLocalPreference? _instance;
+  static LMChatLocalPreference get instance =>
+      _instance ??= LMChatLocalPreference._();
 
-  LMChatPreferences._();
+  LMChatLocalPreference._();
 
-  get getCurrentUser => getUser();
-
-  @override
-  Future<void> storeUserData(User user) async {
-    await LMChatCore.instance.lmChatClient.deleteLoggedInUser();
+  Future<void> storeUserData1(User user) async {
+    await clearUserData();
     await LMChatCore.instance.lmChatClient.insertOrUpdateLoggedInUser(user);
   }
 
-  @override
   User? getUser() {
     return LMChatCore.instance.lmChatClient.getLoggedInUser().data;
   }
 
-  @override
   Future<void> clearUserData() async {
     await LMChatCore.instance.lmChatClient.deleteLoggedInUser();
   }
 
-  @override
   Future<void> storeMemberRights(MemberStateResponse memberState) async {
+    await clearMemberRights();
     await LMChatCore.instance.lmChatClient
         .insertOrUpdateLoggedInMemberState(memberState);
   }
 
-  @override
   MemberStateResponse? getMemberRights() {
     return LMChatCore.instance.lmChatClient.getLoggedInMemberState().data;
   }
 
-  @override
   bool fetchMemberRight(int id) {
     final memberStateResponse = getMemberRights();
     if (memberStateResponse == null) {
@@ -70,30 +50,49 @@ class LMChatPreferences extends ILMPreferenceService {
     }
   }
 
-  @override
   Future<void> clearMemberRights() async {
     await LMChatCore.instance.lmChatClient.deleteLoggedInMemberState();
   }
 
-  @override
   Future<void> storeCommunityData(Community community) async {
+    await clearCommunityData();
     await LMChatCore.instance.lmChatClient.insertOrUpdateCommunity(community);
   }
 
-  @override
-  Community? getCommunity() {
+  Community? getCommunityData() {
     return LMChatCore.instance.lmChatClient.getCommunity().data;
   }
 
-  @override
   Future<void> clearCommunityData() async {
     await LMChatCore.instance.lmChatClient.deleteCommunity();
   }
 
-  @override
-  Future<void> clearLocalPrefs() async {
+  Future<LMResponse> storeCache(LMChatCache cache) {
+    return LMChatCore.client.insertOrUpdateCache(cache);
+  }
+
+  LMChatCache? fetchCache(String key) {
+    LMResponse response = LMChatCore.client.getCache(key);
+
+    if (response.success) {
+      return response.data!;
+    } else {
+      return null;
+    }
+  }
+
+  Future<LMResponse> deleteCache(String key) {
+    return LMChatCore.client.deleteCache(key);
+  }
+
+  Future<LMResponse> clearCache() {
+    return LMChatCore.client.clearCache();
+  }
+
+  Future<void> clearLocalData() async {
     await clearUserData();
     await clearMemberRights();
     await clearCommunityData();
+    await clearCache();
   }
 }

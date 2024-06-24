@@ -55,7 +55,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   @override
   void initState() {
     Bloc.observer = LMChatBlocObserver();
-    user = LMChatPreferences.instance.getCurrentUser;
+    user = LMChatLocalPreference.instance.getUser()!;
     homeFeedPagingController.itemList?.clear();
     chatroomTypes = getChatroomTypes(widget.chatroomType);
     _addPaginationListener();
@@ -71,7 +71,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   @override
   void didUpdateWidget(LMChatHomeScreen oldWidget) {
-    user = LMChatPreferences.instance.getCurrentUser;
+    user =  LMChatLocalPreference.instance.getUser()!;
     homeFeedPagingController.itemList?.clear();
     chatroomTypes = getChatroomTypes(widget.chatroomType);
     _addPaginationListener();
@@ -130,26 +130,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            debugPrint("Floating action button pressed");
-            final LMChatCache cache = (LMChatCacheBuilder()
-                  ..key("kAccessToken")
-                  ..value("accessToken"))
-                .build();
-
-            final localPref =
-                LMChatCore.instance.lmChatClient.insertOrUpdateCache(cache);
-            debugPrint("Local pref while saving: $localPref");
-            final cacheValue =
-                LMChatCore.instance.lmChatClient.getCache("kAccessToken");
-            debugPrint("Cache value: ${cacheValue.data?.value}");
-
-          },
-          child: const Icon(
-            Icons.add,
-          ),
-        ),
         backgroundColor: LMChatTheme.theme.backgroundColor,
         body: SafeArea(
           bottom: false,

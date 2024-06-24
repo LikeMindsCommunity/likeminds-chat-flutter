@@ -1,6 +1,5 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
@@ -185,7 +184,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   }
 
   void leaveChatroom() async {
-    final User user = LMChatPreferences.instance.getCurrentUser;
+    final User user = LMChatLocalPreference.instance.getUser()!;
     if (!(widget.chatroom.isSecret ?? false)) {
       final response =
           await LMChatCore.client.followChatroom((FollowChatroomRequestBuilder()

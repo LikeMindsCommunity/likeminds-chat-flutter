@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_sample/utils/mock_intiate_user.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/utils/network_handling.dart';
-
-const credColor = Color.fromARGB(255, 48, 159, 116);
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -18,8 +16,24 @@ class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _userIdController = TextEditingController();
   final TextEditingController _chatroomController = TextEditingController();
+  static const backgroundColor = Color.fromARGB(255, 48, 159, 116);
 
-  @override
+  final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    fixedSize: const Size(
+      200,
+      42,
+    ),
+  );
+  final TextStyle buttonTextStyle = GoogleFonts.montserrat(
+    color: backgroundColor,
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +45,7 @@ class _CredScreenState extends State<CredScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: credColor,
+      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: SingleChildScrollView(
@@ -115,57 +129,23 @@ class _CredScreenState extends State<CredScreen> {
                 ),
               ),
               const SizedBox(height: 72),
-              GestureDetector(
-                onTap: () async {
-                  String username = _usernameController.text.isEmpty
-                      ? "divi"
-                      : _usernameController.text;
-                  String userId = _userIdController.text.isEmpty &&
-                          _usernameController.text.isEmpty
-                      ? 'divi'
-                      : _userIdController.text;
-                  // int? defaultChatroom = int.tryParse(_chatroomController.text);
-                  if (username.isEmpty || userId.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please enter valid credentials"),
-                      ),
-                    );
-                  } else {
-                    final response = await LMChatCore.instance.initiateUser(
-                        initiateUserRequest: (InitiateUserRequestBuilder()
-                              ..userId(userId)
-                              ..userName(username))
-                            .build());
-                    if (response.success) {
-                      MaterialPageRoute route = MaterialPageRoute(
-                        builder: (context) => const LMChatHomeScreen(
-                          chatroomType: LMChatroomType.dm,
-                        ),
-                      );
-                      Navigator.push(context, route);
-                    } else {
-                      toast(response.errorMessage ?? "An error occured");
-                    }
-                  }
+              ElevatedButton(
+                style: buttonStyle,
+                onPressed: _onSubmit,
+                child: Text(
+                  "Submit",
+                  style: buttonTextStyle,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: buttonStyle,
+                onPressed: () async {
+                  await LMChatLocalPreference.instance.clearLocalData();
                 },
-                child: Container(
-                  width: 200,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Submit",
-                      style: GoogleFonts.montserrat(
-                        color: credColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                child: Text(
+                  "Clear Data",
+                  style: buttonTextStyle,
                 ),
               ),
               const SizedBox(height: 80),
@@ -174,5 +154,47 @@ class _CredScreenState extends State<CredScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _onSubmit() async {
+    String username =
+        _usernameController.text.isEmpty ? "divi" : _usernameController.text;
+    String userId =
+        _userIdController.text.isEmpty && _usernameController.text.isEmpty
+            ? 'divi'
+            : _userIdController.text;
+    // int? defaultChatroom = int.tryParse(_chatroomController.text);
+    if (username.isEmpty || userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter valid credentials"),
+        ),
+      );
+    } else {
+      final (a, b) = await mockInitiateUser(
+        apiKey: "",
+        userName: username,
+        userId: userId,
+      );
+      // final response = await LMChatCore.instance.showChatWithApiKey(
+      //   apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
+      //   uuid: userId,
+      //   userName: username,
+      // );
+      final response = await LMChatCore.instance.showChatWithoutApiKey(
+        accessToken: a,
+        refreshToken: b,
+      );
+      if (response.success) {
+        MaterialPageRoute route = MaterialPageRoute(
+          builder: (context) => const LMChatHomeScreen(
+            chatroomType: LMChatroomType.dm,
+          ),
+        );
+        Navigator.push(context, route);
+      } else {
+        toast(response.errorMessage ?? "An error occurred");
+      }
+    }
   }
 }
