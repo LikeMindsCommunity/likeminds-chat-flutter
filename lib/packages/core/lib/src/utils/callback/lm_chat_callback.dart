@@ -14,9 +14,9 @@ class LMChatCoreCallback {
   });
 }
 
-class LMChatSDKCallbackImplementation implements LMChatSDKCallback {
+class LMChatSDKCallbackImpl implements LMChatSDKCallback {
   final LMChatCoreCallback? _lmFeedCallback;
-  LMChatSDKCallbackImplementation({LMChatCoreCallback? lmChatCallback})
+  LMChatSDKCallbackImpl({LMChatCoreCallback? lmChatCallback})
       : _lmFeedCallback = lmChatCallback;
   @override
   void eventFiredCallback(

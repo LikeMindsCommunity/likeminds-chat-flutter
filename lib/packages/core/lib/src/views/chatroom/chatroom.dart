@@ -11,7 +11,6 @@ import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversa
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
@@ -520,7 +519,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultSentChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser: LMChatLocalPreference.instance.getUser()!.toUserViewData(),
+      currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
@@ -530,7 +529,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultReceivedChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser:  LMChatLocalPreference.instance.getUser()!.toUserViewData(),
+      currentUser:  LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,

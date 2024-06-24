@@ -32,24 +32,7 @@ Future<void> _handleNotification(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
-  await LMChatCore.instance.initialize(
-    lmChatCallback: LMChatCoreCallback(
-        onAccessTokenExpiredAndRefreshed: (accessToken, refreshToken) async {
-      debugPrint(
-          "onAccessTokenExpiredAndRefreshed: $accessToken, $refreshToken");
-    }, onRefreshTokenExpired: () async {
-      debugPrint("onRefreshTokenExpired");
-      final (a, b) = await mockInitiateUser(
-        apiKey: "",
-        userName: "divi",
-        userId: "divi",
-      );
-      return (LMAuthTokenBuilder()
-            ..accessToken(a)
-            ..refreshToken(b))
-          .build();
-    }),
-  );
+  await LMChatCore.instance.initialize();
   runApp(const LMChatSampleApp());
 }
 

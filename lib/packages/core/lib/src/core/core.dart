@@ -1,14 +1,22 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/firebase/firebase.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/callback/lm_chat_callback.dart';
 
+/// {@template lm_chat_core}
+/// The core class of the LikeMinds Chat SDK.
+/// This class is used to initialize the chat, show the chat, and logout the user session.
+///
+/// The [LMChatCore] class is a singleton class.
+/// It has a singleton instance [instance] which is used to access the core class.
+///
+/// {@endtemplate}
 class LMChatCore {
-  //Instance variables
+  /// Instance of [LMChatClient] class accessible through core class.
   late final LMChatClient lmChatClient;
+
+  /// Instance of [LMChatConfig] class accessible through core class.
   late final LMChatConfig chatConfig;
   late String _clientDomain;
   late LMChatWidgetUtility _widgetUtility;
@@ -17,6 +25,8 @@ class LMChatCore {
   /// Singleton class for LMChatCore
   LMChatCore._();
   static LMChatCore? _instance;
+
+  /// Singleton instance of [LMChatCore]
   static LMChatCore get instance => _instance ??= LMChatCore._();
 
   /// Instance of client [LMChatClient] accessible through core class.
@@ -49,22 +59,23 @@ class LMChatCore {
     LMChatCoreCallback? lmChatCallback,
   }) async {
     final lmChatSDKCallback =
-        LMChatSDKCallbackImplementation(lmChatCallback: lmChatCallback);
+        LMChatSDKCallbackImpl(lmChatCallback: lmChatCallback);
     this.lmChatClient = lmChatClient ??
         (LMChatClientBuilder()..sdkCallback(lmChatSDKCallback)).build();
     if (domain != null) _clientDomain = domain;
     chatConfig = config ?? LMChatConfig();
     if (widgets != null) _widgetUtility = widgets;
     LMChatTheme.instance.initialise(theme: theme);
-    LMResponse initDB = await this.lmChatClient.initiateDB();
-    if (!initDB.success) {
+    LMResponse isDBInitiated = await this.lmChatClient.initiateDB();
+    if (!isDBInitiated.success) {
       return LMResponse.error(
-          errorMessage: initDB.errorMessage ?? "Error in initiating DB");
+          errorMessage: isDBInitiated.errorMessage ?? "Error in setting up local storage");
     }
     await initFirebase();
     return LMResponse.success(data: null);
   }
 
+  /// This function is used to close the blocs of the chat.
   Future<void> closeBlocs() async {
     // await LMChatPostBloc.instance.close();
     // await LMChatRoutingBloc.instance.close();
@@ -82,14 +93,14 @@ class LMChatCore {
     String? imageUrl,
     bool? isGuest,
   }) async {
-    String? cachedAccessToken = LMChatLocalPreference.instance
+    String? existingAccessToken = LMChatLocalPreference.instance
         .fetchCache(LMChatStringConstants.accessToken)
         ?.value;
-    String? cachedRefreshToken = LMChatLocalPreference.instance
+    String? existingRefreshToken = LMChatLocalPreference.instance
         .fetchCache(LMChatStringConstants.refreshToken)
         ?.value;
 
-    if (cachedAccessToken == null || cachedRefreshToken == null) {
+    if (existingAccessToken == null || existingRefreshToken == null) {
       InitiateUserRequestBuilder initiateUserRequestBuilder =
           InitiateUserRequestBuilder()
             ..apiKey(apiKey)
@@ -117,8 +128,8 @@ class LMChatCore {
       return initiateUserResponse;
     } else {
       return await showChatWithoutApiKey(
-        accessToken: cachedAccessToken,
-        refreshToken: cachedRefreshToken,
+        accessToken: existingAccessToken,
+        refreshToken: existingRefreshToken,
       );
     }
   }
@@ -131,30 +142,30 @@ class LMChatCore {
     String? accessToken,
     String? refreshToken,
   }) async {
-    String? cachedAccessToken;
-    String? cachedRefreshToken;
+    String? existingAccessToken;
+    String? existingRefreshToken;
     if (accessToken == null || refreshToken == null) {
-      cachedAccessToken = LMChatLocalPreference.instance
+      existingAccessToken = LMChatLocalPreference.instance
           .fetchCache(LMChatStringConstants.accessToken)
           ?.value;
 
-      cachedRefreshToken = LMChatLocalPreference.instance
+      existingRefreshToken = LMChatLocalPreference.instance
           .fetchCache(LMChatStringConstants.refreshToken)
           ?.value;
     } else {
-      cachedAccessToken = accessToken;
-      cachedRefreshToken = refreshToken;
+      existingAccessToken = accessToken;
+      existingRefreshToken = refreshToken;
     }
 
-    if (cachedAccessToken == null || cachedRefreshToken == null) {
+    if (existingAccessToken == null || existingRefreshToken == null) {
       return LMResponse(
           success: false,
           errorMessage: "Access token and Refresh token are required");
     }
 
     ValidateUserRequest request = (ValidateUserRequestBuilder()
-          ..accessToken(cachedAccessToken)
-          ..refreshToken(cachedRefreshToken))
+          ..accessToken(existingAccessToken)
+          ..refreshToken(existingRefreshToken))
         .build();
 
     ValidateUserResponse? validateUserResponse =
