@@ -172,12 +172,12 @@ class _CredScreenState extends State<CredScreen> {
       );
     } else {
       // final (accessToken, accessToken) = await mockInitiateUser(
-      //   apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
+      //   apiKey: "",
       //   userName: username,
       //   userId: userId,
       // );
       final response = await LMChatCore.instance.showChatWithApiKey(
-        apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
+        apiKey: "",
         uuid: userId,
         userName: username,
       );

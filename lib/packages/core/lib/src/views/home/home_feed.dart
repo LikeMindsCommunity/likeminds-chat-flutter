@@ -126,26 +126,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) {
-                  final chatroomViewData =
-                      (LMChatRoomViewDataBuilder()
-                      ..id(97420)
-                      ..isSecret(false)
-                      ..participantCount(1)
-                      ).build();
-                  return LMChatroomParticipantsPage(
-                    chatroomViewData: chatroomViewData,
-                  );
-                },
-              ),
-            );
-          },
-          child: const Icon(Icons.people),
-        ),
         backgroundColor: LMChatTheme.theme.backgroundColor,
         body: SafeArea(
           bottom: false,
