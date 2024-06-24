@@ -30,6 +30,12 @@ class LMChatroomParticipantsPage extends StatefulWidget {
   /// [noMoreItemsIndicatorBuilder] is a builder to show the indicator when no more participants are found.
   final Widget Function(BuildContext)? noMoreItemsIndicatorBuilder;
 
+  /// [appBarBuilder] is a builder to build the app bar for the page.
+  final LMChatAppBarBuilder? appBarBuilder;
+
+  /// [userTileBuilder] is a builder to build the user tile for the participants.
+  final Widget Function(BuildContext, LMChatUserTile)? userTileBuilder;
+
   /// [LMChatroomParticipantsPage] constructor to create an instance of [LMChatroomParticipantsPage].
   const LMChatroomParticipantsPage({
     super.key,
@@ -40,6 +46,8 @@ class LMChatroomParticipantsPage extends StatefulWidget {
     this.newPageProgressIndicatorBuilder,
     this.noItemsFoundIndicatorBuilder,
     this.noMoreItemsIndicatorBuilder,
+    this.appBarBuilder,
+    this.userTileBuilder,
   });
 
   @override
@@ -58,7 +66,7 @@ class _LMChatroomParticipantsPageState
   final PagingController<int, LMChatUserViewData> _pagingController =
       PagingController(firstPageKey: 1);
   Timer? _debounce;
-  final int _pageSize = 2;
+  final int _pageSize = 10;
 
   @override
   void initState() {
@@ -94,7 +102,7 @@ class _LMChatroomParticipantsPageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: LMChatTheme.instance.themeData.container,
-      appBar: _defAppBar(),
+      appBar: widget.appBarBuilder?.call(_defAppBar()) ?? _defAppBar(),
       body: SafeArea(
         child: Column(
           children: [
@@ -260,9 +268,10 @@ class _LMChatroomParticipantsPageState
         physics: const ClampingScrollPhysics(),
         builderDelegate: PagedChildBuilderDelegate<LMChatUserViewData>(
           itemBuilder: (context, item, index) {
-            return LMChatUserTile(
+            LMChatUserTile userTile = LMChatUserTile(
               userViewData: item,
             );
+            return widget.userTileBuilder?.call(context, userTile) ?? userTile;
           },
           firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
           newPageErrorIndicatorBuilder: widget.newPageErrorIndicatorBuilder,

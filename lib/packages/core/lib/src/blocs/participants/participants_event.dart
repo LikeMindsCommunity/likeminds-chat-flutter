@@ -35,6 +35,11 @@ class LMChatGetParticipantsEvent extends LMChatParticipantsEvent {
     required this.isSecret,
   });
   @override
-  List<Object> get props =>
-      [chatroomId, page, pageSize, search ?? '', isSecret];
+  List<Object> get props => [
+        chatroomId,
+        page,
+        pageSize,
+        search ?? '',
+        isSecret,
+      ];
 }

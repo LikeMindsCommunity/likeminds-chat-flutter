@@ -21,6 +21,7 @@ class LMChatParticipantsBloc
   static LMChatParticipantsBloc get instance =>
       _instance ??= LMChatParticipantsBloc._();
   LMChatParticipantsBloc._() : super(const LMChatParticipantsInitialState()) {
+    // handle get participants event
     on<LMChatGetParticipantsEvent>(_getParticipantsEventHandler);
   }
 

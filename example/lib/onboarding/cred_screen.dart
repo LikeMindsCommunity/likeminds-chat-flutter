@@ -171,7 +171,7 @@ class _CredScreenState extends State<CredScreen> {
         ),
       );
     } else {
-      // final (a, b) = await mockInitiateUser(
+      // final (accessToken, accessToken) = await mockInitiateUser(
       //   apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
       //   userName: username,
       //   userId: userId,
@@ -182,8 +182,8 @@ class _CredScreenState extends State<CredScreen> {
         userName: username,
       );
       // final response = await LMChatCore.instance.showChatWithoutApiKey(
-      //   accessToken: a,
-      //   refreshToken: b,
+      //   accessToken: accessToken,
+      //   refreshToken: refreshToken,
       // );
       if (response.success) {
         MaterialPageRoute route = MaterialPageRoute(

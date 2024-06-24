@@ -519,7 +519,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultSentChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser: LMChatLocalPreference.instance.getUser()!.toUserViewData(),
+      currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
@@ -529,7 +529,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultReceivedChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser:  LMChatLocalPreference.instance.getUser()!.toUserViewData(),
+      currentUser:  LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,
