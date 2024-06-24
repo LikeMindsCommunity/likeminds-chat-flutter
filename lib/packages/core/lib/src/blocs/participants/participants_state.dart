@@ -30,8 +30,10 @@ class LMChatParticipantsLoadedState extends LMChatParticipantsState {
   final int page;
 
   /// [LMChatParticipantsLoadedState] constructor to create an instance of [LMChatParticipantsLoadedState].
-  const LMChatParticipantsLoadedState(
-      {required this.participants, required this.page});
+  const LMChatParticipantsLoadedState({
+    required this.participants,
+    required this.page,
+  });
   @override
   List<Object> get props => [participants];
 }
@@ -42,7 +44,11 @@ class LMChatParticipantsErrorState extends LMChatParticipantsState {
   final String errorMessage;
 
   /// [LMChatParticipantsErrorState] constructor to create an instance of [LMChatParticipantsErrorState].
-  const LMChatParticipantsErrorState(this.errorMessage);
+  const LMChatParticipantsErrorState(
+    {
+      required this.errorMessage,
+    }
+  );
   @override
   List<Object> get props => [errorMessage];
 }

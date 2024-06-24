@@ -34,7 +34,7 @@ class LMChatroomParticipantsPage extends StatefulWidget {
   final LMChatAppBarBuilder? appBarBuilder;
 
   /// [userTileBuilder] is a builder to build the user tile for the participants.
-  final Widget Function(BuildContext, LMChatUserTile)? userTileBuilder;
+  final LMChatUserTileBuilder? userTileBuilder;
 
   /// [LMChatroomParticipantsPage] constructor to create an instance of [LMChatroomParticipantsPage].
   const LMChatroomParticipantsPage({
@@ -271,7 +271,7 @@ class _LMChatroomParticipantsPageState
             LMChatUserTile userTile = LMChatUserTile(
               userViewData: item,
             );
-            return widget.userTileBuilder?.call(context, userTile) ?? userTile;
+            return widget.userTileBuilder?.call(context, item, userTile) ?? userTile;
           },
           firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
           newPageErrorIndicatorBuilder: widget.newPageErrorIndicatorBuilder,

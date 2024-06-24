@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
+import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 /// {@template lm_chat_error_handler}
 /// The error handler function for the chat.
 /// This function is called when an error occurs in the chat.
@@ -109,4 +110,18 @@ typedef LMChatContextWidgetBuilder = Widget Function(BuildContext context);
 typedef LMChatroomChatBarBuilder = Widget Function(
   LMChatRoomViewData chatroom,
   Function onMessageSent,
+);
+
+/// {@template lm_chat_tile_builder}
+/// The tile builder function for the chat screen.
+/// This function is called to build the tile for the chat screen.
+/// The [LMChatTileBuilder] function takes two parameters:
+/// - [LMChatConversationViewData] conversation: The conversation.
+/// - [LMChatTile] oldTile: The old tile.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatUserTileBuilder = Widget Function(
+  BuildContext context,
+  LMChatUserViewData user,
+  LMChatUserTile oldUserTile,
 );
