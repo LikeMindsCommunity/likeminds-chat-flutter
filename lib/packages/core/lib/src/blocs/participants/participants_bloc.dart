@@ -2,56 +2,26 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 part 'participants_event.dart';
 part 'participants_state.dart';
+part 'handler/get_participants_handler.dart';
 
+
+/// [LMChatParticipantsBloc] is responsible for handling the participants of a chat room.
+/// It extends [Bloc] and uses [LMChatParticipantsEvent] and [LMChatParticipantsState].
+/// It has a singleton instance [instance] which is used to access the bloc.
 class LMChatParticipantsBloc
     extends Bloc<LMChatParticipantsEvent, LMChatParticipantsState> {
   static LMChatParticipantsBloc? _instance;
+  /// Singleton instance of [LMChatParticipantsBloc]
   static LMChatParticipantsBloc get instance =>
       _instance ??= LMChatParticipantsBloc._();
-  LMChatParticipantsBloc._() : super(const LMChatParticipantsInitial()) {
-    on<LMChatGetParticipantsEvent>((event, emit) async {
-      if (event.getParticipantsRequest.page == 1) {
-        emit(
-          const LMChatParticipantsLoading(),
-        );
-      } else {
-        emit(
-          const LMChatParticipantsPaginationLoading(),
-        );
-      }
-      try {
-        final LMResponse<GetParticipantsResponse> response =
-            await LMChatCore.client.getParticipants(
-          event.getParticipantsRequest,
-        );
-        if (response.success) {
-          GetParticipantsResponse getParticipantsResponse = response.data!;
-
-          emit(
-            LMChatParticipantsLoaded(
-              getParticipantsResponse: getParticipantsResponse,
-            ),
-          );
-        } else {
-          debugPrint(response.errorMessage);
-          emit(
-            LMChatParticipantsError(
-              response.errorMessage!,
-            ),
-          );
-        }
-      } catch (e) {
-        debugPrint(e.toString());
-        emit(
-          const LMChatParticipantsError(
-            'An error occurred',
-          ),
-        );
-      }
-    });
+  LMChatParticipantsBloc._() : super(const LMChatParticipantsInitialState()) {
+    on<LMChatGetParticipantsEvent>(_getParticipantsEventHandler);
   }
+
 }

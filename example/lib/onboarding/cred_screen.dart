@@ -171,20 +171,20 @@ class _CredScreenState extends State<CredScreen> {
         ),
       );
     } else {
-      final (a, b) = await mockInitiateUser(
-        apiKey: "",
-        userName: username,
-        userId: userId,
-      );
-      // final response = await LMChatCore.instance.showChatWithApiKey(
+      // final (a, b) = await mockInitiateUser(
       //   apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
-      //   uuid: userId,
       //   userName: username,
+      //   userId: userId,
       // );
-      final response = await LMChatCore.instance.showChatWithoutApiKey(
-        accessToken: a,
-        refreshToken: b,
+      final response = await LMChatCore.instance.showChatWithApiKey(
+        apiKey: "b3a5e07d-85c4-4d8d-9ec0-ca07e841b35b",
+        uuid: userId,
+        userName: username,
       );
+      // final response = await LMChatCore.instance.showChatWithoutApiKey(
+      //   accessToken: a,
+      //   refreshToken: b,
+      // );
       if (response.success) {
         MaterialPageRoute route = MaterialPageRoute(
           builder: (context) => const LMChatHomeScreen(

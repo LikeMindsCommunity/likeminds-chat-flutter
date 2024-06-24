@@ -5,18 +5,14 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
-import 'package:likeminds_chat_flutter_core/src/blocs/home/home_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_chat_flutter_core/src/views/views.dart';
+import 'package:likeminds_chat_flutter_core/src/views/participants/participants.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -71,7 +67,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   @override
   void didUpdateWidget(LMChatHomeScreen oldWidget) {
-    user =  LMChatLocalPreference.instance.getUser()!;
+    user = LMChatLocalPreference.instance.getUser()!;
     homeFeedPagingController.itemList?.clear();
     chatroomTypes = getChatroomTypes(widget.chatroomType);
     _addPaginationListener();
@@ -130,6 +126,26 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  final chatroomViewData =
+                      (LMChatRoomViewDataBuilder()
+                      ..id(97420)
+                      ..isSecret(false)
+                      ..participantCount(1)
+                      ).build();
+                  return LMChatroomParticipantsPage(
+                    chatroomViewData: chatroomViewData,
+                  );
+                },
+              ),
+            );
+          },
+          child: const Icon(Icons.people),
+        ),
         backgroundColor: LMChatTheme.theme.backgroundColor,
         body: SafeArea(
           bottom: false,

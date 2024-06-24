@@ -1,5 +1,6 @@
 part of 'participants_bloc.dart';
 
+/// abstract class [LMChatParticipantsState] is used to define the state of the participants bloc.
 abstract class LMChatParticipantsState extends Equatable {
   const LMChatParticipantsState();
 
@@ -7,26 +8,31 @@ abstract class LMChatParticipantsState extends Equatable {
   List<Object> get props => [];
 }
 
-class LMChatParticipantsInitial extends LMChatParticipantsState {
-  const LMChatParticipantsInitial();
+/// [LMChatParticipantsInitialState] is the initial state of the participants bloc.
+class LMChatParticipantsInitialState extends LMChatParticipantsState {
+  const LMChatParticipantsInitialState();
 }
 
-class LMChatParticipantsLoading extends LMChatParticipantsState {
-  const LMChatParticipantsLoading();
+/// [LMChatParticipantsLoadingState] is the state when the participants are being loading.
+class LMChatParticipantsLoadingState extends LMChatParticipantsState {
+  const LMChatParticipantsLoadingState();
 }
 
-class LMChatParticipantsPaginationLoading extends LMChatParticipantsState {
-  const LMChatParticipantsPaginationLoading();
+/// [LMChatParticipantsPaginationLoading] is the state when the participants data loaded.
+class LMChatParticipantsLoadedState extends LMChatParticipantsState {
+  final List<LMChatUserViewData> participants;
+  final int page;
+
+  const LMChatParticipantsLoadedState({required this.participants, required this.page});
+  @override
+  List<Object> get props => [participants];
 }
 
-class LMChatParticipantsLoaded extends LMChatParticipantsState {
-  final GetParticipantsResponse getParticipantsResponse;
+/// [LMChatParticipantsErrorState] is the state when an error occurs while loading participants.
+class LMChatParticipantsErrorState extends LMChatParticipantsState {
+  final String errorMessage;
 
-  const LMChatParticipantsLoaded({required this.getParticipantsResponse});
-}
-
-class LMChatParticipantsError extends LMChatParticipantsState {
-  final String message;
-
-  const LMChatParticipantsError(this.message);
+  const LMChatParticipantsErrorState(this.errorMessage);
+  @override
+  List<Object> get props => [errorMessage];
 }

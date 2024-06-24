@@ -11,7 +11,6 @@ import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversa
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
