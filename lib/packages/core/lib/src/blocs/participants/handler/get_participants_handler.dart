@@ -6,6 +6,7 @@ void _getParticipantsEventHandler(LMChatGetParticipantsEvent event,
     Emitter<LMChatParticipantsState> emit) async {
   emit(const LMChatParticipantsLoadingState());
   try {
+    // create get participants request
     final GetParticipantsRequest getParticipantsRequest =
         (GetParticipantsRequestBuilder()
               ..chatroomId(event.chatroomId)
@@ -18,6 +19,9 @@ void _getParticipantsEventHandler(LMChatGetParticipantsEvent event,
         await LMChatCore.client.getParticipants(
       getParticipantsRequest,
     );
+    // check if response is successful
+    // if successful, emit [LMChatParticipantsLoadedState] with participants
+    // if unsuccessful, emit [LMChatParticipantsErrorState] with error message
     if (response.success) {
       GetParticipantsResponse getParticipantsResponse = response.data!;
       List<LMChatUserViewData> participants =
