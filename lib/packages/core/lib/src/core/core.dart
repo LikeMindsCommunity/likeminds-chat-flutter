@@ -5,6 +5,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/notifications/notification
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:flutter/foundation.dart';
 
 class LMChatCore {
   //Instance variables
@@ -31,7 +32,7 @@ class LMChatCore {
   static String get domain => instance._clientDomain;
 
   /// Main initialize function for initalising LMChatCore
-  Future<void> initialize({
+  Future<LMResponse<void>> initialize({
     required String apiKey,
     LMChatClient? lmChatClient,
     String? domain,
@@ -44,9 +45,14 @@ class LMChatCore {
     if (domain != null) _clientDomain = domain;
     chatConfig = config ?? LMChatConfig();
     if (widgets != null) _widgetUtility = widgets;
-    await LMChatPreferences.instance.initialize();
     LMChatTheme.instance.initialise(theme: theme);
+    LMResponse initDB = await this.lmChatClient.initiateDB();
+    if (!initDB.success) {
+      return LMResponse.error(
+          errorMessage: initDB.errorMessage ?? "Error in initiating DB");
+    }
     await initFirebase();
+    return LMResponse.success(data: null);
   }
 
   Future<void> closeBlocs() async {
