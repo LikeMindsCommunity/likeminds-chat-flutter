@@ -19,7 +19,7 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? trailing;
   final Widget? title;
   final Widget? subtitle;
-  final LMChatProfilePicture? banner;
+  final Widget? banner;
 
   final Function? backButtonCallback;
 

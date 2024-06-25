@@ -261,19 +261,7 @@ class LMChatTextFieldStyle {
   }
 }
 
-class LMChatDialogStyle {
-  final Color? backgroundColor;
 
-  const LMChatDialogStyle({
-    this.backgroundColor,
-  });
-
-  LMChatDialogStyle copyWith({Color? backgroundColor}) {
-    return LMChatDialogStyle(
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-    );
-  }
-}
 
 class LMChatPopUpMenuStyle {
   final Color? backgroundColor;
