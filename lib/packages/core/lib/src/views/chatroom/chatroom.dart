@@ -660,8 +660,22 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         onTap: () {
           // Store the answer in the clipboard
           // and show a toast message
+          // if _selectedIds is more than 1, then copy answer with
+          // [date and time] conversation user name : answer format
+          bool isMultiple = _selectedIds.length > 1;
+          String copiedMessage = "";
+          if (isMultiple) {
+            for (int id in _selectedIds) {
+              Conversation conversation = pagedListController.value.itemList!
+                  .firstWhere((element) => element.id == id);
+              copiedMessage +=
+                  "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";
+            }
+          } else {
+            copiedMessage = conversationViewData.answer;
+          }
           Clipboard.setData(
-            ClipboardData(text: conversationViewData.answer),
+            ClipboardData(text: copiedMessage),
           ).then((data) {
             toast("Copied to clipboard");
             _selectedIds.clear();
