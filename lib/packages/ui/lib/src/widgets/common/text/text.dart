@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// A simple text widget to be used throughout the Feed experience
+/// A simple text widget to be used throughout the Chat experience
 /// Provides high level customisability through [LMChatTextStyle]
 /// Also, can add onTap functionality
 class LMChatText extends StatelessWidget {

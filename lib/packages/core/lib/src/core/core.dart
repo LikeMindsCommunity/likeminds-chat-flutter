@@ -136,7 +136,7 @@ class LMChatCore {
 
   /// This function is the starting point of the chat.
   /// It must be executed before displaying the chat home screen or accessing any other [LMChatCore] widgets or screens.
-  /// The [accessToken] and [refreshToken] parameters are required to show the feed screen.
+  /// The [accessToken] and [refreshToken] parameters are required to show the home screen.
   /// If the [accessToken] and [refreshToken] parameters are not provided, the function will fetch them from the local preference.
   Future<LMResponse> showChatWithoutApiKey({
     String? accessToken,
