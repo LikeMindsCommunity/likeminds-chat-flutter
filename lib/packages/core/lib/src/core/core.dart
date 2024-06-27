@@ -1,4 +1,5 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/firebase/firebase.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -57,6 +58,8 @@ class LMChatCore {
     LMChatWidgetUtility? widgets,
     LMChatThemeData? theme,
     LMChatCoreCallback? lmChatCallback,
+    Function(LMChatAnalyticsEventFired)? analyticsListener,
+    Function(LMChatProfileState)? profileListener,
   }) async {
     final lmChatSDKCallback =
         LMChatSDKCallbackImpl(lmChatCallback: lmChatCallback);
@@ -69,7 +72,20 @@ class LMChatCore {
     LMResponse isDBInitiated = await this.lmChatClient.initiateDB();
     if (!isDBInitiated.success) {
       return LMResponse.error(
-          errorMessage: isDBInitiated.errorMessage ?? "Error in setting up local storage");
+          errorMessage: isDBInitiated.errorMessage ??
+              "Error in setting up local storage");
+    }
+    if (analyticsListener != null) {
+      LMChatAnalyticsBloc.instance.stream.listen((LMChatAnalyticsState event) {
+        if (event is LMChatAnalyticsEventFired) {
+          analyticsListener.call(event);
+        }
+      });
+    }
+    if (profileListener != null) {
+      LMChatProfileBloc.instance.stream.listen((event) {
+        profileListener.call(event);
+      });
     }
     await initFirebase();
     return LMResponse.success(data: null);
