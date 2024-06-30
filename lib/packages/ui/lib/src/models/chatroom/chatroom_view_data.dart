@@ -406,7 +406,7 @@ class LMChatRoomViewData {
       chatroomWithUserId: chatroomWithUserId ?? this.chatroomWithUserId,
       userId: userId ?? this.userId,
       lastResponseMembers: lastResponseMembers ?? this.lastResponseMembers,
-      lastConversation: lastConversation ?? lastConversation,
+      lastConversation: lastConversation ?? this.lastConversation,
     );
   }
 }

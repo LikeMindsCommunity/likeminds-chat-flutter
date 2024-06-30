@@ -138,7 +138,7 @@ packages:
     source: hosted
     version: "1.18.0"
   connectivity_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: connectivity_plus
       sha256: db7a4e143dc72cc3cb2044ef9b052a7ebfe729513e6a82943bc3526f784365b8
@@ -544,14 +544,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  get_it:
-    dependency: transitive
-    description:
-      name: get_it
-      sha256: d85128a5dae4ea777324730dc65edd9c9f43155c109d5cc0a69cab74139fbac1
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.7.0"
   glob:
     dependency: transitive
     description:
@@ -568,6 +560,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.1"
+  hive:
+    dependency: transitive
+    description:
+      name: hive
+      sha256: "8dcf6db979d7933da8217edcec84e9df1bdb4e4edc7fc77dbd5aa74356d6d941"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.3"
+  hive_flutter:
+    dependency: transitive
+    description:
+      name: hive_flutter
+      sha256: dca1da446b1d808a51689fb5d0c6c9510c0a2ba01e22805d492c73b68e33eecc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   http:
     dependency: transitive
     description:
@@ -723,25 +731,24 @@ packages:
   likeminds_chat_fl:
     dependency: "direct main"
     description:
-      name: likeminds_chat_fl
-      sha256: e90647431ab08a8ed8657707fc0d80a04cbeb1eb4ed7e5edad0c589392f2ddf7
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.6.0"
+      path: "../../LikeMinds-Flutter-GroupChat-SDK"
+      relative: true
+    source: path
+    version: "1.7.0"
   likeminds_chat_flutter_core:
     dependency: "direct main"
     description:
       path: "../lib/packages/core"
       relative: true
     source: path
-    version: "0.5.0"
+    version: "0.5.1"
   likeminds_chat_flutter_ui:
     dependency: "direct main"
     description:
       path: "../lib/packages/ui"
       relative: true
     source: path
-    version: "0.5.0"
+    version: "0.5.1"
   lints:
     dependency: transitive
     description:

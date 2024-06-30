@@ -114,7 +114,7 @@ class LMChatNotificationHandler {
     if (host == "collabcard") {
       rootNavigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => const LMChatHome(
+          builder: (context) => const LMChatHomeScreen(
               // chatroomType: LMChatroomType.dm,
               ),
         ),
@@ -130,7 +130,7 @@ class LMChatNotificationHandler {
     } else if (host == 'chatroom_detail') {
       rootNavigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => const LMChatHome(
+          builder: (context) => const LMChatHomeScreen(
               // chatroomType: LMChatroomType.dm,
               ),
         ),

@@ -44,7 +44,7 @@ String getHomeChatroomPreviewMessage(
   LMChatConversationViewData conversation,
 ) {
   String personLabel = "";
-  final user = LMChatPreferences.instance.getCurrentUser;
+  final user = LMChatLocalPreference.instance.getUser();
   bool a = conversation.member!.id == user.id;
   personLabel = a ? 'You: ' : '${conversation.member!.name}: ';
   String message = conversation.deletedByUserId == null
@@ -54,7 +54,7 @@ String getHomeChatroomPreviewMessage(
           conversation.answer,
           withTilde: false,
         )}'
-      : getDeletedText(conversation, user!);
+      : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
 

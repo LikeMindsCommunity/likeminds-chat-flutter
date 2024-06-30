@@ -7,3 +7,5 @@ dependency_overrides:
     path: ../lib/packages/core
   likeminds_chat_flutter_ui:
     path: ../lib/packages/ui
+  likeminds_chat_fl:
+    path: ../../LikeMinds-Flutter-GroupChat-SDK
