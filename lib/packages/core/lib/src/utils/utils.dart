@@ -7,3 +7,5 @@ export 'preferences/preferences.dart';
 export 'conversation/conversation_utils.dart';
 export 'analytics/analytics.dart';
 export 'notifications/notification_handler.dart';
+export 'preferences/preferences.dart';
+export 'callback/lm_chat_callback.dart';

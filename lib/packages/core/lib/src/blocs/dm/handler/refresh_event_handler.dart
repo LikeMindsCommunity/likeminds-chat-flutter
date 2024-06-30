@@ -25,7 +25,8 @@ void refreshDMFeedEventHandler(
   //Emit error state and fail gracefully
   if (!response.success) {
     emit(LMChatDMFeedError(
-      errorMessage: response.errorMessage ?? errorFallback,
+      errorMessage:
+          response.errorMessage ?? LMChatStringConstants.errorFallback,
     ));
   }
 

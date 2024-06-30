@@ -54,7 +54,7 @@
 //   @override
 //   void initState() {
 //     Bloc.observer = LMChatBlocObserver();
-//     user = LMChatPreferences.instance.getCurrentUser;
+//     user = LMChatLocalPreferences.instance.getCurrentUser;
 //     homeFeedPagingController.itemList?.clear();
 //     chatroomTypes = getChatroomTypes(widget.chatroomType);
 //     _addPaginationListener();
@@ -70,7 +70,7 @@
 
 //   @override
 //   void didUpdateWidget(LMChatHomeScreen oldWidget) {
-//     user = LMChatPreferences.instance.getCurrentUser;
+//     user = LMChatLocalPreferences.instance.getCurrentUser;
 //     homeFeedPagingController.itemList?.clear();
 //     chatroomTypes = getChatroomTypes(widget.chatroomType);
 //     _addPaginationListener();

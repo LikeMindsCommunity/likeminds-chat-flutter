@@ -27,7 +27,6 @@ export 'tag/tag_view_data.dart';
 
 // user models
 export 'user/user_view_data.dart';
-export 'user/chatroom_member_view_data.dart';
 
 // widget models
 export 'widget/widget_view_data.dart';

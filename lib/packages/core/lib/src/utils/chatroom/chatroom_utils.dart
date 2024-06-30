@@ -1,4 +1,6 @@
 import 'package:intl/intl.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
@@ -18,11 +20,10 @@ String getDMChatroomPreviewMessage(
   LMChatUserViewData chatroomWithUser,
 ) {
   String personLabel = "";
-  final user = LMChatPreferences.instance.getCurrentUser;
+  final user = LMChatLocalPreference.instance.getUser();
   bool a = conversationUser.id == chatroomWithUser.id &&
-      user!.id == chatroomWithUser.id;
-  bool b =
-      conversationUser.id == chatroomUser.id && user!.id == chatroomUser.id;
+      user.id == chatroomWithUser.id;
+  bool b = conversationUser.id == chatroomUser.id && user.id == chatroomUser.id;
   personLabel = a
       ? 'You: '
       : b
@@ -35,7 +36,7 @@ String getDMChatroomPreviewMessage(
           conversation.answer,
           withTilde: false,
         )}'
-      : getDeletedText(conversation, user!);
+      : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
 
@@ -43,7 +44,7 @@ String getHomeChatroomPreviewMessage(
   LMChatConversationViewData conversation,
 ) {
   String personLabel = "";
-  final user = LMChatPreferences.instance.getCurrentUser;
+  final user = LMChatLocalPreference.instance.getUser();
   bool a = conversation.member!.id == user.id;
   personLabel = a ? 'You: ' : '${conversation.member!.name}: ';
   String message = conversation.deletedByUserId == null
@@ -53,7 +54,7 @@ String getHomeChatroomPreviewMessage(
           conversation.answer,
           withTilde: false,
         )}'
-      : getDeletedText(conversation, user!);
+      : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
 

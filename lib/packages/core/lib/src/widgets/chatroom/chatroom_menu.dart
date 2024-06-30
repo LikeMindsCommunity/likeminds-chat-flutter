@@ -184,7 +184,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   }
 
   void leaveChatroom() async {
-    final User user = LMChatPreferences.instance.getCurrentUser;
+    final User user = LMChatLocalPreference.instance.getUser();
     if (!(widget.chatroom.isSecret ?? false)) {
       final response =
           await LMChatCore.client.followChatroom((FollowChatroomRequestBuilder()

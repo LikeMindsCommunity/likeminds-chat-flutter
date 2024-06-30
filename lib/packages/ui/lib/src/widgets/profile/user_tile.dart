@@ -3,61 +3,50 @@ import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
+/// [LMChatUserTile] is a [LMChatTile] that represents a user in a chat room.
 class LMChatUserTile extends LMChatTile {
-  final LMChatUserViewData user;
-  @override
-  final VoidCallback? onTap;
-  @override
-  final LMChatTileStyle? style;
-  @override
-  final Widget? title;
-  @override
-  final Widget? subtitle;
+  /// [userViewData] is the user to be displayed in the tile.
+  final LMChatUserViewData userViewData;
 
+/// [LMChatUserTile] constructor to create an instance of [LMChatUserTile].
   const LMChatUserTile({
-    Key? key,
-    required this.user,
-    this.onTap,
-    this.style,
-    this.title,
-    this.subtitle,
-  }) : super(
-          key: key,
-          onTap: onTap,
-          style: style,
-          title: title,
-          subtitle: subtitle,
-        );
+    super.key,
+    required this.userViewData,
+    super.onTap,
+    super.style,
+    super.title,
+    super.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    LMChatThemeData feedTheme = LMChatTheme.theme;
+    LMChatThemeData chatTheme = LMChatTheme.theme;
     return LMChatTile(
       onTap: onTap,
       style: style ??
           LMChatTileStyle(
-            backgroundColor: feedTheme.container,
+            backgroundColor: chatTheme.container,
             margin: 12,
           ),
       leading: LMChatProfilePicture(
         style: LMChatProfilePictureStyle.basic().copyWith(
-          backgroundColor: feedTheme.primaryColor,
+          backgroundColor: chatTheme.primaryColor,
           size: 42,
           fallbackTextStyle: LMChatTextStyle(
             textStyle: TextStyle(
               fontSize: LMChatDefaultTheme.kFontMedium,
               fontWeight: FontWeight.w500,
-              color: feedTheme.onPrimary,
+              color: chatTheme.onPrimary,
             ),
           ),
         ),
-        fallbackText: user.name,
-        imageUrl: user.imageUrl,
+        fallbackText: userViewData.name,
+        imageUrl: userViewData.imageUrl,
         onTap: onTap,
       ),
       title: title ??
           LMChatText(
-            user.name,
+            userViewData.name,
             style: const LMChatTextStyle(
               textStyle: TextStyle(
                 fontSize: LMChatDefaultTheme.kFontMedium,
@@ -65,17 +54,7 @@ class LMChatUserTile extends LMChatTile {
               ),
             ),
           ),
-      subtitle: subtitle ??
-          LMChatText(
-            "@${user.name.toLowerCase().split(' ').join()} ",
-            style: const LMChatTextStyle(
-              textStyle: TextStyle(
-                fontSize: LMChatDefaultTheme.kFontSmall,
-                color: Colors.grey,
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-          ),
+      subtitle: subtitle,
     );
   }
 }

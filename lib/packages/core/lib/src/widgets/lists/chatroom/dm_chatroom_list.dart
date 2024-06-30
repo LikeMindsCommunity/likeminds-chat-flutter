@@ -153,8 +153,8 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   }
 
   LMChatTile _defaultDMChatRoomTile(LMChatRoomViewData chatroom) {
-    final user = LMChatPreferences.instance.currentUser;
-    bool whichUser = user != null && user.id != chatroom.chatroomWithUserId;
+    final user = LMChatLocalPreference.instance.getUser();
+    bool whichUser = user.id != chatroom.chatroomWithUserId;
     final chatroomUser =
         whichUser ? chatroom.chatroomWithUser! : chatroom.member!;
     String message = getDMChatroomPreviewMessage(

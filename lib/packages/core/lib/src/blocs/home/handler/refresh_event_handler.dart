@@ -25,7 +25,8 @@ void refreshHomeFeedEventHandler(
   //Emit error state and fail gracefully
   if (!response.success) {
     emit(LMChatHomeFeedError(
-      errorMessage: response.errorMessage ?? errorFallback,
+      errorMessage:
+          response.errorMessage ?? LMChatStringConstants.errorFallback,
     ));
   }
 
