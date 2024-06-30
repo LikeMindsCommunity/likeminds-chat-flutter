@@ -31,7 +31,8 @@ class LMChatHomeFeedList extends StatefulWidget {
   State<LMChatHomeFeedList> createState() => _LMChatHomeFeedListState();
 }
 
-class _LMChatHomeFeedListState extends State<LMChatHomeFeedList> {
+class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
+    with AutomaticKeepAliveClientMixin<LMChatHomeFeedList> {
   // Widget level track of page key for pagination
   int _page = 1;
 
@@ -46,18 +47,18 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList> {
 
   @override
   void initState() {
+    super.initState();
     feedBloc = LMChatHomeFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
     _addPaginationListener();
-    super.initState();
   }
 
   @override
   void didUpdateWidget(covariant LMChatHomeFeedList oldWidget) {
+    super.didUpdateWidget(oldWidget);
     feedBloc = LMChatHomeFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
     _addPaginationListener();
-    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -69,6 +70,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: LMChatTheme.theme.container,
       body: SafeArea(
@@ -259,6 +261,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class LMChatHomeFeedListStyle {

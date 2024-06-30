@@ -200,13 +200,13 @@
 //         ),
 //       ),
 //       trailing: [
-//         LMChatProfilePicture(
-//           fallbackText: user!.name,
-//           imageUrl: user?.imageUrl,
-//           style: const LMChatProfilePictureStyle(
-//             size: 42,
-//           ),
-//         ),
+        // LMChatProfilePicture(
+        //   fallbackText: user!.name,
+        //   imageUrl: user?.imageUrl,
+        //   style: const LMChatProfilePictureStyle(
+        //     size: 42,
+        //   ),
+        // ),
 //       ],
 //     );
 //   }

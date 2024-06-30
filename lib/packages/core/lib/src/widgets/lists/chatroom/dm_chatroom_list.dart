@@ -32,7 +32,8 @@ class LMChatDMFeedList extends StatefulWidget {
   State<LMChatDMFeedList> createState() => _LMChatDMFeedListState();
 }
 
-class _LMChatDMFeedListState extends State<LMChatDMFeedList> {
+class _LMChatDMFeedListState extends State<LMChatDMFeedList>
+    with AutomaticKeepAliveClientMixin<LMChatDMFeedList> {
   // Widget level track of page key for pagination
   int _page = 1;
 
@@ -269,6 +270,9 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class LMChatDMFeedListStyle {
