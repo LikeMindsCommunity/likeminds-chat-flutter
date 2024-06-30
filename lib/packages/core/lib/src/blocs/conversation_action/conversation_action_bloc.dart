@@ -15,11 +15,16 @@ part 'handler/reply_conversation_event_handler.dart';
 /// It has a singleton instance [instance] which is used to access the bloc.
 class LMChatConversationActionBloc
     extends Bloc<LMChatConversationActionEvent, LMChatConversationActionState> {
-  static LMChatConversationActionBloc? _instance;
-
   /// Singleton instance of [LMChatConversationActionBloc]
-  static LMChatConversationActionBloc get instance =>
-      _instance ??= LMChatConversationActionBloc._();
+  static LMChatConversationActionBloc? _instance;
+  static LMChatConversationActionBloc get instance {
+    if (_instance == null || _instance!.isClosed) {
+      return _instance = LMChatConversationActionBloc._();
+    } else {
+      return _instance!;
+    }
+  }
+
   LMChatConversationActionBloc._() : super(LMChatConversationActionInitial()) {
     // map the events to the event handlers
     on<LMChatEditConversationEvent>(_editConversationEventHandler);

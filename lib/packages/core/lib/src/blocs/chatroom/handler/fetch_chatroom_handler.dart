@@ -18,7 +18,7 @@ void fetchChatroomEventHandler(
   //Emit error state and fail gracefully
   if (!response.success) {
     emit(LMChatroomErrorState(
-      response.errorMessage ?? errorFallback,
+      response.errorMessage ?? LMChatStringConstants.errorFallback,
     ));
   }
 
@@ -26,9 +26,12 @@ void fetchChatroomEventHandler(
   final ChatRoom chatroom = response.data!.chatroom!;
 
   //Finally, emit the loaded success state with the chatroom response
-  emit(LMChatroomLoadedState(
-    chatroom: chatroom,
-    actions: response.data!.chatroomActions!,
-    lastConversationId: response.data!.lastConversationId!,
-  ));
+  emit(
+    LMChatroomLoadedState(
+      chatroom: chatroom,
+      actions: response.data!.chatroomActions!,
+      participantCount: response.data!.participantCount ?? 0,
+      lastConversationId: response.data!.lastConversationId ?? 0,
+    ),
+  );
 }

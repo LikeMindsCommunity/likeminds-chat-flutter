@@ -89,21 +89,21 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                               )
                             : const SizedBox.shrink()),
                     banner != null
-                        ? SizedBox(width: inStyle.gap ?? 12)
+                        ? SizedBox(width: inStyle.gap ?? 16)
                         : const SizedBox.shrink(),
                     banner ?? const SizedBox.shrink(),
                     leading != null || inStyle.showBackButton
-                        ? SizedBox(width: inStyle.gap ?? 12)
+                        ? SizedBox(width: inStyle.gap ?? 16)
                         : const SizedBox.shrink(),
                     Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            // constraints: BoxConstraints(
-                            //   maxWidth: 60.w,
-                            // ),
+                            constraints: BoxConstraints(
+                              minWidth: 80.w,
+                            ),
                             child: title ?? const SizedBox.shrink(),
                           ),
                           subtitle != null
@@ -113,7 +113,6 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ],
                       ),
                     ),
-                    const Spacer(),
                     if (trailing != null) ...trailing!
                   ],
                 ),

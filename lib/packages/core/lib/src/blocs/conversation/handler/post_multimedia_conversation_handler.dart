@@ -8,7 +8,7 @@ mapPostMultiMediaConversation(
   int? lastConversationId;
   try {
     DateTime dateTime = DateTime.now();
-    User user = LMChatPreferences.instance.getUser()!;
+    User user = LMChatLocalPreference.instance.getUser();
     Conversation conversation = Conversation(
       answer: event.postConversationRequest.text,
       chatroomId: event.postConversationRequest.chatroomId,

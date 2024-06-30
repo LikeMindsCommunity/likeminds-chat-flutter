@@ -24,7 +24,7 @@ class LMChatHomeFeedBloc
     extends Bloc<LMChatHomeFeedEvent, LMChatHomeFeedState> {
   static LMChatHomeFeedBloc? _instance;
 
-  // Creating a singleton instance of the LMChatHomeFeedBloc
+  /// Creates a singleton instance of the LMChatHomeFeedBloc
   static LMChatHomeFeedBloc get instance {
     if (_instance == null || _instance!.isClosed) {
       return _instance = LMChatHomeFeedBloc._();

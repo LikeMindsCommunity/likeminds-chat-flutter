@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/aws/aws.dart';
@@ -17,14 +16,26 @@ part 'conversation_state.dart';
 part 'handler/post_conversation_handler.dart';
 part 'handler/post_multimedia_conversation_handler.dart';
 
+/// LMChatConversationBloc is the BLoC that manages conversations
+///
+/// It is used to fetch, refresh, and post conversations.
+///
+/// Uses a combination of LMChatConversationEvent, and LMChatVonversationState objects.
 class LMChatConversationBloc
     extends Bloc<LMChatConversationEvent, LMChatConversationState> {
   final mediaService = LMChatAWSUtility(!isDebug);
   final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
   int? lastConversationId;
+
   static LMChatConversationBloc? _instance;
-  static LMChatConversationBloc get instance =>
-      _instance ??= LMChatConversationBloc._();
+  static LMChatConversationBloc get instance {
+    if (_instance == null || _instance!.isClosed) {
+      return _instance = LMChatConversationBloc._();
+    } else {
+      return _instance!;
+    }
+  }
+
   LMChatConversationBloc._() : super(ConversationInitial()) {
     // on<InitConversations>(
     // (event, emit) {
@@ -83,20 +94,8 @@ class LMChatConversationBloc
       }
     });
 
-    on<PostConversation>((event, emit) async {
-      await mapPostConversationFunction(
-        event,
-        emit,
-      );
-    });
-    on<PostMultiMediaConversation>(
-      (event, emit) async {
-        await mapPostMultiMediaConversation(
-          event,
-          emit,
-        );
-      },
-    );
+    on<PostConversation>(mapPostConversationFunction);
+    on<PostMultiMediaConversation>(mapPostMultiMediaConversation);
     on<UpdateConversations>(
       (event, emit) async {
         if (lastConversationId != null &&
