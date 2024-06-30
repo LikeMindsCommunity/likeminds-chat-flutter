@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// A simple text widget to be used throughout the Feed experience
+/// A simple text widget to be used throughout the Chat experience
 /// Provides high level customisability through [LMChatTextStyle]
 /// Also, can add onTap functionality
 class LMChatText extends StatelessWidget {
@@ -24,19 +24,15 @@ class LMChatText extends StatelessWidget {
   Widget build(BuildContext context) {
     LMChatTextStyle inStyle = style ?? LMChatTextStyle.basic();
 
-    return Ink(
-      child: InkWell(
+    return Container(
+      color: Colors.transparent,
+      child: SelectableText(
+        text,
+        textAlign: inStyle.textAlign,
+        maxLines: inStyle.maxLines,
+        style: inStyle.textStyle,
+        enableInteractiveSelection: inStyle.selectable,
         onTap: onTap,
-        child: Container(
-          color: Colors.transparent,
-          child: SelectableText(
-            text,
-            textAlign: inStyle.textAlign,
-            maxLines: inStyle.maxLines,
-            style: inStyle.textStyle,
-            enableInteractiveSelection: inStyle.selectable,
-          ),
-        ),
       ),
     );
   }
@@ -79,7 +75,6 @@ class LMChatTextStyle {
 
   factory LMChatTextStyle.basic() {
     return const LMChatTextStyle(
-      maxLines: 1,
       textAlign: TextAlign.start,
       textStyle: TextStyle(
         fontSize: 14,

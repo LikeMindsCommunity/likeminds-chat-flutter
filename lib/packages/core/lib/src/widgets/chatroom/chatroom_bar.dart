@@ -52,9 +52,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   late CustomPopupMenuController _popupMenuController;
   late TextEditingController _textEditingController;
   late FocusNode _focusNode;
-  User? currentUser = LMChatPreferences.instance.getUser();
+  User? currentUser = LMChatLocalPreference.instance.getUser();
   MemberStateResponse? getMemberState =
-      LMChatPreferences.instance.getMemberRights();
+      LMChatLocalPreference.instance.getMemberRights();
 
   List<LMChatTagViewData> tags = [];
   String? result;
@@ -149,7 +149,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   bool checkIfAnnouncementChannel() {
     if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
       return false;
-    } else if (!MemberRightCheck.checkRespondRights(getMemberState)) {
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return false;
     } else {
       return true;
@@ -159,7 +159,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   String getChatBarHintText() {
     if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
       return 'Only Community Managers can respond here';
-    } else if (!MemberRightCheck.checkRespondRights(getMemberState)) {
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
     } else {
       return "Type something...";
@@ -290,7 +290,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   // return;
                                   if (editConversation != null) {
                                     linkModel = null;
-                                    chatActionBloc!.add(EditConversation(
+                                    chatActionBloc!.add(LMChatEditConversationEvent(
                                         (EditConversationRequestBuilder()
                                               ..conversationId(
                                                   editConversation!.id)
@@ -396,7 +396,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                     widget.scrollToBottom();
                                   }
                                   if (replyToConversation != null) {
-                                    chatActionBloc!.add(ReplyRemove());
+                                    chatActionBloc!.add(LMChatReplyRemoveEvent());
                                   }
                                   editConversation = null;
                                   replyToConversation = null;

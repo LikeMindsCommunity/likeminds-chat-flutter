@@ -1,13 +1,16 @@
 part of 'conversation_action_bloc.dart';
 
+/// [LMChatConversationActionEvent] is the base class for all the events related to conversation actions.
 @immutable
-abstract class ConversationActionEvent extends Equatable {}
+abstract class LMChatConversationActionEvent extends Equatable {}
 
-class EditConversation extends ConversationActionEvent {
+///
+class LMChatEditConversationEvent extends LMChatConversationActionEvent {
   final EditConversationRequest editConversationRequest;
   final Conversation? replyConversation;
 
-  EditConversation(this.editConversationRequest, {this.replyConversation});
+  LMChatEditConversationEvent(this.editConversationRequest,
+      {this.replyConversation});
 
   @override
   List<Object> get props => [
@@ -15,12 +18,12 @@ class EditConversation extends ConversationActionEvent {
       ];
 }
 
-class EditingConversation extends ConversationActionEvent {
+class LMChatEditingConversationEvent extends LMChatConversationActionEvent {
   final int conversationId;
   final int chatroomId;
   final Conversation editConversation;
 
-  EditingConversation({
+  LMChatEditingConversationEvent({
     required this.conversationId,
     required this.chatroomId,
     required this.editConversation,
@@ -34,28 +37,38 @@ class EditingConversation extends ConversationActionEvent {
       ];
 }
 
-class EditRemove extends ConversationActionEvent {
+class LMChatEditRemoveEvent extends LMChatConversationActionEvent {
   @override
   List<Object> get props => [];
 }
 
-class DeleteConversation extends ConversationActionEvent {
-  final DeleteConversationRequest deleteConversationRequest;
+/// [LMChatDeleteConversationEvent] is used to delete a conversation.
+class LMChatDeleteConversationEvent extends LMChatConversationActionEvent {
+  /// [List<int>] conversationIds is the list of conversation ids to be deleted.
+  final List<int> conversationIds;
 
-  DeleteConversation(this.deleteConversationRequest);
+  /// [String] reason is the reason for deleting the conversation.
+  final String reason;
+
+  /// [LMChatDeleteConversationEvent] constructor to create an instance of [LMChatDeleteConversationEvent].
+  LMChatDeleteConversationEvent({
+    required this.conversationIds,
+    this.reason = "Delete",
+  });
 
   @override
   List<Object> get props => [
-        deleteConversationRequest,
+        conversationIds,
+        reason,
       ];
 }
 
-class ReplyConversation extends ConversationActionEvent {
+class LMChatReplyConversationEvent extends LMChatConversationActionEvent {
   final int conversationId;
   final int chatroomId;
   final Conversation replyConversation;
 
-  ReplyConversation({
+  LMChatReplyConversationEvent({
     required this.conversationId,
     required this.chatroomId,
     required this.replyConversation,
@@ -69,40 +82,8 @@ class ReplyConversation extends ConversationActionEvent {
       ];
 }
 
-class ReplyRemove extends ConversationActionEvent {
+class LMChatReplyRemoveEvent extends LMChatConversationActionEvent {
   final int time = DateTime.now().millisecondsSinceEpoch;
   @override
   List<Object> get props => [time];
 }
-
-// class NewConversation extends ConversationActionEvent {
-//   final int chatroomId;
-//   final int conversationId;
-
-//   NewConversation({
-//     required this.chatroomId,
-//     required this.conversationId,
-//   });
-
-//   @override
-//   List<Object> get props => [
-//         chatroomId,
-//         conversationId,
-//       ];
-// }
-
-// class UpdateConversationList extends ConversationActionEvent {
-//   final int conversationId;
-//   final int chatroomId;
-
-//   UpdateConversationList({
-//     required this.conversationId,
-//     required this.chatroomId,
-//   });
-
-//   @override
-//   List<Object> get props => [
-//         conversationId,
-//         chatroomId,
-//       ];
-// }

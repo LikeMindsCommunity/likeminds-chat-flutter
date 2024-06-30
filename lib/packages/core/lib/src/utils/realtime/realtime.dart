@@ -9,7 +9,7 @@ class LMChatRealtime {
       _instance ??= LMChatRealtime._internal();
 
   late final FirebaseDatabase database;
-  final int _communityId = LMChatPreferences.instance.getCommunity()!.id;
+  final int _communityId = LMChatLocalPreference.instance.getCommunityData()!.id;
   int? _chatroomId;
 
   LMChatRealtime._internal() {

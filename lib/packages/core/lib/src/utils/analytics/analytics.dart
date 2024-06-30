@@ -5,17 +5,12 @@ class LMAnalytics {
   static LMAnalytics? _instance;
   static LMAnalytics get() => _instance ??= LMAnalytics._();
 
-  LMSDKCallback? sdkCallback;
+  LMChatSDKCallback? sdkCallback;
 
   LMAnalytics._();
 
   void initialize() {
-    sdkCallback =
-        DIService.getIt.isRegistered<LMSDKCallback>(instanceName: "LMCallback")
-            ? DIService.getIt.get<LMSDKCallback>(
-                instanceName: "LMCallback",
-              )
-            : null;
+    sdkCallback = LMChatServiceProvider.instance.sdkCallback;
     debugPrint("Analytics initialized");
   }
 

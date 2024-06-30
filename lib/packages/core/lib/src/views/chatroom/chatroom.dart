@@ -11,7 +11,8 @@ import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversa
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/extension/list_extension.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
@@ -78,6 +79,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   int _page = 1;
   ModalRoute? _route;
+  final List<int> _selectedIds = <int>[];
+  ValueNotifier<bool> rebuildAppBar = ValueNotifier(false);
+
+  bool isAnyMessageSelected() {
+    return _selectedIds.isNotEmpty;
+  }
 
   @override
   void initState() {
@@ -96,7 +103,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     });
     // chatActionBloc = BlocProvider.of<ChatActionBloc>(context);
     // conversationBloc = ConversationBloc();
-    user = LMChatPreferences.instance.getUser();
+    user = LMChatLocalPreference.instance.getUser();
 
     debugPrint("Chatroom id is ${widget.chatroomId}");
   }
@@ -453,9 +460,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                   pagingController: pagedListController,
                                   scrollController: scrollController,
                                   physics: const ClampingScrollPhysics(),
-                                  padding: EdgeInsets.symmetric(
+                                  padding: const EdgeInsets.symmetric(
                                     vertical: 10,
-                                    horizontal: 2.w,
                                   ),
                                   reverse: true,
                                   builderDelegate:
@@ -520,22 +526,64 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultSentChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser:
-          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
+      isSelected: _selectedIds.contains(conversation.id),
+      onLongPress: (value, state) {
+        if (value) {
+          _selectedIds.add(conversation.id);
+        } else {
+          _selectedIds.remove(conversation.id.toString());
+        }
+        rebuildAppBar.value = !rebuildAppBar.value;
+        state.setState(() {});
+      },
+      isSelectableOnTap: () {
+        return _selectedIds.isNotEmpty;
+      },
+      onTap: (value, state) {
+        if (value) {
+          _selectedIds.add(conversation.id);
+        } else {
+          _selectedIds.remove(conversation.id);
+        }
+        rebuildAppBar.value = !rebuildAppBar.value;
+        state.setState(() {});
+      },
     );
   }
 
   Widget _defaultReceivedChatBubble(Conversation conversation) {
     return LMChatBubble(
       conversation: conversation.toConversationViewData(),
-      currentUser:
-          (LMChatPreferences.instance.getCurrentUser as User).toUserViewData(),
+      currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,
+      isSelected: _selectedIds.contains(conversation.id),
+      onLongPress: (value, state) {
+        if (value) {
+          _selectedIds.add(conversation.id);
+        } else {
+          _selectedIds.remove(conversation.id.toString());
+        }
+        rebuildAppBar.value = !rebuildAppBar.value;
+        state.setState(() {});
+      },
+      isSelectableOnTap: () {
+        return _selectedIds.isNotEmpty;
+      },
+      onTap: (value, state) {
+        if (value) {
+          _selectedIds.add(conversation.id);
+        } else {
+          _selectedIds.remove(conversation.id);
+        }
+        rebuildAppBar.value = !rebuildAppBar.value;
+        state.setState(() {});
+      },
     );
   }
 
@@ -550,30 +598,198 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 18),
         backgroundColor: LMChatTheme.theme.container,
       ),
-      banner: LMChatProfilePicture(
-        imageUrl: chatUser.imageUrl ?? chatroom.chatroomImageUrl,
-        fallbackText: chatroom.header,
-        style: LMChatProfilePictureStyle(
-          size: 42,
-          backgroundColor: LMChatTheme.theme.secondaryColor,
-        ),
-      ),
-      title: LMChatText(
-        chatUser.name ?? chatroom.title,
-        style: LMChatTextStyle(
-          maxLines: 1,
-          textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            overflow: TextOverflow.ellipsis,
-            color: LMChatTheme.theme.onContainer,
+      banner: ValueListenableBuilder(
+          valueListenable: rebuildAppBar,
+          builder: (context, _, __) {
+            return isAnyMessageSelected()
+                ? const SizedBox.shrink()
+                : LMChatProfilePicture(
+                    imageUrl: chatUser.imageUrl ?? chatroom.chatroomImageUrl,
+                    fallbackText: chatroom.header,
+                    style: LMChatProfilePictureStyle(
+                      size: 42,
+                      backgroundColor: LMChatTheme.theme.secondaryColor,
+                    ),
+                  );
+          }),
+      title: ValueListenableBuilder(
+          valueListenable: rebuildAppBar,
+          builder: (context, _, __) {
+            return LMChatText(
+              isAnyMessageSelected()
+                  ? _selectedIds.length.toString()
+                  : chatUser.name ?? chatroom.title,
+              style: LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  overflow: TextOverflow.ellipsis,
+                  color: LMChatTheme.theme.onContainer,
+                ),
+              ),
+            );
+          }),
+      trailing: [
+        ValueListenableBuilder(
+            valueListenable: rebuildAppBar,
+            builder: (context, _, __) {
+              return isAnyMessageSelected()
+                  ? Row(
+                      children: _defaultSelectedChatroomMenu(),
+                    )
+                  : _defaultChatroomMenu();
+            }),
+      ],
+    );
+  }
+
+  List<Widget> _defaultSelectedChatroomMenu() {
+    final LMChatConversationViewData? conversationViewData = pagedListController
+        .value.itemList
+        ?.firstWhere((element) => element.id == _selectedIds.first)
+        .toConversationViewData();
+
+    bool haveDeletePermission = conversationViewData != null &&
+        LMChatMemberRightUtil.checkDeletePermissions(conversationViewData);
+    bool haveEditPermission =
+        LMChatMemberRightUtil.checkEditPermissions(conversationViewData!);
+    return [
+      // Copy button
+      LMChatButton(
+        onTap: () {
+          // Store the answer in the clipboard
+          // and show a toast message
+          // if _selectedIds is more than 1, then copy answer with
+          // [date and time] conversation user name : answer format
+          bool isMultiple = _selectedIds.length > 1;
+          String copiedMessage = "";
+          if (isMultiple) {
+            for (int id in _selectedIds) {
+              Conversation conversation = pagedListController.value.itemList!
+                  .firstWhere((element) => element.id == id);
+              copiedMessage +=
+                  "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";
+            }
+          } else {
+            copiedMessage = conversationViewData.answer;
+          }
+          Clipboard.setData(
+            ClipboardData(text: copiedMessage),
+          ).then((data) {
+            toast("Copied to clipboard");
+            _selectedIds.clear();
+            rebuildAppBar.value = !rebuildAppBar.value;
+            rebuildConversationList.value = !rebuildConversationList.value;
+          });
+        },
+        style: LMChatButtonStyle.basic().copyWith(
+          icon: LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.copy,
+            style: LMChatIconStyle(
+              color: LMChatTheme.theme.primaryColor,
+            ),
           ),
         ),
       ),
-      trailing: [
-        _defaultChatroomMenu(),
-      ],
-    );
+      const SizedBox(width: 8),
+      // Edit button
+      if (haveEditPermission && _selectedIds.length == 1)
+        LMChatButton(
+          onTap: () {},
+          style: LMChatButtonStyle.basic().copyWith(
+            icon: LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.edit,
+              style: LMChatIconStyle(
+                color: LMChatTheme.theme.primaryColor,
+              ),
+            ),
+          ),
+        ),
+      const SizedBox(width: 8),
+      // Delete button
+      if (haveDeletePermission && _selectedIds.length == 1)
+        LMChatButton(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return LMChatDialog(
+                  style: LMChatDialogStyle(
+                    backgroundColor: LMChatTheme.theme.container,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  title: LMChatText(
+                    "Delete Message?",
+                    style: LMChatTextStyle(
+                      textStyle: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: LMChatTheme.theme.onContainer,
+                      ),
+                    ),
+                  ),
+                  content: const LMChatText(
+                    "Are you sure you want to delete this message? This action cannot be reversed.",
+                    style: LMChatTextStyle(),
+                  ),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 2.0),
+                      child: LMChatText(
+                        "CANCEL",
+                        style: LMChatTextStyle(
+                          textStyle: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: LMChatTheme.theme.onContainer,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: LMChatText("DELETE",
+                          style: LMChatTextStyle(
+                            textStyle: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: LMChatTheme.theme.primaryColor,
+                            ),
+                          ), onTap: () {
+                        _convActionBloc.add(
+                          LMChatDeleteConversationEvent(
+                            conversationIds: _selectedIds.copy(),
+                            reason: "Delete",
+                          ),
+                        );
+                        _selectedIds.clear();
+                        rebuildAppBar.value = !rebuildAppBar.value;
+                        Navigator.of(context).pop();
+                      }),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          style: LMChatButtonStyle.basic().copyWith(
+            icon: LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.delete,
+              style: LMChatIconStyle(
+                color: LMChatTheme.theme.primaryColor,
+              ),
+            ),
+          ),
+        )
+    ];
   }
 
   Widget _defaultChatroomMenu() {
