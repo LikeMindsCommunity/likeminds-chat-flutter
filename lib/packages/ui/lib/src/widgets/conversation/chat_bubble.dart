@@ -4,7 +4,6 @@ import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
-import 'package:swipe_to_action/swipe_to_action.dart';
 
 part 'chat_bubble_content.dart';
 part 'chat_bubble_footer.dart';
@@ -14,21 +13,55 @@ part 'chat_bubble_reply.dart';
 part 'chat_bubble_sides.dart';
 part 'chat_bubble_state.dart';
 
+/// {@template lm_chat_bubble}
+/// The chat bubble widget.
+/// This widget is used to display the chat bubble.
+/// {@endtemplate}
 class LMChatBubble extends StatefulWidget {
+  /// [LMChatConversationViewData]is data of the conversation.
   final LMChatConversationViewData conversation;
+
+  /// The current user.
   final LMChatUserViewData currentUser;
+
+  /// The user of the conversation.
   final LMChatUserViewData conversationUser;
 
+  /// is the message sent by the current user.
   final bool? isSent;
+
+  /// The reply icon.
   final LMChatIcon? replyIcon;
+
+  /// The avatar of the user.
   final LMChatProfilePicture? avatar;
+
+  /// The function to call when a reply is made.
   final Function(LMChatConversationViewData)? onReply;
+
+  /// The function to call when a tag is tapped.
   final Function(String tag) onTagTap;
 
+  /// The deleted text.
   final LMChatText? deletedText;
+
+  /// The content builder.
   final LMChatBubbleContentBuilder? contentBuilder;
+
+  /// The style of the bubble.
   final LMChatBubbleStyle? style;
 
+  /// The selected state of the bubble.
+  final bool isSelected;
+
+  final Function(bool isSelected, State<LMChatBubble> state)? onTap;
+
+  final Function(bool isSelected, State<LMChatBubble> state)? onLongPress;
+
+  final bool Function()? isSelectableOnTap;
+
+  /// The [LMChatBubble] widget constructor.
+  /// used to display the chat bubble.
   const LMChatBubble({
     super.key,
     required this.conversation,
@@ -42,6 +75,10 @@ class LMChatBubble extends StatefulWidget {
     this.avatar,
     this.isSent,
     this.deletedText,
+    this.isSelected = false,
+    this.onTap,
+    this.onLongPress,
+    this.isSelectableOnTap,
   });
 
   @override
@@ -53,6 +90,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   late LMChatConversationViewData conversation;
   late LMChatUserViewData currentUser;
   late LMChatUserViewData conversationUser;
+  bool _isSelected = false;
+  bool _isDeleted = false;
 
   @override
   void initState() {
@@ -60,6 +99,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     currentUser = widget.currentUser;
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
+    _isSelected = widget.isSelected;
+    _isDeleted = conversation.deletedByUserId != null;
     super.initState();
   }
 
@@ -69,6 +110,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     currentUser = widget.currentUser;
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
+    _isSelected = widget.isSelected;
+    _isDeleted = conversation.deletedByUserId != null;
     super.didUpdateWidget(old);
   }
 
@@ -112,70 +155,95 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     //   direction: SwipeDirection.startToEnd,
     //   child:
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Column(
-          crossAxisAlignment:
-              isSent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+    return InkWell(
+      onLongPress: () {
+        if(_isDeleted) return;
+        _isSelected = !_isSelected;
+        widget.onLongPress?.call(_isSelected, this);
+      },
+      onTap: () {
+        if(_isDeleted) return;
+        if (_isSelected) {
+          _isSelected = false;
+          widget.onTap?.call(_isSelected, this);
+        } else {
+          if (widget.isSelectableOnTap?.call() ?? false) {
+            _isSelected = !_isSelected;
+            widget.onTap?.call(_isSelected, this);
+          }
+        }
+      },
+      child: Container(
+        color: _isSelected ? const Color.fromRGBO(0, 96, 86, 0.3) : null,
+        padding: EdgeInsets.symmetric(
+         horizontal: 2.w,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: EdgeInsets.only(
-                left: widget.avatar != null ? 48.0 : 18.0,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 0.6.h,
-              ),
-              child: Row(
-                mainAxisAlignment:
-                    isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  !isSent
-                      ? widget.avatar ?? const SizedBox()
-                      : const SizedBox(),
-                  const SizedBox(width: 4),
-                  AbsorbPointer(
-                    absorbing: conversation.deletedByUserId != null,
-                    child: Container(
-                      constraints: BoxConstraints(
-                        minHeight: 2.h,
-                        // minWidth: 5.w,
-                        minWidth: conversation.answer.split('\n').length > 4
-                            ? 40.w
-                            : 5.w,
-                        maxWidth: 50.w,
-                      ),
-                      padding: EdgeInsets.all(
-                        conversation.attachmentCount != 0 ? 8.0 : 12.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: inStyle.backgroundColor ??
-                            LMChatTheme.theme.container,
-                        borderRadius: inStyle.borderRadius ??
-                            BorderRadius.circular(
-                              inStyle.borderRadiusNum ?? 6,
-                            ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: isSent
-                            ? CrossAxisAlignment.start
-                            : conversation.answer.length > 3
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                        children: [
-                          const LMChatBubbleHeader(),
-                          conversation.deletedByUserId != null
-                              ? widget.deletedText ??
-                                  LMChatText(
-                                    "Deleted message",
-                                    style: LMChatTextStyle(
-                                      textStyle:
-                                          conversation.deletedByUserId != null
+            Column(
+              crossAxisAlignment:
+                  isSent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: widget.avatar != null ? 48.0 : 18.0,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 0.6.h,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: isSent
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      !isSent
+                          ? widget.avatar ?? const SizedBox()
+                          : const SizedBox(),
+                      const SizedBox(width: 4),
+                      AbsorbPointer(
+                        absorbing: conversation.deletedByUserId != null,
+                        child: Container(
+                          constraints: BoxConstraints(
+                            minHeight: 2.h,
+                            // minWidth: 5.w,
+                            minWidth: conversation.answer.split('\n').length > 4
+                                ? 40.w
+                                : 5.w,
+                            maxWidth: 50.w,
+                          ),
+                          padding: EdgeInsets.all(
+                            conversation.attachmentCount != 0 ? 8.0 : 12.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: inStyle.backgroundColor ??
+                                LMChatTheme.theme.container,
+                            borderRadius: inStyle.borderRadius ??
+                                BorderRadius.circular(
+                                  inStyle.borderRadiusNum ?? 6,
+                                ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: isSent
+                                ? CrossAxisAlignment.start
+                                : conversation.answer.length > 3
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                            children: [
+                              const LMChatBubbleHeader(),
+                              conversation.deletedByUserId != null
+                                  ? widget.deletedText ??
+                                      LMChatText(
+                                        "Deleted message",
+                                        style: LMChatTextStyle(
+                                          textStyle: conversation
+                                                      .deletedByUserId !=
+                                                  null
                                               ? TextStyle(
                                                   fontStyle: FontStyle.italic,
                                                   color: LMChatTheme
@@ -186,34 +254,38 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                                   color: LMChatTheme
                                                       .theme.disabledColor,
                                                 ),
-                                    ),
-                                  )
-                              : widget.contentBuilder?.call(conversation) ??
-                                  LMChatBubbleContent(
+                                        ),
+                                      )
+                                  : widget.contentBuilder?.call(conversation) ??
+                                      LMChatBubbleContent(
+                                        conversation: conversation,
+                                        onTagTap: widget.onTagTap,
+                                      ),
+                              const LMChatBubbleMedia(),
+                              IntrinsicWidth(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: LMChatBubbleFooter(
                                     conversation: conversation,
-                                    onTagTap: widget.onTagTap,
                                   ),
-                          const LMChatBubbleMedia(),
-                          IntrinsicWidth(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child: LMChatBubbleFooter(
-                                conversation: conversation,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      isSent
+                          ? widget.avatar ?? const SizedBox()
+                          : const SizedBox(),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  isSent ? widget.avatar ?? const SizedBox() : const SizedBox(),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
     // );
     // );

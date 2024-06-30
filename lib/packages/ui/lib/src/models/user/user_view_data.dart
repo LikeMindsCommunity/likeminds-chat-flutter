@@ -2,10 +2,10 @@ import 'package:likeminds_chat_flutter_ui/src/models/sdk/sdk_client_info_view_da
 import 'package:likeminds_chat_flutter_ui/src/models/widget/widget_view_data.dart';
 
 /// {@template lm_user_view_data}
-/// A viewmodel data class to hold the user data.
+/// A view data class to hold the user data.
 /// {@endtemplate}
 class LMChatUserViewData {
-  /// unique indentifier of the user
+  /// unique identifier of the user
   int id;
 
   /// name of the user
@@ -33,6 +33,8 @@ class LMChatUserViewData {
   /// community id of the community to which the user belongs
   int? communityId;
   int? createdAt;
+  String? customIntroText;
+  int? memberSinceEpoch;
 
   /// widget for storing custom data
   LMChatWidgetViewData? widget;
@@ -201,7 +203,6 @@ class LMChatUserViewDataBuilder {
     if (_uuid == null) {
       throw Exception('uuid must not be null');
     }
-    
 
     return LMChatUserViewData._(
       id: _id!,

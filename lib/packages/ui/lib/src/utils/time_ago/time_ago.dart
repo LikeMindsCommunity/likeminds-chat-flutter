@@ -1,7 +1,7 @@
 import 'package:likeminds_chat_flutter_ui/src/utils/time_ago/time_ago_message.dart';
 
 class LMChatTimeAgo {
-  LMChatTimeAgoMessages? lmFeedTimeAgoMessages;
+  LMChatTimeAgoMessages? lmChatTimeAgoMessages;
 
   static LMChatTimeAgo? _instance;
 
@@ -10,14 +10,14 @@ class LMChatTimeAgo {
   LMChatTimeAgo._();
 
   void setDefaultTimeFormat(LMChatTimeAgoMessages locale) {
-    lmFeedTimeAgoMessages = locale;
+    lmChatTimeAgoMessages = locale;
   }
 
   String format(DateTime date,
       {String? locale, DateTime? clock, bool allowFromNow = false}) {
     final allowFromNow0 = allowFromNow;
 
-    final messages = lmFeedTimeAgoMessages ?? LMChatTimeShortMessages();
+    final messages = lmChatTimeAgoMessages ?? LMChatTimeShortMessages();
     final clock0 = clock ?? DateTime.now();
     var elapsed = clock0.millisecondsSinceEpoch - date.millisecondsSinceEpoch;
 

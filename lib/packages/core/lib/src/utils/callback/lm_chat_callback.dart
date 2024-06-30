@@ -1,23 +1,35 @@
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 
+/// Callback class for the core module
+/// This class is used to handle the callback events from the core module
+/// The core module will call the methods in this class when the corresponding events are triggered
 class LMChatCoreCallback {
+  /// This method is called when the access token is expired and refreshed
   Function(String accessToken, String refreshToken)?
       onAccessTokenExpiredAndRefreshed;
+
+  /// This method is called when the refresh token is expired
   Future<LMAuthToken> Function()? onRefreshTokenExpired;
 
+  /// Constructor for the LMChatCoreCallback
   LMChatCoreCallback({
     this.onAccessTokenExpiredAndRefreshed,
     this.onRefreshTokenExpired,
   });
 }
 
+
+/// Implementation of the LMChatSDKCallback
+/// This class is used to handle the callback events from the core module
+/// The core module will call the methods in this class when the corresponding events are triggered
 class LMChatSDKCallbackImpl implements LMChatSDKCallback {
-  final LMChatCoreCallback? _lmFeedCallback;
+  final LMChatCoreCallback? _lmChatCoreCallback;
+
+  /// Constructor for the LMChatSDKCallbackImpl
   LMChatSDKCallbackImpl({LMChatCoreCallback? lmChatCallback})
-      : _lmFeedCallback = lmChatCallback;
+      : _lmChatCoreCallback = lmChatCallback;
   @override
   void eventFiredCallback(
       String eventKey, Map<String, dynamic> propertiesMap) {}
@@ -33,7 +45,7 @@ class LMChatSDKCallbackImpl implements LMChatSDKCallback {
       String accessToken, String refreshToken) {
     debugPrint("onAccessTokenExpiredAndRefreshed: $accessToken, $refreshToken");
     //Redirecting from core to example app
-    _lmFeedCallback?.onAccessTokenExpiredAndRefreshed
+    _lmChatCoreCallback?.onAccessTokenExpiredAndRefreshed
         ?.call(accessToken, refreshToken);
   }
 
@@ -68,11 +80,10 @@ class LMChatSDKCallbackImpl implements LMChatSDKCallback {
         throw Exception(initiateUserResponse.errorMessage);
       }
     } else {
-      final onRefreshTokenExpired = _lmFeedCallback?.onRefreshTokenExpired;
+      final onRefreshTokenExpired = _lmChatCoreCallback?.onRefreshTokenExpired;
       if (onRefreshTokenExpired == null) {
         throw Exception("onRefreshTokenExpired callback is not implemented");
       }
-
       return onRefreshTokenExpired();
     }
   }
