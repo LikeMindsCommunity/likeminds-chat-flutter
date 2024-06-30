@@ -3,4 +3,7 @@ export 'widget/widget_utility.dart';
 export 'media/media_utils.dart';
 export 'constants/strings.dart';
 export 'constants/enums.dart';
+export 'preferences/preferences.dart';
+export 'conversation/conversation_utils.dart';
+export 'analytics/analytics.dart';
 export 'notifications/notification_handler.dart';

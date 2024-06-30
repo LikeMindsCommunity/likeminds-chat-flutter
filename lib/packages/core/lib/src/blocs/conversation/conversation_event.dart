@@ -1,8 +1,8 @@
 part of 'conversation_bloc.dart';
 
-abstract class ConversationEvent extends Equatable {}
+abstract class LMChatConversationEvent extends Equatable {}
 
-class InitConversations extends ConversationEvent {
+class InitConversations extends LMChatConversationEvent {
   final int chatroomId;
   final int conversationId;
 
@@ -15,7 +15,7 @@ class InitConversations extends ConversationEvent {
   List<Object?> get props => [chatroomId, conversationId];
 }
 
-class LoadConversations extends ConversationEvent {
+class LoadConversations extends LMChatConversationEvent {
   final GetConversationRequest getConversationRequest;
 
   LoadConversations({
@@ -26,7 +26,7 @@ class LoadConversations extends ConversationEvent {
   List<Object> get props => [getConversationRequest];
 }
 
-class PostConversation extends ConversationEvent {
+class PostConversation extends LMChatConversationEvent {
   final PostConversationRequest postConversationRequest;
   final Conversation? repliedTo;
 
@@ -39,7 +39,7 @@ class PostConversation extends ConversationEvent {
   List<Object?> get props => [postConversationRequest, repliedTo];
 }
 
-class PostMultiMediaConversation extends ConversationEvent {
+class PostMultiMediaConversation extends LMChatConversationEvent {
   final PostConversationRequest postConversationRequest;
   final List<LMChatMedia> mediaFiles;
 
@@ -55,7 +55,7 @@ class PostMultiMediaConversation extends ConversationEvent {
       ];
 }
 
-class UpdateConversations extends ConversationEvent {
+class UpdateConversations extends LMChatConversationEvent {
   final int conversationId;
   final int chatroomId;
 
