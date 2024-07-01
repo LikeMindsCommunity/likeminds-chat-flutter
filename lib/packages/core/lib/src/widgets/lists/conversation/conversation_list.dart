@@ -97,7 +97,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         bloc: _conversationBloc,
         listener: (context, state) {
           updatePagingControllers(state);
-          if (state is ConversationPosted) {
+          if (state is LMChatConversationPostedState) {
             Map<String, String> userTags = LMChatTaggingHelper.decodeString(
                 state.postConversationResponse.conversation?.answer ?? "");
             // LMAnalytics.get().track(
@@ -121,7 +121,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             //   },
             // );
           }
-          if (state is ConversationError) {
+          if (state is LMChatConversationErrorState) {
             // LMAnalytics.get().track(
             //   AnalyticsKeys.messageSendingError,
             //   {
@@ -264,7 +264,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       (pageKey) {
         int currentTime = DateTime.now().millisecondsSinceEpoch;
         _conversationBloc.add(
-          LoadConversations(
+          LMChatFetchConversationsEvent(
             getConversationRequest: (GetConversationRequestBuilder()
                   ..chatroomId(widget.chatroomId)
                   ..page(pageKey)
@@ -280,7 +280,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   void updatePagingControllers(LMChatConversationState state) {
-    if (state is ConversationLoaded) {
+    if (state is LMChatConversationLoadedState) {
       _page++;
 
       if (state.getConversationResponse.conversationMeta != null &&
@@ -304,16 +304,16 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         pagedListController.appendPage(conversationData ?? [], _page);
       }
     }
-    if (state is ConversationPosted) {
+    if (state is LMChatConversationPostedState) {
       addConversationToPagedList(
         state.postConversationResponse.conversation!,
       );
-    } else if (state is LocalConversation) {
+    } else if (state is LMChatLocalConversationState) {
       addLocalConversationToPagedList(state.conversation);
-    } else if (state is ConversationError) {
+    } else if (state is LMChatConversationErrorState) {
       toast(state.message);
     }
-    if (state is ConversationUpdated) {
+    if (state is LMChatConversationUpdatedState) {
       if (state.response.id != lastConversationId) {
         addConversationToPagedList(
           state.response,

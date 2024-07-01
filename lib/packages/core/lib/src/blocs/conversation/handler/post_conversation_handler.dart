@@ -1,7 +1,8 @@
 part of '../conversation_bloc.dart';
 
-mapPostConversationFunction(
-  PostConversation event,
+/// Handler for managing post conversation event
+postConversationEventHandler(
+  LMChatPostConversationEvent event,
   Emitter<LMChatConversationState> emit,
 ) async {
   try {
@@ -22,7 +23,7 @@ mapPostConversationFunction(
       temporaryId: event.postConversationRequest.temporaryId,
       id: 1,
     );
-    emit(LocalConversation(conversation));
+    emit(LMChatLocalConversationState(conversation));
     LMResponse<PostConversationResponse> response =
         await LMChatCore.client.postConversation(
       event.postConversationRequest,
@@ -34,18 +35,18 @@ mapPostConversationFunction(
           conversation.replyConversation != null) {
         conversation.replyConversationObject = event.repliedTo;
       }
-      emit(ConversationPosted(response.data!));
+      emit(LMChatConversationPostedState(response.data!));
 
       return false;
     } else {
-      emit(ConversationError(
+      emit(LMChatConversationErrorState(
         response.errorMessage!,
         event.postConversationRequest.temporaryId,
       ));
       return false;
     }
   } catch (e) {
-    emit(ConversationError(
+    emit(LMChatConversationErrorState(
       "An error occurred",
       event.postConversationRequest.temporaryId,
     ));

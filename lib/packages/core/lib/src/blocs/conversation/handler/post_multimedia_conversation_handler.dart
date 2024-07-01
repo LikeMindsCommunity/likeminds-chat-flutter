@@ -1,11 +1,11 @@
 part of '../conversation_bloc.dart';
 
-mapPostMultiMediaConversation(
-  PostMultiMediaConversation event,
+/// Handler for managing post conversation event
+postMultimediaConversationEventHandler(
+  LMChatPostMultiMediaConversationEvent event,
   Emitter<LMChatConversationState> emit,
 ) async {
   final mediaService = LMChatAWSUtility(!isDebug);
-  int? lastConversationId;
   try {
     DateTime dateTime = DateTime.now();
     User user = LMChatLocalPreference.instance.getUser();
@@ -26,7 +26,7 @@ mapPostMultiMediaConversation(
     );
 
     emit(
-      MultiMediaConversationLoading(
+      LMChatMultiMediaConversationLoadingState(
         conversation,
         event.mediaFiles,
       ),
@@ -41,7 +41,7 @@ mapPostMultiMediaConversation(
       if (event.mediaFiles.length == 1 &&
           event.mediaFiles.first.mediaType == LMChatMediaType.link) {
         emit(
-          MultiMediaConversationPosted(
+          LMChatMultiMediaConversationPostedState(
             postConversationResponse,
             event.mediaFiles,
           ),
@@ -89,23 +89,24 @@ mapPostMultiMediaConversation(
               await LMChatCore.client.putMultimedia(putMediaRequest);
           if (!uploadFileResponse.success) {
             emit(
-              MultiMediaConversationError(
+              LMChatMultiMediaConversationErrorState(
                 uploadFileResponse.errorMessage!,
                 event.postConversationRequest.temporaryId,
               ),
             );
           } else {
             emit(
-              MultiMediaConversationError(
+              LMChatMultiMediaConversationErrorState(
                 uploadFileResponse.errorMessage!,
                 event.postConversationRequest.temporaryId,
               ),
             );
           }
         }
-        lastConversationId = response.data!.conversation!.id;
+        LMChatConversationBloc.instance.lastConversationId =
+            response.data!.conversation!.id;
         emit(
-          MultiMediaConversationPosted(
+          LMChatMultiMediaConversationPostedState(
             postConversationResponse,
             fileLink,
           ),
@@ -113,7 +114,7 @@ mapPostMultiMediaConversation(
       }
     } else {
       emit(
-        MultiMediaConversationError(
+        LMChatMultiMediaConversationErrorState(
           response.errorMessage!,
           event.postConversationRequest.temporaryId,
         ),
@@ -122,7 +123,7 @@ mapPostMultiMediaConversation(
     }
   } catch (e) {
     emit(
-      ConversationError(
+      LMChatConversationErrorState(
         "An error occurred",
         event.postConversationRequest.temporaryId,
       ),
