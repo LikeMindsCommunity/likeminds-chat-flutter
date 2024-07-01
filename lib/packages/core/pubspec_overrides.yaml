@@ -1,7 +1,7 @@
 # melos_managed_dependency_overrides: likeminds_chat_flutter_ui,js
 dependency_overrides:
+  js: ^0.7.1
   likeminds_chat_fl:
     path: ../../../../LikeMinds-Flutter-GroupChat-SDK/
   likeminds_chat_flutter_ui:
     path: ../ui
-  js: ^0.7.1

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
+import 'package:likeminds_chat_flutter_core/src/views/participants/participants.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -111,11 +113,11 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       case 2:
         // _controller.hideMenu();
         _controller!.hideMenu();
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return ChatroomParticipantsPage(
-        //     chatroom: widget.chatroom,
-        //   );
-        // }));
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return LMChatroomParticipantsPage(
+            chatroomViewData: widget.chatroom.toChatRoomViewData(),
+          );
+        }));
         break;
       case 6:
         muteChatroom(action);

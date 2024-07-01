@@ -24,7 +24,7 @@ part 'handler/parsing_result_handler.dart';
 class LMChatDMFeedBloc extends Bloc<LMChatDMFeedEvent, LMChatDMFeedState> {
   static LMChatDMFeedBloc? _instance;
 
-  // Creating a singleton instance of the LMChatDMFeedBloc
+  /// Creating a singleton instance of the LMChatDMFeedBloc
   static LMChatDMFeedBloc get instance {
     if (_instance == null || _instance!.isClosed) {
       return _instance = LMChatDMFeedBloc._();

@@ -3,23 +3,18 @@ part of 'chatroom_bloc.dart';
 @immutable
 abstract class LMChatroomEvent extends Equatable {}
 
-class LMChatInitChatroomEvent extends LMChatroomEvent {
-  final GetChatroomRequest chatroomRequest;
+class LMChatFetchChatroomEvent extends LMChatroomEvent {
+  final int chatroomId;
 
-  LMChatInitChatroomEvent(this.chatroomRequest);
+  LMChatFetchChatroomEvent({required this.chatroomId});
 
   @override
   List<Object> get props => [
-        chatroomRequest,
+        chatroomId,
       ];
 }
 
 class LMChatroomDetailsEvent extends LMChatroomEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class LMChatRefreshChatroomEvent extends LMChatroomEvent {
   @override
   List<Object> get props => [];
 }

@@ -290,14 +290,15 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   // return;
                                   if (editConversation != null) {
                                     linkModel = null;
-                                    chatActionBloc!.add(LMChatEditConversationEvent(
-                                        (EditConversationRequestBuilder()
-                                              ..conversationId(
-                                                  editConversation!.id)
-                                              ..text(result!))
-                                            .build(),
-                                        replyConversation: editConversation!
-                                            .replyConversationObject));
+                                    chatActionBloc!.add(
+                                        LMChatEditConversationEvent(
+                                            (EditConversationRequestBuilder()
+                                                  ..conversationId(
+                                                      editConversation!.id)
+                                                  ..text(result!))
+                                                .build(),
+                                            replyConversation: editConversation!
+                                                .replyConversationObject));
                                     linkModel = null;
                                     isActiveLink = false;
                                     rebuildLinkPreview.value =
@@ -312,7 +313,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                         showLinkPreview &&
                                         linkModel != null) {
                                       conversationBloc!.add(
-                                          PostMultiMediaConversation(
+                                          LMChatPostMultiMediaConversationEvent(
                                               (PostConversationRequestBuilder()
                                                     ..chatroomId(
                                                         widget.chatroom.id)
@@ -322,14 +323,16 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                                     ..text(result!)
                                                     ..replyId(
                                                         replyToConversation?.id)
-                                                    ..ogTags(linkModel!.ogTags!.toOGTag())
+                                                    ..ogTags(linkModel!.ogTags!
+                                                        .toOGTag())
                                                     ..shareLink(
                                                         linkModel!.link!))
                                                   .build(),
                                               [
                                             LMChatMedia(
                                                 mediaType: LMChatMediaType.link,
-                                                ogTags: linkModel!.ogTags?.toOGTag())
+                                                ogTags: linkModel!.ogTags
+                                                    ?.toOGTag())
                                           ]));
                                       linkModel = null;
                                       isActiveLink = false;
@@ -353,7 +356,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                         requestBuilder.shareLink(previewLink);
                                       }
                                       conversationBloc!.add(
-                                        PostConversation(
+                                        LMChatPostConversationEvent(
                                           postConversationRequest:
                                               requestBuilder.build(),
                                           repliedTo: replyToConversation,
@@ -396,7 +399,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                     widget.scrollToBottom();
                                   }
                                   if (replyToConversation != null) {
-                                    chatActionBloc!.add(LMChatReplyRemoveEvent());
+                                    chatActionBloc!
+                                        .add(LMChatReplyRemoveEvent());
                                   }
                                   editConversation = null;
                                   replyToConversation = null;

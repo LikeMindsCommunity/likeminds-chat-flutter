@@ -9,7 +9,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class LMChatConversationList extends StatefulWidget {
+class LMChatDMConversationList extends StatefulWidget {
   final int chatroomId;
 
   final ScrollController? scrollController;
@@ -21,7 +21,7 @@ class LMChatConversationList extends StatefulWidget {
   final PagingController<int, Conversation>? listController;
 
   /// Creates a new instance of LMChatConversationList
-  const LMChatConversationList({
+  const LMChatDMConversationList({
     super.key,
     required this.chatroomId,
     this.scrollController,
@@ -31,10 +31,11 @@ class LMChatConversationList extends StatefulWidget {
   });
 
   @override
-  State<LMChatConversationList> createState() => _LMChatConversationListState();
+  State<LMChatDMConversationList> createState() =>
+      _LMChatDMConversationListState();
 }
 
-class _LMChatConversationListState extends State<LMChatConversationList> {
+class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   late LMChatConversationBloc _conversationBloc;
   late LMChatConversationActionBloc _convActionBloc;
 
@@ -70,7 +71,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   @override
-  void didUpdateWidget(covariant LMChatConversationList oldWidget) {
+  void didUpdateWidget(covariant LMChatDMConversationList oldWidget) {
     super.didUpdateWidget(oldWidget);
     Bloc.observer = LMChatBlocObserver();
     user = LMChatLocalPreference.instance.getUser();
@@ -157,9 +158,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                     if (item.isTimeStamp != null && item.isTimeStamp! ||
                         item.state != 0 && item.state != null) {
                       return _defaultStateBubble(
-                        LMChatTaggingHelper.extractStateMessage(
-                          item.answer,
-                        ),
+                        item.state == 1
+                            ? LMChatTaggingHelper.extractFirstDMStateMessage(
+                                item.toConversationViewData(),
+                                user.toUserViewData(),
+                              )
+                            : LMChatTaggingHelper.extractStateMessage(
+                                item.answer,
+                              ),
                       );
                     }
                     return item.userId == user.id
@@ -184,16 +190,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: true,
-      style: LMChatBubbleStyle.basic(),
-      avatar: LMChatProfilePicture(
-        fallbackText: conversation.member!.toUserViewData().name,
-        imageUrl: conversation.member!.toUserViewData().imageUrl,
-        style: const LMChatProfilePictureStyle(
-          size: 32,
-          boxShape: BoxShape.circle,
-        ),
-      ),
       isSelected: _selectedIds.contains(conversation.id),
+      style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       onLongPress: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);
@@ -225,15 +223,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
       isSent: false,
-      style: LMChatBubbleStyle.basic(),
-      avatar: LMChatProfilePicture(
-        fallbackText: conversation.member!.toUserViewData().name,
-        imageUrl: conversation.member!.toUserViewData().imageUrl,
-        style: const LMChatProfilePictureStyle(
-          size: 32,
-          boxShape: BoxShape.circle,
-        ),
-      ),
+      style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       isSelected: _selectedIds.contains(conversation.id),
       onLongPress: (value, state) {
         if (value) {

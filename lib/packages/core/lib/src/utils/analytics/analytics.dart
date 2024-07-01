@@ -5,12 +5,17 @@ class LMAnalytics {
   static LMAnalytics? _instance;
   static LMAnalytics get() => _instance ??= LMAnalytics._();
 
-  LMChatSDKCallback? sdkCallback;
+  // LMSDKCallback? sdkCallback;
 
   LMAnalytics._();
 
   void initialize() {
-    sdkCallback = LMChatServiceProvider.instance.sdkCallback;
+    // sdkCallback =
+    //     DIService.getIt.isRegistered<LMSDKCallback>(instanceName: "LMCallback")
+    //         ? DIService.getIt.get<LMSDKCallback>(
+    //             instanceName: "LMCallback",
+    //           )
+    //         : null;
     debugPrint("Analytics initialized");
   }
 
@@ -21,7 +26,7 @@ class LMAnalytics {
 
   void track(String eventKey, Map<String, dynamic> propertiesMap) {
     logEvent(eventKey, propertiesMap);
-    sdkCallback?.eventFiredCallback(eventKey, propertiesMap);
+    // sdkCallback?.eventFiredCallback(eventKey, propertiesMap);
   }
 }
 

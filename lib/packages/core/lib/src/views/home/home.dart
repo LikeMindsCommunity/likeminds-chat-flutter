@@ -95,9 +95,11 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       title: LMChatText(
         LMChatStringConstants.homeFeedTitle,
         style: LMChatTextStyle(
-            textStyle: TextStyle(
-          fontSize: 24.0.sp,
-        )),
+          textStyle: TextStyle(
+            fontSize: 22.0.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
