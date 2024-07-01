@@ -46,6 +46,7 @@ class LMChatExpandableText extends StatefulWidget {
     this.animationCurve,
     this.semanticsLabel,
     required this.onTagTap,
+    this.enableSelection = true,
   })  : assert(maxLines > 0),
         super(key: key);
 
@@ -79,6 +80,7 @@ class LMChatExpandableText extends StatefulWidget {
   final Curve? animationCurve;
   final String? semanticsLabel;
   final Function(String) onTagTap;
+  final bool enableSelection;
 
   @override
   LMChatExpandableTextState createState() => LMChatExpandableTextState();
@@ -289,6 +291,7 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
           textDirection: textDirection,
           textAlign: textAlign,
           textScaleFactor: textScaleFactor,
+          enableInteractiveSelection: widget.enableSelection,
           style: widget.style,
         );
 

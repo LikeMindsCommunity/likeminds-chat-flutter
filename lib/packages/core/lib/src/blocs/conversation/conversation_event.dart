@@ -1,12 +1,18 @@
 part of 'conversation_bloc.dart';
 
-abstract class ConversationEvent extends Equatable {}
+/// Abstract class representing a conversation event
+abstract class LMChatConversationEvent extends Equatable {}
 
-class InitConversations extends ConversationEvent {
+/// Event responsible for initialising LMChatConversationBloc
+class LMChatInitialiseConversationsEvent extends LMChatConversationEvent {
+  /// Id of the chatroom where conversations are being initialized
   final int chatroomId;
+
+  /// Last conversation id of the chatroom of conversations
   final int conversationId;
 
-  InitConversations({
+  /// Creates and returns a new instance of initialize event
+  LMChatInitialiseConversationsEvent({
     required this.chatroomId,
     required this.conversationId,
   });
@@ -15,10 +21,12 @@ class InitConversations extends ConversationEvent {
   List<Object?> get props => [chatroomId, conversationId];
 }
 
-class LoadConversations extends ConversationEvent {
+/// Event responsible for fetching conversations in a chatroom
+class LMChatFetchConversationsEvent extends LMChatConversationEvent {
   final GetConversationRequest getConversationRequest;
 
-  LoadConversations({
+  /// Creates and returns a new instance of [LMChatFetchConversationsEvent]
+  LMChatFetchConversationsEvent({
     required this.getConversationRequest,
   });
 
@@ -26,11 +34,13 @@ class LoadConversations extends ConversationEvent {
   List<Object> get props => [getConversationRequest];
 }
 
-class PostConversation extends ConversationEvent {
+/// Event responsible for creating and posting a new conversation
+class LMChatPostConversationEvent extends LMChatConversationEvent {
   final PostConversationRequest postConversationRequest;
   final Conversation? repliedTo;
 
-  PostConversation({
+  /// Creates and returns a new instance of [LMChatPostConversationEvent]
+  LMChatPostConversationEvent({
     required this.postConversationRequest,
     this.repliedTo,
   });
@@ -39,11 +49,13 @@ class PostConversation extends ConversationEvent {
   List<Object?> get props => [postConversationRequest, repliedTo];
 }
 
-class PostMultiMediaConversation extends ConversationEvent {
+/// Event responsible for creating and posting a multimedia conversation
+class LMChatPostMultiMediaConversationEvent extends LMChatConversationEvent {
   final PostConversationRequest postConversationRequest;
   final List<LMChatMedia> mediaFiles;
 
-  PostMultiMediaConversation(
+  /// Creates and returns a new instance of [LMChatPostMultiMediaConversationEvent]
+  LMChatPostMultiMediaConversationEvent(
     this.postConversationRequest,
     this.mediaFiles,
   );
@@ -55,11 +67,15 @@ class PostMultiMediaConversation extends ConversationEvent {
       ];
 }
 
-class UpdateConversations extends ConversationEvent {
+/// Event responsible for updating the conversations of a chatroom
+///
+/// This could be because of a realtime update, or a notification
+class LMChatUpdateConversationsEvent extends LMChatConversationEvent {
   final int conversationId;
   final int chatroomId;
 
-  UpdateConversations({
+  /// Creates and returns a new instance of [LMChatUpdateConversationsEvent]
+  LMChatUpdateConversationsEvent({
     required this.conversationId,
     required this.chatroomId,
   });

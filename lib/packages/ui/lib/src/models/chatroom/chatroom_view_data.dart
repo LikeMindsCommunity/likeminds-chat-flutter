@@ -198,6 +198,8 @@ class LMChatRoomViewData {
   /// The list of members who responded last in the chatroom.
   final List<LMChatUserViewData>? lastResponseMembers;
 
+  final LMChatConversationViewData? lastConversation;
+
   LMChatRoomViewData._({
     required this.access,
     required this.answerText,
@@ -264,6 +266,7 @@ class LMChatRoomViewData {
     required this.externalSeen,
     required this.isGuest,
     required this.followStatus,
+    required this.lastConversation,
   });
 
   /// copyWith method is used to create a new instance of `LMChatRoomViewData` with the updated values.
@@ -334,6 +337,7 @@ class LMChatRoomViewData {
     int? chatroomWithUserId,
     int? userId,
     List<LMChatUserViewData>? lastResponseMembers,
+    LMChatConversationViewData? lastConversation,
   }) {
     return LMChatRoomViewData._(
       followStatus: followStatus ?? this.followStatus,
@@ -402,6 +406,7 @@ class LMChatRoomViewData {
       chatroomWithUserId: chatroomWithUserId ?? this.chatroomWithUserId,
       userId: userId ?? this.userId,
       lastResponseMembers: lastResponseMembers ?? this.lastResponseMembers,
+      lastConversation: lastConversation ?? this.lastConversation,
     );
   }
 }
@@ -474,6 +479,7 @@ class LMChatRoomViewDataBuilder {
   int? _chatroomWithUserId;
   int? _userId;
   List<LMChatUserViewData>? _lastResponseMembers;
+  LMChatConversationViewData? _lastConversation;
 
   /// Sets the access status of the chatroom.
   void access(bool? access) {
@@ -800,7 +806,11 @@ class LMChatRoomViewDataBuilder {
     _lastResponseMembers = members;
   }
 
-  /// Builds and returns the LMChatRoomViewData object.
+  /// Sets the last conversation in the chatroom.
+  void lastConversation(LMChatConversationViewData? lastConversation) {
+    _lastConversation = lastConversation;
+  }
+
   LMChatRoomViewData build() {
     return LMChatRoomViewData._(
       access: _access,
@@ -868,6 +878,7 @@ class LMChatRoomViewDataBuilder {
       externalSeen: _externalSeen,
       isGuest: _isGuest,
       followStatus: _followStatus,
+      lastConversation: _lastConversation,
     );
   }
 }

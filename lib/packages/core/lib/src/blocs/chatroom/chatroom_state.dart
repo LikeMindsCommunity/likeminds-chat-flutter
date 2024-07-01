@@ -3,38 +3,37 @@ part of 'chatroom_bloc.dart';
 @immutable
 abstract class LMChatroomState extends Equatable {}
 
-class LMChatroomInitialState extends LMChatroomState {
-  @override
-  List<Object> get props => [];
-}
-
 class LMChatroomLoadingState extends LMChatroomState {
   @override
   List<Object> get props => [];
 }
 
 class LMChatroomLoadedState extends LMChatroomState {
-  final GetChatroomResponse getChatroomResponse;
+  final ChatRoom chatroom;
+  final List<ChatroomAction> actions;
+  final int lastConversationId;
+  final int participantCount;
 
-  LMChatroomLoadedState({required this.getChatroomResponse});
+  LMChatroomLoadedState({
+    required this.chatroom,
+    required this.actions,
+    required this.lastConversationId,
+    required this.participantCount,
+  });
 
   @override
-  List<Object> get props => [getChatroomResponse];
+  List<Object> get props => [
+        chatroom,
+        actions,
+        lastConversationId,
+        participantCount,
+      ];
 }
 
 class LMChatroomErrorState extends LMChatroomState {
   final String message;
 
   LMChatroomErrorState(this.message);
-
-  @override
-  List<Object> get props => [message];
-}
-
-class LMChatroomReportState extends LMChatroomState {
-  final String message;
-
-  LMChatroomReportState(this.message);
 
   @override
   List<Object> get props => [message];

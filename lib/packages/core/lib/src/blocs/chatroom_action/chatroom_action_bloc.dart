@@ -10,8 +10,15 @@ part 'chatroom_action_state.dart';
 class LMChatroomActionBloc
     extends Bloc<ChatroomActionEvent, ChatroomActionState> {
   static LMChatroomActionBloc? _instance;
-  static LMChatroomActionBloc get instance =>
-      _instance ??= LMChatroomActionBloc._();
+  // Creating a singleton instance of the LMChatHomeFeedBloc
+  static LMChatroomActionBloc get instance {
+    if (_instance == null || _instance!.isClosed) {
+      return _instance = LMChatroomActionBloc._();
+    } else {
+      return _instance!;
+    }
+  }
+
   LMChatroomActionBloc._() : super(ChatroomActionInitial()) {
     on<ChatroomActionEvent>((event, emit) async {
       if (event is MarkReadChatroomEvent) {

@@ -6,4 +6,10 @@ class LMChatStringConstants {
   static const String authToken = "authToken";
   static const String accessToken = "accessToken";
   static const String refreshToken = 'refreshToken';
+  static const String dmHomeFeedTitle = "Direct Messages";
+
+  static const String groupHomeTabTitle = "Groups";
+  static const String dmHomeTabTitle = "DMs";
+
+  static const String errorFallback = "Something went wrong, please try again!";
 }

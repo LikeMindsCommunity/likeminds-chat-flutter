@@ -18,30 +18,34 @@ class LMChatBubbleFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        conversation.createdAt.isNotEmpty
-            ? LMChatText(
-                conversation.createdAt,
-                style: LMChatTextStyle(
-                  textStyle: TextStyle(
-                    fontSize: 10,
+    return FittedBox(
+      alignment: Alignment.centerRight,
+      child: Row(
+        // mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // const Spacer(),
+          conversation.createdAt.isNotEmpty
+              ? LMChatText(
+                  conversation.createdAt,
+                  style: LMChatTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 10,
+                      color: LMChatTheme.theme.onContainer.withOpacity(0.6),
+                    ),
+                  ),
+                )
+              : LMChatIcon(
+                  type: LMChatIconType.icon,
+                  icon: Icons.timer_outlined,
+                  style: LMChatIconStyle(
+                    size: 10,
                     color: LMChatTheme.theme.onContainer.withOpacity(0.6),
                   ),
                 ),
-              )
-            : LMChatIcon(
-                type: LMChatIconType.icon,
-                icon: Icons.timer_outlined,
-                style: LMChatIconStyle(
-                  size: 10,
-                  color: LMChatTheme.theme.onContainer.withOpacity(0.6),
-                ),
-              ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -58,6 +62,29 @@ class LMChatBubbleFooter extends StatelessWidget {
       style: style ?? this.style,
     );
   }
+
+  @override
+  void debugAssertDoesMeetConstraints() {
+    // TODO: implement debugAssertDoesMeetConstraints
+  }
+
+  @override
+  // TODO: implement paintBounds
+  Rect get paintBounds => throw UnimplementedError();
+
+  @override
+  void performLayout() {
+    // TODO: implement performLayout
+  }
+
+  @override
+  void performResize() {
+    // TODO: implement performResize
+  }
+
+  @override
+  // TODO: implement semanticBounds
+  Rect get semanticBounds => throw UnimplementedError();
 }
 
 class LMChatBubbleFooterStyle {

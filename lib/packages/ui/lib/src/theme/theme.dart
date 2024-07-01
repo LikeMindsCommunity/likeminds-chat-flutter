@@ -261,8 +261,6 @@ class LMChatTextFieldStyle {
   }
 }
 
-
-
 class LMChatPopUpMenuStyle {
   final Color? backgroundColor;
   final LMChatIcon? icon;
@@ -374,10 +372,16 @@ extension ScreenWidth on num {
   double get w => (this / 100) * ScreenSize.width;
 }
 
+extension ScreenPoints on double {
+  double get sp => ScreenSize.textScale.scale(this);
+}
+
 // Class to initialize the screen size
 class ScreenSize {
   static late double width;
   static late double height;
+  static late double pixelRatio;
+  static late TextScaler textScale;
   static late double blockSizeHorizontal;
   static late double blockSizeVertical;
   static late double _safeAreaHorizontal;
@@ -387,6 +391,8 @@ class ScreenSize {
 
   static init(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    pixelRatio = mediaQuery.devicePixelRatio;
+    textScale = mediaQuery.textScaler;
     width = mediaQuery.size.width;
     height = mediaQuery.size.height;
     blockSizeHorizontal = width / 100;

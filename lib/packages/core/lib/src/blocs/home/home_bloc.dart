@@ -1,84 +1,42 @@
+import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
-const int pageSize = 20;
+part 'handler/fetch_event_handler.dart';
+part 'handler/refresh_event_handler.dart';
+part 'handler/parsing_result_handler.dart';
 
-class LMChatHomeBloc extends Bloc<LMChatHomeEvent, LMChatHomeState> {
-  int currentTime = DateTime.now().millisecondsSinceEpoch;
+/// BLoC responsible for handling the Group Home Feed,
+/// Allows for users to fetch, and refresh the feed,
+/// Also, updates the feed based on a realtime update.
+class LMChatHomeFeedBloc
+    extends Bloc<LMChatHomeFeedEvent, LMChatHomeFeedState> {
+  static LMChatHomeFeedBloc? _instance;
 
-  @override
-  Future<void> close() {
-    _instance = null;
-    return super.close();
-  }
-
-  static LMChatHomeBloc? _instance;
-  static LMChatHomeBloc get instance {
+  /// Creates a singleton instance of the LMChatHomeFeedBloc
+  static LMChatHomeFeedBloc get instance {
     if (_instance == null || _instance!.isClosed) {
-      return _instance ??= LMChatHomeBloc._();
+      return _instance = LMChatHomeFeedBloc._();
     } else {
       return _instance!;
     }
   }
 
-  LMChatHomeBloc._() : super(LMChatHomeInitial()) {
-    final DatabaseReference realTime = LMChatRealtime.instance.homeFeed();
-    realTime.onValue.listen((event) {
-      debugPrint(event.toString());
-      add(LMChatUpdateHomeEvent());
-    });
-    on<LMChatHomeEvent>(
-      (event, emit) async {
-        if (event is LMChatInitHomeEvent) {
-          emit(LMChatHomeLoading());
-
-          final response = await LMChatCore.client.getHomeFeed(event.request);
-          if (response.success) {
-            response.data?.conversationMeta?.forEach((key, value) {
-              String? userId = value.userId == null
-                  ? value.memberId?.toString()
-                  : value.userId.toString();
-              final user = response.data?.userMeta?[userId];
-              value.member = user;
-            });
-
-            emit(LMChatHomeLoaded(response: response.data!));
-          } else {
-            emit(LMChatHomeError(response.errorMessage!));
-          }
-        }
-        if (event is LMChatUpdateHomeEvent) {
-          final response = await LMChatCore.client.getHomeFeed(event.request ??
-              (GetHomeFeedRequestBuilder()
-                    ..page(1)
-                    ..pageSize(pageSize)
-                    ..minTimestamp(0)
-                    ..maxTimestamp(currentTime)
-                    ..chatroomTypes([10]))
-                  .build());
-          if (response.success) {
-            emit(LMChatUpdatedHomeFeed());
-            response.data?.conversationMeta?.forEach((key, value) {
-              String? userId = value.userId == null
-                  ? value.memberId?.toString()
-                  : value.userId.toString();
-              final user = response.data?.userMeta?[userId];
-              value.member = user;
-            });
-            emit(LMChatUpdateHomeFeed(response: response.data!));
-          } else {
-            emit(LMChatHomeError(response.errorMessage ?? "An error occured"));
-          }
-        }
-      },
-    );
+  LMChatHomeFeedBloc._() : super(LMChatHomeInitial()) {
+    // Event handler for fetch DM Feed event
+    on<LMChatFetchHomeFeedEvent>(fetchHomeFeedEventHandler);
+    // Event handler for refresh DM Feed event
+    on<LMChatRefreshHomeFeedEvent>(refreshHomeFeedEventHandler);
   }
 }
