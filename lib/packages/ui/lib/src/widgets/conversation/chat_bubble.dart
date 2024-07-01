@@ -174,7 +174,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         }
       },
       child: Container(
-        color: _isSelected ? const Color.fromRGBO(0, 96, 86, 0.3) : null,
+        foregroundDecoration: BoxDecoration(
+          color: _isSelected ? const Color.fromRGBO(0, 96, 86, 0.3) : null,
+        ),
         padding: EdgeInsets.symmetric(
          horizontal: 2.w,
         ),
