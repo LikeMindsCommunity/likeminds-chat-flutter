@@ -1,9 +1,7 @@
-// import 'package:flutter/material.dart';
-// import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-
 part of 'chat_bubble.dart';
 
-typedef LMChatBubbleContentBuilder = Widget Function(LMChatConversationViewData conversation);
+typedef LMChatBubbleContentBuilder = Widget Function(
+    LMChatConversationViewData conversation);
 
 class LMChatBubbleContent extends StatelessWidget {
   const LMChatBubbleContent({
@@ -28,6 +26,7 @@ class LMChatBubbleContent extends StatelessWidget {
           ? LMChatExpandableText(
               conversation.answer,
               expandText: "see more",
+              enableSelection: inStyle.enableSelection ?? false,
               animation: inStyle.animation ?? true,
               maxLines: inStyle.visibleLines ?? 4,
               mentionStyle: inStyle.tagStyle,
@@ -69,6 +68,7 @@ class LMChatBubbleContentStyle {
   final String? expandText;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+  final bool? enableSelection;
 
   const LMChatBubbleContentStyle({
     this.textStyle,
@@ -81,6 +81,7 @@ class LMChatBubbleContentStyle {
     this.padding,
     this.margin,
     this.tagStyle,
+    this.enableSelection,
   });
 
   LMChatBubbleContentStyle copyWith({
@@ -96,6 +97,7 @@ class LMChatBubbleContentStyle {
     double? height,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    bool? enableSelection,
   }) {
     return LMChatBubbleContentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -107,6 +109,7 @@ class LMChatBubbleContentStyle {
       textAlign: textAlign ?? this.textAlign,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
+      enableSelection: enableSelection ?? this.enableSelection,
     );
   }
 

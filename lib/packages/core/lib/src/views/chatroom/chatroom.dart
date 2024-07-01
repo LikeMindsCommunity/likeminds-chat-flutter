@@ -91,6 +91,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    ScreenSize.init(context);
   }
 
   @override
@@ -105,7 +106,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenSize.init(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(

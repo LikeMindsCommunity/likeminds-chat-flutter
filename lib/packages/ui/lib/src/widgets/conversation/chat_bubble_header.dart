@@ -13,7 +13,14 @@ class LMChatBubbleHeader extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        LMChatText(conversationUser.name),
+        LMChatText(
+          conversationUser.name,
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.primaryColor,
+            ),
+          ),
+        ),
       ],
     );
   }

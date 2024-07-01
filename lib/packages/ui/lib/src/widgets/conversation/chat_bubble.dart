@@ -232,7 +232,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               crossAxisAlignment: isSent
                                   ? CrossAxisAlignment.start
                                   : conversation.answer.length > 3
-                                      ? CrossAxisAlignment.end
+                                      ? CrossAxisAlignment.start
                                       : CrossAxisAlignment.start,
                               children: [
                                 inStyle.showHeader ?? true
@@ -269,13 +269,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         ),
                                 const LMChatBubbleMedia(),
                                 inStyle.showFooter ?? true
-                                    ? IntrinsicWidth(
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 4.0),
-                                          child: LMChatBubbleFooter(
-                                            conversation: conversation,
-                                          ),
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 4.0),
+                                        child: LMChatBubbleFooter(
+                                          conversation: conversation,
                                         ),
                                       )
                                     : const SizedBox.shrink(),
