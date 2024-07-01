@@ -1,6 +1,4 @@
 # This is a generated file; do not edit or check into version control.
-connectivity_plus=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/connectivity_plus-6.0.3/
-device_info_plus=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/device_info_plus-10.1.0/
 media_kit_video=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/
 package_info_plus=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/package_info_plus-8.0.0/
 path_provider=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider-2.1.3/
@@ -8,7 +6,6 @@ path_provider_android=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provi
 path_provider_foundation=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.0/
 path_provider_linux=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
 path_provider_windows=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider_windows-2.2.1/
-realm=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/realm-2.2.1/
 screen_brightness=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/screen_brightness-0.2.2+1/
 screen_brightness_android=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/screen_brightness_android-0.1.0+2/
 screen_brightness_ios=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/screen_brightness_ios-0.1.0/

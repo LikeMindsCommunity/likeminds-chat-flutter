@@ -54,7 +54,7 @@ PODS:
   - firebase_core (2.31.1):
     - Firebase/CoreOnly (= 10.25.0)
     - Flutter
-  - firebase_database (10.5.5):
+  - firebase_database (10.5.6):
     - Firebase/Database (= 10.25.0)
     - firebase_core
     - Flutter
@@ -154,8 +154,6 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
-  - realm (2.2.1):
-    - Flutter
   - screen_brightness_ios (0.1.0):
     - Flutter
   - SDWebImage (5.19.2):
@@ -198,7 +196,6 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - pdf_render (from `.symlinks/plugins/pdf_render/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - realm (from `.symlinks/plugins/realm/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - simple_s3 (from `.symlinks/plugins/simple_s3/ios`)
@@ -261,8 +258,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/pdf_render/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  realm:
-    :path: ".symlinks/plugins/realm/ios"
   screen_brightness_ios:
     :path: ".symlinks/plugins/screen_brightness_ios/ios"
   shared_preferences_foundation:
@@ -291,7 +286,7 @@ SPEC CHECKSUMS:
   file_picker: 09aa5ec1ab24135ccd7a1621c46c84134bfd6655
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
   firebase_core: 22e117a2e0dec3cb318c8f53f2dd01c140375617
-  firebase_database: f28e95d6c770bf0bb7da58b307cc38855b1db834
+  firebase_database: a4d10ffef3d041a166d319587718b4748d15c4be
   firebase_messaging: 7c04a2151f0da85796b41e01ad7da870af6a27e2
   FirebaseAppCheckInterop: 5da5ce93e8797a215e3f677fb0654b74e736c8b8
   FirebaseCore: 7ec4d0484817f12c3373955bc87762d96842d483
@@ -314,7 +309,6 @@ SPEC CHECKSUMS:
   pdf_render: 0b4e1a615aab83ce88b26c57753049424908a755
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  realm: 3d6d3c663ef6399a8613f434717b271faa122316
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
   SDWebImage: dfe95b2466a9823cf9f0c6d01217c06550d7b29a
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78

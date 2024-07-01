@@ -8,7 +8,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   media_kit_video
   permission_handler_windows
-  realm
   screen_brightness_windows
   url_launcher_windows
 )

@@ -13,6 +13,7 @@ class LMChatButton extends StatefulWidget {
     this.isActive = false,
     this.style,
     this.onTextTap,
+    this.icon,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -23,6 +24,9 @@ class LMChatButton extends StatefulWidget {
 
   /// Text to be displayed in the button
   final LMChatText? text;
+
+  /// Icon to be displayed in the button
+  final LMChatIcon? icon;
 
   /// Action to perform after tapping on the button
   final Function() onTap;
@@ -39,6 +43,7 @@ class LMChatButton extends StatefulWidget {
     bool? isActive,
     LMChatButtonStyle? style,
     LMChatText? text,
+    LMChatIcon? icon,
     Function()? onTap,
     LMChatText? activeText,
     VoidCallback? onTextTap,
@@ -47,6 +52,7 @@ class LMChatButton extends StatefulWidget {
       isActive: isActive ?? this.isActive,
       style: style ?? this.style,
       text: text ?? this.text,
+      icon: icon ?? this.icon,
       onTap: onTap ?? this.onTap,
       activeText: activeText ?? this.activeText,
       onTextTap: onTextTap ?? this.onTextTap,
@@ -96,9 +102,9 @@ class _LMButtonState extends State<LMChatButton> {
           children: [
             inStyle.placement == LMChatIconButtonPlacement.start
                 ? _active
-                    ? (inStyle.activeIcon ?? inStyle.icon) ??
+                    ? (inStyle.activeIcon ?? inStyle.icon ?? widget.icon) ??
                         const SizedBox.shrink()
-                    : inStyle.icon ?? const SizedBox.shrink()
+                    : inStyle.icon ?? widget.icon ?? const SizedBox.shrink()
                 : const SizedBox.shrink(),
             GestureDetector(
               onTap: inStyle.showText ? widget.onTextTap : null,

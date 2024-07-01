@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  likeminds_chat_fl: ^1.6.0
+  likeminds_chat_fl: ^1.7.0
 
   flutter_svg: ^2.0.10+1
   media_kit: ^1.1.10

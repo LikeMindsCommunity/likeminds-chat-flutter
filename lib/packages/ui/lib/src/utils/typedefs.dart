@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
+
 /// {@template lm_chat_error_handler}
 /// The error handler function for the chat.
 /// This function is called when an error occurs in the chat.
@@ -9,6 +10,8 @@ import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 /// - [StackTrace] stackTrace: The stack
 /// {@endtemplate}
 typedef LMChatErrorHandler = Function(String, StackTrace);
+
+typedef LMChatButtonBuilder = LMChatButton Function(LMChatButton olButton);
 
 /// {@template lm_chat_home_app_bar_builder}
 /// The app bar builder function for the chat home screen.

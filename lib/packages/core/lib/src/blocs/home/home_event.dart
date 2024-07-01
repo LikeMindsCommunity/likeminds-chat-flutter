@@ -1,44 +1,24 @@
 part of 'home_bloc.dart';
 
+/// Base event class for [LMChatHomeFeedBloc]
+/// Tracks events related to DM home feed
 @immutable
-abstract class LMChatHomeEvent extends Equatable {}
+sealed class LMChatHomeFeedEvent extends Equatable {}
 
-class LMChatInitHomeEvent extends LMChatHomeEvent {
-  final GetHomeFeedRequest request;
+/// Event class for fetching Home feed.
+/// Requires a page size [int]
+class LMChatFetchHomeFeedEvent extends LMChatHomeFeedEvent {
+  final int page;
 
-  LMChatInitHomeEvent({
-    required this.request,
-  });
+  LMChatFetchHomeFeedEvent({required this.page});
 
   @override
-  List<Object?> get props => [request];
+  List<Object?> get props => [page];
 }
 
-class LMChatGetHomeFeedEvent extends LMChatHomeEvent {
-  final GetHomeFeedRequest request;
-
-  LMChatGetHomeFeedEvent({
-    required this.request,
-  });
-  @override
-  List<Object?> get props => [];
-}
-
-class LMChatReloadHomeEvent extends LMChatHomeEvent {
-  final GetHomeFeedResponse response;
-
-  LMChatReloadHomeEvent({required this.response});
-  @override
-  List<Object?> get props => [response];
-}
-
-class LMChatUpdateHomeEvent extends LMChatHomeEvent {
-  final GetHomeFeedRequest? request;
-
-  LMChatUpdateHomeEvent({
-    this.request,
-  });
-
+/// Event class for refreshing Home feed
+/// in cases of realtime update, or changing states
+class LMChatRefreshHomeFeedEvent extends LMChatHomeFeedEvent {
   @override
   List<Object?> get props => [];
 }
