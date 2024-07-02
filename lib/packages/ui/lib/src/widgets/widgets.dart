@@ -22,6 +22,9 @@ export 'media/image.dart';
 
 export 'conversation/chat_bubble.dart';
 
+export 'explore/explore_tile.dart';
+export 'explore/join_button.dart';
+
 export 'common/menu/menu.dart';
 export 'common/menu/menu_item.dart';
 export 'common/dialog/dialog.dart';

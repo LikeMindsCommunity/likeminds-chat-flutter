@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_core/src/views/explore/explore.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -107,7 +108,14 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   LMChatButton _floatingActionButton() {
     return LMChatButton(
       // onPressed: () {},
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LMChatExplorePage(),
+          ),
+        );
+      },
       style: LMChatButtonStyle(
         backgroundColor: LMChatTheme.theme.backgroundColor,
         height: 48,
