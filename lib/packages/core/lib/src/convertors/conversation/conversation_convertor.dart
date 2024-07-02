@@ -2,57 +2,10 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-/*
- final bool? allowAddOption;
-  final String answer;
-  final int? apiVersion;
-  final int? attachmentCount;
-  final List<LMChatAttachmentViewData>? attachments;
-  final bool? attachmentsUploaded;
-  final int? chatroomId;
-  final int? communityId;
-  final String createdAt;
-  final int? createdEpoch;
-  final String? date;
-  final int? deletedByUserId;
-  final String? deviceId;
-  final int? endTime;
-  final int? expiryTime;
-  final bool? hasFiles;
-  final bool? hasReactions;
-  final String? header;
-  final int id;
-  final String? internalLink;
-  final bool? isAnonymous;
-  final bool? isEdited;
-  final int? lastUpdated;
-  final String? location;
-  final String? locationLat;
-  final String? locationLong;
-  final int? multipleSelectNo;
-  final int? multipleSelectState;
-  final dynamic ogTags;
-  final int? onlineLinkEnableBefore;
-  final String? pollAnswerText;
-  final int? pollType;
-  final int? replyChatroomId;
-  final int? replyId;
-  final int? startTime;
-  final int? state;
-  final String? temporaryId;
-  final int? userId;
-  final int? memberId;
-  final bool? toShowResults;
-  final String? pollTypeText;
-  final String? submitTypeText;
-  final bool? isTimeStamp;
-  final LMChatUserViewData? member;
-  final int? replyConversation;
-  final LMChatConversationViewData? replyConversationObject;
-  final List<LMChatReactionViewData>? conversationReactions;
-  final LMChatPollViewData? poll;
-*/
+/// [ConversationViewDataConvertor] is an extension on [Conversation] class.
+/// It converts [Conversation] to [LMChatConversationViewData].
 extension ConversationViewDataConvertor on Conversation {
+  /// Converts [Conversation] to [LMChatConversationViewData]
   LMChatConversationViewData toConversationViewData() {
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
@@ -86,7 +39,6 @@ extension ConversationViewDataConvertor on Conversation {
           ..startTime(startTime)
           ..state(state)
           ..temporaryId(temporaryId)
-          ..userId(userId)
           ..memberId(memberId)
           ..toShowResults(toShowResults)
           ..pollTypeText(pollTypeText)
@@ -104,7 +56,10 @@ extension ConversationViewDataConvertor on Conversation {
   }
 }
 
+/// [ConversationConvertor] is an extension on [LMChatConversationViewData] class.
+/// It converts [LMChatConversationViewData] to [Conversation].
 extension ConversationConvertor on LMChatConversationViewData {
+  /// Converts [LMChatConversationViewData] to [Conversation]
   Conversation toConversation() {
     return Conversation(
       answer: answer,
@@ -137,7 +92,6 @@ extension ConversationConvertor on LMChatConversationViewData {
       startTime: startTime,
       state: state,
       temporaryId: temporaryId,
-      userId: userId,
       memberId: memberId,
       toShowResults: toShowResults,
       pollTypeText: pollTypeText,

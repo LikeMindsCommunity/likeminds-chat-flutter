@@ -1,5 +1,5 @@
 export 'aws/credentials.dart';
-export 'widget/widget_utility.dart';
+export 'builder_delegates/widget_builder_delegate.dart';
 export 'media/media_utils.dart';
 export 'constants/strings.dart';
 export 'constants/enums.dart';

@@ -58,7 +58,6 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   @override
   void initState() {
     super.initState();
-    Bloc.observer = LMChatBlocObserver();
     user = LMChatLocalPreference.instance.getUser();
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
@@ -94,89 +93,106 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LMChatConversationBloc, LMChatConversationState>(
-        bloc: _conversationBloc,
-        listener: (context, state) {
-          updatePagingControllers(state);
-          if (state is LMChatConversationPostedState) {
-            Map<String, String> userTags = LMChatTaggingHelper.decodeString(
-                state.postConversationResponse.conversation?.answer ?? "");
-            // LMAnalytics.get().track(
-            //   AnalyticsKeys.chatroomResponded,
-            //   {
-            //     "chatroom_type": chatroom.type,
-            //     "community_id": chatroom.communityId,
-            //     "chatroom_name": chatroom.header,
-            //     "chatroom_last_conversation_type": state
-            //             .postConversationResponse
-            //             .conversation
-            //             ?.attachments
-            //             ?.first
-            //             .type ??
-            //         "text",
-            //     "tagged_users": userTags.isNotEmpty,
-            //     "count_tagged_users": userTags.length,
-            //     "name_tagged_users":
-            //         userTags.keys.map((e) => e.replaceFirst("@", "")).toList(),
-            //     "is_group_tag": false,
-            //   },
-            // );
-          }
-          if (state is LMChatConversationErrorState) {
-            // LMAnalytics.get().track(
-            //   AnalyticsKeys.messageSendingError,
-            //   {
-            //     "chatroom_id": chatroom.id,
-            //     "chatroom_type": chatroom.type,
-            //     "clicked_resend": false,
-            //   },
-            // );
-          }
-        },
-        builder: (context, state) {
-          return ValueListenableBuilder(
-            valueListenable: rebuildConversationList,
-            builder: (context, value, child) {
-              return PagedListView(
-                pagingController: pagedListController,
-                scrollController: scrollController,
-                physics: const ClampingScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 2.w,
-                ),
-                reverse: true,
-                builderDelegate: PagedChildBuilderDelegate<Conversation>(
-                  noItemsFoundIndicatorBuilder: (context) => const Center(
-                    child: LMChatText('No chats found!'),
-                  ),
-                  firstPageProgressIndicatorBuilder: (context) =>
-                      const LMChatSkeletonChatList(),
-                  animateTransitions: true,
-                  transitionDuration: const Duration(milliseconds: 500),
-                  itemBuilder: (context, item, index) {
-                    if (item.isTimeStamp != null && item.isTimeStamp! ||
-                        item.state != 0 && item.state != null) {
-                      return _defaultStateBubble(
-                        item.state == 1
-                            ? LMChatTaggingHelper.extractFirstDMStateMessage(
-                                item.toConversationViewData(),
-                                user.toUserViewData(),
-                              )
-                            : LMChatTaggingHelper.extractStateMessage(
-                                item.answer,
-                              ),
-                      );
-                    }
-                    return item.userId == user.id
-                        ? _defaultSentChatBubble(item)
-                        : _defaultReceivedChatBubble(item);
-                  },
-                ),
-              );
-            },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LMChatConversationActionBloc,
+            LMChatConversationActionState>(
+          bloc: _convActionBloc,
+          listener: (context, state) {
+            if (state is LMChatConversationDelete) {
+              _updateDeletedConversation(
+                  state.deleteConversationResponse.conversations!.first);
+            }
+             if (state is LMChatConversationEdited) {
+              updateEditedConversation(
+                  state.editConversationResponse.conversation!);
+            }
+          },
+        ),
+        BlocListener<LMChatConversationBloc, LMChatConversationState>(
+          bloc: _conversationBloc,
+          listener: (context, state) {
+            updatePagingControllers(state);
+            if (state is LMChatConversationPostedState) {
+              Map<String, String> userTags = LMChatTaggingHelper.decodeString(
+                  state.postConversationResponse.conversation?.answer ?? "");
+              // LMAnalytics.get().track(
+              //   AnalyticsKeys.chatroomResponded,
+              //   {
+              //     "chatroom_type": chatroom.type,
+              //     "community_id": chatroom.communityId,
+              //     "chatroom_name": chatroom.header,
+              //     "chatroom_last_conversation_type": state
+              //             .postConversationResponse
+              //             .conversation
+              //             ?.attachments
+              //             ?.first
+              //             .type ??
+              //         "text",
+              //     "tagged_users": userTags.isNotEmpty,
+              //     "count_tagged_users": userTags.length,
+              //     "name_tagged_users":
+              //         userTags.keys.map((e) => e.replaceFirst("@", "")).toList(),
+              //     "is_group_tag": false,
+              //   },
+              // );
+            }
+            if (state is LMChatConversationErrorState) {
+              // LMAnalytics.get().track(
+              //   AnalyticsKeys.messageSendingError,
+              //   {
+              //     "chatroom_id": chatroom.id,
+              //     "chatroom_type": chatroom.type,
+              //     "clicked_resend": false,
+              //   },
+              // );
+            }
+          },
+        ),
+      ],
+      child: ValueListenableBuilder(
+        valueListenable: rebuildConversationList,
+        builder: (context, value, child) {
+          return PagedListView(
+            pagingController: pagedListController,
+            scrollController: scrollController,
+            physics: const ClampingScrollPhysics(),
+            padding: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 2.w,
+            ),
+            reverse: true,
+            builderDelegate: PagedChildBuilderDelegate<Conversation>(
+              noItemsFoundIndicatorBuilder: (context) => const Center(
+                child: LMChatText('No chats found!'),
+              ),
+              firstPageProgressIndicatorBuilder: (context) =>
+                  const LMChatSkeletonChatList(),
+              animateTransitions: true,
+              transitionDuration: const Duration(milliseconds: 500),
+              itemBuilder: (context, item, index) {
+                if (item.isTimeStamp != null && item.isTimeStamp! ||
+                    item.state != 0 && item.state != null) {
+                  return _defaultStateBubble(
+                    item.state == 1
+                        ? LMChatTaggingHelper.extractFirstDMStateMessage(
+                            item.toConversationViewData(),
+                            user.toUserViewData(),
+                          )
+                        : LMChatTaggingHelper.extractStateMessage(
+                            item.answer,
+                          ),
+                  );
+                }
+                return item.memberId == user.id
+                    ? _defaultSentChatBubble(item)
+                    : _defaultReceivedChatBubble(item);
+              },
+            ),
           );
-        });
+        },
+      ),
+    );
   }
 
   Widget _defaultStateBubble(String message) {
@@ -371,7 +387,6 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             chatroomId: widget.chatroomId,
             date: conversation.date,
             memberId: conversation.memberId,
-            userId: conversation.userId,
             temporaryId: conversation.temporaryId,
             answer: conversation.date ?? '',
             communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
@@ -387,6 +402,44 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       if (!userMeta.containsKey(user.id)) {
         userMeta[user.id] = user;
       }
+    }
+    pagedListController.itemList = conversationList;
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  void _updateDeletedConversation(Conversation conversation) {
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
+    int index =
+        conversationList.indexWhere((element) => element.id == conversation.id);
+    if (index != -1) {
+      conversationList[index].deletedByUserId = user.id;
+    }
+    if (conversationMeta.isNotEmpty &&
+        conversationMeta.containsKey(conversation.id.toString())) {
+      conversationMeta[conversation.id..toString()]!.deletedByUserId = user.id;
+    }
+    pagedListController.itemList = conversationList;
+    scrollController.animateTo(
+      scrollController.position.pixels + 10,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOut,
+    );
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  void updateEditedConversation(Conversation editedConversation) {
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
+    int index = conversationList
+        .indexWhere((element) => element.id == editedConversation.id);
+    if (index != -1) {
+      conversationList[index] = editedConversation;
+    }
+
+    if (conversationMeta.isNotEmpty &&
+        conversationMeta.containsKey(editedConversation.id.toString())) {
+      conversationMeta[editedConversation.id.toString()] = editedConversation;
     }
     pagedListController.itemList = conversationList;
     rebuildConversationList.value = !rebuildConversationList.value;

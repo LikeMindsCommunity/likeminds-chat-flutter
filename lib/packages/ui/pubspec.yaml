@@ -10,9 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  likeminds_chat_fl: ^1.7.0
-
   flutter_svg: ^2.0.10+1
   media_kit: ^1.1.10
   media_kit_video: ^1.2.4

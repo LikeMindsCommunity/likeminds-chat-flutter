@@ -117,7 +117,7 @@ class LMChatEditConversationState extends LMChatConversationActionState {
   final int conversationId;
 
   /// The conversation
-  final Conversation editConversation;
+  final LMChatConversationViewData editConversation;
 
   /// [LMChatEditConversationState] constructor
   LMChatEditConversationState({
@@ -130,7 +130,7 @@ class LMChatEditConversationState extends LMChatConversationActionState {
   List<Object> get props => [
         chatroomId,
         conversationId,
-        editConversation.toEntity().toJson(),
+        editConversation,
       ];
 }
 

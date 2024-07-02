@@ -21,7 +21,7 @@ postMultimediaConversationEventHandler(
       member: user,
       temporaryId: event.postConversationRequest.temporaryId,
       id: 1,
-      userId: user.id,
+      memberId: user.id,
       ogTags: event.postConversationRequest.ogTags,
     );
 

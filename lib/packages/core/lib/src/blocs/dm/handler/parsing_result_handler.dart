@@ -53,7 +53,7 @@ LMChatRoomViewData parseDMLastConversation(
   //Create a new instance with member object copied
   LMChatConversationViewData updated = lastConversation.copyWith(
       member: response
-          .userMeta![lastConversation.memberId ?? lastConversation.userId]!
+          .userMeta![lastConversation.memberId]!
           .toUserViewData());
   //Return a copy of passed chatroom with lastConversation updated
   return chatroom.copyWith(lastConversation: updated);

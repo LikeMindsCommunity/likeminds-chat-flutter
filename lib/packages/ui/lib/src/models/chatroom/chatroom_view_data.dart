@@ -94,7 +94,7 @@ class LMChatRoomViewData {
   final bool? isEdited;
 
   /// Indicates if the user is a guest in the chatroom.
-  final bool? isGuest;
+  bool? isGuest;
 
   /// Indicates if the chatroom is paid.
   final bool? isPaid;
