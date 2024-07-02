@@ -17,17 +17,36 @@ import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+/// {@template chatroom_screen}
+/// Chatroom screen is the main screen where the user can chat with other users.
+/// It has a chatroom list, chatroom bar, and chatroom menu.
+///  {@endtemplate}
 class LMChatroomScreen extends StatefulWidget {
+  /// [chatroomId] is the id of the chatroom.
   final int chatroomId;
 
+  /// [appbarBuilder] is the builder for the appbar.
   final LMChatroomAppBarBuilder? appbarBuilder;
+
+  /// [chatBubbleBuilder] is the builder for the chat bubble.
   final LMChatBubbleBuilder? chatBubbleBuilder;
+
+  /// [stateBubbleBuilder] is the builder for the state message bubble.
   final LMChatStateBubbleBuilder? stateBubbleBuilder;
+
+  /// [loadingPageWidget] is the builder for the loading page widget.
   final LMChatContextWidgetBuilder? loadingPageWidget;
+
+  /// [loadingListWidget] is the builder for the loading list widget.
   final LMChatContextWidgetBuilder? loadingListWidget;
+
+  /// [paginatedLoadingWidget] is the builder for the paginated loading widget.
   final LMChatContextWidgetBuilder? paginatedLoadingWidget;
+
+  /// [chatBarBuilder] is the builder for the chat bar.
   final LMChatroomChatBarBuilder? chatBarBuilder;
 
+  /// {@macro chatroom_screen}
   const LMChatroomScreen({
     super.key,
     required this.chatroomId,
@@ -160,7 +179,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                       ),
                     ),
                     LMChatroomBar(
-                      chatroom: chatroom,
+                      chatroom: chatroom.toChatRoomViewData(),
                       scrollToBottom: _scrollToBottom,
                     ),
                   ],
@@ -374,7 +393,18 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       // Edit button
       if (haveEditPermission && _selectedIds.length == 1)
         LMChatButton(
-          onTap: () {},
+          onTap: () {
+            _selectedIds.clear();
+            _convActionBloc.add(
+              LMChatEditingConversationEvent(
+                conversationId: conversationViewData.id,
+                chatroomId: widget.chatroomId,
+                editConversation: conversationViewData,
+              ),
+            );
+            rebuildAppBar.value = !rebuildAppBar.value;
+            // rebuildConversationList.value = !rebuildConversationList.value;
+          },
           style: LMChatButtonStyle.basic().copyWith(
             icon: LMChatIcon(
               type: LMChatIconType.icon,

@@ -12,7 +12,7 @@ postConversationEventHandler(
       answer: event.postConversationRequest.text,
       chatroomId: event.postConversationRequest.chatroomId,
       createdAt: "",
-      userId: user.id,
+      memberId: user.id,
       header: "",
       date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
       replyId: event.postConversationRequest.replyId,

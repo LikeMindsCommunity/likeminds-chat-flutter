@@ -41,7 +41,6 @@ class LMChatConversationViewData {
   final int? startTime;
   final int? state;
   final String? temporaryId;
-  final int? userId;
   final int? memberId;
   final bool? toShowResults;
   final String? pollTypeText;
@@ -91,7 +90,6 @@ class LMChatConversationViewData {
     this.startTime,
     this.state,
     this.temporaryId,
-    this.userId,
     this.memberId,
     this.toShowResults,
     this.pollTypeText,
@@ -144,7 +142,6 @@ class LMChatConversationViewData {
     int? startTime,
     int? state,
     String? temporaryId,
-    int? userId,
     int? memberId,
     bool? toShowResults,
     String? pollTypeText,
@@ -186,7 +183,8 @@ class LMChatConversationViewData {
       multipleSelectNo: multipleSelectNo ?? this.multipleSelectNo,
       multipleSelectState: multipleSelectState ?? this.multipleSelectState,
       ogTags: ogTags ?? this.ogTags,
-      onlineLinkEnableBefore: onlineLinkEnableBefore ?? this.onlineLinkEnableBefore,
+      onlineLinkEnableBefore:
+          onlineLinkEnableBefore ?? this.onlineLinkEnableBefore,
       pollAnswerText: pollAnswerText ?? this.pollAnswerText,
       pollType: pollType ?? this.pollType,
       replyChatroomId: replyChatroomId ?? this.replyChatroomId,
@@ -194,7 +192,6 @@ class LMChatConversationViewData {
       startTime: startTime ?? this.startTime,
       state: state ?? this.state,
       temporaryId: temporaryId ?? this.temporaryId,
-      userId: userId ?? this.userId,
       memberId: memberId ?? this.memberId,
       toShowResults: toShowResults ?? this.toShowResults,
       pollTypeText: pollTypeText ?? this.pollTypeText,
@@ -202,19 +199,20 @@ class LMChatConversationViewData {
       isTimeStamp: isTimeStamp ?? this.isTimeStamp,
       member: member ?? this.member,
       replyConversation: replyConversation ?? this.replyConversation,
-      replyConversationObject: replyConversationObject ?? this.replyConversationObject,
-      conversationReactions: conversationReactions ?? this.conversationReactions,
+      replyConversationObject:
+          replyConversationObject ?? this.replyConversationObject,
+      conversationReactions:
+          conversationReactions ?? this.conversationReactions,
       poll: poll ?? this.poll,
     );
   }
-
 }
 
 /// `LMChatConversationViewDataBuilder` is a builder class used to create an instance of `LMChatConversationViewData`.
 /// This class is used to create an instance of `LMChatConversationViewData` with the provided values.
 class LMChatConversationViewDataBuilder {
   bool? _allowAddOption;
-  String? _answer ;
+  String? _answer;
   int? _apiVersion;
   int? _attachmentCount;
   List<LMChatAttachmentViewData>? _attachments;
@@ -250,7 +248,6 @@ class LMChatConversationViewDataBuilder {
   int? _startTime;
   int? _state;
   String? _temporaryId;
-  int? _userId;
   int? _memberId;
   bool? _toShowResults;
   String? _pollTypeText;
@@ -265,24 +262,31 @@ class LMChatConversationViewDataBuilder {
   void allowAddOption(bool? allowAddOption) {
     _allowAddOption = allowAddOption;
   }
+
   void answer(String answer) {
     _answer = answer;
   }
+
   void apiVersion(int? apiVersion) {
     _apiVersion = apiVersion;
   }
+
   void attachmentCount(int? attachmentCount) {
     _attachmentCount = attachmentCount;
   }
+
   void attachments(List<LMChatAttachmentViewData>? attachments) {
     _attachments = attachments;
   }
+
   void attachmentsUploaded(bool? attachmentsUploaded) {
     _attachmentsUploaded = attachmentsUploaded;
   }
+
   void chatroomId(int? chatroomId) {
     _chatroomId = chatroomId;
   }
+
   void communityId(int? communityId) {
     _communityId = communityId;
   }
@@ -329,7 +333,7 @@ class LMChatConversationViewDataBuilder {
 
   void id(int? id) {
     _id = id;
-  } 
+  }
 
   void internalLink(String? internalLink) {
     _internalLink = internalLink;
@@ -403,10 +407,6 @@ class LMChatConversationViewDataBuilder {
     _temporaryId = temporaryId;
   }
 
-  void userId(int? userId) {
-    _userId = userId;
-  }
-
   void memberId(int? memberId) {
     _memberId = memberId;
   }
@@ -435,18 +435,19 @@ class LMChatConversationViewDataBuilder {
     _replyConversation = replyConversation;
   }
 
-  void replyConversationObject(LMChatConversationViewData? replyConversationObject) {
+  void replyConversationObject(
+      LMChatConversationViewData? replyConversationObject) {
     _replyConversationObject = replyConversationObject;
   }
 
-  void conversationReactions(List<LMChatReactionViewData>? conversationReactions) {
+  void conversationReactions(
+      List<LMChatReactionViewData>? conversationReactions) {
     _conversationReactions = conversationReactions;
   }
 
   void poll(LMChatPollInfoViewData? poll) {
     _poll = poll;
   }
-
 
   /// Builds the `LMChatConversationViewData` object using the provided values.
   LMChatConversationViewData build() {
@@ -488,7 +489,6 @@ class LMChatConversationViewDataBuilder {
       startTime: _startTime,
       state: _state,
       temporaryId: _temporaryId,
-      userId: _userId,
       memberId: _memberId,
       toShowResults: _toShowResults,
       pollTypeText: _pollTypeText,
@@ -501,6 +501,4 @@ class LMChatConversationViewDataBuilder {
       poll: _poll,
     );
   }
-
-
 }

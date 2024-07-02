@@ -22,8 +22,7 @@ updateConversationsEventHandler(
     if (response.success) {
       GetConversationResponse conversationResponse = response.data!;
       for (var element in conversationResponse.conversationData!) {
-        element.member =
-            conversationResponse.userMeta?[element.userId ?? element.memberId];
+        element.member = conversationResponse.userMeta?[element.memberId];
       }
       for (var element in conversationResponse.conversationData!) {
         String? replyId = element.replyId == null
@@ -31,10 +30,8 @@ updateConversationsEventHandler(
             : element.replyId.toString();
         element.replyConversationObject =
             conversationResponse.conversationMeta?[replyId];
-        element.replyConversationObject?.member =
-            conversationResponse.userMeta?[
-                element.replyConversationObject?.userId ??
-                    element.replyConversationObject?.memberId];
+        element.replyConversationObject?.member = conversationResponse
+            .userMeta?[element.replyConversationObject?.memberId];
       }
       Conversation realTimeConversation =
           response.data!.conversationData!.first;
