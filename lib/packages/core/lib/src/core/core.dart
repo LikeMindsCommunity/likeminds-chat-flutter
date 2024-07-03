@@ -20,7 +20,7 @@ class LMChatCore {
   /// Instance of [LMChatConfig] class accessible through core class.
   late final LMChatConfig chatConfig;
   late String _clientDomain;
-  late LMChatWidgetUtility _widgetUtility;
+  late LMChatWidgetBuilderDelegate _widgetBuilder;
   // LMChatSDKCallbackImplementation? _lmChatSDKCallback;
 
   /// Singleton class for LMChatCore
@@ -37,7 +37,7 @@ class LMChatCore {
   static LMChatConfig get config => instance.chatConfig;
 
   /// Instance of widget utility class through core.
-  static LMChatWidgetUtility get widgets => instance._widgetUtility;
+  static LMChatWidgetBuilderDelegate get widgets => instance._widgetBuilder;
 
   /// Domain passed from client's end [String]
   static String get domain => instance._clientDomain;
@@ -55,7 +55,7 @@ class LMChatCore {
     LMChatClient? lmChatClient,
     String? domain,
     LMChatConfig? config,
-    LMChatWidgetUtility? widgets,
+    LMChatWidgetBuilderDelegate? widgets,
     LMChatThemeData? theme,
     LMChatCoreCallback? lmChatCallback,
     Function(LMChatAnalyticsEventFired)? analyticsListener,
@@ -67,7 +67,7 @@ class LMChatCore {
         (LMChatClientBuilder()..sdkCallback(lmChatSDKCallback)).build();
     if (domain != null) _clientDomain = domain;
     chatConfig = config ?? LMChatConfig();
-    if (widgets != null) _widgetUtility = widgets;
+    if (widgets != null) _widgetBuilder = widgets;
     LMChatTheme.instance.initialise(theme: theme);
     LMResponse isDBInitiated = await this.lmChatClient.initiateDB();
     if (!isDBInitiated.success) {

@@ -90,6 +90,7 @@ class _LMButtonState extends State<LMChatButton> {
       child: Container(
         height: inStyle.height,
         width: inStyle.width,
+        margin: inStyle.margin,
         padding: inStyle.padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
           color: inStyle.backgroundColor ?? LMChatTheme.theme.backgroundColor,
@@ -114,7 +115,7 @@ class _LMButtonState extends State<LMChatButton> {
                 children: [
                   inStyle.placement == LMChatIconButtonPlacement.start
                       ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.margin ?? 0)
+                          ? SizedBox(width: inStyle.spacing ?? 0)
                           : const SizedBox.shrink()
                       : const SizedBox.shrink(),
                   inStyle.showText
@@ -128,7 +129,7 @@ class _LMButtonState extends State<LMChatButton> {
                       : const SizedBox.shrink(),
                   inStyle.placement == LMChatIconButtonPlacement.end
                       ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.margin ?? 0)
+                          ? SizedBox(width: inStyle.spacing ?? 0)
                           : const SizedBox.shrink()
                       : const SizedBox.shrink(),
                 ],
@@ -148,9 +149,15 @@ class _LMButtonState extends State<LMChatButton> {
   }
 }
 
+/// {@template lm_chat_button_style}
+/// [LMChatButtonStyle] is used to style the [LMChatButton]
+/// {@endtemplate}
 class LMChatButtonStyle {
   /// padding of the button, defaults to zero
   final EdgeInsets? padding;
+
+  /// margin of the button, defaults to zero
+  final EdgeInsets? margin;
 
   /// background color of the button, defaults to transparent
   final Color? backgroundColor;
@@ -173,9 +180,10 @@ class LMChatButtonStyle {
   /// axis alignment for setting button's icon and text spacing
   final MainAxisAlignment? mainAxisAlignment;
 
-  /// margin between the text and icon
-  final double? margin;
+  /// space between the text and icon
+  final double? spacing;
 
+  /// whether to show the text in the button
   final bool showText;
 
   /// Icon to be displayed in the button
@@ -184,17 +192,20 @@ class LMChatButtonStyle {
   /// Icon to be displayed in the button if the button is active
   final LMChatIcon? activeIcon;
 
+  /// padding for the text
   final EdgeInsets? textPadding;
 
+  /// {@macro lm_chat_button_style}
   const LMChatButtonStyle({
     this.padding,
+    this.margin,
     this.backgroundColor,
     this.border,
     this.borderRadius,
     this.height,
     this.width,
     this.placement = LMChatIconButtonPlacement.start,
-    this.margin,
+    this.spacing,
     this.mainAxisAlignment,
     this.showText = true,
     this.icon,
@@ -202,19 +213,22 @@ class LMChatButtonStyle {
     this.textPadding,
   });
 
+  /// Basic style factory constructor; used as default style
   factory LMChatButtonStyle.basic() {
     return const LMChatButtonStyle(
       padding: EdgeInsets.all(4),
       backgroundColor: Colors.transparent,
       borderRadius: 8,
       height: 28,
-      margin: 4,
+      spacing: 4,
       textPadding: EdgeInsets.zero,
     );
   }
 
+  /// CopyWith method to create a new instance of [LMChatButtonStyle] with the updated values
   LMChatButtonStyle copyWith({
     EdgeInsets? padding,
+    EdgeInsets? margin,
     Color? backgroundColor,
     Border? border,
     double? borderRadius,
@@ -222,7 +236,7 @@ class LMChatButtonStyle {
     double? width,
     LMChatIconButtonPlacement? placement,
     MainAxisAlignment? mainAxisAlignment,
-    double? margin,
+    double? spacing,
     bool? showText,
     LMChatIcon? icon,
     LMChatIcon? activeIcon,
@@ -230,6 +244,7 @@ class LMChatButtonStyle {
   }) {
     return LMChatButtonStyle(
       padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -237,7 +252,7 @@ class LMChatButtonStyle {
       width: width ?? this.width,
       placement: placement ?? this.placement,
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
-      margin: margin ?? this.margin,
+      spacing: spacing ?? this.spacing,
       showText: showText ?? this.showText,
       icon: icon ?? this.icon,
       activeIcon: activeIcon ?? this.activeIcon,
