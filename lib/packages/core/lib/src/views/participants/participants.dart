@@ -12,42 +12,10 @@ class LMChatroomParticipantsPage extends StatefulWidget {
   /// [chatroomViewData] is the chat room for which the participants are to be fetched.
   final LMChatRoomViewData chatroomViewData;
 
-  /// [firstPageErrorIndicatorBuilder] is a builder to show the error in fetching the first page of participants.
-  final Widget Function(BuildContext)? firstPageErrorIndicatorBuilder;
-
-  /// [newPageErrorIndicatorBuilder] is a builder to show the error in fetching the new page of participants.
-  final Widget Function(BuildContext)? newPageErrorIndicatorBuilder;
-
-  /// [firstPageProgressIndicatorBuilder] is a builder to show the progress indicator while fetching the first page of participants.
-  final Widget Function(BuildContext)? firstPageProgressIndicatorBuilder;
-
-  /// [newPageProgressIndicatorBuilder] is a builder to show the progress indicator while fetching the new page of participants.
-  final Widget Function(BuildContext)? newPageProgressIndicatorBuilder;
-
-  /// [noItemsFoundIndicatorBuilder] is a builder to show the indicator when no participants are found.
-  final Widget Function(BuildContext)? noItemsFoundIndicatorBuilder;
-
-  /// [noMoreItemsIndicatorBuilder] is a builder to show the indicator when no more participants are found.
-  final Widget Function(BuildContext)? noMoreItemsIndicatorBuilder;
-
-  /// [appBarBuilder] is a builder to build the app bar for the page.
-  final LMChatAppBarBuilder? appBarBuilder;
-
-  /// [userTileBuilder] is a builder to build the user tile for the participants.
-  final LMChatUserTileBuilder? userTileBuilder;
-
   /// [LMChatroomParticipantsPage] constructor to create an instance of [LMChatroomParticipantsPage].
   const LMChatroomParticipantsPage({
     super.key,
     required this.chatroomViewData,
-    this.firstPageErrorIndicatorBuilder,
-    this.newPageErrorIndicatorBuilder,
-    this.firstPageProgressIndicatorBuilder,
-    this.newPageProgressIndicatorBuilder,
-    this.noItemsFoundIndicatorBuilder,
-    this.noMoreItemsIndicatorBuilder,
-    this.appBarBuilder,
-    this.userTileBuilder,
   });
 
   @override
@@ -67,6 +35,8 @@ class _LMChatroomParticipantsPageState
       PagingController(firstPageKey: 1);
   Timer? _debounce;
   final int _pageSize = 10;
+  final LMChatParticipantBuilderDelegate _screenBuilder =
+      LMChatCore.config.participantConfig.builder;
 
   @override
   void initState() {
@@ -102,7 +72,7 @@ class _LMChatroomParticipantsPageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: LMChatTheme.instance.themeData.container,
-      appBar: widget.appBarBuilder?.call(_defAppBar()) ?? _defAppBar(),
+      appBar: _screenBuilder.appBarBuilder.call(context, _defAppBar()),
       body: SafeArea(
         child: Column(
           children: [
@@ -271,16 +241,20 @@ class _LMChatroomParticipantsPageState
             LMChatUserTile userTile = LMChatUserTile(
               userViewData: item,
             );
-            return widget.userTileBuilder?.call(context, item, userTile) ?? userTile;
+            return _screenBuilder.userTileBuilder.call(context, item, userTile);
           },
-          firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
-          newPageErrorIndicatorBuilder: widget.newPageErrorIndicatorBuilder,
+          firstPageErrorIndicatorBuilder:
+              _screenBuilder.firstPageErrorIndicatorBuilder,
+          newPageErrorIndicatorBuilder:
+              _screenBuilder.newPageErrorIndicatorBuilder,
           firstPageProgressIndicatorBuilder:
-              widget.firstPageProgressIndicatorBuilder,
+              _screenBuilder.firstPageProgressIndicatorBuilder,
           newPageProgressIndicatorBuilder:
-              widget.newPageProgressIndicatorBuilder,
-          noItemsFoundIndicatorBuilder: widget.noItemsFoundIndicatorBuilder,
-          noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder,
+              _screenBuilder.newPageProgressIndicatorBuilder,
+          noItemsFoundIndicatorBuilder:
+              _screenBuilder.noItemsFoundIndicatorBuilder,
+          noMoreItemsIndicatorBuilder:
+              _screenBuilder.noMoreItemsIndicatorBuilder,
         ),
       ),
     );

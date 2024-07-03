@@ -1,6 +1,7 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations.dart';
+import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
+import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_config.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/firebase/firebase.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';

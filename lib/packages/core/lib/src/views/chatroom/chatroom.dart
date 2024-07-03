@@ -4,10 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/extension/list_extension.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -25,38 +27,38 @@ class LMChatroomScreen extends StatefulWidget {
   /// [chatroomId] is the id of the chatroom.
   final int chatroomId;
 
-  /// [appbarBuilder] is the builder for the appbar.
-  final LMChatroomAppBarBuilder? appbarBuilder;
+  // /// [appbarBuilder] is the builder for the appbar.
+  // final LMChatroomAppBarBuilder? appbarBuilder;
 
-  /// [chatBubbleBuilder] is the builder for the chat bubble.
-  final LMChatBubbleBuilder? chatBubbleBuilder;
+  // /// [chatBubbleBuilder] is the builder for the chat bubble.
+  // final LMChatBubbleBuilder? chatBubbleBuilder;
 
-  /// [stateBubbleBuilder] is the builder for the state message bubble.
-  final LMChatStateBubbleBuilder? stateBubbleBuilder;
+  // /// [stateBubbleBuilder] is the builder for the state message bubble.
+  // final LMChatStateBubbleBuilder? stateBubbleBuilder;
 
-  /// [loadingPageWidget] is the builder for the loading page widget.
-  final LMChatContextWidgetBuilder? loadingPageWidget;
+  // /// [loadingPageWidget] is the builder for the loading page widget.
+  // final LMChatContextWidgetBuilder? loadingPageWidget;
 
-  /// [loadingListWidget] is the builder for the loading list widget.
-  final LMChatContextWidgetBuilder? loadingListWidget;
+  // /// [loadingListWidget] is the builder for the loading list widget.
+  // final LMChatContextWidgetBuilder? loadingListWidget;
 
-  /// [paginatedLoadingWidget] is the builder for the paginated loading widget.
-  final LMChatContextWidgetBuilder? paginatedLoadingWidget;
+  // /// [paginatedLoadingWidget] is the builder for the paginated loading widget.
+  // final LMChatContextWidgetBuilder? paginatedLoadingWidget;
 
-  /// [chatBarBuilder] is the builder for the chat bar.
-  final LMChatroomChatBarBuilder? chatBarBuilder;
+  // /// [chatBarBuilder] is the builder for the chat bar.
+  // final LMChatroomChatBarBuilder? chatBarBuilder;
 
   /// {@macro chatroom_screen}
   const LMChatroomScreen({
     super.key,
     required this.chatroomId,
-    this.appbarBuilder,
-    this.chatBarBuilder,
-    this.chatBubbleBuilder,
-    this.stateBubbleBuilder,
-    this.loadingListWidget,
-    this.loadingPageWidget,
-    this.paginatedLoadingWidget,
+    // this.appbarBuilder,
+    // this.chatBarBuilder,
+    // this.chatBubbleBuilder,
+    // this.stateBubbleBuilder,
+    // this.loadingListWidget,
+    // this.loadingPageWidget,
+    // this.paginatedLoadingWidget,
   });
 
   @override
@@ -87,6 +89,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       PagingController<int, Conversation>(firstPageKey: 1);
 
   final List<int> _selectedIds = <int>[];
+  final LMChatRoomBuilderDelegate _screenBuilder =
+      LMChatCore.config.chatRoomConfig.builder;
 
   bool isAnyMessageSelected() {
     return _selectedIds.isNotEmpty;
@@ -159,17 +163,14 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 actions = chatroomState.actions;
                 return Column(
                   children: [
-                    widget.appbarBuilder?.call(
-                          chatroom.toChatRoomViewData(),
-                          _defaultAppBar(
-                            chatroom,
-                            chatroomState.participantCount,
-                          ),
-                        ) ??
-                        _defaultAppBar(
-                          chatroom,
-                          chatroomState.participantCount,
-                        ),
+                    _screenBuilder.appBarBuilder.call(
+                      context,
+                      chatroom.toChatRoomViewData(),
+                      _defaultAppBar(
+                        chatroom,
+                        chatroomState.participantCount,
+                      ),
+                    ),
                     Expanded(
                       child: ValueListenableBuilder(
                         valueListenable: rebuildConversationList,

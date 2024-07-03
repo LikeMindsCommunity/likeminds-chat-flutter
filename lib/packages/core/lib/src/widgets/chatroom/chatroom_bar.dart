@@ -44,7 +44,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatConversationViewData? replyToConversation;
   List<LMChatMedia>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
-  Map<int, LMChatUserViewData?>? userMeta;
   final CustomPopupMenuController _popupMenuController =
       CustomPopupMenuController();
   final TextEditingController _textEditingController = TextEditingController();
@@ -67,18 +66,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   final LMChatThemeData _themeData = LMChatTheme.instance.themeData;
 
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        debugPrint('Focus lost');
-      } else if (_focusNode.hasFocus) {
-        debugPrint('Focus gained');
-      }
-    });
-  }
-
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -92,7 +79,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _popupMenuController.dispose();
     _textEditingController.dispose();
     _focusNode.dispose();
-    replyToConversation = null;
     _debounce?.cancel();
     super.dispose();
   }
