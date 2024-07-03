@@ -6,8 +6,8 @@ part of 'space_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-LMChatSpaceModel _$SpaceModelFromJson(Map<String, dynamic> json) =>
-    LMChatSpaceModel(
+LMChatSpaceViewModel _$SpaceModelFromJson(Map<String, dynamic> json) =>
+    LMChatSpaceViewModel(
       name: json['name'] as String,
       description: json['description'] as String,
       imageUrl: json['imageUrl'] as String,
@@ -18,7 +18,7 @@ LMChatSpaceModel _$SpaceModelFromJson(Map<String, dynamic> json) =>
       isJoined: json['isJoined'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$SpaceModelToJson(LMChatSpaceModel instance) =>
+Map<String, dynamic> _$SpaceModelToJson(LMChatSpaceViewModel instance) =>
     <String, dynamic>{
       'name': instance.name,
       'description': instance.description,

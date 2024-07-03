@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'space_model.g.dart';
 
 @JsonSerializable()
-class LMChatSpaceModel {
+class LMChatSpaceViewModel {
   final String name;
   final String description;
   final String imageUrl;
@@ -14,7 +14,7 @@ class LMChatSpaceModel {
   final int members;
   final int messages;
 
-  LMChatSpaceModel({
+  LMChatSpaceViewModel({
     required this.name,
     required this.description,
     required this.imageUrl,
@@ -25,7 +25,7 @@ class LMChatSpaceModel {
     this.isJoined = false,
   });
 
-  factory LMChatSpaceModel.fromJson(Map<String, dynamic> json) =>
+  factory LMChatSpaceViewModel.fromJson(Map<String, dynamic> json) =>
       _$SpaceModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$SpaceModelToJson(this);

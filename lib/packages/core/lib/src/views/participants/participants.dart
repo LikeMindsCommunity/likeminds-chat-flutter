@@ -136,8 +136,10 @@ class _LMChatroomParticipantsPageState
 
   LMChatAppBar _defAppBar() {
     return LMChatAppBar(
-      style: const LMChatAppBarStyle(
-        height: 95,
+      style: LMChatAppBarStyle(
+        height: 72,
+        gap: 0,
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
       title: ValueListenableBuilder(
         valueListenable: _showSearchBarTextField,
@@ -145,7 +147,7 @@ class _LMChatroomParticipantsPageState
           return Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 4.w,
-              vertical: 2.h,
+              // vertical: 2.h,
             ),
             child: _showSearchBarTextField.value
                 ? Expanded(
@@ -271,7 +273,8 @@ class _LMChatroomParticipantsPageState
             LMChatUserTile userTile = LMChatUserTile(
               userViewData: item,
             );
-            return widget.userTileBuilder?.call(context, item, userTile) ?? userTile;
+            return widget.userTileBuilder?.call(context, item, userTile) ??
+                userTile;
           },
           firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
           newPageErrorIndicatorBuilder: widget.newPageErrorIndicatorBuilder,

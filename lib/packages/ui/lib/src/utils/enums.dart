@@ -5,4 +5,4 @@ enum LMChatIconType { icon, svg, png }
 enum LMChatIconButtonPlacement { start, end }
 
 /// An enum to describe space type of explore chatrooms
-enum LMChatSpaces { newest, mostMessages, mostParticipants, active }
+enum LMChatSpace { newest, mostMessages, mostParticipants, active }
