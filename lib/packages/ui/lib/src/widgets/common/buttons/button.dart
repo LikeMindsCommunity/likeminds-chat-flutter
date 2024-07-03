@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/enums.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
@@ -92,7 +93,7 @@ class _LMButtonState extends State<LMChatButton> {
         margin: inStyle.margin,
         padding: inStyle.padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
-          color: inStyle.backgroundColor,
+          color: inStyle.backgroundColor ?? LMChatTheme.theme.backgroundColor,
           borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
           border: inStyle.border,
         ),

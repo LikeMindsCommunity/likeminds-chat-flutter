@@ -143,7 +143,7 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(style?.height ?? 98);
+  Size get preferredSize => Size.fromHeight(style?.height ?? 72);
 }
 
 class LMChatAppBarStyle {

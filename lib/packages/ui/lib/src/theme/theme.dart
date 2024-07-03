@@ -48,6 +48,7 @@ class LMChatThemeData {
   final Color container;
   final Color onContainer;
   final Color onPrimary;
+  final Color scaffold;
 
   const LMChatThemeData({
     required this.primaryColor,
@@ -63,6 +64,7 @@ class LMChatThemeData {
     required this.container,
     required this.onContainer,
     required this.onPrimary,
+    required this.scaffold,
     required this.textFieldStyle,
     required this.dialogStyle,
     required this.popUpMenuStyle,
@@ -92,6 +94,7 @@ class LMChatThemeData {
       container: theme.colorScheme.surface,
       onContainer: theme.colorScheme.onPrimaryContainer,
       onPrimary: theme.colorScheme.onPrimary,
+      scaffold: theme.colorScheme.surface,
     );
   }
 
@@ -106,14 +109,15 @@ class LMChatThemeData {
     Color? tagColor,
     Color? hashTagColor,
     Color? linkColor,
+    Color? scaffold,
+    Color? container,
+    Color? onContainer,
+    Color? onPrimary,
     LMChatButtonStyle? buttonStyle,
     LMChatIconStyle? iconStyle,
     LMChatTextFieldStyle? textFieldStyle,
     LMChatDialogStyle? dialogStyle,
     LMChatPopUpMenuStyle? popUpMenuStyle,
-    Color? container,
-    Color? onContainer,
-    Color? onPrimary,
     LMChatLoaderStyle? loaderStyle,
     LMChatBottomSheetStyle? bottomSheetStyle,
     LMChatSnackBarStyle? snackBarTheme,
@@ -136,6 +140,7 @@ class LMChatThemeData {
       errorColor: errorColor ?? LMChatDefaultTheme.errorColor,
       inActiveColor: inActiveColor ?? LMChatDefaultTheme.inactiveColor,
       container: container ?? LMChatDefaultTheme.container,
+      scaffold: scaffold ?? LMChatDefaultTheme.container,
       onContainer: onContainer ?? LMChatDefaultTheme.onContainer,
       onPrimary: onPrimary ?? LMChatDefaultTheme.onPrimary,
       hashTagColor: hashTagColor ?? LMChatDefaultTheme.hashTagColor,
@@ -177,11 +182,12 @@ class LMChatThemeData {
     Color? tagColor,
     Color? hashTagColor,
     Color? linkColor,
-    LMChatButtonStyle? buttonStyle,
-    LMChatIconStyle? iconStyle,
     Color? container,
     Color? onContainer,
     Color? onPrimary,
+    Color? scaffold,
+    LMChatButtonStyle? buttonStyle,
+    LMChatIconStyle? iconStyle,
     LMChatTextFieldStyle? textFieldStyle,
     LMChatDialogStyle? dialogStyle,
     LMChatPopUpMenuStyle? popUpMenuStyle,
@@ -210,6 +216,7 @@ class LMChatThemeData {
       hashTagColor: hashTagColor ?? this.hashTagColor,
       linkColor: linkColor ?? this.linkColor,
       container: container ?? this.container,
+      scaffold: scaffold ?? this.scaffold,
       onContainer: onContainer ?? this.onContainer,
       onPrimary: onPrimary ?? this.onPrimary,
       dialogStyle: dialogStyle ?? this.dialogStyle,

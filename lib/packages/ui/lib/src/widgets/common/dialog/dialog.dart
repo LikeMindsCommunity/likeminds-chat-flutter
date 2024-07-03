@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 
 /// {@template lm_chat_dialog}
 /// A widget to show a chat dialog.
@@ -29,7 +30,7 @@ class LMChatDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: style?.backgroundColor,
+      backgroundColor: style?.backgroundColor ?? LMChatTheme.theme.container,
       shape: style?.shape,
       title: title,
       content: content,
