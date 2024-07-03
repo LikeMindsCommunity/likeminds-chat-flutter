@@ -8,7 +8,7 @@ class LMChatUserTile extends LMChatTile {
   /// [userViewData] is the user to be displayed in the tile.
   final LMChatUserViewData userViewData;
 
-/// [LMChatUserTile] constructor to create an instance of [LMChatUserTile].
+  /// [LMChatUserTile] constructor to create an instance of [LMChatUserTile].
   const LMChatUserTile({
     super.key,
     required this.userViewData,
@@ -26,16 +26,17 @@ class LMChatUserTile extends LMChatTile {
       style: style ??
           LMChatTileStyle(
             backgroundColor: chatTheme.container,
-            margin: 12,
+            margin: 4,
+            // margin: 12,
           ),
       leading: LMChatProfilePicture(
         style: LMChatProfilePictureStyle.basic().copyWith(
           backgroundColor: chatTheme.primaryColor,
-          size: 42,
+          size: 48,
           fallbackTextStyle: LMChatTextStyle(
             textStyle: TextStyle(
-              fontSize: LMChatDefaultTheme.kFontMedium,
-              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
               color: chatTheme.onPrimary,
             ),
           ),
@@ -49,8 +50,8 @@ class LMChatUserTile extends LMChatTile {
             userViewData.name,
             style: const LMChatTextStyle(
               textStyle: TextStyle(
-                fontSize: LMChatDefaultTheme.kFontMedium,
-                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),

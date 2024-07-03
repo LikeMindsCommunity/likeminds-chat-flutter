@@ -13,6 +13,7 @@ class LMChatProfilePicture extends StatelessWidget {
     required this.fallbackText,
     this.onTap,
     this.style,
+    this.overlay,
   });
 
   final String? imageUrl;
@@ -20,6 +21,7 @@ class LMChatProfilePicture extends StatelessWidget {
   final String fallbackText;
   final Function()? onTap;
   final LMChatProfilePictureStyle? style;
+  final Widget? overlay;
 
   @override
   Widget build(BuildContext context) {
@@ -28,50 +30,57 @@ class LMChatProfilePicture extends StatelessWidget {
       onTap: () {
         if (onTap != null) onTap!();
       },
-      child: Container(
-        height: inStyle.size,
-        width: inStyle.size,
-        decoration: BoxDecoration(
-          borderRadius: inStyle.boxShape == null
-              ? BorderRadius.circular(inStyle.borderRadius ?? 0)
-              : null,
-          border: Border.all(
-            color: Colors.white,
-            width: inStyle.border ?? 0,
-          ),
-          shape: inStyle.boxShape ?? BoxShape.rectangle,
-          color: imageUrl != null && imageUrl!.isNotEmpty
-              ? Colors.grey.shade300
-              : inStyle.backgroundColor ?? LMChatTheme.theme.primaryColor,
-          image: filePath != null
-              ? DecorationImage(
-                  image: FileImage(File(filePath!)), fit: BoxFit.cover)
-              : imageUrl != null && imageUrl!.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(imageUrl!),
-                      fit: BoxFit.cover,
-                    )
+      child: Stack(
+        // fit: StackFit.expand,
+        alignment: Alignment.center,
+        children: [
+          Container(
+            height: inStyle.size,
+            width: inStyle.size,
+            decoration: BoxDecoration(
+              borderRadius: inStyle.boxShape == null
+                  ? BorderRadius.circular(inStyle.borderRadius ?? 0)
                   : null,
-        ),
-        child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
-            ? Center(
-                child: LMChatText(
-                  getInitials(fallbackText).toUpperCase(),
-                  style: inStyle.fallbackTextStyle ??
-                      LMChatTextStyle(
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        textStyle: TextStyle(
-                          overflow: TextOverflow.clip,
-                          color: LMChatTheme.theme.onPrimary,
-                          fontSize:
-                              inStyle.size != null ? inStyle.size! / 2 : 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                ),
-              )
-            : null,
+              border: Border.all(
+                color: Colors.white,
+                width: inStyle.border ?? 0,
+              ),
+              shape: inStyle.boxShape ?? BoxShape.rectangle,
+              color: imageUrl != null && imageUrl!.isNotEmpty
+                  ? Colors.grey.shade300
+                  : inStyle.backgroundColor ?? LMChatTheme.theme.primaryColor,
+              image: filePath != null
+                  ? DecorationImage(
+                      image: FileImage(File(filePath!)), fit: BoxFit.cover)
+                  : imageUrl != null && imageUrl!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(imageUrl!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+            ),
+            child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
+                ? Center(
+                    child: LMChatText(
+                      getInitials(fallbackText).toUpperCase(),
+                      style: inStyle.fallbackTextStyle ??
+                          LMChatTextStyle(
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            textStyle: TextStyle(
+                              overflow: TextOverflow.clip,
+                              color: LMChatTheme.theme.onPrimary,
+                              fontSize:
+                                  inStyle.size != null ? inStyle.size! / 2 : 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                    ),
+                  )
+                : null,
+          ),
+          if (overlay != null) overlay!,
+        ],
       ),
     );
   }
@@ -109,12 +118,12 @@ class LMChatProfilePictureStyle {
   });
 
   factory LMChatProfilePictureStyle.basic() {
-    return const LMChatProfilePictureStyle(
-      backgroundColor: Colors.blue,
+    return LMChatProfilePictureStyle(
+      backgroundColor: LMChatTheme.theme.primaryColor,
       boxShape: BoxShape.circle,
       fallbackTextStyle: LMChatTextStyle(
         textStyle: TextStyle(
-          color: Colors.white,
+          color: LMChatTheme.theme.onPrimary,
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
