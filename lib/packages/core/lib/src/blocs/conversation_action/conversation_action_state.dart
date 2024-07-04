@@ -32,32 +32,32 @@ class LMChatConversationActionError extends LMChatConversationActionState {
 /// [LMChatConversationEdited] is the state when a conversation is edited.
 class LMChatConversationEdited extends LMChatConversationActionState {
   /// The response of the edit conversation request
-  final EditConversationResponse editConversationResponse;
+  final LMChatConversationViewData conversationViewData;
 
   /// [LMChatConversationEdited] constructor
-  LMChatConversationEdited(
-    this.editConversationResponse,
-  );
+  LMChatConversationEdited({
+    required this.conversationViewData,
+  });
 
   @override
   List<Object> get props => [
-        editConversationResponse,
+        conversationViewData,
       ];
 }
 
 /// [LMChatConversationDelete] is the state when a conversation is deleted.
 class LMChatConversationDelete extends LMChatConversationActionState {
-  /// The response of the delete conversation request
-  final DeleteConversationResponse deleteConversationResponse;
+  /// List of conversations that are deleted
+  final List<LMChatConversationViewData> conversations;
 
   /// [LMChatConversationDelete] constructor
-  LMChatConversationDelete(
-    this.deleteConversationResponse,
-  );
+  LMChatConversationDelete({
+    required this.conversations,
+  });
 
   @override
   List<Object> get props => [
-        deleteConversationResponse,
+        conversations,
       ];
 }
 
@@ -84,7 +84,7 @@ class LMChatReplyConversationState extends LMChatConversationActionState {
   final int conversationId;
 
   /// The conversation
-  final Conversation conversation;
+  final LMChatConversationViewData conversation;
 
   /// [LMChatReplyConversationState] constructor
   LMChatReplyConversationState({

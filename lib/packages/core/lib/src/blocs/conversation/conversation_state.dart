@@ -45,44 +45,44 @@ class LMChatConversationErrorState extends LMChatConversationState {
 /// Represents an updated state of the conversation.
 class LMChatConversationUpdatedState extends LMChatConversationState {
   /// The updated conversation data.
-  final Conversation response;
+  final LMChatConversationViewData conversationViewData;
 
   /// Creates and returns a new instance of [LMChatConversationUpdatedState]
   LMChatConversationUpdatedState({
-    required this.response,
+    required this.conversationViewData,
   });
 
   @override
   List<Object> get props => [
-        response,
+        conversationViewData,
       ];
 }
 
 /// Represents a local state of the conversation.
 class LMChatLocalConversationState extends LMChatConversationState {
   /// The local conversation data.
-  final Conversation conversation;
+  final LMChatConversationViewData conversationViewData;
 
   /// Creates and returns a new instance of [LMChatLocalConversationState]
-  LMChatLocalConversationState(this.conversation);
+  LMChatLocalConversationState(this.conversationViewData);
 
   @override
-  List<Object> get props => [conversation];
+  List<Object> get props => [conversationViewData];
 }
 
 /// Represents the state after a conversation has been posted.
 class LMChatConversationPostedState extends LMChatConversationState {
   /// The response received after posting the conversation.
-  final PostConversationResponse postConversationResponse;
+  final LMChatConversationViewData conversationViewData;
 
   /// Creates and returns a new instance of [LMChatConversationPostedState]
   LMChatConversationPostedState(
-    this.postConversationResponse,
+    this.conversationViewData,
   );
 
   @override
   List<Object> get props => [
-        postConversationResponse,
+        conversationViewData,
       ];
 }
 

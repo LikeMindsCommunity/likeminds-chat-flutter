@@ -79,8 +79,8 @@ class LMChatReplyConversationEvent extends LMChatConversationActionEvent {
   final int conversationId;
   /// [int] chatroomId is the id of the chatroom.
   final int chatroomId;
-  /// [Conversation] replyConversation is the conversation to be replied.
-  final Conversation replyConversation;
+  /// [LMChatConversationViewData] replyConversation is the conversation to be replied.
+  final LMChatConversationViewData replyConversation;
 
   /// {@macro lm_chat_reply_conversation_event}
   LMChatReplyConversationEvent({

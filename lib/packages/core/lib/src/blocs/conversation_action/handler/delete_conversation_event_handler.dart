@@ -14,7 +14,11 @@ part of "../conversation_action_bloc.dart";
       final response = await LMChatCore.client
           .deleteConversation(deleteConversationRequestBuilder.build());
       if (response.success) {
-        emit(LMChatConversationDelete(response.data!));
+        emit(LMChatConversationDelete(
+            conversations: response.data!.conversations!.map((e) {
+          return e.toConversationViewData();
+        }).toList(),
+        ));
       } else {
         emit(LMChatConversationDeleteError(
             response.errorMessage ?? 'An error occurred'));

@@ -28,7 +28,7 @@ extension UserViewConvertor on LMChatUserViewData {
     return User(
       id: id,
       name: name,
-      imageUrl: imageUrl!,
+      imageUrl: imageUrl,
       isGuest: isGuest!,
       userUniqueId: uuid,
       organisationName: organisationName,

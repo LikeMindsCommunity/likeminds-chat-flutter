@@ -1,19 +1,25 @@
-// import 'package:flutter/material.dart';
-// import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-// import 'package:likeminds_chat_ui_fl/src/utils/theme.dart';
-// import 'package:likeminds_chat_ui_fl/src/utils/utils.dart';
-// import 'package:likeminds_chat_ui_fl/src/widgets/common/text/text_view.dart';
 part of 'chat_bubble.dart';
 
+/// {@template lm_chat_bubble_reply}
+/// A widget to display a reply to a conversation
+/// {@endtemplate}
 class LMChatBubbleReply extends StatelessWidget {
+  /// The conversation to which the reply is made
   final LMChatConversationViewData replyToConversation;
 
+  /// Title widget of the reply item, if not provided, the name of the member
   final Widget? title;
+
+  /// Subtitle widget of the reply item, if not provided, the text of reply
   final Widget? subtitle;
+
+  /// Media widget of the reply item, if not provided, the media files
   final Widget? media;
 
+  /// Style of the reply item
   final LMChatBubbleReplyStyle? chatBubbleReplyStyle;
 
+  /// {@macro lm_chat_bubble_reply}
   const LMChatBubbleReply({
     super.key,
     required this.replyToConversation,
@@ -27,10 +33,9 @@ class LMChatBubbleReply extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = LMChatTheme.theme;
     final inStyle = chatBubbleReplyStyle ?? theme.replyStyle;
-
     return Container(
       decoration: BoxDecoration(
-        color: inStyle.backgroundColor ?? theme.container,
+        color: inStyle.backgroundColor ?? theme.disabledColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
       ),
       child: Row(
@@ -61,7 +66,7 @@ class LMChatBubbleReply extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           color: theme.primaryColor,
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -77,7 +82,6 @@ class LMChatBubbleReply extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           color: theme.onContainer,
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -92,14 +96,29 @@ class LMChatBubbleReply extends StatelessWidget {
   }
 }
 
+/// {@template lm_chat_bubble_reply_style}
+/// Style for the reply item
+/// {@endtemplate}
 class LMChatBubbleReplyStyle {
+  /// Background color of the reply item
   final Color? backgroundColor;
+
+  /// Highlight color of the reply item
   final Color? highlightColor;
+
+  /// Border radius of the reply item
   final double? borderRadius;
+
+  /// Style of the title widget
   final LMChatTextStyle? titleStyle;
+
+  /// Style of the subtitle widget
   final LMChatTextStyle? subtitleStyle;
+
+  /// Style of the media widget
   final LMChatImageStyle? mediaStyle;
 
+  /// {@macro lm_chat_bubble_reply_style}
   const LMChatBubbleReplyStyle({
     this.backgroundColor,
     this.highlightColor,
@@ -109,41 +128,3 @@ class LMChatBubbleReplyStyle {
     this.mediaStyle,
   });
 }
-// class LMReplyItem extends StatelessWidget {
-//   const LMReplyItem({
-//     super.key,
-//     required this.replyToConversation,
-//     this.backgroundColor,
-//     this.highlightColor,
-//     this.title,
-//     this.subtitle,
-//     this.borderRadius,
-//   });
-
-//   /// The conversation to which the reply is made
-//   /// This is a required field
-//   final Conversation? replyToConversation;
-
-//   /// Color of the reply item background
-//   final Color? backgroundColor;
-
-//   /// Color of the reply item highlight bar (on the left)
-//   final Color? highlightColor;
-
-//   /// Title widget of the reply item, if not provided, the name of the member
-//   /// Preferrably use a [LMTextView] widget, when providing a custom title
-//   final Widget? title;
-
-//   /// Subtitle widget of the reply item, if not provided, the text of reply
-//   /// Preferrably use a [LMTextView] widget, when providing a custom subtitle
-//   final Widget? subtitle;
-
-//   /// Border radius of the reply item
-//   final double? borderRadius;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return replyToConversation != null
-//         : const SizedBox();
-//   }
-// }

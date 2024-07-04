@@ -1,11 +1,11 @@
-import 'package:likeminds_chat_flutter_core/src/core/configurations/explore/builder.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/explore/setting.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/explore/style.dart';
+import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/builder.dart';
+import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/setting.dart';
+import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/style.dart';
 
 // export all the configurations
-export 'package:likeminds_chat_flutter_core/src/core/configurations/explore/builder.dart';
-export 'package:likeminds_chat_flutter_core/src/core/configurations/explore/setting.dart';
-export 'package:likeminds_chat_flutter_core/src/core/configurations/explore/style.dart';
+export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/builder.dart';
+export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/setting.dart';
+export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/style.dart';
 
 /// {@template lm_chat_explore_config}
 /// [LMChatExploreConfig] is a class which is used to configure the explore

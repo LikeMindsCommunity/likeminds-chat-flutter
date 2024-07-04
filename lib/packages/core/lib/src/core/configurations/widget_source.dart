@@ -14,6 +14,9 @@ enum LMChatWidgetSource {
   /// participants screen
   participants,
 
+  /// report screen
+  report,
+
   /// other screen
   other,
 }

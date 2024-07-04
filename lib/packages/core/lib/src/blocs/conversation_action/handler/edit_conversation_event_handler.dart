@@ -16,7 +16,9 @@ _editConversationEventHandler(LMChatEditConversationEvent event,
         conversation.replyConversationObject = event.replyConversation;
       }
       emit(
-        LMChatConversationEdited(response.data!),
+        LMChatConversationEdited(
+          conversationViewData: conversation.toConversationViewData(),
+        ),
       );
     } else {
       emit(

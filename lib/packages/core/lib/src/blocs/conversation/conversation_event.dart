@@ -23,30 +23,74 @@ class LMChatInitialiseConversationsEvent extends LMChatConversationEvent {
 
 /// Event responsible for fetching conversations in a chatroom
 class LMChatFetchConversationsEvent extends LMChatConversationEvent {
-  final GetConversationRequest getConversationRequest;
+  /// Id of the chatroom where conversations are being fetched
+  final int chatroomId;
+
+  /// Page number of the conversations
+  final int page;
+
+  /// Number of conversations to be fetched
+  final int pageSize;
 
   /// Creates and returns a new instance of [LMChatFetchConversationsEvent]
   LMChatFetchConversationsEvent({
-    required this.getConversationRequest,
+    required this.chatroomId,
+    required this.page,
+    required this.pageSize,
   });
 
   @override
-  List<Object> get props => [getConversationRequest];
+  List<Object> get props => [
+        chatroomId,
+        page,
+        pageSize,
+      ];
 }
 
 /// Event responsible for creating and posting a new conversation
 class LMChatPostConversationEvent extends LMChatConversationEvent {
-  final PostConversationRequest postConversationRequest;
-  final Conversation? repliedTo;
+  /// Text of the conversation
+  final String text;
+
+  /// Chatroom id where the conversation is to be posted
+  final int chatroomId;
+
+  /// Id of the conversation being replied to if any
+  final int? replyId;
+
+  /// Reply object of the conversation being replied to if any
+  final LMChatConversationViewData? repliedTo;
+
+  /// Link String if present
+  final String? shareLink;
+
+  /// Attachment count of the conversation
+  final int? attachmentCount;
+
+  /// Has files of the conversation
+  final bool? hasFiles;
 
   /// Creates and returns a new instance of [LMChatPostConversationEvent]
   LMChatPostConversationEvent({
-    required this.postConversationRequest,
+    required this.chatroomId,
+    required this.text,
+    this.replyId,
     this.repliedTo,
+    this.shareLink,
+    this.attachmentCount,
+    this.hasFiles,
   });
 
   @override
-  List<Object?> get props => [postConversationRequest, repliedTo];
+  List<Object?> get props => [
+        chatroomId,
+        text,
+        replyId,
+        repliedTo,
+        shareLink,
+        attachmentCount,
+        hasFiles,
+      ];
 }
 
 /// Event responsible for creating and posting a multimedia conversation
@@ -71,7 +115,10 @@ class LMChatPostMultiMediaConversationEvent extends LMChatConversationEvent {
 ///
 /// This could be because of a realtime update, or a notification
 class LMChatUpdateConversationsEvent extends LMChatConversationEvent {
+  /// Id of the conversation to be updated
   final int conversationId;
+
+  /// Id of the chatroom where the conversation is to be updated
   final int chatroomId;
 
   /// Creates and returns a new instance of [LMChatUpdateConversationsEvent]

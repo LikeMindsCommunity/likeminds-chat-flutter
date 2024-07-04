@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -85,8 +86,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   ValueNotifier<bool> rebuildAppBar = ValueNotifier(false);
 
   ScrollController scrollController = ScrollController();
-  PagingController<int, Conversation> pagedListController =
-      PagingController<int, Conversation>(firstPageKey: 1);
+  PagingController<int, LMChatConversationViewData> pagedListController =
+      PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
 
   final List<int> _selectedIds = <int>[];
   final LMChatRoomBuilderDelegate _screenBuilder =
@@ -344,8 +345,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   List<Widget> _defaultSelectedChatroomMenu() {
     final LMChatConversationViewData? conversationViewData = pagedListController
         .value.itemList
-        ?.firstWhere((element) => element.id == _selectedIds.first)
-        .toConversationViewData();
+        ?.firstWhere((element) => element.id == _selectedIds.first);
 
     bool haveDeletePermission = conversationViewData != null &&
         LMChatMemberRightUtil.checkDeletePermissions(conversationViewData);
@@ -363,7 +363,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           String copiedMessage = "";
           if (isMultiple) {
             for (int id in _selectedIds) {
-              Conversation conversation = pagedListController.value.itemList!
+              LMChatConversationViewData conversation = pagedListController
+                  .value.itemList!
                   .firstWhere((element) => element.id == id);
               copiedMessage +=
                   "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";
@@ -498,7 +499,50 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               ),
             ),
           ),
-        )
+        ),
+      // pop up menu button for report
+      CustomPopupMenu(
+        pressType: PressType.singleClick,
+        showArrow: false,
+        controller: CustomPopupMenuController(),
+        enablePassEvent: false,
+        menuBuilder: () => ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 60.w,
+            color: LMChatTheme.theme.container,
+            child: LMChatText(
+              "Report Message",
+              onTap: () {
+                _selectedIds.clear();
+                rebuildAppBar.value = !rebuildAppBar.value;
+                rebuildConversationList.value = !rebuildConversationList.value;
+              },
+              style: LMChatTextStyle(
+                maxLines: 1,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 6.w,
+                  vertical: 2.h,
+                ),
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: LMChatTheme.theme.primaryColor,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ),
+        ),
+        child: LMChatIcon(
+          type: LMChatIconType.icon,
+          icon: Icons.more_vert_rounded,
+          style: LMChatIconStyle(
+            size: 28,
+            color: LMChatTheme.theme.onContainer,
+          ),
+        ),
+      ),
     ];
   }
 

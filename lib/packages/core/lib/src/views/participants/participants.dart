@@ -79,22 +79,7 @@ class _LMChatroomParticipantsPageState
             Expanded(
               child: BlocListener(
                 bloc: participantsBloc,
-                listener: (context, state) {
-                  if (state is LMChatParticipantsLoadedState) {
-                    if (state.participants.isEmpty) {
-                      _pagingController.appendLastPage(
-                        state.participants,
-                      );
-                    } else {
-                      _pagingController.appendPage(
-                        state.participants,
-                        state.page + 1,
-                      );
-                    }
-                  } else if (state is LMChatParticipantsErrorState) {
-                    _pagingController.error = state.errorMessage;
-                  }
-                },
+                listener: _updatePaginationState,
                 child: _buildParticipantsList(),
               ),
             ),
@@ -229,6 +214,23 @@ class _LMChatroomParticipantsPageState
         );
       },
     );
+  }
+
+  void _updatePaginationState(context, state) {
+    if (state is LMChatParticipantsLoadedState) {
+      if (state.participants.length < _pageSize) {
+        _pagingController.appendLastPage(
+          state.participants,
+        );
+      } else {
+        _pagingController.appendPage(
+          state.participants,
+          state.page + 1,
+        );
+      }
+    } else if (state is LMChatParticipantsErrorState) {
+      _pagingController.error = state.errorMessage;
+    }
   }
 
   Widget _buildParticipantsList() {
