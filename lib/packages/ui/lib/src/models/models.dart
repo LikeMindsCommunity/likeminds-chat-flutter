@@ -1,4 +1,3 @@
-
 // attachment models
 export 'attachment/attachment_view_data.dart';
 export 'attachment/poll_info_view_data.dart';
@@ -31,4 +30,8 @@ export 'user/user_view_data.dart';
 // widget models
 export 'widget/widget_view_data.dart';
 
+// delete models
+export 'delete/delete_reason_view_data.dart';
 
+// moderation models
+export 'moderation/report_tag_view_data.dart';

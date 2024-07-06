@@ -35,14 +35,17 @@ class LMChatText extends StatelessWidget {
         color: inStyle.backgroundColor ?? Colors.transparent,
         borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 4),
       ),
-      child: SelectableText(
-        text,
-        textAlign: inStyle.textAlign,
-        minLines: inStyle.minLines,
-        maxLines: inStyle.maxLines,
-        style: inStyle.textStyle,
-        enableInteractiveSelection: inStyle.selectable,
-        onTap: onTap,
+      child: AbsorbPointer(
+        absorbing: onTap == null,
+        child: SelectableText(
+          text,
+          textAlign: inStyle.textAlign,
+          minLines: inStyle.minLines,
+          maxLines: inStyle.maxLines,
+          style: inStyle.textStyle,
+          enableInteractiveSelection: inStyle.selectable,
+          onTap: onTap,
+        ),
       ),
     );
   }

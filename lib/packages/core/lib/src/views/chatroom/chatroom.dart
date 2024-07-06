@@ -14,6 +14,7 @@ import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/extension/list_extension.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_core/src/views/report/report.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
@@ -28,38 +29,10 @@ class LMChatroomScreen extends StatefulWidget {
   /// [chatroomId] is the id of the chatroom.
   final int chatroomId;
 
-  // /// [appbarBuilder] is the builder for the appbar.
-  // final LMChatroomAppBarBuilder? appbarBuilder;
-
-  // /// [chatBubbleBuilder] is the builder for the chat bubble.
-  // final LMChatBubbleBuilder? chatBubbleBuilder;
-
-  // /// [stateBubbleBuilder] is the builder for the state message bubble.
-  // final LMChatStateBubbleBuilder? stateBubbleBuilder;
-
-  // /// [loadingPageWidget] is the builder for the loading page widget.
-  // final LMChatContextWidgetBuilder? loadingPageWidget;
-
-  // /// [loadingListWidget] is the builder for the loading list widget.
-  // final LMChatContextWidgetBuilder? loadingListWidget;
-
-  // /// [paginatedLoadingWidget] is the builder for the paginated loading widget.
-  // final LMChatContextWidgetBuilder? paginatedLoadingWidget;
-
-  // /// [chatBarBuilder] is the builder for the chat bar.
-  // final LMChatroomChatBarBuilder? chatBarBuilder;
-
   /// {@macro chatroom_screen}
   const LMChatroomScreen({
     super.key,
     required this.chatroomId,
-    // this.appbarBuilder,
-    // this.chatBarBuilder,
-    // this.chatBubbleBuilder,
-    // this.stateBubbleBuilder,
-    // this.loadingListWidget,
-    // this.loadingPageWidget,
-    // this.paginatedLoadingWidget,
   });
 
   @override
@@ -72,7 +45,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   late LMChatConversationActionBloc _convActionBloc;
 
   late ChatRoom chatroom;
-  late User user;
+  late User currentUser;
   List<ChatroomAction> actions = [];
   Conversation? localTopic;
 
@@ -101,7 +74,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   void initState() {
     super.initState();
     Bloc.observer = LMChatBlocObserver();
-    user = LMChatLocalPreference.instance.getUser();
+    currentUser = LMChatLocalPreference.instance.getUser();
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
     _chatroomBloc = LMChatroomBloc.instance
@@ -272,7 +245,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   ) {
     User? chatUser;
     if (chatroom.type! == 10) {
-      chatUser = user.id == chatroom.chatroomWithUser!.id
+      chatUser = currentUser.id == chatroom.chatroomWithUser!.id
           ? chatroom.member!
           : chatroom.chatroomWithUser!;
     }
@@ -501,48 +474,59 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           ),
         ),
       // pop up menu button for report
-      CustomPopupMenu(
-        pressType: PressType.singleClick,
-        showArrow: false,
-        controller: CustomPopupMenuController(),
-        enablePassEvent: false,
-        menuBuilder: () => ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            width: 60.w,
-            color: LMChatTheme.theme.container,
-            child: LMChatText(
-              "Report Message",
-              onTap: () {
-                _selectedIds.clear();
-                rebuildAppBar.value = !rebuildAppBar.value;
-                rebuildConversationList.value = !rebuildConversationList.value;
-              },
-              style: LMChatTextStyle(
-                maxLines: 1,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 6.w,
-                  vertical: 2.h,
-                ),
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: LMChatTheme.theme.primaryColor,
-                  overflow: TextOverflow.ellipsis,
+      if (_selectedIds.length == 1 &&
+          LMChatMemberRightUtil.isReportAllowed(conversationViewData))
+        CustomPopupMenu(
+          pressType: PressType.singleClick,
+          showArrow: false,
+          controller: CustomPopupMenuController(),
+          enablePassEvent: false,
+          menuBuilder: () => ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              width: 60.w,
+              color: LMChatTheme.theme.container,
+              child: LMChatText(
+                "Report Message",
+                onTap: () {
+                  _selectedIds.clear();
+                  rebuildAppBar.value = !rebuildAppBar.value;
+                  rebuildConversationList.value =
+                      !rebuildConversationList.value;
+                  context.push(
+                    LMChatReportScreen(
+                      entityId: conversationViewData.id.toString(),
+                      entityCreatorId:
+                          conversationViewData.member!.id.toString(),
+                      entityType: 3,
+                    ),
+                  );
+                },
+                style: LMChatTextStyle(
+                  maxLines: 1,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 6.w,
+                    vertical: 2.h,
+                  ),
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: LMChatTheme.theme.primaryColor,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        child: LMChatIcon(
-          type: LMChatIconType.icon,
-          icon: Icons.more_vert_rounded,
-          style: LMChatIconStyle(
-            size: 28,
-            color: LMChatTheme.theme.onContainer,
+          child: LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.more_vert_rounded,
+            style: LMChatIconStyle(
+              size: 28,
+              color: LMChatTheme.theme.primaryColor,
+            ),
           ),
         ),
-      ),
     ];
   }
 

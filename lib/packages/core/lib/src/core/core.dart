@@ -69,6 +69,10 @@ class LMChatCore {
     if (domain != null) _clientDomain = domain;
     chatConfig = config ?? LMChatConfig();
     if (widgets != null) _widgetBuilder = widgets;
+    else {
+      _widgetBuilder = LMChatWidgetBuilderDelegate.instance;
+    }
+    ;
     LMChatTheme.instance.initialise(theme: theme);
     LMResponse isDBInitiated = await this.lmChatClient.initiateDB();
     if (!isDBInitiated.success) {
