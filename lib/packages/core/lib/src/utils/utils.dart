@@ -10,3 +10,4 @@ export 'callback/lm_chat_callback.dart';
 
 export 'chatroom/chatroom_utils.dart';
 export 'chatroom/explore_utils.dart';
+export 'extension/extension.dart';

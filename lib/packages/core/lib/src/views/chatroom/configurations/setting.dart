@@ -1,8 +1,8 @@
 /// {@template chatroom_setting}
-/// [LMChatRoomSetting] is a class which is used to configure the chatroom
+/// [LMChatroomSetting] is a class which is used to configure the chatroom
 /// screen. It is used to customize the chatroom screen.
 /// {@endtemplate}
-class LMChatRoomSetting {
+class LMChatroomSetting {
   /// {@macro chatroom_setting}
-  const LMChatRoomSetting();
+  const LMChatroomSetting();
 }

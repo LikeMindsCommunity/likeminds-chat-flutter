@@ -16,7 +16,7 @@ export 'package:likeminds_chat_flutter_core/src/views/participants/configuration
 /// {@endtemplate}
 class LMChatConfig {
   /// {@macro lm_chat_chatroom_config}
-  final LMChatRoomConfig chatRoomConfig;
+  final LMChatroomConfig chatRoomConfig;
 
   /// {@macro lm_chat_explore_config}
   final LMChatExploreConfig exploreConfig;
@@ -35,7 +35,7 @@ class LMChatConfig {
 
   /// {@macro lm_chat_config}
   LMChatConfig({
-    this.chatRoomConfig = const LMChatRoomConfig(),
+    this.chatRoomConfig = const LMChatroomConfig(),
     this.exploreConfig = const LMChatExploreConfig(),
     this.homeConfig = const LMChatHomeConfig(),
     this.participantConfig = const LMChatParticipantConfig(),

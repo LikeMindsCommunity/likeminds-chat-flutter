@@ -71,20 +71,34 @@ class LMChatBubbleReply extends StatelessWidget {
                       ),
                     ),
                 kVerticalPaddingXSmall,
-                subtitle ??
-                    LMChatText(
-                      replyToConversation.answer.isEmpty
-                          ? "Media files"
-                          : replyToConversation.answer,
-                      style: LMChatTextStyle(
-                        maxLines: 1,
-                        textStyle: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          color: theme.onContainer,
-                          fontSize: 12,
+                replyToConversation.deletedByUserId != null
+                    ? LMChatText(
+                        "Deleted message",
+                        style: LMChatTextStyle(
+                          textStyle: replyToConversation.deletedByUserId != null
+                              ? TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: LMChatTheme.theme.disabledColor,
+                                )
+                              : TextStyle(
+                                  fontSize: 14,
+                                  color: LMChatTheme.theme.disabledColor,
+                                ),
+                        ),
+                      )
+                    : LMChatText(
+                        replyToConversation.answer.isEmpty
+                            ? "Media files"
+                            : replyToConversation.answer,
+                        style: LMChatTextStyle(
+                          maxLines: 1,
+                          textStyle: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            color: theme.onContainer,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
                 const SizedBox(height: 6),
               ],
             ),

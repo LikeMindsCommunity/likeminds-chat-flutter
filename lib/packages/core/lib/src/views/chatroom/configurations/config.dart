@@ -9,23 +9,23 @@ export 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/st
 
 
 /// {@template lm_chatroom_config}
-/// [LMChatRoomConfig] is a class which is used to configure the chatroom
+/// [LMChatroomConfig] is a class which is used to configure the chatroom
 /// screen. It is used to customize the chatroom screen.
 /// {@endtemplate}
-class LMChatRoomConfig {
+class LMChatroomConfig {
   /// {@macro lm_chatroom_config}
-  final LMChatRoomBuilderDelegate builder;
+  final LMChatroomBuilderDelegate builder;
 
   /// {@macro lm_chatroom_config}
-  final LMChatRoomSetting setting;
+  final LMChatroomSetting setting;
 
   /// {@macro lm_chatroom_config}
-  final LMChatRoomStyle style;
+  final LMChatroomStyle style;
 
   /// {@macro lm_chatroom_config}
-  const LMChatRoomConfig({
-    this.builder = const LMChatRoomBuilderDelegate(),
-    this.setting = const LMChatRoomSetting(),
-    this.style = const LMChatRoomStyle(),
+  const LMChatroomConfig({
+    this.builder = const LMChatroomBuilderDelegate(),
+    this.setting = const LMChatroomSetting(),
+    this.style = const LMChatroomStyle(),
   });
 }
