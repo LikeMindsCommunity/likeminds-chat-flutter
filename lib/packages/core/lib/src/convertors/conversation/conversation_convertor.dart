@@ -63,9 +63,9 @@ extension ConversationConvertor on LMChatConversationViewData {
   Conversation toConversation() {
     return Conversation(
       answer: answer,
-      attachmentsUploaded: attachmentsUploaded!,
-      chatroomId: chatroomId!,
-      communityId: communityId!,
+      attachmentsUploaded: attachmentsUploaded,
+      chatroomId: chatroomId,
+      communityId: communityId,
       createdAt: createdAt,
       createdEpoch: createdEpoch,
       date: date,

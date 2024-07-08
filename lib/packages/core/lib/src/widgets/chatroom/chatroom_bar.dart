@@ -44,7 +44,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatConversationViewData? replyToConversation;
   List<LMChatMedia>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
-  Map<int, LMChatUserViewData?>? userMeta;
   final CustomPopupMenuController _popupMenuController =
       CustomPopupMenuController();
   final TextEditingController _textEditingController = TextEditingController();
@@ -67,18 +66,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   final LMChatThemeData _themeData = LMChatTheme.instance.themeData;
 
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        debugPrint('Focus lost');
-      } else if (_focusNode.hasFocus) {
-        debugPrint('Focus gained');
-      }
-    });
-  }
-
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -92,7 +79,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _popupMenuController.dispose();
     _textEditingController.dispose();
     _focusNode.dispose();
-    replyToConversation = null;
     _debounce?.cancel();
     super.dispose();
   }
@@ -204,6 +190,14 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           editConversation = null;
           _setupEditText();
         }
+        if (state is LMChatReplyConversationState) {
+          replyToConversation = state.conversation;
+          _setupReplyText();
+        }
+        if (state is LMChatReplyRemoveState) {
+          replyToConversation = null;
+          _setupReplyText();
+        }
         return Column(
           children: [
             ValueListenableBuilder(
@@ -279,6 +273,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (editConversation != null) _defEditConversationWidget(),
+        if (replyToConversation != null) _defReplyConversationWidget(),
         Container(
           width: 75.w,
           constraints: BoxConstraints(
@@ -288,11 +283,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
           decoration: BoxDecoration(
             color: _themeData.container,
-            borderRadius: editConversation == null
-                ? BorderRadius.circular(24)
-                : const BorderRadius.vertical(
-                    bottom: Radius.circular(24),
-                  ),
+            borderRadius:
+                editConversation == null && replyToConversation == null
+                    ? BorderRadius.circular(24)
+                    : const BorderRadius.vertical(
+                        bottom: Radius.circular(24),
+                      ),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -412,18 +408,17 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           }
           widget.scrollToBottom();
         } else {
-          var requestBuilder = PostConversationRequestBuilder()
-            ..chatroomId(widget.chatroom.id)
-            ..text(result!)
-            ..replyId(replyToConversation?.id)
-            ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString());
+          bool isLinkPresent = false;
           if (showLinkPreview && previewLink.isNotEmpty) {
-            requestBuilder.shareLink(previewLink);
+            isLinkPresent = true;
           }
           conversationBloc.add(
             LMChatPostConversationEvent(
-              postConversationRequest: requestBuilder.build(),
-              repliedTo: replyToConversation?.toConversation(),
+              text: result ?? '',
+              chatroomId: widget.chatroom.id,
+              replyId: replyToConversation?.id,
+              repliedTo: replyToConversation,
+              shareLink: isLinkPresent ? previewLink : null,
             ),
           );
         }
@@ -464,6 +459,84 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       replyToConversation = null;
       FocusScope.of(context).unfocus();
     }
+  }
+
+  Container _defReplyConversationWidget() {
+    String userText = replyToConversation?.member?.name ?? '';
+    if (replyToConversation?.memberId == currentUser.id) {
+      userText = 'You';
+    }
+    return Container(
+      height: 8.h,
+      width: 75.w,
+      decoration: BoxDecoration(
+          color: _themeData.container,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(24),
+          )),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Container(
+                color: LMChatTheme.instance.themeData.disabledColor
+                    .withOpacity(0.2),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 1.w,
+                      color: LMChatTheme.instance.themeData.primaryColor,
+                    ),
+                    kHorizontalPaddingMedium,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LMChatText(
+                          userText,
+                          style: LMChatTextStyle(
+                            maxLines: 1,
+                            textStyle: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              color: _themeData.primaryColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        kVerticalPaddingSmall,
+                        SizedBox(
+                          width: 55.w,
+                          child: Text(
+                            LMChatTaggingHelper.convertRouteToTag(
+                                    replyToConversation?.answer) ??
+                                "",
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              chatActionBloc.add(LMChatReplyRemoveEvent());
+              _textEditingController.clear();
+            },
+            icon: Icon(
+              Icons.close,
+              color: LMChatTheme.instance.themeData.disabledColor,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Container _defEditConversationWidget() {

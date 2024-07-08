@@ -25,7 +25,7 @@ class LMChatBubbleFooter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (conversation.isEdited ?? false)
+          if (conversation.isEdited ?? false) ...[
             LMChatText(
               'Edited',
               style: LMChatTextStyle(
@@ -35,7 +35,6 @@ class LMChatBubbleFooter extends StatelessWidget {
                 ),
               ),
             ),
-          if (conversation.isEdited ?? false)
             LMChatText(
               ' • ',
               style: LMChatTextStyle(
@@ -45,6 +44,7 @@ class LMChatBubbleFooter extends StatelessWidget {
                 ),
               ),
             ),
+          ],
           conversation.createdAt.isNotEmpty
               ? LMChatText(
                   conversation.createdAt,

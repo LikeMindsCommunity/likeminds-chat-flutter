@@ -2,27 +2,28 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-List<Conversation>? addTimeStampInConversationList(
-    List<Conversation>? conversationList, int communityId) {
+List<LMChatConversationViewData>? addTimeStampInConversationList(
+    List<LMChatConversationViewData>? conversationList, int communityId) {
   if (conversationList == null) {
     return conversationList;
   }
-  LinkedHashMap<String, List<Conversation>> mappedConversations =
-      LinkedHashMap<String, List<Conversation>>();
+  LinkedHashMap<String, List<LMChatConversationViewData>> mappedConversations =
+      LinkedHashMap<String, List<LMChatConversationViewData>>();
 
-  for (Conversation conversation in conversationList) {
+  for (LMChatConversationViewData conversation in conversationList) {
     if (conversation.isTimeStamp == null || !conversation.isTimeStamp!) {
       if (mappedConversations.containsKey(conversation.date)) {
         mappedConversations[conversation.date]!.add(conversation);
       } else {
-        mappedConversations[conversation.date!] = <Conversation>[conversation];
+        mappedConversations[conversation.date!] = <LMChatConversationViewData>[conversation];
       }
     }
   }
-  List<Conversation> conversationListWithTimeStamp = <Conversation>[];
+  List<LMChatConversationViewData> conversationListWithTimeStamp = <LMChatConversationViewData>[];
   mappedConversations.forEach(
     (key, value) {
       conversationListWithTimeStamp.addAll(value);
@@ -36,7 +37,7 @@ List<Conversation>? addTimeStampInConversationList(
           header: key,
           id: 0,
           pollAnswerText: key,
-        ),
+        ).toConversationViewData(),
       );
     },
   );

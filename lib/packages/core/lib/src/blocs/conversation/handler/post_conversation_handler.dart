@@ -5,50 +5,64 @@ postConversationEventHandler(
   LMChatPostConversationEvent event,
   Emitter<LMChatConversationState> emit,
 ) async {
+  final DateTime dateTime = DateTime.now();
+  final tempId = dateTime.toString();
   try {
-    DateTime dateTime = DateTime.now();
     User user = LMChatLocalPreference.instance.getUser();
-    Conversation conversation = Conversation(
-      answer: event.postConversationRequest.text,
-      chatroomId: event.postConversationRequest.chatroomId,
-      createdAt: "",
-      memberId: user.id,
-      header: "",
-      date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
-      replyId: event.postConversationRequest.replyId,
-      attachmentCount: event.postConversationRequest.attachmentCount,
-      replyConversationObject: event.repliedTo,
-      hasFiles: event.postConversationRequest.hasFiles,
-      member: user,
-      temporaryId: event.postConversationRequest.temporaryId,
-      id: 1,
-    );
-    emit(LMChatLocalConversationState(conversation));
+    LMChatConversationViewData conversationViewData =
+        (LMChatConversationViewDataBuilder()
+              ..answer(event.text)
+              ..chatroomId(event.chatroomId)
+              ..createdAt("")
+              ..memberId(user.id)
+              ..header("")
+              ..date("${dateTime.day} ${dateTime.month} ${dateTime.year}")
+              ..replyId(event.replyId)
+              ..attachmentCount(event.attachmentCount)
+              ..replyConversationObject(event.repliedTo)
+              ..hasFiles(event.hasFiles)
+              ..member(user.toUserViewData())
+              ..temporaryId(tempId)
+              ..id(1))
+            .build();
+
+    emit(LMChatLocalConversationState(conversationViewData));
+
+    final PostConversationRequest postConversationRequest =
+        (PostConversationRequestBuilder()
+              ..chatroomId(event.chatroomId)
+              ..text(event.text)
+              ..replyId(event.replyId)
+              ..temporaryId(tempId))
+            .build();
     LMResponse<PostConversationResponse> response =
         await LMChatCore.client.postConversation(
-      event.postConversationRequest,
+      postConversationRequest,
     );
 
-    if (response.success) {
+    if (response.success && response.data != null) {
       Conversation conversation = response.data!.conversation!;
+      conversationViewData = conversation.toConversationViewData();
       if (conversation.replyId != null ||
           conversation.replyConversation != null) {
-        conversation.replyConversationObject = event.repliedTo;
+        conversationViewData = conversationViewData.copyWith(
+          replyConversationObject: event.repliedTo,
+        );
       }
-      emit(LMChatConversationPostedState(response.data!));
+      emit(LMChatConversationPostedState(conversationViewData));
 
       return false;
     } else {
       emit(LMChatConversationErrorState(
         response.errorMessage!,
-        event.postConversationRequest.temporaryId,
+        tempId,
       ));
       return false;
     }
   } catch (e) {
     emit(LMChatConversationErrorState(
       "An error occurred",
-      event.postConversationRequest.temporaryId,
+      tempId,
     ));
     return false;
   }

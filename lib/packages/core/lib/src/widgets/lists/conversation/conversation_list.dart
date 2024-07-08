@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
-import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -18,7 +17,7 @@ class LMChatConversationList extends StatefulWidget {
 
   final ValueNotifier<bool>? appBarNotifier;
 
-  final PagingController<int, Conversation>? listController;
+  final PagingController<int, LMChatConversationViewData>? listController;
 
   /// Creates a new instance of LMChatConversationList
   const LMChatConversationList({
@@ -51,8 +50,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   List<int> _selectedIds = [];
 
   late ScrollController scrollController;
-  late PagingController<int, Conversation> pagedListController =
-      PagingController<int, Conversation>(firstPageKey: 1);
+  late PagingController<int, LMChatConversationViewData> pagedListController =
+      PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
 
   @override
   void initState() {
@@ -64,7 +63,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     rebuildAppBar = widget.appBarNotifier ?? ValueNotifier(false);
     scrollController = widget.scrollController ?? ScrollController();
     pagedListController = widget.listController ??
-        PagingController<int, Conversation>(firstPageKey: 1);
+        PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
     _addPaginationListener();
   }
 
@@ -78,7 +77,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     rebuildAppBar = widget.appBarNotifier ?? ValueNotifier(false);
     scrollController = widget.scrollController ?? ScrollController();
     pagedListController = widget.listController ??
-        PagingController<int, Conversation>(firstPageKey: 1);
+        PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
     _addPaginationListener();
   }
 
@@ -98,12 +97,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           bloc: _convActionBloc,
           listener: (context, state) {
             if (state is LMChatConversationDelete) {
-              _updateDeletedConversation(
-                  state.deleteConversationResponse.conversations!.first);
+              _updateDeletedConversation(state.conversations.first);
             }
             if (state is LMChatConversationEdited) {
-              _updateEditedConversation(
-                  state.editConversationResponse.conversation!);
+              _updateEditedConversation(state.conversationViewData);
             }
           },
         ),
@@ -113,7 +110,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               updatePagingControllers(state);
               if (state is LMChatConversationPostedState) {
                 Map<String, String> userTags = LMChatTaggingHelper.decodeString(
-                    state.postConversationResponse.conversation?.answer ?? "");
+                    state.conversationViewData.answer);
                 // LMAnalytics.get().track(
                 //   AnalyticsKeys.chatroomResponded,
                 //   {
@@ -150,7 +147,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       child: ValueListenableBuilder(
         valueListenable: rebuildConversationList,
         builder: (context, value, child) {
-          return PagedListView(
+          return PagedListView<int, LMChatConversationViewData>(
             pagingController: pagedListController,
             scrollController: scrollController,
             physics: const ClampingScrollPhysics(),
@@ -159,7 +156,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               horizontal: 2.w,
             ),
             reverse: true,
-            builderDelegate: PagedChildBuilderDelegate<Conversation>(
+            builderDelegate:
+                PagedChildBuilderDelegate<LMChatConversationViewData>(
               noItemsFoundIndicatorBuilder: (context) => const Center(
                 child: LMChatText('No chats found!'),
               ),
@@ -177,8 +175,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                   );
                 }
                 return item.memberId == user.id
-                    ? _defaultSentChatBubble(item)
-                    : _defaultReceivedChatBubble(item);
+                    ? _defaultSentChatBubble(item.toConversation())
+                    : _defaultReceivedChatBubble(item.toConversation());
               },
             ),
           );
@@ -197,6 +195,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
+      onReply: (conversation) {
+        _convActionBloc.add(
+          LMChatReplyConversationEvent(
+            chatroomId: widget.chatroomId,
+            conversationId: conversation.id,
+            replyConversation: conversation,
+          ),
+        );
+      },
       isSent: true,
       style: LMChatBubbleStyle.basic(),
       avatar: LMChatProfilePicture(
@@ -238,6 +245,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!.toUserViewData(),
       onTagTap: (tag) {},
+      onReply: (conversation) {
+        _convActionBloc.add(
+          LMChatReplyConversationEvent(
+            chatroomId: widget.chatroomId,
+            conversationId: conversation.id,
+            replyConversation: conversation,
+          ),
+        );
+      },
       isSent: false,
       style: LMChatBubbleStyle.basic(),
       avatar: LMChatProfilePicture(
@@ -276,17 +292,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   _addPaginationListener() {
     pagedListController.addPageRequestListener(
       (pageKey) {
-        int currentTime = DateTime.now().millisecondsSinceEpoch;
         _conversationBloc.add(
           LMChatFetchConversationsEvent(
-            getConversationRequest: (GetConversationRequestBuilder()
-                  ..chatroomId(widget.chatroomId)
-                  ..page(pageKey)
-                  ..pageSize(500)
-                  ..isLocalDB(false)
-                  ..minTimestamp(0)
-                  ..maxTimestamp(currentTime))
-                .build(),
+            chatroomId: widget.chatroomId,
+            page: pageKey,
+            pageSize: 500,
           ),
         );
       },
@@ -305,8 +315,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
-      List<Conversation>? conversationData =
-          state.getConversationResponse.conversationData;
+      List<LMChatConversationViewData>? conversationData = state
+          .getConversationResponse.conversationData
+          ?.map((e) => e.toConversationViewData())
+          .toList();
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,
           LMChatLocalPreference.instance.getCommunityData()!.id);
@@ -320,37 +332,39 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
     if (state is LMChatConversationPostedState) {
       addConversationToPagedList(
-        state.postConversationResponse.conversation!,
+        state.conversationViewData,
       );
     } else if (state is LMChatLocalConversationState) {
-      addLocalConversationToPagedList(state.conversation);
+      addLocalConversationToPagedList(state.conversationViewData);
     } else if (state is LMChatConversationErrorState) {
       toast(state.message);
     }
     if (state is LMChatConversationUpdatedState) {
-      if (state.response.id != lastConversationId) {
+      if (state.conversationViewData.id != lastConversationId) {
         addConversationToPagedList(
-          state.response,
+          state.conversationViewData,
         );
-        lastConversationId = state.response.id;
+        lastConversationId = state.conversationViewData.id;
       }
     }
   }
 
   // This function adds local conversation to the paging controller
   // and rebuilds the list to reflect UI changes
-  void addLocalConversationToPagedList(Conversation conversation) {
-    List<Conversation> conversationList =
-        pagedListController.itemList ?? <Conversation>[];
+  void addLocalConversationToPagedList(
+      LMChatConversationViewData conversation) {
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
 
     if (pagedListController.itemList != null &&
         conversation.replyId != null &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
-      Conversation? replyConversation = pagedListController.itemList!
-          .firstWhere((element) =>
+      LMChatConversationViewData? replyConversation =
+          pagedListController.itemList!.firstWhere((element) =>
               element.id ==
               (conversation.replyId ?? conversation.replyConversation));
-      conversationMeta[conversation.replyId.toString()] = replyConversation;
+      conversationMeta[conversation.replyId.toString()] =
+          replyConversation.toConversation();
     }
     conversationList.insert(0, conversation);
     if (conversationList.length >= 500) {
@@ -364,20 +378,21 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 
-  void addConversationToPagedList(Conversation conversation) {
-    List<Conversation> conversationList =
-        pagedListController.itemList ?? <Conversation>[];
+  void addConversationToPagedList(LMChatConversationViewData conversation) {
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
 
     int index = conversationList.indexWhere(
         (element) => element.temporaryId == conversation.temporaryId);
     if (pagedListController.itemList != null &&
         conversation.replyId != null &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
-      Conversation? replyConversation = pagedListController.itemList!
-          .firstWhere((element) =>
+      LMChatConversationViewData? replyConversation =
+          pagedListController.itemList!.firstWhere((element) =>
               element.id ==
               (conversation.replyId ?? conversation.replyConversation));
-      conversationMeta[conversation.replyId.toString()] = replyConversation;
+      conversationMeta[conversation.replyId.toString()] =
+          replyConversation.toConversation();
     }
     if (index != -1) {
       conversationList[index] = conversation;
@@ -400,7 +415,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
             createdAt: conversation.createdAt,
             header: conversation.header,
-          ),
+          ).toConversationViewData(),
         );
       }
       conversationList.insert(0, conversation);
@@ -415,13 +430,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 
-  void _updateDeletedConversation(Conversation conversation) {
-    List<Conversation> conversationList =
-        pagedListController.itemList ?? <Conversation>[];
+  void _updateDeletedConversation(LMChatConversationViewData conversation) {
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
     int index =
         conversationList.indexWhere((element) => element.id == conversation.id);
     if (index != -1) {
-      conversationList[index].deletedByUserId = user.id;
+      conversationList[index] = conversationList[index].copyWith(
+        deletedByUserId: user.id,
+      );
     }
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(conversation.id.toString())) {
@@ -436,9 +453,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 
-  void _updateEditedConversation(Conversation editedConversation) {
-    List<Conversation> conversationList =
-        pagedListController.itemList ?? <Conversation>[];
+  void _updateEditedConversation(
+      LMChatConversationViewData editedConversation) {
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
     int index = conversationList
         .indexWhere((element) => element.id == editedConversation.id);
     if (index != -1) {
@@ -447,7 +465,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(editedConversation.id.toString())) {
-      conversationMeta[editedConversation.id.toString()] = editedConversation;
+      conversationMeta[editedConversation.id.toString()] =
+          editedConversation.toConversation();
     }
     pagedListController.itemList = conversationList;
     rebuildConversationList.value = !rebuildConversationList.value;

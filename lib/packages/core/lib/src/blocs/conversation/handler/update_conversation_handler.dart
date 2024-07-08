@@ -43,7 +43,7 @@ updateConversationsEventHandler(
       }
       emit(
         LMChatConversationUpdatedState(
-          response: realTimeConversation,
+          conversationViewData: realTimeConversation.toConversationViewData(),
         ),
       );
       lastConversationId = event.conversationId;
