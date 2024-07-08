@@ -3,35 +3,12 @@ import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.da
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// {@template lm_chatroom_builder}
-/// [LMChatRoomBuilderDelegate] is a class which is used to build the chatroom
+/// [LMChatroomBuilderDelegate] is a class which is used to build the chatroom
 /// screen. It is used to customize the chatroom screen.
 /// {@endtemplate}
-class LMChatRoomBuilderDelegate {
+class LMChatroomBuilderDelegate {
   /// {@macro lm_chatroom_builder}
-  const LMChatRoomBuilderDelegate();
-
-/*
-  /// [appbarBuilder] is the builder for the appbar.
-  final LMChatroomAppBarBuilder? appbarBuilder;
-
-  /// [chatBubbleBuilder] is the builder for the chat bubble.
-  final LMChatBubbleBuilder? chatBubbleBuilder;
-
-  /// [stateBubbleBuilder] is the builder for the state message bubble.
-  final LMChatStateBubbleBuilder? stateBubbleBuilder;
-
-  /// [loadingPageWidget] is the builder for the loading page widget.
-  final LMChatContextWidgetBuilder? loadingPageWidget;
-
-  /// [loadingListWidget] is the builder for the loading list widget.
-  final LMChatContextWidgetBuilder? loadingListWidget;
-
-  /// [paginatedLoadingWidget] is the builder for the paginated loading widget.
-  final LMChatContextWidgetBuilder? paginatedLoadingWidget;
-
-  /// [chatBarBuilder] is the builder for the chat bar.
-  final LMChatroomChatBarBuilder? chatBarBuilder;
-  */
+  const LMChatroomBuilderDelegate();
 
   /// Builds the app bar.
   PreferredSizeWidget appBarBuilder(

@@ -469,58 +469,60 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return Container(
       height: 8.h,
       width: 75.w,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
           color: _themeData.container,
           borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(24),
+            top: Radius.circular(12),
           )),
       child: Row(
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(6)),
                 color: LMChatTheme.instance.themeData.disabledColor
                     .withOpacity(0.2),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 1.w,
-                      color: LMChatTheme.instance.themeData.primaryColor,
-                    ),
-                    kHorizontalPaddingMedium,
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        LMChatText(
-                          userText,
-                          style: LMChatTextStyle(
-                            maxLines: 1,
-                            textStyle: TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              color: _themeData.primaryColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        kVerticalPaddingSmall,
-                        SizedBox(
-                          width: 55.w,
-                          child: Text(
-                            LMChatTaggingHelper.convertRouteToTag(
-                                    replyToConversation?.answer) ??
-                                "",
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 1.w,
+                    color: LMChatTheme.instance.themeData.primaryColor,
+                  ),
+                  kHorizontalPaddingMedium,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LMChatText(
+                        userText,
+                        style: LMChatTextStyle(
+                          maxLines: 1,
+                          textStyle: TextStyle(
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: Theme.of(context).textTheme.bodySmall,
+                            color: _themeData.primaryColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      kVerticalPaddingSmall,
+                      SizedBox(
+                        width: 55.w,
+                        child: Text(
+                          LMChatTaggingHelper.convertRouteToTag(
+                                  replyToConversation?.answer) ??
+                              "",
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
@@ -543,52 +545,56 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return Container(
       height: 8.h,
       width: 75.w,
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
           color: _themeData.container,
           borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(24),
+            top: Radius.circular(12),
           )),
       child: Row(
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
                 color: LMChatTheme.instance.themeData.disabledColor
                     .withOpacity(0.2),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 1.w,
-                      color: LMChatTheme.instance.themeData.primaryColor,
-                    ),
-                    kHorizontalPaddingMedium,
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Edit message",
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(6),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 1.w,
+                    color: LMChatTheme.instance.themeData.primaryColor,
+                  ),
+                  kHorizontalPaddingMedium,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Edit message",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      kVerticalPaddingSmall,
+                      SizedBox(
+                        width: 55.w,
+                        child: Text(
+                          LMChatTaggingHelper.convertRouteToTag(
+                                  editConversation?.answer) ??
+                              "",
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
-                        kVerticalPaddingSmall,
-                        SizedBox(
-                          width: 55.w,
-                          child: Text(
-                            LMChatTaggingHelper.convertRouteToTag(
-                                    editConversation?.answer) ??
-                                "",
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

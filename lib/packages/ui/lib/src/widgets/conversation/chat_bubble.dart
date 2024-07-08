@@ -220,7 +220,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           LMChatBubbleHeader(
                             conversationUser: widget.conversationUser,
                           ),
-                        if (conversation.replyConversationObject != null)
+                        if (conversation.replyConversationObject != null &&
+                            conversation.deletedByUserId == null)
                           LMChatBubbleReply(
                             replyToConversation:
                                 conversation.replyConversationObject!,

@@ -63,7 +63,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
 
   final List<int> _selectedIds = <int>[];
-  final LMChatRoomBuilderDelegate _screenBuilder =
+  final LMChatroomBuilderDelegate _screenBuilder =
       LMChatCore.config.chatRoomConfig.builder;
 
   bool isAnyMessageSelected() {
