@@ -18,6 +18,9 @@ class LMChatSampleApp extends StatelessWidget {
         title: 'Chat App for UI + SDK package',
         debugShowCheckedModeBanner: isDebug,
         scaffoldMessengerKey: rootScaffoldMessengerKey,
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+        ),
         home: const CredScreen(),
       ),
     );

@@ -71,8 +71,9 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      backgroundColor: LMChatTheme.theme.container,
+      backgroundColor: LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
         child: BlocConsumer<LMChatDMFeedBloc, LMChatDMFeedState>(
@@ -165,7 +166,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
     );
     return LMChatTile(
       style: LMChatTileStyle.basic().copyWith(
-        backgroundColor: LMChatTheme.theme.container,
+        backgroundColor: LMChatTheme.theme.scaffold,
       ),
       onTap: () {
         LMChatRealtime.instance.chatroomId = chatroom.id;

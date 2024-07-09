@@ -277,10 +277,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           : chatroom.chatroomWithUser!;
     }
     return LMChatAppBar(
-      style: LMChatAppBarStyle(
+      style: const LMChatAppBarStyle(
         height: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        backgroundColor: LMChatTheme.theme.container,
+        padding: EdgeInsets.symmetric(horizontal: 18),
       ),
       banner: ValueListenableBuilder(
         valueListenable: rebuildAppBar,
