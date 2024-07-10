@@ -205,14 +205,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         );
       },
       isSent: true,
-      style: LMChatBubbleStyle.basic(),
-      avatar: LMChatProfilePicture(
-        fallbackText: conversation.member!.toUserViewData().name,
-        imageUrl: conversation.member!.toUserViewData().imageUrl,
-        style: const LMChatProfilePictureStyle(
-          size: 32,
-          boxShape: BoxShape.circle,
-        ),
+      style: LMChatBubbleStyle.basic().copyWith(
+        showHeader: false,
       ),
       isSelected: _selectedIds.contains(conversation.id),
       onLongPress: (value, state) {

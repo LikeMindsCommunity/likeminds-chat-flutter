@@ -47,7 +47,14 @@ class LMChatParticipantBuilderDelegate {
   Widget noItemsFoundIndicatorBuilder(
     BuildContext context,
   ) {
-    return const SizedBox();
+    return const Center(
+        child: LMChatText(
+      'No search results found',
+      style: LMChatTextStyle(
+          textStyle: TextStyle(
+        fontSize: 16,
+      )),
+    ));
   }
 
   /// Builds the no more items indicator.

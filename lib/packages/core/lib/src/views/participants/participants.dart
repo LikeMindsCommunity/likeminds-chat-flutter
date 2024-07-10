@@ -105,24 +105,22 @@ class _LMChatroomParticipantsPageState
               // vertical: 2.h,
             ),
             child: _showSearchBarTextField.value
-                ? Expanded(
-                    child: TextField(
-                      focusNode: focusNode,
-                      keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.words,
-                      controller: _searchController,
-                      onChanged: _onSearchTextChange,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Search...",
-                        hintStyle:
-                            Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                      ),
-                    ),
-                  )
+                ? TextField(
+                  focusNode: focusNode,
+                  keyboardType: TextInputType.text,
+                  textCapitalization: TextCapitalization.words,
+                  controller: _searchController,
+                  onChanged: _onSearchTextChange,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Search...",
+                    hintStyle:
+                        Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                  ),
+                )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

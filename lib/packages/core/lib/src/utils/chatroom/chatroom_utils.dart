@@ -45,8 +45,8 @@ String getHomeChatroomPreviewMessage(
 ) {
   String personLabel = "";
   final user = LMChatLocalPreference.instance.getUser();
-  bool a = conversation.member!.id == user.id;
-  personLabel = a ? 'You: ' : '${conversation.member!.name}: ';
+  bool isByCurrentUser = conversation.member!.id == user.id;
+  personLabel = isByCurrentUser ? 'You: ' : '${conversation.member!.name.split(' ').first}: ';
   String message = conversation.deletedByUserId == null
       ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
           conversation.answer,

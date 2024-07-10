@@ -156,7 +156,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         ),
       ),
       direction: SwipeDirection.startToEnd,
-      child: InkWell(
+      child: GestureDetector(
         onLongPress: () {
           if (_isDeleted) return;
           _isSelected = !_isSelected;
@@ -246,7 +246,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         conversation.deletedByUserId != null
                             ? widget.deletedText ??
                                 LMChatText(
-                                  "Deleted message",
+                                  _getDeletedText(),
                                   style: LMChatTextStyle(
                                     textStyle: conversation.deletedByUserId !=
                                             null
@@ -268,7 +268,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   onTagTap: widget.onTagTap,
                                 ),
                         const LMChatBubbleMedia(),
-                        if (inStyle.showFooter ?? true)
+                        if (conversation.deletedByUserId == null &&
+                            inStyle.showFooter == true)
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
                             child: LMChatBubbleFooter(
@@ -287,6 +288,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         ),
       ),
     );
+  }
+
+  String _getDeletedText() {
+    return conversation.deletedByUserId == conversation.memberId
+        ? conversation.deletedByUserId == currentUser.id
+            ? 'You deleted this message'
+            : "This message was deleted"
+        : "This message was deleted by a community manager";
   }
 }
 

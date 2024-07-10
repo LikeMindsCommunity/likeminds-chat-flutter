@@ -325,6 +325,33 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     bool haveEditPermission =
         LMChatMemberRightUtil.checkEditPermissions(conversationViewData!);
     return [
+      // Reply button
+      if (_selectedIds.length == 1)
+        LMChatButton(
+          onTap: () {
+            // add reply event
+            _convActionBloc.add(
+              LMChatReplyConversationEvent(
+                conversationId: conversationViewData.id,
+                chatroomId: widget.chatroomId,
+                replyConversation: conversationViewData,
+              ),
+            );
+            _selectedIds.clear();
+            rebuildAppBar.value = !rebuildAppBar.value;
+            rebuildConversationList.value = !rebuildConversationList.value;
+          },
+          style: LMChatButtonStyle.basic().copyWith(
+            icon: LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.reply,
+              style: LMChatIconStyle(
+                color: LMChatTheme.theme.primaryColor,
+              ),
+            ),
+          ),
+        ),
+      const SizedBox(width: 8),
       // Copy button
       LMChatButton(
         onTap: () {
@@ -378,7 +405,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               ),
             );
             rebuildAppBar.value = !rebuildAppBar.value;
-            // rebuildConversationList.value = !rebuildConversationList.value;
+            rebuildConversationList.value = !rebuildConversationList.value;
           },
           style: LMChatButtonStyle.basic().copyWith(
             icon: LMChatIcon(
