@@ -29,7 +29,7 @@ class LMChatMemberRightUtil {
         LMChatLocalPreference.instance.getMemberRights();
     // check if user is cm state = 4 and owner state = 1
     if (memberRight != null &&
-        memberRight.member?.state == 1  &&
+        memberRight.member?.state == 1 &&
         conversationViewData.deletedByUserId == null) {
       return true;
     } else {
@@ -49,5 +49,15 @@ class LMChatMemberRightUtil {
       LMChatConversationViewData conversationViewData) {
     final currentUser = LMChatLocalPreference.instance.getUser();
     return currentUser.id == conversationViewData.memberId;
+  }
+
+  static bool isReportAllowed(LMChatConversationViewData conversationViewData) {
+    final currentUser = LMChatLocalPreference.instance.getUser();
+    final memberState = LMChatLocalPreference.instance.getMemberRights();
+    if (currentUser.id == conversationViewData.memberId ||
+        memberState?.state == 1) {
+      return false;
+    }
+    return true;
   }
 }
