@@ -17,7 +17,7 @@ class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _userIdController = TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
-  static const backgroundColor = Color.fromARGB(255, 48, 159, 116);
+  late Color backgroundColor;
 
   final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
     backgroundColor: Colors.white,
@@ -29,7 +29,7 @@ class _CredScreenState extends State<CredScreen> {
       42,
     ),
   );
-  final TextStyle buttonTextStyle = const TextStyle(
+  late TextStyle buttonTextStyle = TextStyle(
     color: backgroundColor,
     fontSize: 18,
     fontWeight: FontWeight.bold,
@@ -73,6 +73,7 @@ class _CredScreenState extends State<CredScreen> {
 
   @override
   Widget build(BuildContext context) {
+    backgroundColor = Theme.of(context).primaryColor;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: backgroundColor,

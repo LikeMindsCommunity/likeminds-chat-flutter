@@ -72,7 +72,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: LMChatTheme.theme.container,
+      backgroundColor: LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
         child: BlocConsumer<LMChatHomeFeedBloc, LMChatHomeFeedState>(
@@ -156,7 +156,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
     String message = getHomeChatroomPreviewMessage(chatroom.lastConversation!);
     return LMChatTile(
       style: LMChatTileStyle.basic().copyWith(
-        backgroundColor: LMChatTheme.theme.container,
+        backgroundColor: LMChatTheme.theme.scaffold,
       ),
       onTap: () {
         LMChatRealtime.instance.chatroomId = chatroom.id;
