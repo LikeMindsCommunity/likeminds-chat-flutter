@@ -65,6 +65,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   final List<int> _selectedIds = <int>[];
   final LMChatroomBuilderDelegate _screenBuilder =
       LMChatCore.config.chatRoomConfig.builder;
+  final CustomPopupMenuController _menuController = CustomPopupMenuController();
 
   bool isAnyMessageSelected() {
     return _selectedIds.isNotEmpty;
@@ -559,6 +560,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget _defaultChatroomMenu() {
     return LMChatroomMenu(
       chatroom: chatroom,
+      controller: _menuController,
       chatroomActions: actions,
     );
   }

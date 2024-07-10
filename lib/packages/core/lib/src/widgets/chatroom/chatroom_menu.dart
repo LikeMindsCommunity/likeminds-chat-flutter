@@ -13,9 +13,11 @@ import 'package:overlay_support/overlay_support.dart';
 class LMChatroomMenu extends StatefulWidget {
   final ChatRoom chatroom;
   final List<ChatroomAction> chatroomActions;
+  final CustomPopupMenuController? controller;
 
   const LMChatroomMenu({
     Key? key,
+    required this.controller,
     required this.chatroom,
     required this.chatroomActions,
   }) : super(key: key);
@@ -25,7 +27,6 @@ class LMChatroomMenu extends StatefulWidget {
 }
 
 class _ChatroomMenuState extends State<LMChatroomMenu> {
-  CustomPopupMenuController? _controller;
   late List<ChatroomAction> chatroomActions;
 
   ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
@@ -36,7 +37,6 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     super.initState();
     homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
-    _controller = CustomPopupMenuController();
   }
 
   @override
@@ -44,7 +44,6 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     super.didUpdateWidget(old);
     homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
-    _controller = CustomPopupMenuController();
   }
 
   @override
@@ -52,7 +51,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     return CustomPopupMenu(
       pressType: PressType.singleClick,
       showArrow: false,
-      controller: _controller,
+      controller: widget.controller,
       enablePassEvent: false,
       menuBuilder: () => ClipRRect(
         borderRadius: BorderRadius.circular(8),
@@ -111,14 +110,15 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   void performAction(ChatroomAction action) {
     switch (action.id) {
       case 2:
-        // _controller.hideMenu();
-        _controller!.hideMenu();
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return LMChatroomParticipantsPage(
-            chatroomViewData: widget.chatroom.toChatRoomViewData(),
-          );
-        }));
-        break;
+        {
+          widget.controller!.hideMenu();
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return LMChatroomParticipantsPage(
+              chatroomViewData: widget.chatroom.toChatRoomViewData(),
+            );
+          }));
+          break;
+        }
       case 6:
         muteChatroom(action);
         break;
@@ -134,7 +134,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       default:
         unimplemented();
     }
-    _controller!.hideMenu();
+    widget.controller!.hideMenu();
   }
 
   void unimplemented() {
@@ -148,7 +148,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               ..value(!widget.chatroom.muteStatus!))
             .build());
     if (response.success) {
-      // _controller.hideMenu();
+      // widget.controller.hideMenu();
       // rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       if (action.title.toLowerCase() == "mute notifications") {
         LMAnalytics.get().track(
@@ -178,7 +178,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         return element;
       }).toList();
       rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
-      _controller!.hideMenu();
+      widget.controller!.hideMenu();
       homeBloc!.add(LMChatRefreshHomeFeedEvent());
     } else {
       toast(response.errorMessage!);
@@ -205,7 +205,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           },
         );
         toast("Chatroom left");
-        _controller!.hideMenu();
+        widget.controller!.hideMenu();
         homeBloc?.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
@@ -228,7 +228,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           },
         );
         toast("Chatroom left");
-        _controller!.hideMenu();
+        widget.controller!.hideMenu();
         homeBloc?.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
