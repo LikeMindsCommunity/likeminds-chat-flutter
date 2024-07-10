@@ -31,11 +31,7 @@ Future<void> _handleNotification(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
-  await LMChatCore.instance.initialize(
-    theme: LMChatThemeData.light(
-      primaryColor: Colors.orange,
-    ),
-  );
+  await LMChatCore.instance.initialize();
   runApp(const LMChatSampleApp());
 }
 
