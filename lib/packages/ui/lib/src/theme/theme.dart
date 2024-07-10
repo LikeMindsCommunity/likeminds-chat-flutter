@@ -94,7 +94,6 @@ class LMChatThemeData {
       container: theme.colorScheme.primaryContainer,
       onContainer: theme.colorScheme.onPrimaryContainer,
       onPrimary: theme.colorScheme.onPrimary,
-      scaffold: theme.colorScheme.surfaceContainer,
     );
   }
 

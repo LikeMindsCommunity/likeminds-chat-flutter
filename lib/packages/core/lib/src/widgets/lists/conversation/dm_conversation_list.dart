@@ -155,9 +155,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             pagingController: pagedListController,
             scrollController: scrollController,
             physics: const ClampingScrollPhysics(),
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               vertical: 10,
-              horizontal: 2.w,
             ),
             reverse: true,
             builderDelegate:

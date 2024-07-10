@@ -208,17 +208,16 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(
-                horizontal: 4.w,
+                horizontal: 2.w,
                 vertical: 1.h,
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
                       : _defDisabledTextField(context),
-                  SizedBox(width: 2.w),
                   if (_isRespondingAllowed()) _defSendButton(context),
                 ],
               ),
@@ -275,10 +274,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         if (editConversation != null) _defEditConversationWidget(),
         if (replyToConversation != null) _defReplyConversationWidget(),
         Container(
-          width: 75.w,
+          width: 80.w,
           constraints: BoxConstraints(
-            // minHeight: 4.h,
-            minHeight: 4.h,
+            minHeight: 3.h,
             maxHeight: 24.h,
           ),
           decoration: BoxDecoration(
@@ -292,8 +290,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: kPaddingSmall,
-              vertical: kPaddingSmall,
+              horizontal: 2,
+              // vertical: 2,
             ),
             child: LMChatTextField(
               key: const GlobalObjectKey('chatTextField'),
@@ -342,8 +340,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         backgroundColor: _themeData.primaryColor,
         padding: const EdgeInsets.all(8),
         borderRadius: 100,
-        height: 6.h,
-        width: 6.h,
+        height: 5.h,
+        width: 5.h,
       ),
       icon: LMChatIcon(
         type: LMChatIconType.icon,
@@ -468,7 +466,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     }
     return Container(
       height: 8.h,
-      width: 75.w,
+      width: 80.w,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
           color: _themeData.container,
@@ -550,7 +548,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   Container _defEditConversationWidget() {
     return Container(
       height: 8.h,
-      width: 75.w,
+      width: 80.w,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
           color: _themeData.container,

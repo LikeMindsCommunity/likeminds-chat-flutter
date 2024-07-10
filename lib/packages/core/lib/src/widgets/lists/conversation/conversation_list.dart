@@ -151,9 +151,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             pagingController: pagedListController,
             scrollController: scrollController,
             physics: const ClampingScrollPhysics(),
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               vertical: 10,
-              horizontal: 2.w,
             ),
             reverse: true,
             builderDelegate:
@@ -254,7 +253,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         fallbackText: conversation.member!.toUserViewData().name,
         imageUrl: conversation.member!.toUserViewData().imageUrl,
         style: const LMChatProfilePictureStyle(
-          size: 32,
+          size: 39,
           boxShape: BoxShape.circle,
         ),
       ),
