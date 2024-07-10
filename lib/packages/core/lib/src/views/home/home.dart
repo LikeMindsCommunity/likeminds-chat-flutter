@@ -87,8 +87,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
         ),
         const SizedBox(width: 8),
       ],
-      bottom: const TabBar(
-        tabs: [
+      bottom: TabBar(
+        labelColor: LMChatTheme.theme.primaryColor,
+        indicatorColor: LMChatTheme.theme.primaryColor,
+        tabs: const [
           Tab(text: LMChatStringConstants.groupHomeTabTitle),
           Tab(text: LMChatStringConstants.dmHomeTabTitle),
         ],

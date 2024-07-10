@@ -91,10 +91,10 @@ class LMChatThemeData {
       disabledColor: theme.disabledColor,
       errorColor: theme.colorScheme.error,
       inActiveColor: theme.unselectedWidgetColor,
-      container: theme.colorScheme.surface,
+      container: theme.colorScheme.primaryContainer,
       onContainer: theme.colorScheme.onPrimaryContainer,
       onPrimary: theme.colorScheme.onPrimary,
-      scaffold: theme.colorScheme.surface,
+      scaffold: theme.colorScheme.surfaceContainer,
     );
   }
 

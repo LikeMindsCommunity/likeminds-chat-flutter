@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
+
 /// [LMChatSkeletonChatPage] is a skeleton screen for the chat page.
 class LMChatSkeletonChatPage extends StatelessWidget {
   const LMChatSkeletonChatPage({Key? key}) : super(key: key);
@@ -221,7 +222,7 @@ class LMChatSkeletonChatroom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: LMChatDefaultTheme.whiteColor,
+      color: LMChatTheme.theme.container,
       child: Padding(
         padding: EdgeInsets.only(
           left: 18,
