@@ -251,23 +251,26 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           : chatroom.chatroomWithUser!;
     }
     return LMChatAppBar(
-      style: const LMChatAppBarStyle(
+      style: LMChatAppBarStyle(
         height: 72,
-        padding: EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        gap: 3.w,
       ),
       banner: ValueListenableBuilder(
         valueListenable: rebuildAppBar,
         builder: (context, _, __) {
           return isAnyMessageSelected()
               ? const SizedBox.shrink()
-              : LMChatProfilePicture(
-                  imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
-                  fallbackText: chatroom.header,
-                  style: LMChatProfilePictureStyle(
-                    size: 42,
-                    backgroundColor: LMChatTheme.theme.primaryColor,
-                  ),
-                );
+              : chatroom.type! == 10
+                  ? LMChatProfilePicture(
+                      imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
+                      fallbackText: chatroom.header,
+                      style: LMChatProfilePictureStyle(
+                        size: 42,
+                        backgroundColor: LMChatTheme.theme.primaryColor,
+                      ),
+                    )
+                  : const SizedBox.shrink();
         },
       ),
       title: ValueListenableBuilder(
@@ -297,6 +300,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     ? const SizedBox.shrink()
                     : LMChatText(
                         "${participants.toString()} participants",
+                        style: const LMChatTextStyle(
+                          textStyle: TextStyle(
+                            color: LMChatDefaultTheme.greyColor,
+                          ),
+                        ),
                       );
               },
             )

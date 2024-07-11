@@ -147,7 +147,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
     } else {
-      return "Type something...";
+      return "Type your response";
     }
   }
 
@@ -161,7 +161,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       text: convertedMsgText ?? '',
       selection: TextSelection.fromPosition(
         TextPosition(
-          offset: _textEditingController.text.length-1,
+          offset: _textEditingController.text.length - 1,
         ),
       ),
     );
@@ -201,15 +201,18 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         return Column(
           children: [
             ValueListenableBuilder(
-                valueListenable: rebuildLinkPreview,
-                builder: ((context, value, child) {
-                  return Container(color: Colors.red);
-                })),
+              valueListenable: rebuildLinkPreview,
+              builder: ((context, value, child) {
+                return Container(color: Colors.red);
+              }),
+            ),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: 2.w,
-                vertical: 1.h,
+              padding: EdgeInsets.only(
+                left: 2.w,
+                right: 2.w,
+                top: 0,
+                bottom: 2.h,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -384,7 +387,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         widget.scrollToBottom();
       } else {
         if (isActiveLink && showLinkPreview && linkModel != null) {
-          conversationBloc.add(LMChatPostMultiMediaConversationEvent(
+          conversationBloc.add(
+            LMChatPostMultiMediaConversationEvent(
               (PostConversationRequestBuilder()
                     ..chatroomId(widget.chatroom.id)
                     ..temporaryId(
@@ -396,9 +400,13 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   .build(),
               [
                 LMChatMedia(
-                    mediaType: LMChatMediaType.link,
-                    ogTags: linkModel!.ogTags?.toOGTag())
-              ]));
+                  mediaType: LMChatMediaType.link,
+                  ogTags: linkModel!.ogTags?.toOGTag(),
+                ),
+              ],
+            ),
+          );
+          // if(widget.chatroom.)
           linkModel = null;
           isActiveLink = false;
           rebuildLinkPreview.value = !rebuildLinkPreview.value;
