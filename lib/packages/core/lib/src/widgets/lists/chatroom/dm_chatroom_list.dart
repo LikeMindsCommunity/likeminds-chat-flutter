@@ -103,7 +103,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                           widget.loadingListWidget?.call(context) ??
                           const LMChatSkeletonChatroomList(),
                       noItemsFoundIndicatorBuilder: (context) =>
-                          const SizedBox(),
+                          _defaultEmptyView(),
                       itemBuilder: (context, item, index) {
                         return _defaultDMChatRoomTile(item);
                       },
@@ -152,6 +152,17 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
 
   Widget _defaultErrorView() {
     return Container();
+  }
+
+  Widget _defaultEmptyView() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Looks empty, start a new DM"),
+        ],
+      ),
+    );
   }
 
   LMChatTile _defaultDMChatRoomTile(LMChatRoomViewData chatroom) {

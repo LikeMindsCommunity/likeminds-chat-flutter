@@ -229,10 +229,10 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       physics: const ClampingScrollPhysics(),
       builderDelegate: PagedChildBuilderDelegate<ChatRoom>(
         noItemsFoundIndicatorBuilder: (context) => const Center(
-            child: Text(
-          "Opps, no chatrooms found!",
-          // style: LMTheme.medium,
-        )),
+          child: Text(
+            "Opps, no chatrooms found!",
+          ),
+        ),
         itemBuilder: (context, item, index) =>
             _defaultExploreTile(item, context),
       ),

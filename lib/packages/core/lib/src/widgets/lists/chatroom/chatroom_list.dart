@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
+import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/chatroom/chatroom_utils.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -75,40 +78,152 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       backgroundColor: LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
-        child: BlocConsumer<LMChatHomeFeedBloc, LMChatHomeFeedState>(
-          bloc: feedBloc,
-          listener: (_, state) {
-            _updatePagingControllers(state);
-          },
-          builder: (context, state) {
-            if (state is LMChatDMFeedError) {
-              return widget.listErrorBuilder?.call(context) ??
-                  _defaultErrorView();
-            }
-            return ValueListenableBuilder(
-                valueListenable: rebuildFeedList,
-                builder: (context, _, __) {
-                  return PagedListView<int, LMChatRoomViewData>(
-                    pagingController: homeFeedPagingController,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 4,
-                    ),
-                    physics: const ClampingScrollPhysics(),
-                    builderDelegate:
-                        PagedChildBuilderDelegate<LMChatRoomViewData>(
-                      firstPageProgressIndicatorBuilder: (context) =>
-                          widget.loadingListWidget?.call(context) ??
-                          const LMChatSkeletonChatroomList(),
-                      noItemsFoundIndicatorBuilder: (context) =>
-                          const SizedBox(),
-                      itemBuilder: (context, item, index) {
-                        return _defaultHomeChatRoomTile(item);
-                      },
-                    ),
+        child: Column(
+          children: [
+            _defaultExploreTile(),
+            Expanded(
+              child: BlocConsumer<LMChatHomeFeedBloc, LMChatHomeFeedState>(
+                bloc: feedBloc,
+                listener: (_, state) {
+                  _updatePagingControllers(state);
+                },
+                builder: (context, state) {
+                  if (state is LMChatDMFeedError) {
+                    return widget.listErrorBuilder?.call(context) ??
+                        _defaultErrorView();
+                  }
+                  return ValueListenableBuilder(
+                    valueListenable: rebuildFeedList,
+                    builder: (context, _, __) {
+                      return PagedListView<int, LMChatRoomViewData>(
+                        pagingController: homeFeedPagingController,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 4,
+                        ),
+                        physics: const ClampingScrollPhysics(),
+                        builderDelegate:
+                            PagedChildBuilderDelegate<LMChatRoomViewData>(
+                          firstPageProgressIndicatorBuilder: (context) =>
+                              widget.loadingListWidget?.call(context) ??
+                              const LMChatSkeletonChatroomList(),
+                          noItemsFoundIndicatorBuilder: (context) =>
+                              const SizedBox(),
+                          itemBuilder: (context, item, index) {
+                            return _defaultHomeChatRoomTile(item);
+                          },
+                        ),
+                      );
+                    },
                   );
-                });
-          },
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container _defaultExploreTile() {
+    return Container(
+      width: 100.w,
+      height: 8.h,
+      decoration: const BoxDecoration(),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LMChatExplorePage(),
+            ),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 2.w),
+          padding: EdgeInsets.symmetric(horizontal: 6.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                height: 32,
+                width: 32,
+                decoration: BoxDecoration(
+                  color: LMChatTheme.theme.primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: LMChatIcon(
+                  type: LMChatIconType.icon,
+                  icon: Icons.navigation_outlined,
+                  style: LMChatIconStyle(
+                    color: LMChatTheme.theme.onPrimary,
+                    size: 18,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 4.w,
+                ),
+                child: LMChatText(
+                  'Explore Chatrooms',
+                  style: LMChatTextStyle(
+                    maxLines: 1,
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      color: LMChatTheme.theme.onContainer,
+                      fontWeight: FontWeight.w500,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ),
+              const Spacer(),
+              FutureBuilder(
+                future: LMChatCore.client.getExploreTabCount(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container();
+                  }
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    if (snapshot.data!.success) {
+                      GetExploreTabCountResponse response =
+                          snapshot.data!.data!;
+
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 2.w,
+                          vertical: 1.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: LMChatTheme.theme.primaryColor,
+                          borderRadius: BorderRadius.circular(4.w),
+                          shape: BoxShape.rectangle,
+                        ),
+                        child: LMChatText(
+                          response.unseenChannelCount == null ||
+                                  response.unseenChannelCount == 0
+                              ? '${response.totalChannelCount} Chatrooms'
+                              : '${response.unseenChannelCount} NEW',
+                          style: LMChatTextStyle(
+                            textStyle: TextStyle(
+                              color: LMChatTheme.theme.onPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      const SizedBox();
+                    }
+                  }
+                  return const SizedBox();
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -117,11 +232,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   _addPaginationListener() {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
-        feedBloc.add(
-          LMChatFetchHomeFeedEvent(
-            page: pageKey,
-          ),
-        );
+        feedBloc.add(LMChatFetchHomeFeedEvent(page: pageKey));
       },
     );
   }

@@ -57,9 +57,10 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           ),
       leading: LMChatProfilePicture(
         fallbackText: chatroom.header,
-        overlay: chatroom.externalSeen != null && !chatroom.externalSeen!
-            ? _defaultNewText()
-            : const SizedBox.shrink(),
+        overlay:
+            chatroom.externalSeen != null && chatroom.externalSeen! == false
+                ? _defaultNewText()
+                : const SizedBox.shrink(),
         imageUrl: chatroom.chatroomImageUrl,
         style: LMChatProfilePictureStyle.basic().copyWith(
           size: 56,
@@ -186,7 +187,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             vertical: 2.0,
             horizontal: 2.0,
           ),
-          backgroundColor: LMChatTheme.theme.secondaryColor,
+          backgroundColor: LMChatTheme.theme.errorColor,
           textStyle: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w600,

@@ -200,20 +200,20 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     clipper: LMChatBubbleClipper(
                       isSent: isSent,
                     ),
-                    color: inStyle.backgroundColor?? theme.container,
+                    color: inStyle.backgroundColor ?? theme.container,
                     child: Padding(
                       padding: isSent
-                          ? const EdgeInsets.only(
-                              top: 10,
-                              bottom: 10,
-                              left: 10,
-                              right: 25,
+                          ? EdgeInsets.only(
+                              top: 1.h,
+                              bottom: 1.h,
+                              left: 2.w,
+                              right: 4.w,
                             )
-                          : const EdgeInsets.only(
-                              top: 10,
-                              bottom: 10,
-                              left: 25,
-                              right: 10,
+                          : EdgeInsets.only(
+                              top: 1.h,
+                              bottom: 1.h,
+                              left: 4.w,
+                              right: 2.w,
                             ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
