@@ -74,7 +74,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
     super.build(context);
     return Scaffold(
       backgroundColor: LMChatTheme.theme.scaffold,
-      floatingActionButton: _floatingActionButton(),
+      // floatingActionButton: _floatingActionButton(),
       body: SafeArea(
         top: false,
         child: BlocConsumer<LMChatDMFeedBloc, LMChatDMFeedState>(

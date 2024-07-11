@@ -137,7 +137,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             MaterialPageRoute(
               builder: (context) => const LMChatExplorePage(),
             ),
-          );
+          ).then((val) {
+            feedBloc.add(LMChatRefreshHomeFeedEvent());
+          });
         },
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 2.w),
@@ -340,28 +342,22 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
               const SizedBox(height: 6),
               Visibility(
                 visible: chatroom.unseenCount! > 0,
-                child: Container(
-                  constraints: const BoxConstraints(
-                    minHeight: 24,
-                    maxHeight: 24,
-                  ),
-                  width: 24,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(14)),
-                    color: LMChatTheme.theme.primaryColor,
-                  ),
-                  child: Center(
-                    child: LMChatText(
-                      chatroom.unseenCount! > 99
-                          ? "99+"
-                          : chatroom.unseenCount.toString(),
-                      style: LMChatTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 12,
-                          color: LMChatTheme.theme.onPrimary,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                child: LMChatText(
+                  chatroom.unseenCount! > 99
+                      ? "99+"
+                      : chatroom.unseenCount.toString(),
+                  style: LMChatTextStyle(
+                    maxLines: 1,
+                    backgroundColor: LMChatTheme.theme.primaryColor,
+                    borderRadius: 24,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 4,
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      color: LMChatTheme.theme.onPrimary,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
