@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_chat_flutter_core/src/views/explore/explore.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// LMChatHomeScreen is the main screen to enter LM Chat experience.
 ///
-/// To customise it pass appropriate builders to constructor.
+/// To customize it pass appropriate builders to constructor.
 class LMChatHomeScreen extends StatefulWidget {
   /// Builder function to render a floating action button on screen
   final LMChatButtonBuilder? floatingActionButton;
@@ -32,6 +31,7 @@ class LMChatHomeScreen extends StatefulWidget {
 class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   final LMChatUserViewData user =
       LMChatLocalPreference.instance.getUser().toUserViewData();
+  final _homeScreenBuilder = LMChatCore.config.homeConfig.builder;
 
   @override
   void didUpdateWidget(covariant LMChatHomeScreen oldWidget) {
@@ -45,17 +45,19 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       value: SystemUiOverlayStyle.dark,
       child: DefaultTabController(
         length: 2,
-        child: Scaffold(
+        child: _homeScreenBuilder.scaffold(
           backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: widget.appBar?.call(
-                user,
-                _appBar(),
-              ) ??
-              _appBar(),
-          body: const TabBarView(
+          appBar: _homeScreenBuilder.appBarBuilder(context, _defAppBar()),
+          body: TabBarView(
             children: [
-              LMChatHomeFeedList(),
-              LMChatDMFeedList(),
+              _homeScreenBuilder.homeFeedListBuilder(
+                context,
+                const LMChatHomeFeedList(),
+              ),
+              _homeScreenBuilder.dmFeedListBuilder(
+                context,
+                const LMChatDMFeedList(),
+              ),
             ],
           ),
           floatingActionButton: widget.floatingActionButton?.call(
@@ -67,14 +69,12 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     );
   }
 
-  LMChatAppBar _appBar() {
+  LMChatAppBar _defAppBar() {
     return LMChatAppBar(
       style: const LMChatAppBarStyle(
         height: 120,
       ),
       leading: const SizedBox.shrink(),
-      // titleSpacing: -24,
-      // centerTitle: false,
       trailing: [
         // const Icon(Icons.search),
         const SizedBox(width: 8),
@@ -134,3 +134,4 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     );
   }
 }
+

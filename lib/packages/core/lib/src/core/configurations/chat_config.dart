@@ -28,7 +28,7 @@ class LMChatConfig {
   final LMChatParticipantConfig participantConfig;
 
   /// {@macro lm_widget_builder_delegate}
-  final LMChatWidgetBuilderDelegate? widgetBuilderDelegate;
+  final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
   /// [globalSystemOverlayStyle] is the system overlay style for the app.
   final SystemUiOverlayStyle? globalSystemOverlayStyle;
@@ -39,7 +39,7 @@ class LMChatConfig {
     this.exploreConfig = const LMChatExploreConfig(),
     this.homeConfig = const LMChatHomeConfig(),
     this.participantConfig = const LMChatParticipantConfig(),
-    this.widgetBuilderDelegate,
+    this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });
 }

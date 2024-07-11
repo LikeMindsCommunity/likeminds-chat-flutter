@@ -9,14 +9,6 @@ class LMChatReportBuilderDelegate {
   /// {@macro lm_chat_report_builder_delegate}
   const LMChatReportBuilderDelegate();
 
-  //   /// Report chip builder
-  // final Widget Function(BuildContext, LMChatDeleteReasonViewData)?
-  //     reportChipBuilder;
-
-  // /// Report content builder
-  // final Widget Function(BuildContext, LMReportContentWidget)?
-  //     reportContentBuilder;
-
   /// Builds the report chip.
   Widget reportChipBuilder(
     BuildContext context,

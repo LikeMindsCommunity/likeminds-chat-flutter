@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/moderation/moderation_bloc.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -52,7 +51,8 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   LMChatThemeData theme = LMChatTheme.instance.themeData;
   final TextEditingController _reportReasonController = TextEditingController();
   LMChatReportTagViewData? _selectedReportTag;
-  final LMChatWidgetBuilderDelegate _builderDelegate = LMChatCore.widgets;
+  final LMChatWidgetBuilderDelegate _builderDelegate =
+      LMChatCore.config.widgetBuilderDelegate;
   final LMChatModerationBloc _moderationBloc = LMChatModerationBloc();
 
   @override
@@ -247,8 +247,9 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
               fontWeight: FontWeight.w400,
             ).copyWith(
               fontSize: 14,
-              color:
-                  _selectedReportTag?.id == e.id ? Colors.white :  theme.inActiveColor,
+              color: _selectedReportTag?.id == e.id
+                  ? Colors.white
+                  : theme.inActiveColor,
             ),
           ),
         ),
@@ -260,7 +261,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
           side: BorderSide(
             color: _selectedReportTag?.id == e.id
                 ? theme.primaryColor
-                :  theme.inActiveColor,
+                : theme.inActiveColor,
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16.0),

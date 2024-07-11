@@ -7,25 +7,77 @@ import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
+/// {@template lm_chat_home_feed_list}
 /// A widget that represents a List of Group Chatrooms on home
 /// Talks to an instance of LMChatHomeFeedBloc, and updates accordingly
 /// Allows for customizations to change the look and feel.
+/// {@endtemplate}
 class LMChatHomeFeedList extends StatefulWidget {
+  /// [chatroomTileBuilder] is a builder function to render a chatroom tile
   final LMChatroomTileBuilder? chatroomTileBuilder;
-  final LMChatContextWidgetBuilder? listErrorBuilder;
-  final LMChatContextWidgetBuilder? loadingNextPageWidget;
-  final LMChatContextWidgetBuilder? loadingListWidget;
 
+  /// [LMChatHomeFeedListStyle] is a style object to customize the look and feel
   final LMChatHomeFeedListStyle? style;
 
+  /// [firstPageErrorIndicatorBuilder] is a builder function to render an error indicator on first page
+  final LMContextWidgetBuilder? firstPageErrorIndicatorBuilder;
+
+  /// [newPageErrorIndicatorBuilder] is a builder function to render an error indicator on new page
+  final LMContextWidgetBuilder? newPageErrorIndicatorBuilder;
+
+  /// [firstPageProgressIndicatorBuilder] is a builder function to render a progress indicator on first page
+  final LMContextWidgetBuilder? firstPageProgressIndicatorBuilder;
+
+  /// [newPageProgressIndicatorBuilder] is a builder function to render a progress indicator on new page
+  final LMContextWidgetBuilder? newPageProgressIndicatorBuilder;
+
+  /// [noItemsFoundIndicatorBuilder] is a builder function to render a no items found indicator
+  final LMContextWidgetBuilder? noItemsFoundIndicatorBuilder;
+
+  /// [noMoreItemsIndicatorBuilder] is a builder function to render a no more items indicator
+  final LMContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+
+  /// {@macro lm_chat_home_feed_list}
   const LMChatHomeFeedList({
     super.key,
     this.style,
     this.chatroomTileBuilder,
-    this.listErrorBuilder,
-    this.loadingNextPageWidget,
-    this.loadingListWidget,
+    this.firstPageErrorIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noItemsFoundIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
   });
+
+  /// Creates a copy of this [LMChatHomeFeedList] but with the given fields replaced with the new values.
+  LMChatHomeFeedList copyWith({
+    LMChatroomTileBuilder? chatroomTileBuilder,
+    LMChatHomeFeedListStyle? style,
+    LMContextWidgetBuilder? firstPageErrorIndicatorBuilder,
+    LMContextWidgetBuilder? newPageErrorIndicatorBuilder,
+    LMContextWidgetBuilder? firstPageProgressIndicatorBuilder,
+    LMContextWidgetBuilder? newPageProgressIndicatorBuilder,
+    LMContextWidgetBuilder? noItemsFoundIndicatorBuilder,
+    LMContextWidgetBuilder? noMoreItemsIndicatorBuilder,
+  }) {
+    return LMChatHomeFeedList(
+      chatroomTileBuilder: chatroomTileBuilder ?? this.chatroomTileBuilder,
+      style: style ?? this.style,
+      firstPageErrorIndicatorBuilder:
+          firstPageErrorIndicatorBuilder ?? this.firstPageErrorIndicatorBuilder,
+      newPageErrorIndicatorBuilder:
+          newPageErrorIndicatorBuilder ?? this.newPageErrorIndicatorBuilder,
+      firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder ??
+          this.firstPageProgressIndicatorBuilder,
+      newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder ??
+          this.newPageProgressIndicatorBuilder,
+      noItemsFoundIndicatorBuilder:
+          noItemsFoundIndicatorBuilder ?? this.noItemsFoundIndicatorBuilder,
+      noMoreItemsIndicatorBuilder:
+          noMoreItemsIndicatorBuilder ?? this.noMoreItemsIndicatorBuilder,
+    );
+  }
 
   @override
   State<LMChatHomeFeedList> createState() => _LMChatHomeFeedListState();
@@ -72,43 +124,51 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: LMChatTheme.theme.scaffold,
+      backgroundColor:
+          widget.style?.backgroundColor ?? LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
-        child: BlocConsumer<LMChatHomeFeedBloc, LMChatHomeFeedState>(
+        child: BlocListener<LMChatHomeFeedBloc, LMChatHomeFeedState>(
           bloc: feedBloc,
           listener: (_, state) {
             _updatePagingControllers(state);
           },
-          builder: (context, state) {
-            if (state is LMChatDMFeedError) {
-              return widget.listErrorBuilder?.call(context) ??
-                  _defaultErrorView();
-            }
-            return ValueListenableBuilder(
-                valueListenable: rebuildFeedList,
-                builder: (context, _, __) {
-                  return PagedListView<int, LMChatRoomViewData>(
-                    pagingController: homeFeedPagingController,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 4,
-                    ),
-                    physics: const ClampingScrollPhysics(),
-                    builderDelegate:
-                        PagedChildBuilderDelegate<LMChatRoomViewData>(
-                      firstPageProgressIndicatorBuilder: (context) =>
-                          widget.loadingListWidget?.call(context) ??
-                          const LMChatSkeletonChatroomList(),
-                      noItemsFoundIndicatorBuilder: (context) =>
-                          const SizedBox(),
-                      itemBuilder: (context, item, index) {
-                        return _defaultHomeChatRoomTile(item);
-                      },
-                    ),
-                  );
-                });
-          },
+          child: ValueListenableBuilder(
+              valueListenable: rebuildFeedList,
+              builder: (context, _, __) {
+                return PagedListView<int, LMChatRoomViewData>(
+                  pagingController: homeFeedPagingController,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 4,
+                  ),
+                  physics: const ClampingScrollPhysics(),
+                  builderDelegate:
+                      PagedChildBuilderDelegate<LMChatRoomViewData>(
+                    firstPageErrorIndicatorBuilder:
+                        widget.firstPageErrorIndicatorBuilder ??
+                            (context) => _defaultErrorView(),
+                    newPageErrorIndicatorBuilder:
+                        widget.newPageErrorIndicatorBuilder ??
+                            (context) => _defaultErrorView(),
+                    firstPageProgressIndicatorBuilder:
+                        widget.firstPageProgressIndicatorBuilder ??
+                            (context) => const LMChatSkeletonChatroomList(),
+                    newPageProgressIndicatorBuilder:
+                        widget.newPageProgressIndicatorBuilder ??
+                            (context) => const LMChatSkeletonChatroomList(),
+                    noItemsFoundIndicatorBuilder:
+                        widget.noItemsFoundIndicatorBuilder,
+                    noMoreItemsIndicatorBuilder:
+                        widget.noMoreItemsIndicatorBuilder,
+                    itemBuilder: (context, item, index) {
+                      return widget.chatroomTileBuilder
+                              ?.call(item, _defaultHomeChatRoomTile(item)) ??
+                          _defaultHomeChatRoomTile(item);
+                    },
+                  ),
+                );
+              }),
         ),
       ),
     );
@@ -127,6 +187,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   }
 
   _updatePagingControllers(LMChatHomeFeedState state) {
+    if (state is LMChatHomeFeedError) {
+      homeFeedPagingController.error = state.errorMessage;
+      return;
+    }
     if (state is LMChatHomeFeedLoaded) {
       _page++;
       homeFeedPagingController.itemList?.clear();
@@ -266,10 +330,17 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   bool get wantKeepAlive => true;
 }
 
+/// {@template lm_chat_home_feed_list_style}
+/// A style object to customize the look and feel of the home feed list
+/// {@endtemplate}
 class LMChatHomeFeedListStyle {
+  /// [backgroundColor] is the background color of the list
   final Color? backgroundColor;
+
+  /// [padding] is the padding of the list
   final EdgeInsets? padding;
 
+  /// {@macro lm_chat_home_feed_list_style}
   const LMChatHomeFeedListStyle({
     this.backgroundColor,
     this.padding,

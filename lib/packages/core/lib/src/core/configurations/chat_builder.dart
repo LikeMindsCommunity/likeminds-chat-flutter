@@ -2,18 +2,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/widget_source.dart';
 
 /// {@template lm_widget_builder_delegate}
 /// Delegate class for the widget builder.
 /// {@endtemplate}
 class LMChatWidgetBuilderDelegate {
-  static LMChatWidgetBuilderDelegate? _instance;
-  LMChatWidgetBuilderDelegate._();
-
   /// {@macro lm_widget_builder_delegate}
-  static LMChatWidgetBuilderDelegate get instance =>
-      _instance ??= LMChatWidgetBuilderDelegate._();
+  const LMChatWidgetBuilderDelegate();
 
   /// Builds a [Scaffold] widget with the given parameters.
   Widget scaffold({

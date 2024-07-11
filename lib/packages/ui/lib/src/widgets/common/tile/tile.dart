@@ -85,14 +85,16 @@ class LMChatTile extends StatelessWidget {
     );
   }
 
-  LMChatTile copyWith(
+  /// `copyWith` method to update the properties of the tile
+  /// with new values without changing the original tile
+  LMChatTile copyWith({
     Function()? onTap,
     LMChatTileStyle? style,
     Widget? leading,
     Widget? title,
     Widget? subtitle,
     Widget? trailing,
-  ) {
+  }) {
     return LMChatTile(
       onTap: onTap ?? this.onTap,
       style: style ?? this.style,
