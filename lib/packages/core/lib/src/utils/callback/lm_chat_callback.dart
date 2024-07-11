@@ -20,7 +20,6 @@ class LMChatCoreCallback {
   });
 }
 
-
 /// Implementation of the LMChatSDKCallback
 /// This class is used to handle the callback events from the core module
 /// The core module will call the methods in this class when the corresponding events are triggered
@@ -56,10 +55,7 @@ class LMChatSDKCallbackImpl implements LMChatSDKCallback {
         ?.value as String?;
 
     if (apiKey != null) {
-      User? user = LMChatLocalPreference.instance.getUser();
-      if (user == null) {
-        throw Exception("User data not found");
-      }
+      User user = LMChatLocalPreference.instance.getUser();
 
       InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
             ..apiKey(apiKey)

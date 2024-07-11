@@ -74,6 +74,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
     super.build(context);
     return Scaffold(
       backgroundColor: LMChatTheme.theme.scaffold,
+      floatingActionButton: _floatingActionButton(),
       body: SafeArea(
         top: false,
         child: BlocConsumer<LMChatDMFeedBloc, LMChatDMFeedState>(
@@ -268,6 +269,32 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  LMChatButton _floatingActionButton() {
+    return LMChatButton(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LMChatExplorePage(),
+          ),
+        );
+      },
+      style: LMChatButtonStyle(
+        backgroundColor: LMChatTheme.theme.backgroundColor,
+        height: 48,
+        width: 48,
+        borderRadius: 12,
+      ),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.message,
+        style: LMChatIconStyle(
+          color: LMChatTheme.theme.primaryColor,
+        ),
       ),
     );
   }

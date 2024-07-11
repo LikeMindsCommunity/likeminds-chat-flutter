@@ -39,6 +39,8 @@ class LMChatBubbleReply extends StatelessWidget {
         color: inStyle.backgroundColor ?? theme.disabledColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
       ),
+      margin: inStyle.margin ?? const EdgeInsets.symmetric(vertical: 4),
+      padding: inStyle.padding,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -121,6 +123,12 @@ class LMChatBubbleReplyStyle {
   /// Border radius of the reply item
   final double? borderRadius;
 
+  /// Padding inside the reply bubble
+  final EdgeInsetsGeometry? padding;
+
+  /// Margin outside the reply bubble
+  final EdgeInsetsGeometry? margin;
+
   /// Style of the title widget
   final LMChatTextStyle? titleStyle;
 
@@ -138,5 +146,7 @@ class LMChatBubbleReplyStyle {
     this.titleStyle,
     this.subtitleStyle,
     this.mediaStyle,
+    this.margin,
+    this.padding,
   });
 }

@@ -8,7 +8,6 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('DEBUG');
