@@ -96,16 +96,19 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       _defaultExploreBlocConsumer() {
     return BlocConsumer<LMChatExploreBloc, LMChatExploreState>(
       bloc: exploreBloc,
-      buildWhen: (previous, current) {
-        if (current is LMChatExploreLoadingState && _page != 1) {
-          return false;
-        }
-        return true;
-      },
+      // buildWhen: (previous, current) {
+      //   if (current is LMChatExploreLoadingState && _page != 1) {
+      //     return false;
+      //   }
+      //   return true;
+      // },
       listener: (context, state) {
         _updatePagingController(state);
       },
       builder: (context, state) {
+        if (state is LMChatExploreLoadingState) {
+          return const LMChatLoader();
+        }
         return _defaultExploreFeedList();
       },
     );
@@ -233,6 +236,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
             "Opps, no chatrooms found!",
           ),
         ),
+        firstPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         itemBuilder: (context, item, index) =>
             _defaultExploreTile(item, context),
       ),
@@ -252,7 +256,9 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
               chatroomId: item.id,
             ),
           ),
-        );
+        ).then((d) {
+          _refreshExploreFeed();
+        });
         _markRead(item.id);
       },
     );
