@@ -112,13 +112,15 @@ class LMChatParticipantBuilderDelegate {
     BuildContext context,
   ) {
     return const Center(
-        child: LMChatText(
-      'No search results found',
-      style: LMChatTextStyle(
+      child: LMChatText(
+        'No search results found',
+        style: LMChatTextStyle(
           textStyle: TextStyle(
-        fontSize: 16,
-      )),
-    ));
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
   }
 
   /// Builds the no more items indicator.

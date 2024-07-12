@@ -34,7 +34,7 @@ class LMChatUserTile extends LMChatTile {
       style: style ??
           LMChatTileStyle(
             backgroundColor: _chatTheme.container,
-            margin: 4,
+            gap: 4,
             // margin: 12,
           ),
       leading: leading ??

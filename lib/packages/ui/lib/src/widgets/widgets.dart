@@ -7,6 +7,7 @@ export 'common/buttons/floating_action_button.dart';
 
 export 'common/extras/appbar.dart';
 export 'common/extras/loader.dart';
+export 'common/extras/chip.dart';
 
 export 'common/snackbar/snackbar.dart';
 

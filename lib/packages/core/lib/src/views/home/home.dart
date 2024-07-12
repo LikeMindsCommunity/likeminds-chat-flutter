@@ -45,26 +45,27 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       value: SystemUiOverlayStyle.dark,
       child: DefaultTabController(
         length: 2,
-        child: _homeScreenBuilder.scaffold(
-          backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: _homeScreenBuilder.appBarBuilder(context, _defAppBar()),
-          body: TabBarView(
-            children: [
-              _homeScreenBuilder.homeFeedListBuilder(
-                context,
-                const LMChatHomeFeedList(),
-              ),
-              _homeScreenBuilder.dmFeedListBuilder(
-                context,
-                const LMChatDMFeedList(),
-              ),
-            ],
-          ),
-          floatingActionButton: widget.floatingActionButton?.call(
+        child: Builder(builder: (context) {
+          return _homeScreenBuilder.scaffold(
+            backgroundColor: LMChatTheme.theme.backgroundColor,
+            appBar: _homeScreenBuilder.appBarBuilder(
+              context,
+              user,
+              DefaultTabController.of(context),
+              _defAppBar(),
+            ),
+            body: const TabBarView(
+              children: [
+                LMChatHomeFeedList(),
+                LMChatDMFeedList(),
+              ],
+            ),
+            floatingActionButton: widget.floatingActionButton?.call(
+                  _floatingActionButton(),
+                ) ??
                 _floatingActionButton(),
-              ) ??
-              _floatingActionButton(),
-        ),
+          );
+        }),
       ),
     );
   }
@@ -134,4 +135,3 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     );
   }
 }
-

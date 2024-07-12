@@ -21,15 +21,60 @@ class LMChatExploreTile extends StatefulWidget {
   /// Chatroom view model required to render the widget
   final LMChatRoomViewData chatroom;
 
+  /// Callback function to handle tap event
   final VoidCallback? onTap;
+
+  /// Flag to absorb touch events
+  final bool? absorbTouch;
+
+  /// Widget to display on the left side of the tile
+  final Widget? leading;
+
+  /// Widget to display as title
+  final Widget? title;
+
+  /// Widget to display as subtitle
+  final Widget? subtitle;
+
+  /// Widget to display on the right side of the tile
+  final Widget? trailing;
 
   ///{@macro lm_chat_explore_tile}
   const LMChatExploreTile({
     super.key,
     this.style,
     this.onTap,
+    this.absorbTouch,
+    this.leading,
+    this.title,
+    this.subtitle,
+    this.trailing,
     required this.chatroom,
   });
+
+  /// CopyWith method to update the widget with new values
+  /// Returns a new instance of the widget with updated values
+  LMChatExploreTile copyWith({
+    LMChatTileStyle? style,
+    VoidCallback? onTap,
+    bool? absorbTouch,
+    Widget? leading,
+    Widget? title,
+    Widget? subtitle,
+    Widget? trailing,
+    LMChatRoomViewData? chatroom,
+  }) {
+    return LMChatExploreTile(
+      style: style ?? this.style,
+      onTap: onTap ?? this.onTap,
+      absorbTouch: absorbTouch ?? this.absorbTouch,
+      leading: leading ?? this.leading,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      trailing: trailing ?? this.trailing,
+      chatroom: chatroom ?? this.chatroom,
+    );
+  }
 
   @override
   State<LMChatExploreTile> createState() => _LMChatExploreTileState();
@@ -50,59 +95,63 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
   Widget build(BuildContext context) {
     return LMChatTile(
       onTap: widget.onTap,
-      absorbTouch: false,
+      absorbTouch: widget.absorbTouch ?? false,
       style: widget.style ??
           LMChatTheme.theme.chatTileStyle.copyWith(
-            margin: 6,
+            gap: 6,
           ),
-      leading: LMChatProfilePicture(
-        fallbackText: chatroom.header,
-        overlay: chatroom.externalSeen != null && !chatroom.externalSeen!
-            ? _defaultNewText()
-            : const SizedBox.shrink(),
-        imageUrl: chatroom.chatroomImageUrl,
-        style: LMChatProfilePictureStyle.basic().copyWith(
-          size: 56,
-        ),
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LMChatText(
-                  chatroom.header,
-                  style: const LMChatTextStyle(
-                    maxLines: 1,
-                    textStyle: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                _defaultSpaceStats(),
-              ],
+      leading: widget.leading ??
+          LMChatProfilePicture(
+            fallbackText: chatroom.header,
+            overlay: chatroom.externalSeen != null && !chatroom.externalSeen!
+                ? _defaultNewText()
+                : const SizedBox.shrink(),
+            imageUrl: chatroom.chatroomImageUrl,
+            style: LMChatProfilePictureStyle.basic().copyWith(
+              size: 56,
             ),
           ),
-          const SizedBox(width: 12),
-          _defaultJoinButton(),
-        ],
-      ),
-      subtitle: LMChatText(
-        chatroom.title,
-        // style: LMTheme.regular.copyWith(color: kGrey3Color),
-        style: const LMChatTextStyle(
-          textAlign: TextAlign.left,
-          maxLines: 2,
-          minLines: 1,
-          textStyle: TextStyle(
-            overflow: TextOverflow.ellipsis,
+      title: widget.title ??
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LMChatText(
+                      chatroom.header,
+                      style: const LMChatTextStyle(
+                        maxLines: 1,
+                        textStyle: TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    _defaultSpaceStats(),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              _defaultJoinButton(),
+            ],
           ),
-        ),
-      ),
+      subtitle: widget.subtitle ??
+          LMChatText(
+            chatroom.title,
+            // style: LMTheme.regular.copyWith(color: kGrey3Color),
+            style: const LMChatTextStyle(
+              textAlign: TextAlign.left,
+              maxLines: 2,
+              minLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+      trailing: widget.trailing,
     );
   }
 
