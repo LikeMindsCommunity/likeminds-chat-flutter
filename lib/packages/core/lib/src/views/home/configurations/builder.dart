@@ -12,6 +12,7 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 /// [LMChatHomeBuilderDelegate] and override the methods.
 /// Then pass the instance of this class to the [LMChatHomeConfig] class.
 /// which is used to configure the home screen.
+/// 
 /// example:
 /// ```dart
 /// class ExampleHomeBuilder extends LMChatHomeBuilderDelegate {
@@ -20,16 +21,16 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 ///   return appBar.copyWith(
 ///    style: LMChatAppBarStyle.basic().copyWith(
 ///     backgroundColor: Colors.green,
-///   ),
-/// );
-/// }
+///       ),
+///     );
+///   }
 /// }
 /// ```
 /// Then pass the instance of this class to the [LMChatHomeConfig] class.
 /// ```dart
 /// LMChatHomeConfig(
 ///  builder: ExampleHomeBuilder(),
-/// );
+///   );
 /// ```
 /// Use This [LMChatHomeConfig] instance to configure the home screen
 /// by passing it to the [LMChatCore] class. in initialize method.
