@@ -76,7 +76,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 2.w),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _defaultExploreMenu(),
               const Spacer(),
@@ -96,19 +96,10 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       _defaultExploreBlocConsumer() {
     return BlocConsumer<LMChatExploreBloc, LMChatExploreState>(
       bloc: exploreBloc,
-      // buildWhen: (previous, current) {
-      //   if (current is LMChatExploreLoadingState && _page != 1) {
-      //     return false;
-      //   }
-      //   return true;
-      // },
       listener: (context, state) {
         _updatePagingController(state);
       },
       builder: (context, state) {
-        if (state is LMChatExploreLoadingState) {
-          return const LMChatLoader();
-        }
         return _defaultExploreFeedList();
       },
     );
@@ -232,10 +223,9 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       physics: const ClampingScrollPhysics(),
       builderDelegate: PagedChildBuilderDelegate<ChatRoom>(
         noItemsFoundIndicatorBuilder: (context) => const Center(
-          child: Text(
-            "Opps, no chatrooms found!",
-          ),
+          child: LMChatText("Opps, no chatrooms found!"),
         ),
+        newPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         firstPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         itemBuilder: (context, item, index) =>
             _defaultExploreTile(item, context),
@@ -246,7 +236,6 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   LMChatExploreTile _defaultExploreTile(ChatRoom item, BuildContext context) {
     return LMChatExploreTile(
       chatroom: item.toChatRoomViewData(),
-      // refresh: () => refresh(),
       onTap: () {
         LMChatRealtime.instance.chatroomId = item.id;
         Navigator.push(
@@ -268,98 +257,82 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
     return ValueListenableBuilder(
       valueListenable: rebuildPin,
       builder: (context, _, __) {
-        return pinnedChatroomCount <= 1
+        return pinnedChatroomCount <= 3
             ? const SizedBox()
-            : GestureDetector(
-                onTap: () {
-                  pinnedChatroom = !pinnedChatroom;
-                  rebuildPin.value = !rebuildPin.value;
-                  _refreshExploreFeed();
-                  debugPrint("Pin button tapped");
-                },
-                child: pinnedChatroom
-                    ? _defaultPinnedButton()
-                    : _defaultPinButton(),
-              );
+            : pinnedChatroom
+                ? _defaultPinnedButton()
+                : _defaultPinButton();
       },
     );
   }
 
-  Container _defaultPinButton() {
-    return Container(
-      // height: 18.sp,
-      // width: 18.sp,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.grey,
+  LMChatButton _defaultPinButton() {
+    return LMChatButton(
+      onTap: () {
+        pinnedChatroom = !pinnedChatroom;
+        rebuildPin.value = !rebuildPin.value;
+        _refreshExploreFeed();
+        debugPrint("Pin button tapped");
+      },
+      icon: const LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.push_pin_outlined,
+        style: LMChatIconStyle(
+          size: 20,
         ),
       ),
-      child: const Icon(
-        Icons.push_pin,
-        // size: 10.sp,
-        // color: kDarkGreyColor,
+      style: LMChatButtonStyle(
+        height: 32,
+        width: 32,
+        border: Border.all(),
+        borderRadius: 16,
+        backgroundColor: Colors.transparent,
       ),
     );
   }
 
-  Container _defaultPinnedButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(
-          color: Colors.red,
+  LMChatButton _defaultPinnedButton() {
+    return LMChatButton(
+      onTap: () {
+        pinnedChatroom = !pinnedChatroom;
+        rebuildPin.value = !rebuildPin.value;
+        _refreshExploreFeed();
+        debugPrint("Pin button tapped");
+      },
+      text: const LMChatText(
+        "Pinned",
+        style: LMChatTextStyle(
+          textStyle: TextStyle(fontSize: 14),
         ),
       ),
-      child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              height: 18,
-              width: 18,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: LMChatTheme.theme.primaryColor,
-                ),
-              ),
-              child: Icon(
-                Icons.push_pin,
-                // size: 10.sp,
-                // color: LMTheme.buttonColor,
-                color: LMChatTheme.theme.primaryColor,
-              ),
-            ),
-            kHorizontalPaddingSmall,
-            const Text(
-              'Pinned',
-              // style: LMTheme.medium.copyWith(
-              //     color: LMTheme.buttonColor),
-            ),
-            kHorizontalPaddingSmall,
-            const SizedBox(
-              // height: 18.sp,
-              // width: 18.sp,
-              child: Icon(
-                CupertinoIcons.xmark,
-                size: 24,
-                // size: 12.sp,
-                // color: LMTheme.buttonColor,
-              ),
-            ),
-          ]),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.push_pin_outlined,
+        style: LMChatIconStyle(
+          size: 18,
+          boxBorder: 1,
+          boxBorderRadius: 11,
+          boxPadding: 2,
+          boxSize: 22,
+          boxBorderColor: LMChatTheme.theme.onContainer,
+        ),
+      ),
+      style: LMChatButtonStyle(
+        height: 32,
+        spacing: 6,
+        border: Border.all(),
+        borderRadius: 16,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 6,
+          vertical: 4,
+        ),
+        backgroundColor: Colors.transparent,
+      ),
     );
   }
-
-  void refresh() => setState(() {});
 
   void _refreshExploreFeed() {
     _page = 1;
-    exploreFeedPagingController.itemList?.clear();
     exploreBloc.add(
       LMChatFetchExploreEvent(
         getExploreFeedRequest: (GetExploreFeedRequestBuilder()
@@ -369,6 +342,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
             .build(),
       ),
     );
+    exploreFeedPagingController.itemList?.clear();
   }
 
   _addPaginationListener() {

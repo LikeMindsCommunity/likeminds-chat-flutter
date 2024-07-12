@@ -57,10 +57,16 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           ),
       leading: LMChatProfilePicture(
         fallbackText: chatroom.header,
-        overlay:
-            chatroom.externalSeen != null && chatroom.externalSeen! == false
-                ? _defaultNewText()
-                : const SizedBox.shrink(),
+        overlay: chatroom.externalSeen != null &&
+                chatroom.externalSeen! == false
+            ? _defaultNewText()
+            : Positioned(
+                bottom: 0,
+                right: 0,
+                child: chatroom.isPinned != null && chatroom.isPinned! == true
+                    ? _defaultPinnedIcon()
+                    : const SizedBox.shrink(),
+              ),
         imageUrl: chatroom.chatroomImageUrl,
         style: LMChatProfilePictureStyle.basic().copyWith(
           size: 56,
@@ -94,7 +100,6 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
       ),
       subtitle: LMChatText(
         chatroom.title,
-        // style: LMTheme.regular.copyWith(color: kGrey3Color),
         style: const LMChatTextStyle(
           textAlign: TextAlign.left,
           maxLines: 2,
@@ -103,6 +108,22 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+      ),
+    );
+  }
+
+  LMChatIcon _defaultPinnedIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.push_pin,
+      style: LMChatIconStyle(
+        size: 18,
+        boxSize: 24,
+        boxBorder: 2,
+        boxPadding: 4,
+        boxBorderRadius: 12,
+        color: LMChatTheme.theme.onContainer,
+        backgroundColor: LMChatTheme.theme.container,
       ),
     );
   }
