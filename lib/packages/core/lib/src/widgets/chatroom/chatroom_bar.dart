@@ -406,7 +406,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               ],
             ),
           );
-          // if(widget.chatroom.)
           linkModel = null;
           isActiveLink = false;
           rebuildLinkPreview.value = !rebuildLinkPreview.value;
@@ -450,6 +449,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         }
       }
       if (widget.chatroom.isGuest ?? false) {
+        toast("Chatroom joined");
+        widget.chatroom.isGuest = false;
+      }
+      if (widget.chatroom.followStatus == false) {
         toast("Chatroom joined");
         widget.chatroom.isGuest = false;
       }

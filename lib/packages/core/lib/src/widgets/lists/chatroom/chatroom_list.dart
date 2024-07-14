@@ -148,20 +148,13 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
-                height: 32,
-                width: 32,
-                decoration: BoxDecoration(
+              LMChatIcon(
+                type: LMChatIconType.svg,
+                assetPath: exploreIcon,
+                style: LMChatIconStyle(
                   color: LMChatTheme.theme.primaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: LMChatIcon(
-                  type: LMChatIconType.icon,
-                  icon: Icons.navigation_outlined,
-                  style: LMChatIconStyle(
-                    color: LMChatTheme.theme.onPrimary,
-                    size: 18,
-                  ),
+                  size: 28,
+                  boxSize: 32,
                 ),
               ),
               Padding(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
@@ -68,9 +69,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
                     : const SizedBox.shrink(),
               ),
         imageUrl: chatroom.chatroomImageUrl,
-        style: LMChatProfilePictureStyle.basic().copyWith(
-          size: 56,
-        ),
+        style: LMChatProfilePictureStyle.basic().copyWith(size: 56),
       ),
       title: Row(
         children: [
@@ -137,6 +136,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           icon: Icons.people_outline,
           style: LMChatIconStyle(
             size: 20,
+            color: LMChatDefaultTheme.greyColor,
           ),
         ),
         const SizedBox(width: 4),
@@ -147,15 +147,17 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
+              color: LMChatDefaultTheme.greyColor,
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         const LMChatIcon(
           type: LMChatIconType.icon,
-          icon: Icons.chat_bubble_outline,
+          icon: CupertinoIcons.chat_bubble,
           style: LMChatIconStyle(
             size: 20,
+            color: LMChatDefaultTheme.greyColor,
           ),
         ),
         const SizedBox(width: 4),
@@ -166,6 +168,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
+              color: LMChatDefaultTheme.greyColor,
             ),
           ),
         ),

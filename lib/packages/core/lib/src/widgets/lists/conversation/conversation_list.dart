@@ -109,8 +109,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             listener: (context, state) {
               updatePagingControllers(state);
               if (state is LMChatConversationPostedState) {
-                Map<String, String> userTags = LMChatTaggingHelper.decodeString(
-                    state.conversationViewData.answer);
+                // Map<String, String> userTags = LMChatTaggingHelper.decodeString(
+                //     state.conversationViewData.answer);
                 // LMAnalytics.get().track(
                 //   AnalyticsKeys.chatroomResponded,
                 //   {

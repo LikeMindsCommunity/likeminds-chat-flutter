@@ -126,10 +126,10 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         muteChatroom(action);
         break;
       case 9:
-        leaveChatroom();
+        showLeaveDialog();
         break;
       case 15:
-        leaveChatroom();
+        showLeaveDialog();
         break;
       default:
         unimplemented();
@@ -187,6 +187,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   void leaveChatroom() async {
     final User user = LMChatLocalPreference.instance.getUser();
+
     if (!(widget.chatroom.isSecret ?? false)) {
       final response =
           await LMChatCore.client.followChatroom((FollowChatroomRequestBuilder()
@@ -235,14 +236,53 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         toast(response.errorMessage!);
       }
     }
-    // final response =
-    //     await LMChatCore.client.leaveChatroom(LeaveChatroomRequest(
-    //   chatroomId: chatroom.id,
-    // ));
-    // if (response.success) {
-    //   toast("Chatroom left");
-    // } else {
-    //   toast(response.errorMessage!);
-    // }
+  }
+
+  void showLeaveDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => LMChatDialog(
+        title: const Text("Leave chatroom"),
+        content: Text(
+          widget.chatroom.isSecret != null && widget.chatroom.isSecret!
+              ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
+              : 'Are you sure you want to leave this group?',
+        ),
+        // actionText: 'Confirm',
+        // onActionPressed: onTap,
+        actions: [
+          LMChatText(
+            'Cancel',
+            onTap: () {
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          LMChatText(
+            'Confirm',
+            onTap: () {
+              leaveChatroom();
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
