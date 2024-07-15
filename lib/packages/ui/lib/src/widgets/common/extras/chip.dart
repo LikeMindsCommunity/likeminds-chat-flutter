@@ -45,9 +45,10 @@ class LMChatChip extends StatelessWidget {
         label: label,
         backgroundColor: style?.backgroundColor,
         shape: style?.shape,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        labelPadding: EdgeInsets.zero,
+        padding: style?.padding ?? const EdgeInsets.symmetric(horizontal: 16.0),
+        labelPadding: style?.labelPadding ?? EdgeInsets.zero,
         elevation: 0,
+        side: style?.side,
       ),
     );
   }
@@ -75,6 +76,9 @@ class LMChatChipStyle {
   /// The elevation of the chip.
   final double? elevation;
 
+  /// The Border of the chip.
+  final BorderSide? side;
+
   /// {@macro lm_chat_chip_style}
   const LMChatChipStyle({
     this.backgroundColor,
@@ -83,6 +87,7 @@ class LMChatChipStyle {
     this.margin,
     this.labelPadding,
     this.elevation,
+    this.side,
   });
 
   /// Creates a copy of this [LMChatChipStyle] but with the given fields replaced with the new values.
@@ -93,6 +98,7 @@ class LMChatChipStyle {
     EdgeInsets? padding,
     EdgeInsets? labelPadding,
     double? elevation,
+    BorderSide? side,
   }) {
     return LMChatChipStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -100,6 +106,7 @@ class LMChatChipStyle {
       padding: padding ?? this.padding,
       labelPadding: labelPadding ?? this.labelPadding,
       elevation: elevation ?? this.elevation,
+      side: side ?? this.side,
     );
   }
 

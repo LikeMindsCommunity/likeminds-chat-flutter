@@ -207,29 +207,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
               snapshot.hasData) {
             if (snapshot.data!.success) {
               GetExploreTabCountResponse response = snapshot.data!.data!;
-
-              return Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 2.w,
-                  vertical: 1.w,
-                ),
-                decoration: BoxDecoration(
-                  color: LMChatTheme.theme.primaryColor,
-                  borderRadius: BorderRadius.circular(4.w),
-                  shape: BoxShape.rectangle,
-                ),
-                child: LMChatText(
-                  response.unseenChannelCount == null ||
-                          response.unseenChannelCount == 0
-                      ? '${response.totalChannelCount} Chatrooms'
-                      : '${response.unseenChannelCount} NEW',
-                  style: LMChatTextStyle(
-                    textStyle: TextStyle(
-                      color: LMChatTheme.theme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+              return _screenBuilder.homeFeedExploreChipBuilder(
+                context,
+                _defExploreChip(response),
               );
             } else {
               const SizedBox();
@@ -237,6 +217,29 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           }
           return const SizedBox();
         },
+      ),
+    );
+  }
+
+  LMChatChip _defExploreChip(GetExploreTabCountResponse response) {
+    return LMChatChip(
+      style: LMChatChipStyle.basic().copyWith(
+        backgroundColor: LMChatTheme.theme.primaryColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: 2.w,
+        ),
+        side: BorderSide.none,
+      ),
+      label: LMChatText(
+        response.unseenChannelCount == null || response.unseenChannelCount == 0
+            ? '${response.totalChannelCount} Chatrooms'
+            : '${response.unseenChannelCount} NEW',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            color: LMChatTheme.theme.onPrimary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }
