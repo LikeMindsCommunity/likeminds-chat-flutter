@@ -114,8 +114,12 @@ class _LMButtonState extends State<LMChatButton> {
               child: Row(
                 children: [
                   inStyle.placement == LMChatIconButtonPlacement.start
-                      ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.spacing ?? 0)
+                      ? (widget.icon != null ||
+                              inStyle.icon != null ||
+                              inStyle.activeIcon != null)
+                          ? SizedBox(
+                              width: inStyle.spacing ?? 0,
+                            )
                           : const SizedBox.shrink()
                       : const SizedBox.shrink(),
                   inStyle.showText
@@ -125,10 +129,13 @@ class _LMButtonState extends State<LMChatButton> {
                               ? widget.activeText ??
                                   widget.text ??
                                   const SizedBox.shrink()
-                              : widget.text ?? const SizedBox.shrink())
+                              : widget.text ?? const SizedBox.shrink(),
+                        )
                       : const SizedBox.shrink(),
                   inStyle.placement == LMChatIconButtonPlacement.end
-                      ? (inStyle.icon != null || inStyle.activeIcon != null)
+                      ? (widget.icon != null ||
+                              inStyle.icon != null ||
+                              inStyle.activeIcon != null)
                           ? SizedBox(width: inStyle.spacing ?? 0)
                           : const SizedBox.shrink()
                       : const SizedBox.shrink(),
@@ -138,9 +145,10 @@ class _LMButtonState extends State<LMChatButton> {
             inStyle.placement == LMChatIconButtonPlacement.end
                 ? _active
                     ? inStyle.activeIcon ??
+                        widget.icon ??
                         inStyle.icon ??
                         const SizedBox.shrink()
-                    : inStyle.icon ?? const SizedBox.shrink()
+                    : widget.icon ?? inStyle.icon ?? const SizedBox.shrink()
                 : const SizedBox.shrink(),
           ],
         ),

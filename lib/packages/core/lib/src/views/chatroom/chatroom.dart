@@ -5,15 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/conversation/conversation_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/extension/list_extension.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/report.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
@@ -42,6 +40,7 @@ class LMChatroomScreen extends StatefulWidget {
 class _LMChatroomScreenState extends State<LMChatroomScreen> {
   late LMChatroomBloc _chatroomBloc;
   late LMChatroomActionBloc _chatroomActionBloc;
+  late LMChatConversationBloc _conversationBloc;
   late LMChatConversationActionBloc _convActionBloc;
 
   late ChatRoom chatroom;
@@ -76,10 +75,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     super.initState();
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
-    _chatroomActionBloc = LMChatroomActionBloc.instance;
-    _convActionBloc = LMChatConversationActionBloc.instance;
     _chatroomBloc = LMChatroomBloc.instance
       ..add(LMChatFetchChatroomEvent(chatroomId: widget.chatroomId));
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
+    _conversationBloc = LMChatConversationBloc.instance;
+    _convActionBloc = LMChatConversationActionBloc.instance;
     scrollController.addListener(() {
       _showScrollToBottomButton();
       _handleChatTopic();
@@ -94,11 +94,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void dispose() {
-    _chatroomActionBloc.add(MarkReadChatroomEvent(
-      chatroomId: widget.chatroomId,
-    ));
     _chatroomBloc.close();
     _convActionBloc.close();
+    _chatroomActionBloc.close();
+    _conversationBloc.close();
     super.dispose();
   }
 
@@ -117,6 +116,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               if (state is LMChatroomLoadedState) {
                 chatroom = state.chatroom;
                 lastConversationId = state.lastConversationId;
+                _conversationBloc.add(LMChatInitialiseConversationsEvent(
+                  chatroomId: chatroom.id,
+                  conversationId: lastConversationId,
+                ));
                 _chatroomActionBloc.add(MarkReadChatroomEvent(
                   chatroomId: chatroom.id,
                 ));
@@ -251,23 +254,29 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           : chatroom.chatroomWithUser!;
     }
     return LMChatAppBar(
-      style: const LMChatAppBarStyle(
+      style: LMChatAppBarStyle(
         height: 72,
-        padding: EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        gap: 3.w,
       ),
+      backButtonCallback: () => _chatroomActionBloc.add(MarkReadChatroomEvent(
+        chatroomId: widget.chatroomId,
+      )),
       banner: ValueListenableBuilder(
         valueListenable: rebuildAppBar,
         builder: (context, _, __) {
           return isAnyMessageSelected()
               ? const SizedBox.shrink()
-              : LMChatProfilePicture(
-                  imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
-                  fallbackText: chatroom.header,
-                  style: LMChatProfilePictureStyle(
-                    size: 42,
-                    backgroundColor: LMChatTheme.theme.primaryColor,
-                  ),
-                );
+              : chatroom.type! == 10
+                  ? LMChatProfilePicture(
+                      imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
+                      fallbackText: chatroom.header,
+                      style: LMChatProfilePictureStyle(
+                        size: 42,
+                        backgroundColor: LMChatTheme.theme.primaryColor,
+                      ),
+                    )
+                  : const SizedBox.shrink();
         },
       ),
       title: ValueListenableBuilder(
@@ -297,6 +306,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     ? const SizedBox.shrink()
                     : LMChatText(
                         "${participants.toString()} participants",
+                        style: const LMChatTextStyle(
+                          textStyle: TextStyle(
+                            color: LMChatDefaultTheme.greyColor,
+                          ),
+                        ),
                       );
               },
             )

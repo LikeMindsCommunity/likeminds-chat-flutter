@@ -17,7 +17,15 @@ class LMChatFetchExploreEvent extends LMChatExploreEvent {
 }
 
 /// Event class to refresh Explore feed
-class LMChatRefreshExploreEvent extends LMChatExploreEvent {}
+class LMChatRefreshExploreEvent extends LMChatExploreEvent {
+  final int orderType;
+  final bool pinned;
+
+  LMChatRefreshExploreEvent({
+    required this.orderType,
+    required this.pinned,
+  });
+}
 
 /// Event class to pin an Explore space to feed
 class LMChatPinSpaceEvent extends LMChatExploreEvent {

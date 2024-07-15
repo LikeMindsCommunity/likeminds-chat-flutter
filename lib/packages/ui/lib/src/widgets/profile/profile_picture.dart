@@ -51,7 +51,9 @@ class LMChatProfilePicture extends StatelessWidget {
                   : inStyle.backgroundColor ?? LMChatTheme.theme.primaryColor,
               image: filePath != null
                   ? DecorationImage(
-                      image: FileImage(File(filePath!)), fit: BoxFit.cover)
+                      image: FileImage(File(filePath!)),
+                      fit: BoxFit.cover,
+                    )
                   : imageUrl != null && imageUrl!.isNotEmpty
                       ? DecorationImage(
                           image: NetworkImage(imageUrl!),
