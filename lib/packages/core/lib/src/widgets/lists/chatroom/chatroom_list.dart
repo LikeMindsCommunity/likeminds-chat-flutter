@@ -170,6 +170,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           bottom: 1.h,
         ),
         padding: EdgeInsets.symmetric(horizontal: 6.w),
+        height: 4.h,
       ),
       leading: LMChatIcon(
         type: LMChatIconType.svg,
@@ -304,7 +305,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       leading: LMChatProfilePicture(
         fallbackText: chatroom.header,
         imageUrl: chatroom.chatroomImageUrl,
-        style: const LMChatProfilePictureStyle(size: 48),
+        style: _style?.profilePictureStyle ??
+            const LMChatProfilePictureStyle(size: 48),
       ),
       title: Row(
         children: [
@@ -320,15 +322,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             ),
           ),
           const SizedBox(width: 2),
-          chatroom.isSecret == true
-              ? LMChatIcon(
-                  type: LMChatIconType.svg,
-                  assetPath: secretLockIcon,
-                  style: LMChatIconStyle(
-                    size: 20,
-                  ),
-                )
-              : const SizedBox.shrink()
+          if (chatroom.isSecret == true)
+            _screenBuilder.homeFeedSecretChatroomIconBuilder(
+              _defSecretChatroomIcon(),
+            ),
         ],
       ),
       subtitle: LMChatText(
@@ -401,6 +398,16 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
     );
   }
 
+  LMChatIcon _defSecretChatroomIcon() {
+    return const LMChatIcon(
+      type: LMChatIconType.svg,
+      assetPath: secretLockIcon,
+      style: LMChatIconStyle(
+        size: 20,
+      ),
+    );
+  }
+
   LMChatIcon _defMuteIcon() {
     return const LMChatIcon(
       type: LMChatIconType.icon,
@@ -422,12 +429,16 @@ class LMChatHomeFeedListStyle {
   /// [padding] is the padding of the list
   final EdgeInsets? padding;
 
+  /// [profilePictureStyle] is the style of the profile picture
+  final LMChatProfilePictureStyle? profilePictureStyle;
+
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_home_feed_list_style}
   const LMChatHomeFeedListStyle({
     this.backgroundColor,
     this.padding,
+    this.profilePictureStyle,
   });
 
   /// Default style for the home feed list
@@ -435,6 +446,7 @@ class LMChatHomeFeedListStyle {
     return LMChatHomeFeedListStyle(
       backgroundColor: _themeData.scaffold,
       padding: const EdgeInsets.all(0),
+      profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
     );
   }
 
@@ -443,10 +455,12 @@ class LMChatHomeFeedListStyle {
   LMChatHomeFeedListStyle copyWith({
     Color? backgroundColor,
     EdgeInsets? padding,
+    LMChatProfilePictureStyle? profilePictureStyle,
   }) {
     return LMChatHomeFeedListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
+      profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,
     );
   }
 }

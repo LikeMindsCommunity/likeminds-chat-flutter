@@ -83,10 +83,11 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
               builder: (context, _, __) {
                 return PagedListView<int, LMChatRoomViewData>(
                   pagingController: homeFeedPagingController,
-                  padding: _style?.padding?? const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 4,
-                  ),
+                  padding: _style?.padding ??
+                      const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 4,
+                      ),
                   physics: const ClampingScrollPhysics(),
                   builderDelegate:
                       PagedChildBuilderDelegate<LMChatRoomViewData>(
@@ -215,7 +216,8 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
       leading: LMChatProfilePicture(
         fallbackText: chatroomUser.name,
         imageUrl: chatroomUser.imageUrl,
-        style: const LMChatProfilePictureStyle(size: 48),
+        style: _style?.profilePictureStyle ??
+            const LMChatProfilePictureStyle(size: 48),
       ),
       title: LMChatText(
         chatroomUser.name,
@@ -355,12 +357,16 @@ class LMChatDMFeedListStyle {
   /// [padding] is the padding of the list
   final EdgeInsets? padding;
 
+  /// [profilePictureStyle] is the style of the profile picture
+  final LMChatProfilePictureStyle? profilePictureStyle;
+
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_dm_feed_list_style}
   const LMChatDMFeedListStyle({
     this.backgroundColor,
     this.padding,
+    this.profilePictureStyle,
   });
 
   /// {@macro lm_chat_dm_feed_list_style}
@@ -368,6 +374,7 @@ class LMChatDMFeedListStyle {
     return LMChatDMFeedListStyle(
       backgroundColor: _themeData.scaffold,
       padding: EdgeInsets.zero,
+      profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
     );
   }
 
@@ -376,10 +383,12 @@ class LMChatDMFeedListStyle {
   LMChatDMFeedListStyle copyWith({
     Color? backgroundColor,
     EdgeInsets? padding,
+    LMChatProfilePictureStyle? profilePictureStyle,
   }) {
     return LMChatDMFeedListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
+      profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,
     );
   }
 }

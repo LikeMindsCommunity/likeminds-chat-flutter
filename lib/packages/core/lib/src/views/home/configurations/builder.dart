@@ -155,6 +155,11 @@ class LMChatHomeBuilderDelegate {
     return icon;
   }
 
+  /// Builds search icon in home feed
+  Widget homeFeedSecretChatroomIconBuilder(LMChatIcon icon) {
+    return icon;
+  }
+
   /// Builds the first page error indicator.
   Widget homeFeedFirstPageErrorIndicatorBuilder(
     BuildContext context,
