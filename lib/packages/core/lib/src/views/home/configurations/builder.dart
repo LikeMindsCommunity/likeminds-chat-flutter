@@ -134,6 +134,14 @@ class LMChatHomeBuilderDelegate {
     return tile;
   }
 
+/// Builds a home feed explore tile
+  Widget homeFeedExploreTileBuilder(
+    BuildContext context,
+    LMChatTile tile,
+  ) {
+    return tile;
+  }
+
   /// Builds mute icon in home feed
   Widget homeFeedMuteIconBuilder(LMChatIcon icon) {
     return icon;

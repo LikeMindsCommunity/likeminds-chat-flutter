@@ -9,19 +9,12 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 ///
 /// To customize it pass appropriate builders to constructor.
 class LMChatHomeScreen extends StatefulWidget {
-  /// Builder function to render a floating action button on screen
-  final LMChatButtonBuilder? floatingActionButton;
-
-  /// Builder function to render app bar on screen
-  final LMChatHomeAppBarBuilder? appBar;
 
   /// Constructor for LMChatHomeScreen
   ///
   /// Creates a new instance of the screen widget
   const LMChatHomeScreen({
     super.key,
-    this.appBar,
-    this.floatingActionButton,
   });
 
   @override

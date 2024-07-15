@@ -75,7 +75,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         top: false,
         child: Column(
           children: [
-            _defaultExploreTile(),
+            _screenBuilder.homeFeedExploreTileBuilder(
+              context,
+              _defaultExploreTile(),
+            ),
             Expanded(
               child: BlocListener<LMChatHomeFeedBloc, LMChatHomeFeedState>(
                 bloc: feedBloc,
@@ -149,101 +152,91 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
     );
   }
 
-  Container _defaultExploreTile() {
-    return Container(
-      width: 100.w,
-      height: 8.h,
-      decoration: const BoxDecoration(),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const LMChatExplorePage(),
+  LMChatTile _defaultExploreTile() {
+    return LMChatTile(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LMChatExplorePage(),
+          ),
+        ).then((val) {
+          feedBloc.add(LMChatRefreshHomeFeedEvent());
+        });
+      },
+      style: LMChatTileStyle.basic().copyWith(
+        margin: EdgeInsets.only(
+          top: 3.h,
+          bottom: 1.h,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 6.w),
+      ),
+      leading: LMChatIcon(
+        type: LMChatIconType.svg,
+        assetPath: exploreIcon,
+        style: LMChatIconStyle(
+          color: LMChatTheme.theme.primaryColor,
+          size: 28,
+          boxSize: 32,
+        ),
+      ),
+      title: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: 4.w,
+        ),
+        child: LMChatText(
+          'Explore Chatrooms',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              fontSize: 16,
+              color: LMChatTheme.theme.onContainer,
+              fontWeight: FontWeight.w500,
+              overflow: TextOverflow.ellipsis,
             ),
-          ).then((val) {
-            feedBloc.add(LMChatRefreshHomeFeedEvent());
-          });
-        },
-        child: Container(
-          margin: EdgeInsets.symmetric(vertical: 2.w),
-          padding: EdgeInsets.symmetric(horizontal: 6.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              LMChatIcon(
-                type: LMChatIconType.svg,
-                assetPath: exploreIcon,
-                style: LMChatIconStyle(
-                  color: LMChatTheme.theme.primaryColor,
-                  size: 28,
-                  boxSize: 32,
-                ),
-              ),
-              Padding(
+          ),
+        ),
+      ),
+      trailing: FutureBuilder(
+        future: LMChatCore.client.getExploreTabCount(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container();
+          }
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            if (snapshot.data!.success) {
+              GetExploreTabCountResponse response = snapshot.data!.data!;
+
+              return Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: 4.w,
+                  horizontal: 2.w,
+                  vertical: 1.w,
+                ),
+                decoration: BoxDecoration(
+                  color: LMChatTheme.theme.primaryColor,
+                  borderRadius: BorderRadius.circular(4.w),
+                  shape: BoxShape.rectangle,
                 ),
                 child: LMChatText(
-                  'Explore Chatrooms',
+                  response.unseenChannelCount == null ||
+                          response.unseenChannelCount == 0
+                      ? '${response.totalChannelCount} Chatrooms'
+                      : '${response.unseenChannelCount} NEW',
                   style: LMChatTextStyle(
-                    maxLines: 1,
                     textStyle: TextStyle(
-                      fontSize: 16,
-                      color: LMChatTheme.theme.onContainer,
+                      color: LMChatTheme.theme.onPrimary,
                       fontWeight: FontWeight.w500,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
-              ),
-              const Spacer(),
-              FutureBuilder(
-                future: LMChatCore.client.getExploreTabCount(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container();
-                  }
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    if (snapshot.data!.success) {
-                      GetExploreTabCountResponse response =
-                          snapshot.data!.data!;
-
-                      return Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 2.w,
-                          vertical: 1.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: LMChatTheme.theme.primaryColor,
-                          borderRadius: BorderRadius.circular(4.w),
-                          shape: BoxShape.rectangle,
-                        ),
-                        child: LMChatText(
-                          response.unseenChannelCount == null ||
-                                  response.unseenChannelCount == 0
-                              ? '${response.totalChannelCount} Chatrooms'
-                              : '${response.unseenChannelCount} NEW',
-                          style: LMChatTextStyle(
-                            textStyle: TextStyle(
-                              color: LMChatTheme.theme.onPrimary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      );
-                    } else {
-                      const SizedBox();
-                    }
-                  }
-                  return const SizedBox();
-                },
-              )
-            ],
-          ),
-        ),
+              );
+            } else {
+              const SizedBox();
+            }
+          }
+          return const SizedBox();
+        },
       ),
     );
   }
