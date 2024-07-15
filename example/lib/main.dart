@@ -22,6 +22,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 /// Call [LMChatNotificationHandler.instance.handleNotification] in this function
 /// to handle notifications at the second level (inside the app)
 /// Make sure to call [setupNotifications] before this function
+@pragma('vm:entry-point')
 Future<void> _handleNotification(RemoteMessage message) async {
   debugPrint("--- Notification received in LEVEL 1 ---");
   await LMChatNotificationHandler.instance
@@ -80,6 +81,11 @@ void setupNotifications() async {
       }
     },
   );
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    debugPrint("---The app is opened from a notification---");
+    await LMChatNotificationHandler.instance
+        .handleNotification(message, false, rootNavigatorKey);
+  });
 }
 
 /// Get device id
@@ -102,17 +108,22 @@ Future<String> deviceId() async {
 /// 4. Return FCM token
 Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
+  // messaging.setForegroundNotificationPresentationOptions(
+  //   alert: true,
+  //   badge: true,
+  //   sound: true,
+  // );
+  await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: true,
+    sound: true,
+  );
   if (Platform.isIOS) {
-    await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
+    messaging.getAPNSToken();
   }
-
   final token = await messaging.getToken();
   debugPrint("Token - $token");
   return token.toString();
