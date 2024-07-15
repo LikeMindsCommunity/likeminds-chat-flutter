@@ -8,6 +8,7 @@ part 'explore_state.dart';
 
 part 'handler/fetch_explore_handler.dart';
 part 'handler/pin_explore_space_handler.dart';
+part 'handler/refresh_explore_event_handler.dart';
 
 /// A BLoC to manage the Explore Feed of LMChat
 ///
@@ -29,5 +30,7 @@ class LMChatExploreBloc extends Bloc<LMChatExploreEvent, LMChatExploreState> {
     on<LMChatFetchExploreEvent>(fetchExploreEventHandler);
     // Handle pin explore space using handlers
     on<LMChatPinSpaceEvent>(pinExploreSpaceEventHandler);
+    // Handle refresh explore event using handler
+    on<LMChatRefreshExploreEvent>(refreshExploreEventHandler);
   }
 }

@@ -59,16 +59,21 @@ class LMChatCore {
     LMChatWidgetBuilderDelegate? widgets,
     LMChatThemeData? theme,
     LMChatCoreCallback? lmChatCallback,
+    List<ConversationState>? excludedConversationStates,
     Function(LMChatAnalyticsEventFired)? analyticsListener,
     Function(LMChatProfileState)? profileListener,
   }) async {
     final lmChatSDKCallback =
         LMChatSDKCallbackImpl(lmChatCallback: lmChatCallback);
     this.lmChatClient = lmChatClient ??
-        (LMChatClientBuilder()..sdkCallback(lmChatSDKCallback)).build();
+        (LMChatClientBuilder()
+              ..sdkCallback(lmChatSDKCallback)
+              ..excludedConversationStates(excludedConversationStates ?? []))
+            .build();
     if (domain != null) _clientDomain = domain;
     chatConfig = config ?? LMChatConfig();
-    if (widgets != null) _widgetBuilder = widgets;
+    if (widgets != null)
+      _widgetBuilder = widgets;
     else {
       _widgetBuilder = LMChatWidgetBuilderDelegate.instance;
     }

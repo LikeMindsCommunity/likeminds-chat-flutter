@@ -28,6 +28,8 @@ class LMChatConversationBloc
   /// Last conversation id for this instance of [LMChatConversationBloc]
   int? lastConversationId;
 
+  final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
+
   static LMChatConversationBloc? _instance;
 
   /// Creates and maintains a singleton instance of this BLoC
@@ -51,5 +53,29 @@ class LMChatConversationBloc
         postMultimediaConversationEventHandler);
     // Handle update conversations event through handler
     on<LMChatUpdateConversationsEvent>(updateConversationsEventHandler);
+  }
+
+  initialiseConversationsEventHandler(
+    LMChatInitialiseConversationsEvent event,
+    Emitter<LMChatConversationState> emit,
+  ) async {
+    int chatroomId = event.chatroomId;
+    lastConversationId = event.conversationId;
+
+    realTime.onValue.listen(
+      (event) {
+        if (event.snapshot.value != null) {
+          final response = event.snapshot.value as Map;
+          final conversationId = int.parse(response["collabcard"]["answer_id"]);
+          if (lastConversationId != null &&
+              conversationId != lastConversationId) {
+            LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
+              chatroomId: chatroomId,
+              conversationId: conversationId,
+            ));
+          }
+        }
+      },
+    );
   }
 }

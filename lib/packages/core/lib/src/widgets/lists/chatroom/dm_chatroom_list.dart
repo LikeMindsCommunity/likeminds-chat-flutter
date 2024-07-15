@@ -74,6 +74,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
     super.build(context);
     return Scaffold(
       backgroundColor: LMChatTheme.theme.scaffold,
+      // floatingActionButton: _floatingActionButton(),
       body: SafeArea(
         top: false,
         child: BlocConsumer<LMChatDMFeedBloc, LMChatDMFeedState>(
@@ -102,7 +103,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                           widget.loadingListWidget?.call(context) ??
                           const LMChatSkeletonChatroomList(),
                       noItemsFoundIndicatorBuilder: (context) =>
-                          const SizedBox(),
+                          _defaultEmptyView(),
                       itemBuilder: (context, item, index) {
                         return _defaultDMChatRoomTile(item);
                       },
@@ -153,6 +154,17 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
     return Container();
   }
 
+  Widget _defaultEmptyView() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("Looks empty, start a new DM"),
+        ],
+      ),
+    );
+  }
+
   LMChatTile _defaultDMChatRoomTile(LMChatRoomViewData chatroom) {
     final user = LMChatLocalPreference.instance.getUser();
     bool whichUser = user.id != chatroom.chatroomWithUserId;
@@ -177,8 +189,8 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
             );
           },
         );
-        Navigator.of(context).push(route).whenComplete(
-              () => feedBloc.add(LMChatRefreshDMFeedEvent()),
+        Navigator.of(context).push(route).then(
+              (val) => feedBloc.add(LMChatRefreshDMFeedEvent()),
             );
       },
       leading: LMChatProfilePicture(
@@ -255,6 +267,12 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                           ? "99+"
                           : chatroom.unseenCount.toString(),
                       style: LMChatTextStyle(
+                        padding: const EdgeInsets.only(
+                          left: 7,
+                          right: 5,
+                          top: 2,
+                          bottom: 2,
+                        ),
                         textStyle: TextStyle(
                           fontSize: 12,
                           color: LMChatTheme.theme.onPrimary,
@@ -268,6 +286,32 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  LMChatButton _floatingActionButton() {
+    return LMChatButton(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LMChatExplorePage(),
+          ),
+        );
+      },
+      style: LMChatButtonStyle(
+        backgroundColor: LMChatTheme.theme.backgroundColor,
+        height: 48,
+        width: 48,
+        borderRadius: 12,
+      ),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.message,
+        style: LMChatIconStyle(
+          color: LMChatTheme.theme.primaryColor,
+        ),
       ),
     );
   }

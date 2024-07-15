@@ -248,7 +248,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
             ).copyWith(
               fontSize: 14,
               color:
-                  _selectedReportTag?.id == e.id ? Colors.white : Colors.black,
+                  _selectedReportTag?.id == e.id ? Colors.white :  theme.inActiveColor,
             ),
           ),
         ),
@@ -260,7 +260,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
           side: BorderSide(
             color: _selectedReportTag?.id == e.id
                 ? theme.primaryColor
-                : Colors.black,
+                :  theme.inActiveColor,
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -274,7 +274,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
     return LMChatButton(
       style: LMChatButtonStyle(
         height: 48,
-        padding: const EdgeInsets.symmetric(horizontal: 40.0),
+        padding: const EdgeInsets.symmetric(horizontal: 60.0),
         margin: const EdgeInsets.symmetric(vertical: 24.0),
         backgroundColor: _selectedReportTag == null
             ? theme.errorColor.withOpacity(0.2)
@@ -282,7 +282,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
         borderRadius: 50,
       ),
       text: LMChatText(
-        'Report Message',
+        'Report',
         style: LMChatTextStyle(
           textStyle: TextStyle(
               color: theme.container,
@@ -391,9 +391,9 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
         ),
         descriptionStyle: LMChatTextStyle(
           textStyle: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: theme.onContainer,
+            color: theme.inActiveColor,
             overflow: TextOverflow.visible,
           ),
         ),

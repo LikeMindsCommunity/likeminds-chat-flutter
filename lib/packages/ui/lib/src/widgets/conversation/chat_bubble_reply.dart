@@ -34,17 +34,19 @@ class LMChatBubbleReply extends StatelessWidget {
     final theme = LMChatTheme.theme;
     final inStyle = chatBubbleReplyStyle ?? theme.replyStyle;
     return Container(
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: inStyle.backgroundColor ?? theme.disabledColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
       ),
+      margin: inStyle.margin ?? const EdgeInsets.symmetric(vertical: 4),
+      padding: inStyle.padding,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const SizedBox(width: 10),
           Container(
-            height: 4.h,
+            height: 5.h,
             width: 1.w,
             decoration: BoxDecoration(
               color: inStyle.highlightColor ?? theme.primaryColor,
@@ -56,7 +58,6 @@ class LMChatBubbleReply extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 6),
                 title ??
                     LMChatText(
                       replyToConversation.member!.name,
@@ -99,7 +100,6 @@ class LMChatBubbleReply extends StatelessWidget {
                           ),
                         ),
                       ),
-                const SizedBox(height: 6),
               ],
             ),
           ),
@@ -123,6 +123,12 @@ class LMChatBubbleReplyStyle {
   /// Border radius of the reply item
   final double? borderRadius;
 
+  /// Padding inside the reply bubble
+  final EdgeInsetsGeometry? padding;
+
+  /// Margin outside the reply bubble
+  final EdgeInsetsGeometry? margin;
+
   /// Style of the title widget
   final LMChatTextStyle? titleStyle;
 
@@ -140,5 +146,7 @@ class LMChatBubbleReplyStyle {
     this.titleStyle,
     this.subtitleStyle,
     this.mediaStyle,
+    this.margin,
+    this.padding,
   });
 }

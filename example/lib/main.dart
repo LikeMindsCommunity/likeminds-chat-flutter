@@ -4,10 +4,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('DEBUG');
@@ -31,7 +31,12 @@ Future<void> _handleNotification(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
-  await LMChatCore.instance.initialize();
+  await LMChatCore.instance.initialize(excludedConversationStates: [
+    ConversationState.memberJoinedOpenChatroom,
+    ConversationState.memberLeftOpenChatroom,
+    ConversationState.memberLeftSecretChatroom,
+    ConversationState.memberAddedToChatroom,
+  ]);
   runApp(const LMChatSampleApp());
 }
 

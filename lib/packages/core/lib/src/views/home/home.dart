@@ -58,10 +58,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               LMChatDMFeedList(),
             ],
           ),
-          floatingActionButton: widget.floatingActionButton?.call(
-                _floatingActionButton(),
-              ) ??
-              _floatingActionButton(),
+          // floatingActionButton: widget.floatingActionButton?.call(
+          //       _floatingActionButton(),
+          //     ) ??
+          //     _floatingActionButton(),
         ),
       ),
     );
@@ -73,10 +73,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
         height: 120,
       ),
       leading: const SizedBox.shrink(),
-      // titleSpacing: -24,
-      // centerTitle: false,
       trailing: [
-        // const Icon(Icons.search),
         const SizedBox(width: 8),
         LMChatProfilePicture(
           fallbackText: user.name,
@@ -109,7 +106,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   LMChatButton _floatingActionButton() {
     return LMChatButton(
-      // onPressed: () {},
       onTap: () {
         Navigator.push(
           context,

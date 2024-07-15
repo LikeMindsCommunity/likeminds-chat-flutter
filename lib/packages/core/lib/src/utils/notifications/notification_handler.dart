@@ -63,7 +63,8 @@ class LMChatNotificationHandler {
   Future<void> handleNotification(RemoteMessage message, bool show,
       GlobalKey<NavigatorState> rootNavigatorKey) async {
     debugPrint("--- Notification received in LEVEL 2 ---");
-    if (message.data["category"].contains("Chat")) {
+    if (message.data.containsKey('category') &&
+        message.data["category"].contains("Chat")) {
       message.toMap().forEach((key, value) {
         debugPrint("$key: $value");
         if (key == "data") {
@@ -112,15 +113,9 @@ class LMChatNotificationHandler {
     }
 
     if (host == "collabcard") {
-      rootNavigatorKey.currentState!.push(
-        MaterialPageRoute(
-          builder: (context) => const LMChatHomeScreen(
-              // chatroomType: LMChatroomType.dm,
-              ),
-        ),
-      );
+      await LMChatCore.instance.showChatWithoutApiKey();
 
-      rootNavigatorKey.currentState!.push(MaterialPageRoute(
+      rootNavigatorKey.currentState?.push(MaterialPageRoute(
         builder: (context) => LMChatroomScreen(
           chatroomId: int.parse(
             queryParams["collabcard_id"]!,
@@ -128,14 +123,9 @@ class LMChatNotificationHandler {
         ),
       ));
     } else if (host == 'chatroom_detail') {
-      rootNavigatorKey.currentState!.push(
-        MaterialPageRoute(
-          builder: (context) => const LMChatHomeScreen(
-              // chatroomType: LMChatroomType.dm,
-              ),
-        ),
-      );
-      rootNavigatorKey.currentState!.push(MaterialPageRoute(
+      await LMChatCore.instance.showChatWithoutApiKey();
+
+      rootNavigatorKey.currentState?.push(MaterialPageRoute(
         builder: (context) => LMChatroomScreen(
           chatroomId: int.parse(
             queryParams["chatroom_id"]!,
@@ -168,21 +158,22 @@ class LMChatNotificationHandler {
             children: [
               LMChatText(
                 message.data["title"],
-                style: const LMChatTextStyle(
+                style: LMChatTextStyle(
                   textStyle: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: LMChatDefaultTheme.blackColor),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: LMChatTheme.theme.onContainer,
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
               LMChatText(
                 message.data["sub_title"],
-                style: const LMChatTextStyle(
+                style: LMChatTextStyle(
                   maxLines: 1,
                   textStyle: TextStyle(
-                    fontSize: 10,
-                    color: LMChatDefaultTheme.greyColor,
+                    fontSize: 12,
+                    color: LMChatTheme.theme.onContainer,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -190,13 +181,13 @@ class LMChatNotificationHandler {
             ],
           ),
         ),
-        background: Colors.white,
+        background: LMChatTheme.theme.container,
         duration: const Duration(seconds: 3),
         leading: LMChatIcon(
           type: LMChatIconType.icon,
           icon: Icons.notifications,
           style: LMChatIconStyle(
-            color: LMChatTheme.theme.secondaryColor,
+            color: LMChatTheme.theme.primaryColor,
             size: 28,
           ),
         ),

@@ -36,7 +36,11 @@ class LMChatBubbleContent extends StatelessWidget {
                     fontSize: 14,
                   ),
               textAlign: TextAlign.left,
-              style: inStyle.textStyle ?? const TextStyle(fontSize: 14),
+              style: inStyle.textStyle ??
+                  const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
               linkEllipsis: true,
               onTagTap: onTagTap,
             )

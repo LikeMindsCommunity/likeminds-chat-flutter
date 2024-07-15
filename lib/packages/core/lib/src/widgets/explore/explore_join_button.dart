@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 class LMChatJoinButton extends StatelessWidget {
@@ -80,15 +81,21 @@ class LMChatJoinButton extends StatelessWidget {
                   child: Row(
                     children: [
                       isJoined
-                          ? Icon(
-                              Icons.notifications_active_outlined,
-                              size: 24,
-                              color: LMChatTheme.theme.primaryColor,
+                          ? LMChatIcon(
+                              type: LMChatIconType.svg,
+                              assetPath: exploreJoinnedIcon,
+                              style: LMChatIconStyle(
+                                size: 24,
+                                color: LMChatTheme.theme.primaryColor,
+                              ),
                             )
-                          : Icon(
-                              Icons.notification_add_outlined,
-                              size: 24,
-                              color: LMChatTheme.theme.onPrimary,
+                          : LMChatIcon(
+                              type: LMChatIconType.svg,
+                              assetPath: exploreJoinIcon,
+                              style: LMChatIconStyle(
+                                size: 24,
+                                color: LMChatTheme.theme.onPrimary,
+                              ),
                             ),
                       const SizedBox(width: 6),
                       LMChatText(

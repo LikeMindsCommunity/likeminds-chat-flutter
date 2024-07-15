@@ -1,5 +1,4 @@
 import 'package:intl/intl.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
@@ -45,8 +44,10 @@ String getHomeChatroomPreviewMessage(
 ) {
   String personLabel = "";
   final user = LMChatLocalPreference.instance.getUser();
-  bool a = conversation.member!.id == user.id;
-  personLabel = a ? 'You: ' : '${conversation.member!.name}: ';
+  bool isByCurrentUser = conversation.member!.id == user.id;
+  personLabel = isByCurrentUser
+      ? 'You: '
+      : '${conversation.member!.name.split(' ').first}: ';
   String message = conversation.deletedByUserId == null
       ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
           conversation.answer,

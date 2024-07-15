@@ -126,13 +126,13 @@ class LMChatSkeletonChatBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: LMChatDefaultTheme.whiteColor,
+      color: LMChatTheme.theme.backgroundColor,
       child: Padding(
         padding: EdgeInsets.only(
           left: 18,
           right: 18,
           top: 2.h,
-          bottom: 3.h,
+          bottom: 2.h,
         ),
         child: Row(
           children: [
