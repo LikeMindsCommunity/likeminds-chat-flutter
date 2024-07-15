@@ -358,7 +358,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                     backgroundColor: LMChatTheme.theme.primaryColor,
                     borderRadius: 24,
                     padding: const EdgeInsets.only(
-                      left: 6,
+                      left: 7,
                       right: 5,
                       top: 2,
                       bottom: 2,

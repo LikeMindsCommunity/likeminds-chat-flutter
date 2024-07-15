@@ -267,6 +267,12 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                           ? "99+"
                           : chatroom.unseenCount.toString(),
                       style: LMChatTextStyle(
+                        padding: const EdgeInsets.only(
+                          left: 7,
+                          right: 5,
+                          top: 2,
+                          bottom: 2,
+                        ),
                         textStyle: TextStyle(
                           fontSize: 12,
                           color: LMChatTheme.theme.onPrimary,
