@@ -97,7 +97,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _chatroomBloc.close();
     _convActionBloc.close();
     _chatroomActionBloc.close();
-    _conversationBloc.close();
     super.dispose();
   }
 
