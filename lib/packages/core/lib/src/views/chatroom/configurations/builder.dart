@@ -1,5 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
+import 'package:likeminds_chat_flutter_core/src/core/configurations/widget_source.dart';
+import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// {@template lm_chatroom_builder}
@@ -10,6 +16,74 @@ class LMChatroomBuilderDelegate {
   /// {@macro lm_chatroom_builder}
   const LMChatroomBuilderDelegate();
 
+  /// chatWidgetBuilder
+  static final LMChatWidgetBuilderDelegate _chatWidgetBuilderDelegate =
+      LMChatCore.config.widgetBuilderDelegate;
+
+  /// Builds the scaffold for the screen
+  /// Builds a [Scaffold] widget with the given parameters.
+  Widget scaffold({
+    Key? key,
+    bool extendBody = false,
+    bool extendBodyBehindAppBar = false,
+    PreferredSizeWidget? appBar,
+    Widget? body,
+    Widget? floatingActionButton,
+    FloatingActionButtonLocation? floatingActionButtonLocation,
+    FloatingActionButtonAnimator? floatingActionButtonAnimator,
+    List<Widget>? persistentFooterButtons,
+    AlignmentDirectional persistentFooterAlignment =
+        AlignmentDirectional.centerEnd,
+    Widget? drawer,
+    DrawerCallback? onDrawerChanged,
+    Widget? endDrawer,
+    DrawerCallback? onEndDrawerChanged,
+    Color? drawerScrimColor,
+    Color? backgroundColor,
+    Widget? bottomNavigationBar,
+    Widget? bottomSheet,
+    bool? resizeToAvoidBottomInset,
+    bool primary = true,
+    DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
+    double? drawerEdgeDragWidth,
+    bool drawerEnableOpenDragGesture = true,
+    bool endDrawerEnableOpenDragGesture = true,
+    String? restorationId,
+    LMChatWidgetSource source = LMChatWidgetSource.home,
+    bool canPop = true,
+    Function(bool)? onPopInvoked,
+  }) {
+    return _chatWidgetBuilderDelegate.scaffold(
+      key: key,
+      extendBody: extendBody,
+      extendBodyBehindAppBar: extendBodyBehindAppBar,
+      appBar: appBar,
+      body: body,
+      floatingActionButton: floatingActionButton,
+      floatingActionButtonLocation: floatingActionButtonLocation,
+      floatingActionButtonAnimator: floatingActionButtonAnimator,
+      persistentFooterButtons: persistentFooterButtons,
+      persistentFooterAlignment: persistentFooterAlignment,
+      drawer: drawer,
+      onDrawerChanged: onDrawerChanged,
+      endDrawer: endDrawer,
+      onEndDrawerChanged: onEndDrawerChanged,
+      drawerScrimColor: drawerScrimColor,
+      backgroundColor: backgroundColor,
+      bottomNavigationBar: bottomNavigationBar,
+      bottomSheet: bottomSheet,
+      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+      primary: primary,
+      drawerDragStartBehavior: drawerDragStartBehavior,
+      drawerEdgeDragWidth: drawerEdgeDragWidth,
+      drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
+      endDrawerEnableOpenDragGesture: endDrawerEnableOpenDragGesture,
+      restorationId: restorationId,
+    );
+  }
+
+  /// Builds the scroll to bottom button
+
   /// Builds the app bar.
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
@@ -19,14 +93,24 @@ class LMChatroomBuilderDelegate {
     return appBar;
   }
 
-  /// Builds the chat bubble.
-  Widget chatBubbleBuilder(
+  /// Builds the sent chat bubble.
+  Widget sentChatBubbleBuilder(
     BuildContext context,
     LMChatConversationViewData conversation,
     LMChatBubble bubble,
   ) {
     return bubble;
   }
+
+  /// Builds the received chat bubble.
+  Widget receivedChatBubbleBuilder(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatBubble bubble,
+  ) {
+    return bubble;
+  }
+
   /// Builds the state bubble.
   Widget stateBubbleBuilder(
     BuildContext context,
@@ -35,29 +119,73 @@ class LMChatroomBuilderDelegate {
   ) {
     return stateBubble;
   }
+
+  /// Builds the conversation list for group chatroom
+  Widget conversationList(
+    int chatroomId,
+    LMChatConversationList conversationList,
+  ) {
+    return conversationList;
+  }
+
+  /// Builds the conversation list for DM chatroom
+  Widget dmConversationList(
+    int chatroomId,
+    LMChatDMConversationList dmConversationList,
+  ) {
+    return dmConversationList;
+  }
+
+  /// Builds the floating action button for chatroom
+  Widget floatingActionButton(LMChatButton floatingActionButton) {
+    return floatingActionButton;
+  }
+
   /// Builds the loading page widget.
   Widget loadingPageWidgetBuilder(
     BuildContext context,
+    Widget loadingPageWidget,
   ) {
-    return const SizedBox();
+    return loadingPageWidget;
   }
+
   /// Builds the loading list widget.
   Widget loadingListWidgetBuilder(
     BuildContext context,
+    Widget loadingListWidget,
   ) {
-    return const SizedBox();
+    return loadingListWidget;
   }
+
+  /// Builds the empty list widget.
+  Widget noItemInListWidgetBuilder(
+    BuildContext context,
+    Widget noItemInListWidget,
+  ) {
+    return noItemInListWidget;
+  }
+
   /// Builds the paginated loading widget.
   Widget paginatedLoadingWidgetBuilder(
     BuildContext context,
+    Widget paginatedLoadingWidget,
   ) {
-    return const SizedBox();
+    return paginatedLoadingWidget;
   }
+
   /// Builds the chat bar.
   Widget chatBarBuilder(
     BuildContext context,
     LMChatroomBar chatBar,
   ) {
     return chatBar;
+  }
+
+  /// Builds the chatroom menu
+  Widget chatroomMenu(
+    BuildContext context,
+    LMChatroomMenu chatroomMenu,
+  ) {
+    return chatroomMenu;
   }
 }
