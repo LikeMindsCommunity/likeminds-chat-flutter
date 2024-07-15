@@ -189,8 +189,8 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
             );
           },
         );
-        Navigator.of(context).push(route).whenComplete(
-              () => feedBloc.add(LMChatRefreshDMFeedEvent()),
+        Navigator.of(context).push(route).then(
+              (val) => feedBloc.add(LMChatRefreshDMFeedEvent()),
             );
       },
       leading: LMChatProfilePicture(

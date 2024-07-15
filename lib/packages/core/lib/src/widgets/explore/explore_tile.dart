@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -71,32 +72,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
         imageUrl: chatroom.chatroomImageUrl,
         style: LMChatProfilePictureStyle.basic().copyWith(size: 56),
       ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LMChatText(
-                  chatroom.header,
-                  style: const LMChatTextStyle(
-                    maxLines: 1,
-                    textStyle: TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                _defaultSpaceStats(),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          _defaultJoinButton(),
-        ],
-      ),
+      title: _defaulltExploreTitle(),
       subtitle: LMChatText(
         chatroom.title,
         style: const LMChatTextStyle(
@@ -108,6 +84,63 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           ),
         ),
       ),
+    );
+  }
+
+  Row _defaulltExploreTitle() {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  chatroom.isSecret == true
+                      ? LMChatText(
+                          chatroom.header,
+                          style: const LMChatTextStyle(
+                            maxLines: 1,
+                            textStyle: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      : Expanded(
+                          child: LMChatText(
+                            chatroom.header,
+                            style: const LMChatTextStyle(
+                              maxLines: 1,
+                              textStyle: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                  const SizedBox(width: 2),
+                  chatroom.isSecret == true
+                      ? const LMChatIcon(
+                          type: LMChatIconType.svg,
+                          assetPath: secretLockIcon,
+                          style: LMChatIconStyle(
+                            size: 20,
+                          ),
+                        )
+                      : const SizedBox.shrink()
+                ],
+              ),
+              const SizedBox(height: 4),
+              _defaultSpaceStats(),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        _defaultJoinButton(),
+      ],
     );
   }
 

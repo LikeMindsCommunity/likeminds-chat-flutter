@@ -4,3 +4,5 @@ const exploreJoinIcon =
     'packages/likeminds_chat_flutter_core/assets/icons/explore_join.svg';
 const exploreJoinnedIcon =
     'packages/likeminds_chat_flutter_core/assets/icons/explore_joinned.svg';
+const secretLockIcon =
+    'packages/likeminds_chat_flutter_core/assets/icons/secret_lock.svg';

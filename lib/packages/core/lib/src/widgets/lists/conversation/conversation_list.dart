@@ -108,40 +108,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             bloc: _conversationBloc,
             listener: (context, state) {
               updatePagingControllers(state);
-              if (state is LMChatConversationPostedState) {
-                // Map<String, String> userTags = LMChatTaggingHelper.decodeString(
-                //     state.conversationViewData.answer);
-                // LMAnalytics.get().track(
-                //   AnalyticsKeys.chatroomResponded,
-                //   {
-                //     "chatroom_type": chatroom.type,
-                //     "community_id": chatroom.communityId,
-                //     "chatroom_name": chatroom.header,
-                //     "chatroom_last_conversation_type": state
-                //             .postConversationResponse
-                //             .conversation
-                //             ?.attachments
-                //             ?.first
-                //             .type ??
-                //         "text",
-                //     "tagged_users": userTags.isNotEmpty,
-                //     "count_tagged_users": userTags.length,
-                //     "name_tagged_users":
-                //         userTags.keys.map((e) => e.replaceFirst("@", "")).toList(),
-                //     "is_group_tag": false,
-                //   },
-                // );
-              }
-              if (state is LMChatConversationErrorState) {
-                // LMAnalytics.get().track(
-                //   AnalyticsKeys.messageSendingError,
-                //   {
-                //     "chatroom_id": chatroom.id,
-                //     "chatroom_type": chatroom.type,
-                //     "clicked_resend": false,
-                //   },
-                // );
-              }
             })
       ],
       child: ValueListenableBuilder(
@@ -168,9 +134,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                 if (item.isTimeStamp != null && item.isTimeStamp! ||
                     item.state != 0 && item.state != null) {
                   return _defaultStateBubble(
-                    LMChatTaggingHelper.extractStateMessage(
-                      item.answer,
-                    ),
+                    LMChatTaggingHelper.extractStateMessage(item.answer),
                   );
                 }
                 return item.memberId == user.id

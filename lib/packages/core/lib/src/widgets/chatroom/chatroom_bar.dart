@@ -178,7 +178,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('ChatroomBar build');
     return BlocConsumer<LMChatConversationActionBloc,
         LMChatConversationActionState>(
       bloc: chatActionBloc,

@@ -282,17 +282,30 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         imageUrl: chatroom.chatroomImageUrl,
         style: const LMChatProfilePictureStyle(size: 48),
       ),
-      title: LMChatText(
-        chatroom.header,
-        style: LMChatTextStyle(
-          maxLines: 1,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: LMChatTheme.theme.onContainer,
-            fontWeight: FontWeight.w500,
-            overflow: TextOverflow.ellipsis,
+      title: Row(
+        children: [
+          LMChatText(
+            chatroom.header,
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-        ),
+          const SizedBox(width: 2),
+          chatroom.isSecret == true
+              ? const LMChatIcon(
+                  type: LMChatIconType.svg,
+                  assetPath: secretLockIcon,
+                  style: LMChatIconStyle(
+                    size: 20,
+                  ),
+                )
+              : const SizedBox.shrink()
+        ],
       ),
       subtitle: LMChatText(
         chatroom.lastConversation!.state != 0
@@ -341,11 +354,14 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                       : chatroom.unseenCount.toString(),
                   style: LMChatTextStyle(
                     maxLines: 1,
+                    textAlign: TextAlign.end,
                     backgroundColor: LMChatTheme.theme.primaryColor,
                     borderRadius: 24,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 7,
-                      vertical: 4,
+                    padding: const EdgeInsets.only(
+                      left: 6,
+                      right: 5,
+                      top: 2,
+                      bottom: 2,
                     ),
                     textStyle: TextStyle(
                       fontSize: 12,

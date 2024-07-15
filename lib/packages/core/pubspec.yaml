@@ -53,4 +53,5 @@ dev_dependencies:
 
 flutter:
   assets: 
-    - 'assets/icons/'
+    - assets/
+    - assets/icons/
