@@ -1,6 +1,5 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_config.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/firebase/firebase.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -19,10 +18,10 @@ class LMChatCore {
   late final LMChatClient lmChatClient;
 
   /// Instance of [LMChatConfig] class accessible through core class.
-  late final LMChatConfig chatConfig;
+  late final LMChatConfig _lmChatConfig;
+
+  /// [String] domain passed from client's end. used in generating the URL for sharing.
   late String _clientDomain;
-  late LMChatWidgetBuilderDelegate _widgetBuilder;
-  // LMChatSDKCallbackImplementation? _lmChatSDKCallback;
 
   /// Singleton class for LMChatCore
   LMChatCore._();
@@ -35,10 +34,7 @@ class LMChatCore {
   static LMChatClient get client => instance.lmChatClient;
 
   /// Instance of configuration file passed while initialising
-  static LMChatConfig get config => instance.chatConfig;
-
-  /// Instance of widget utility class through core.
-  static LMChatWidgetBuilderDelegate get widgets => instance._widgetBuilder;
+  static LMChatConfig get config => instance._lmChatConfig;
 
   /// Domain passed from client's end [String]
   static String get domain => instance._clientDomain;
@@ -53,10 +49,10 @@ class LMChatCore {
   /// The function returns a [LMResponse] object.
   /// If the initialization is successful, the [LMResponse] object give [success] as true and [data] as null.
   Future<LMResponse<void>> initialize({
+    @Deprecated("Use [LMChatCore.instance.client] to get an instance of [LMChatClient] instead of passing it as a parameter.")
     LMChatClient? lmChatClient,
     String? domain,
     LMChatConfig? config,
-    LMChatWidgetBuilderDelegate? widgets,
     LMChatThemeData? theme,
     LMChatCoreCallback? lmChatCallback,
     List<ConversationState>? excludedConversationStates,
@@ -71,13 +67,7 @@ class LMChatCore {
               ..excludedConversationStates(excludedConversationStates ?? []))
             .build();
     if (domain != null) _clientDomain = domain;
-    chatConfig = config ?? LMChatConfig();
-    if (widgets != null)
-      _widgetBuilder = widgets;
-    else {
-      _widgetBuilder = LMChatWidgetBuilderDelegate.instance;
-    }
-    ;
+    _lmChatConfig = config ?? LMChatConfig();
     LMChatTheme.instance.initialise(theme: theme);
     LMResponse isDBInitiated = await this.lmChatClient.initiateDB();
     if (!isDBInitiated.success) {

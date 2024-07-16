@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
+/// {@template lm_context_widget_builder}
+/// The context widget builder function for the chat screen.
+/// This function is called to build the context widget for the chat screen.
+/// The [LMContextWidgetBuilder] function takes one parameter:
+/// - [BuildContext] context: The context.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMContextWidgetBuilder = Widget Function(BuildContext context);
+
 /// {@template lm_chat_error_handler}
 /// The error handler function for the chat.
 /// This function is called when an error occurs in the chat.
@@ -11,6 +20,13 @@ import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 /// {@endtemplate}
 typedef LMChatErrorHandler = Function(String, StackTrace);
 
+/// {@template lm_chat_button_builder}
+/// The button builder function for the chat.
+/// This function is called to build the button for the chat.
+/// The [LMChatButtonBuilder] function takes one parameter:
+/// - [LMChatButton] olButton: The old button.
+/// The function returns a [LMChatButton] widget.
+/// {@endtemplate}
 typedef LMChatButtonBuilder = LMChatButton Function(LMChatButton olButton);
 
 /// {@template lm_chat_home_app_bar_builder}

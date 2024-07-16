@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -50,6 +49,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   List<int> _selectedIds = [];
 
   late ScrollController scrollController;
+  final LMChatroomBuilderDelegate _screenBuilder =
+      LMChatCore.config.chatRoomConfig.builder;
   late PagingController<int, LMChatConversationViewData> pagedListController =
       PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
 
@@ -123,23 +124,45 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             reverse: true,
             builderDelegate:
                 PagedChildBuilderDelegate<LMChatConversationViewData>(
-              noItemsFoundIndicatorBuilder: (context) => const Center(
-                child: LMChatText('No chats found!'),
-              ),
-              firstPageProgressIndicatorBuilder: (context) =>
-                  const LMChatSkeletonChatList(),
               animateTransitions: true,
               transitionDuration: const Duration(milliseconds: 500),
+              noItemsFoundIndicatorBuilder: (context) =>
+                  _screenBuilder.noItemInListWidgetBuilder(
+                context,
+                const Center(
+                  child: LMChatText('No chats found!'),
+                ),
+              ),
+              firstPageProgressIndicatorBuilder: (context) =>
+                  _screenBuilder.loadingListWidgetBuilder(
+                context,
+                const LMChatSkeletonChatList(),
+              ),
+              newPageProgressIndicatorBuilder: (context) =>
+                  _screenBuilder.paginatedLoadingWidgetBuilder(
+                context,
+                const LMChatLoader(),
+              ),
               itemBuilder: (context, item, index) {
                 if (item.isTimeStamp != null && item.isTimeStamp! ||
                     item.state != 0 && item.state != null) {
-                  return _defaultStateBubble(
-                    LMChatTaggingHelper.extractStateMessage(item.answer),
+                  final stateMessage = item.state == 1
+                      ? LMChatTaggingHelper.extractFirstDMStateMessage(
+                          item,
+                          user.toUserViewData(),
+                        )
+                      : LMChatTaggingHelper.extractStateMessage(item.answer);
+                  return _screenBuilder.stateBubbleBuilder(
+                    context,
+                    stateMessage,
+                    _defaultStateBubble(stateMessage),
                   );
                 }
                 return item.memberId == user.id
-                    ? _defaultSentChatBubble(item.toConversation())
-                    : _defaultReceivedChatBubble(item.toConversation());
+                    ? _screenBuilder.sentChatBubbleBuilder(
+                        context, item, _defaultSentChatBubble(item))
+                    : _screenBuilder.receivedChatBubbleBuilder(
+                        context, item, _defaultReceivedChatBubble(item));
               },
             ),
           );
@@ -148,15 +171,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     );
   }
 
-  Widget _defaultStateBubble(String message) {
+  LMChatStateBubble _defaultStateBubble(String message) {
     return LMChatStateBubble(message: message);
   }
 
-  Widget _defaultSentChatBubble(Conversation conversation) {
+  LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
-      conversation: conversation.toConversationViewData(),
+      conversation: conversation,
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
-      conversationUser: conversation.member!.toUserViewData(),
+      conversationUser: conversation.member!,
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -196,11 +219,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     );
   }
 
-  Widget _defaultReceivedChatBubble(Conversation conversation) {
+  LMChatBubble _defaultReceivedChatBubble(
+      LMChatConversationViewData conversation) {
     return LMChatBubble(
-      conversation: conversation.toConversationViewData(),
+      conversation: conversation,
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
-      conversationUser: conversation.member!.toUserViewData(),
+      conversationUser: conversation.member!,
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -214,8 +238,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       isSent: false,
       style: LMChatBubbleStyle.basic(),
       avatar: LMChatProfilePicture(
-        fallbackText: conversation.member!.toUserViewData().name,
-        imageUrl: conversation.member!.toUserViewData().imageUrl,
+        fallbackText: conversation.member!.name,
+        imageUrl: conversation.member!.imageUrl,
         style: const LMChatProfilePictureStyle(
           size: 39,
           boxShape: BoxShape.circle,

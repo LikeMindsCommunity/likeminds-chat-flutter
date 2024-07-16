@@ -39,6 +39,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   final CustomPopupMenuController _controller = CustomPopupMenuController();
   PagingController<int, ChatRoom> exploreFeedPagingController =
       PagingController<int, ChatRoom>(firstPageKey: 1);
+  final _screenBuilder = LMChatCore.config.exploreConfig.builder;
 
   int pinnedChatroomCount = 0;
   int _page = 1;
@@ -59,9 +60,9 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _screenBuilder.scaffold(
       backgroundColor: LMChatTheme.theme.scaffold,
-      appBar: _defaultExploreAppBar(),
+      appBar: _screenBuilder.appBarBuilder(context, _defaultExploreAppBar()),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 2.w),
         child: _defaultExploreBody(),
@@ -78,7 +79,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _defaultExploreMenu(),
+              _screenBuilder.exploreMenuBuilder(context, _defaultExploreMenu()),
               const Spacer(),
               _defaultExplorePinButton(),
             ],
@@ -228,7 +229,11 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         newPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         firstPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         itemBuilder: (context, item, index) =>
-            _defaultExploreTile(item, context),
+            _screenBuilder.exploreTileBuilder(
+          context,
+          item.toChatRoomViewData(),
+          _defaultExploreTile(item, context),
+        ),
       ),
     );
   }

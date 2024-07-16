@@ -4,12 +4,14 @@ import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/co
 import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
 
 // export all the configurations
 export 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
 
 /// {@template lm_chat_config}
 /// Configuration class for the Likeminds Chat SDK.
@@ -27,8 +29,11 @@ class LMChatConfig {
   /// {@macro lm_chat_participant_config}
   final LMChatParticipantConfig participantConfig;
 
+  /// {@macro lm_chat_report_config}
+  final LMChatReportConfig reportConfig;
+
   /// {@macro lm_widget_builder_delegate}
-  final LMChatWidgetBuilderDelegate? widgetBuilderDelegate;
+  final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
   /// [globalSystemOverlayStyle] is the system overlay style for the app.
   final SystemUiOverlayStyle? globalSystemOverlayStyle;
@@ -39,7 +44,8 @@ class LMChatConfig {
     this.exploreConfig = const LMChatExploreConfig(),
     this.homeConfig = const LMChatHomeConfig(),
     this.participantConfig = const LMChatParticipantConfig(),
-    this.widgetBuilderDelegate,
+    this.reportConfig = const LMChatReportConfig(),
+    this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });
 }

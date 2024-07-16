@@ -215,7 +215,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
@@ -342,8 +342,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         backgroundColor: _themeData.primaryColor,
         padding: const EdgeInsets.all(8),
         borderRadius: 100,
-        height: 5.h,
-        width: 5.h,
+        height: 5.2.h,
+        width: 5.2.h,
       ),
       icon: LMChatIcon(
         type: LMChatIconType.icon,

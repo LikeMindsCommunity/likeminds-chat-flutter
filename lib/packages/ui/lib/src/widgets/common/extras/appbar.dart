@@ -130,6 +130,9 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? leading,
     List<Widget>? trailing,
     Widget? title,
+    Widget? subtitle,
+    Widget? banner,
+    PreferredSizeWidget? bottom,
     Function? backButtonCallback,
     LMChatAppBarStyle? style,
   }) {
@@ -137,6 +140,9 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: leading ?? this.leading,
       trailing: trailing ?? this.trailing,
       title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      banner: banner ?? this.banner,
+      bottom: bottom ?? this.bottom,
       backButtonCallback: backButtonCallback ?? this.backButtonCallback,
       style: style ?? this.style,
     );

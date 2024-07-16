@@ -70,9 +70,9 @@ class _LMChatroomParticipantsPageState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _screenBuilder.scaffold(
       backgroundColor: LMChatTheme.instance.themeData.container,
-      appBar: _screenBuilder.appBarBuilder.call(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
       body: SafeArea(
         child: Column(
           children: [
@@ -243,7 +243,7 @@ class _LMChatroomParticipantsPageState
             LMChatUserTile userTile = LMChatUserTile(
               userViewData: item,
             );
-            return _screenBuilder.userTileBuilder.call(context, item, userTile);
+            return _screenBuilder.userTileBuilder(context, item, userTile);
           },
           firstPageErrorIndicatorBuilder:
               _screenBuilder.firstPageErrorIndicatorBuilder,

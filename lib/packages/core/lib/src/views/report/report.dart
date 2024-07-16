@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/moderation/moderation_bloc.dart';
+import 'package:likeminds_chat_flutter_core/src/views/report/configurations/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -52,7 +52,8 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   LMChatThemeData theme = LMChatTheme.instance.themeData;
   final TextEditingController _reportReasonController = TextEditingController();
   LMChatReportTagViewData? _selectedReportTag;
-  final LMChatWidgetBuilderDelegate _builderDelegate = LMChatCore.widgets;
+  final LMChatReportBuilderDelegate _screenBuilder =
+      LMChatCore.config.reportConfig.builder;
   final LMChatModerationBloc _moderationBloc = LMChatModerationBloc();
 
   @override
@@ -71,10 +72,10 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    return _builderDelegate.scaffold(
+    return _screenBuilder.scaffold(
       backgroundColor: theme.container,
       source: _widgetSource,
-      appBar: _defAppBar(context),
+      appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context)),
       body: SafeArea(
         top: false,
         child: Column(
@@ -97,12 +98,22 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
                     _defChipListBuilder(),
                     if (_selectedReportTag?.name.toLowerCase() == 'others' ||
                         _selectedReportTag?.name.toLowerCase() == 'other')
-                      _defOtherReasonTextField()
+                      _screenBuilder.otherReasonTextFieldBuilder(
+                        context,
+                        _reportReasonController,
+                        _defOtherReasonTextField(),
+                      )
                   ],
                 ),
               ),
             ),
-            _defSubmitButton(context),
+            _screenBuilder.submitButtonBuilder(
+              context,
+              widget.entityId,
+              _selectedReportTag?.id,
+              _reportReasonController.text.trim(),
+              _defSubmitButton(context),
+            ),
           ],
         ),
       ),
@@ -208,7 +219,11 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
                   children: reportTags.isNotEmpty
                       ? reportTags
                           .map(
-                            (e) => _defChip(e),
+                            (tagViewData) => _screenBuilder.reportChipBuilder(
+                              context,
+                              tagViewData,
+                              _defChip(tagViewData),
+                            ),
                           )
                           .toList()
                       : []),
@@ -219,53 +234,49 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
         });
   }
 
-  InkWell _defChip(LMChatReportTagViewData e) {
-    return InkWell(
-      splashFactory: InkRipple.splashFactory,
+  LMChatChip _defChip(LMChatReportTagViewData tagViewData) {
+    return LMChatChip(
       onTap: () {
-        setState(
-          () {
-            if (_selectedReportTag?.id == e.id) {
-              if (_selectedReportTag?.name.toLowerCase() == 'others' ||
-                  _selectedReportTag?.name.toLowerCase() == 'other') {
-                _reportReasonController.clear();
-              }
-              _selectedReportTag = null;
-            } else {
-              _selectedReportTag = e;
+        setState(() {
+          if (_selectedReportTag?.id == tagViewData.id) {
+            if (_selectedReportTag?.name.toLowerCase() == 'others' ||
+                _selectedReportTag?.name.toLowerCase() == 'other') {
+              _reportReasonController.clear();
             }
-          },
-        );
+            _selectedReportTag = null;
+          } else {
+            _selectedReportTag = tagViewData;
+          }
+        });
       },
-      child: Chip(
-        label: LMChatText(
-          e.name,
-          style: LMChatTextStyle(
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-            ).copyWith(
-              fontSize: 14,
-              color:
-                  _selectedReportTag?.id == e.id ? Colors.white :  theme.inActiveColor,
-            ),
+      label: LMChatText(
+        tagViewData.name,
+        style: LMChatTextStyle(
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w400,
+          ).copyWith(
+            fontSize: 14,
+            color: _selectedReportTag?.id == tagViewData.id
+                ? Colors.white
+                : theme.inActiveColor,
           ),
         ),
-        backgroundColor: _selectedReportTag?.id == e.id
+      ),
+      style: LMChatChipStyle.basic().copyWith(
+        backgroundColor: _selectedReportTag?.id == tagViewData.id
             ? theme.primaryColor
             : theme.container,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50.0),
           side: BorderSide(
-            color: _selectedReportTag?.id == e.id
+            color: _selectedReportTag?.id == tagViewData.id
                 ? theme.primaryColor
-                :  theme.inActiveColor,
+                : theme.inActiveColor,
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        labelPadding: EdgeInsets.zero,
-        elevation: 0,
       ),
     );
   }

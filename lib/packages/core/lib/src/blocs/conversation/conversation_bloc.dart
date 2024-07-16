@@ -31,6 +31,7 @@ class LMChatConversationBloc
   final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
 
   static LMChatConversationBloc? _instance;
+  static int? _currentChatroomId;
 
   /// Creates and maintains a singleton instance of this BLoC
   static LMChatConversationBloc get instance {
@@ -55,22 +56,28 @@ class LMChatConversationBloc
     on<LMChatUpdateConversationsEvent>(updateConversationsEventHandler);
   }
 
+  @override
+  Future<void> close() {
+    _currentChatroomId = null;
+    return super.close();
+  }
+
   initialiseConversationsEventHandler(
     LMChatInitialiseConversationsEvent event,
     Emitter<LMChatConversationState> emit,
   ) async {
-    int chatroomId = event.chatroomId;
+    _currentChatroomId = event.chatroomId;
     lastConversationId = event.conversationId;
 
     realTime.onValue.listen(
       (event) {
-        if (event.snapshot.value != null) {
+        if (event.snapshot.value != null && _currentChatroomId != null) {
           final response = event.snapshot.value as Map;
           final conversationId = int.parse(response["collabcard"]["answer_id"]);
           if (lastConversationId != null &&
               conversationId != lastConversationId) {
             LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
-              chatroomId: chatroomId,
+              chatroomId: _currentChatroomId!,
               conversationId: conversationId,
             ));
           }

@@ -23,15 +23,60 @@ class LMChatExploreTile extends StatefulWidget {
   /// Chatroom view model required to render the widget
   final LMChatRoomViewData chatroom;
 
+  /// Callback function to handle tap event
   final VoidCallback? onTap;
+
+  /// Flag to absorb touch events
+  final bool? absorbTouch;
+
+  /// Widget to display on the left side of the tile
+  final Widget? leading;
+
+  /// Widget to display as title
+  final Widget? title;
+
+  /// Widget to display as subtitle
+  final Widget? subtitle;
+
+  /// Widget to display on the right side of the tile
+  final Widget? trailing;
 
   ///{@macro lm_chat_explore_tile}
   const LMChatExploreTile({
     super.key,
     this.style,
     this.onTap,
+    this.absorbTouch,
+    this.leading,
+    this.title,
+    this.subtitle,
+    this.trailing,
     required this.chatroom,
   });
+
+  /// CopyWith method to update the widget with new values
+  /// Returns a new instance of the widget with updated values
+  LMChatExploreTile copyWith({
+    LMChatTileStyle? style,
+    VoidCallback? onTap,
+    bool? absorbTouch,
+    Widget? leading,
+    Widget? title,
+    Widget? subtitle,
+    Widget? trailing,
+    LMChatRoomViewData? chatroom,
+  }) {
+    return LMChatExploreTile(
+      style: style ?? this.style,
+      onTap: onTap ?? this.onTap,
+      absorbTouch: absorbTouch ?? this.absorbTouch,
+      leading: leading ?? this.leading,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      trailing: trailing ?? this.trailing,
+      chatroom: chatroom ?? this.chatroom,
+    );
+  }
 
   @override
   State<LMChatExploreTile> createState() => _LMChatExploreTileState();
@@ -52,10 +97,10 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
   Widget build(BuildContext context) {
     return LMChatTile(
       onTap: widget.onTap,
-      absorbTouch: false,
+      absorbTouch: widget.absorbTouch ?? false,
       style: widget.style ??
           LMChatTheme.theme.chatTileStyle.copyWith(
-            margin: 6,
+            gap: 6,
           ),
       leading: LMChatProfilePicture(
         fallbackText: chatroom.header,
