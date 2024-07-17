@@ -7,6 +7,7 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/explore/bloc/explore_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/chatroom.dart';
@@ -223,9 +224,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       padding: EdgeInsets.zero,
       physics: const ClampingScrollPhysics(),
       builderDelegate: PagedChildBuilderDelegate<ChatRoom>(
-        noItemsFoundIndicatorBuilder: (context) => const Center(
-          child: LMChatText("Opps, no chatrooms found!"),
-        ),
+        noItemsFoundIndicatorBuilder: (context) => _defaultEmptyView(),
         newPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         firstPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         itemBuilder: (context, item, index) =>
@@ -236,6 +235,32 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         ),
       ),
     );
+  }
+
+  Widget _defaultEmptyView() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No chatrooms found.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
   }
 
   LMChatExploreTile _defaultExploreTile(ChatRoom item, BuildContext context) {
@@ -317,7 +342,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
           size: 18,
           boxBorder: 1,
           boxBorderRadius: 11,
-          boxPadding: 2,
+          boxPadding: const EdgeInsets.all(2),
           boxSize: 22,
           boxBorderColor: LMChatTheme.theme.onContainer,
         ),
@@ -337,17 +362,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   }
 
   void _refreshExploreFeed() {
-    _page = 1;
-    exploreBloc.add(
-      LMChatFetchExploreEvent(
-        getExploreFeedRequest: (GetExploreFeedRequestBuilder()
-              ..orderType(mapLMChatSpacesToInt(_space))
-              ..page(_page)
-              ..pinned(pinnedChatroom))
-            .build(),
-      ),
-    );
-    exploreFeedPagingController.itemList?.clear();
+    exploreFeedPagingController.refresh();
   }
 
   _addPaginationListener() {

@@ -166,8 +166,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
       }
       toast((action.title.toLowerCase() == "mute notifications")
-          ? "Chatroom muted"
-          : "Chatroom unmuted");
+          ? "Notifications muted for this space!"
+          : "Notifications unmuted for this space!");
       chatroomActions = chatroomActions.map((element) {
         if (element.title.toLowerCase() == "mute notifications") {
           element.title = "Unmute notifications";

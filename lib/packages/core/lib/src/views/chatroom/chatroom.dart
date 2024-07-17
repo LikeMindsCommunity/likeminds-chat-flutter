@@ -1,8 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -88,6 +86,21 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   }
 
   @override
+  void didUpdateWidget(LMChatroomScreen old) {
+    super.didUpdateWidget(old);
+    Bloc.observer = LMChatBlocObserver();
+    currentUser = LMChatLocalPreference.instance.getUser();
+    _chatroomBloc = LMChatroomBloc.instance
+      ..add(LMChatFetchChatroomEvent(chatroomId: widget.chatroomId));
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
+    _conversationBloc = LMChatConversationBloc.instance;
+    _convActionBloc = LMChatConversationActionBloc.instance;
+    scrollController.addListener(() {
+      _showScrollToBottomButton();
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     ScreenSize.init(context);
@@ -109,11 +122,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         valueListenable: rebuildFloatingButton,
         builder: (context, _, __) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 96.0),
+            padding: const EdgeInsets.only(bottom: 48.0, right: 2),
             child: showScrollButton
-                ? _screenBuilder.floatingActionButton(
-                    _defaultScrollButton(),
-                  )
+                ? _screenBuilder.floatingActionButton(_defaultScrollButton())
                 : null,
           );
         },
@@ -577,7 +588,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           style: LMChatIconStyle(
             size: 28,
             boxSize: 28,
-            boxPadding: 2,
+            boxPadding: const EdgeInsets.all(2),
             color: LMChatTheme.theme.onContainer,
           ),
         ),

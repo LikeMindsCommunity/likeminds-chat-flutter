@@ -210,12 +210,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               padding: EdgeInsets.only(
                 left: 2.w,
                 right: 2.w,
-                top: 0,
+                top: 1.h,
                 bottom: 2.h,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
@@ -292,8 +292,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 2,
-              // vertical: 2,
+              horizontal: 4,
+              vertical: 2,
             ),
             child: LMChatTextField(
               key: const GlobalObjectKey('chatTextField'),

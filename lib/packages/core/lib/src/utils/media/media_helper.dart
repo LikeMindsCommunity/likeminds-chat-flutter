@@ -193,7 +193,6 @@ Widget getChatItemAttachmentTile(
           style: const LMChatIconStyle(
             color: LMChatDefaultTheme.greyColor,
             size: 16,
-            boxPadding: 0,
             boxSize: 16,
           ),
         ),

@@ -126,7 +126,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                               _screenBuilder
                                   .homeFeedNoItemsFoundIndicatorBuilder(
                             context,
-                            const SizedBox(),
+                            _defaultEmptyView(),
                           ),
                           noMoreItemsIndicatorBuilder: (context) =>
                               _screenBuilder
@@ -169,7 +169,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           top: 3.h,
           bottom: 1.h,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 6.w),
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
         height: 4.h,
       ),
       leading: LMChatIcon(
@@ -182,8 +182,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         ),
       ),
       title: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 4.w,
+        padding: EdgeInsets.only(
+          left: 4.w,
+          right: 4,
         ),
         child: LMChatText(
           'Explore Chatrooms',
@@ -279,6 +280,32 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
     }
   }
 
+  Widget _defaultEmptyView() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No chatrooms found.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
+  }
+
   Widget _defaultErrorView() {
     return Container();
   }
@@ -309,6 +336,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             const LMChatProfilePictureStyle(size: 48),
       ),
       title: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           LMChatText(
             chatroom.header,
@@ -344,13 +372,13 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       ),
       trailing: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
               ? _screenBuilder.homeFeedMuteIconBuilder(
                   _defMuteIcon(),
                 )
               : const SizedBox.shrink(),
-          const SizedBox(width: 8),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -374,12 +402,11 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                       : chatroom.unseenCount.toString(),
                   style: LMChatTextStyle(
                     maxLines: 1,
-                    textAlign: TextAlign.end,
                     backgroundColor: LMChatTheme.theme.primaryColor,
                     borderRadius: 24,
                     padding: const EdgeInsets.only(
                       left: 7,
-                      right: 5,
+                      right: 7,
                       top: 2,
                       bottom: 2,
                     ),
@@ -409,9 +436,18 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   }
 
   LMChatIcon _defMuteIcon() {
-    return const LMChatIcon(
+    return LMChatIcon(
       type: LMChatIconType.icon,
       icon: Icons.volume_off_outlined,
+      style: LMChatIconStyle(
+        backgroundColor: LMChatTheme.theme.scaffold,
+        boxSize: 36,
+        boxPadding: const EdgeInsets.only(
+          left: 6,
+          right: 4,
+        ),
+        fit: BoxFit.contain,
+      ),
     );
   }
 

@@ -150,7 +150,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     color: LMChatTheme.theme.primaryColor,
                     size: 28,
                     boxSize: 28,
-                    boxPadding: 0,
                   ),
                 ),
           ],
@@ -194,7 +193,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     minHeight: 2.h,
                     minWidth:
                         conversation.answer.split('\n').length > 4 ? 40.w : 5.w,
-                    maxWidth: 50.w,
+                    maxWidth: 60.w,
                   ),
                   child: PhysicalShape(
                     clipper: LMChatBubbleClipper(

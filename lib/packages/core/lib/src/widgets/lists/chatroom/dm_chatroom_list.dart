@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -121,7 +122,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                     noItemsFoundIndicatorBuilder: (context) =>
                         _screenBuilder.dmFeedNoItemsFoundIndicatorBuilder(
                       context,
-                      const SizedBox(),
+                      _defaultEmptyView(),
                     ),
                     noMoreItemsIndicatorBuilder: (context) =>
                         _screenBuilder.dmFeedNoMoreItemsIndicatorBuilder(
@@ -175,14 +176,29 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   }
 
   Widget _defaultEmptyView() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Looks empty, start a new DM"),
-        ],
-      ),
-    );
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No direct messages.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
   }
 
   LMChatTile _defaultDMChatRoomTile(LMChatRoomViewData chatroom) {

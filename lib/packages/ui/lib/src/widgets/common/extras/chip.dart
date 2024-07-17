@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 
 /// {@template lm_chat_chip}
 /// A widget which displays a chip.

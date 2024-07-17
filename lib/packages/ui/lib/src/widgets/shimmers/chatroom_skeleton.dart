@@ -19,9 +19,7 @@ class LMChatSkeletonChatPage extends StatelessWidget {
             const SizedBox(height: 18),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 2.w,
-                ),
+                padding: const EdgeInsets.symmetric(),
                 child: Container(
                   color: LMChatTheme.theme.backgroundColor,
                   child: const LMChatSkeletonChatList(),
@@ -178,13 +176,14 @@ class LMChatSkeletonChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> list = List.generate(
-      12,
+      11,
       (index) => LMChatSkeletonChatBubble(isSent: index % 3 == 0),
     );
 
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: 1.4.h,
+        horizontal: 2.w,
       ),
       child: Column(
         children: list,
@@ -307,12 +306,12 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
               else
                 LMChatSkeletonAnimation(
                   child: Container(
-                    width: 4.h,
-                    height: 4.h,
+                    width: 4.5.h,
+                    height: 4.5.h,
                     decoration: BoxDecoration(
                       color: LMChatDefaultTheme.greyColor,
                       borderRadius: BorderRadius.all(
-                        Radius.circular(2.h),
+                        Radius.circular(3.h),
                       ),
                     ),
                   ),
@@ -325,8 +324,8 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                 ),
                 constraints: BoxConstraints(
                   maxWidth: 60.w,
-                  maxHeight: 4.h,
-                  minHeight: 4.h,
+                  maxHeight: 4.5.h,
+                  minHeight: 4.5.h,
                 ),
                 alignment: Alignment.center,
                 child: LMChatSkeletonAnimation(
@@ -343,12 +342,12 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
               if (isSent)
                 LMChatSkeletonAnimation(
                   child: Container(
-                    width: 4.h,
-                    height: 4.h,
+                    width: 4.5.h,
+                    height: 4.5.h,
                     decoration: BoxDecoration(
                       color: LMChatDefaultTheme.greyColor,
                       borderRadius: BorderRadius.all(
-                        Radius.circular(2.h),
+                        Radius.circular(3.h),
                       ),
                     ),
                   ),

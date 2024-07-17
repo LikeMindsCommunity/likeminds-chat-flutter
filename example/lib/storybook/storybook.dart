@@ -39,7 +39,6 @@ LMChatText textStory() {
   return const LMChatText(
     'Hello, World!',
     style: LMChatTextStyle(
-      selectable: true,
       textStyle: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
