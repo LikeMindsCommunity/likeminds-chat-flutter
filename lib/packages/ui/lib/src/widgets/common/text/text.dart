@@ -29,16 +29,16 @@ class LMChatText extends StatelessWidget {
   Widget build(BuildContext context) {
     LMChatTextStyle inStyle = style ?? LMChatTextStyle.basic();
 
-    return AbsorbPointer(
-      absorbing: onTap == null,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: inStyle.padding ?? EdgeInsets.zero,
-          decoration: BoxDecoration(
-            color: inStyle.backgroundColor ?? Colors.transparent,
-            borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 4),
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: inStyle.padding ?? EdgeInsets.zero,
+        decoration: BoxDecoration(
+          color: inStyle.backgroundColor ?? Colors.transparent,
+          borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 4),
+        ),
+        child: AbsorbPointer(
+          absorbing: onTap == null,
           child: Text(
             text,
             textAlign: inStyle.textAlign,
