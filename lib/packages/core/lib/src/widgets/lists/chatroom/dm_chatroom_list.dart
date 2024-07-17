@@ -121,7 +121,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                     noItemsFoundIndicatorBuilder: (context) =>
                         _screenBuilder.dmFeedNoItemsFoundIndicatorBuilder(
                       context,
-                      const SizedBox(),
+                      _defaultEmptyView(),
                     ),
                     noMoreItemsIndicatorBuilder: (context) =>
                         _screenBuilder.dmFeedNoMoreItemsIndicatorBuilder(
