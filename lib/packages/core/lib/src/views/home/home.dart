@@ -9,7 +9,6 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 ///
 /// To customize it pass appropriate builders to constructor.
 class LMChatHomeScreen extends StatefulWidget {
-
   /// Constructor for LMChatHomeScreen
   ///
   /// Creates a new instance of the screen widget
@@ -45,7 +44,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
               context,
               user,
               DefaultTabController.of(context),
-              _defAppBar(),
+              _defAppBar(context),
             ),
             body: const TabBarView(
               children: [
@@ -59,7 +58,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     );
   }
 
-  LMChatAppBar _defAppBar() {
+  LMChatAppBar _defAppBar(BuildContext context) {
     return LMChatAppBar(
       style: const LMChatAppBarStyle(
         height: 120,
@@ -76,13 +75,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
         ),
         const SizedBox(width: 8),
       ],
-      bottom: TabBar(
-        labelColor: LMChatTheme.theme.primaryColor,
-        indicatorColor: LMChatTheme.theme.primaryColor,
-        tabs: const [
-          Tab(text: LMChatStringConstants.groupHomeTabTitle),
-          Tab(text: LMChatStringConstants.dmHomeTabTitle),
-        ],
+      bottom: _homeScreenBuilder.tabBarBuilder(
+        context,
+        DefaultTabController.of(context),
+        _defTabBar(),
       ),
       title: LMChatText(
         LMChatStringConstants.homeFeedTitle,
@@ -93,6 +89,17 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  TabBar _defTabBar() {
+    return TabBar(
+      labelColor: LMChatTheme.theme.primaryColor,
+      indicatorColor: LMChatTheme.theme.primaryColor,
+      tabs: const [
+        Tab(text: LMChatStringConstants.groupHomeTabTitle),
+        Tab(text: LMChatStringConstants.dmHomeTabTitle),
+      ],
     );
   }
 

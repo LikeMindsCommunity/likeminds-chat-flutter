@@ -86,12 +86,12 @@ class LMChatProfilePicture extends StatelessWidget {
     );
   }
 
-  LMChatProfilePicture copyWith(
+  LMChatProfilePicture copyWith({
     String? imageUrl,
     String? fallbackText,
     Function()? onTap,
     LMChatProfilePictureStyle? style,
-  ) {
+  }) {
     return LMChatProfilePicture(
       fallbackText: fallbackText ?? this.fallbackText,
       imageUrl: imageUrl ?? this.imageUrl,

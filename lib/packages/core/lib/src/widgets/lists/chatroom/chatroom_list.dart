@@ -38,10 +38,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
 
   final LMChatHomeBuilderDelegate _screenBuilder =
       LMChatCore.config.homeConfig.builder;
-  final LMChatHomeFeedListStyle? _style =
+  final LMChatHomeFeedListStyle _style =
       LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
     LMChatHomeFeedListStyle.basic(),
-  );
+  ) ?? LMChatHomeFeedListStyle.basic();
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: _style?.backgroundColor ?? LMChatTheme.theme.scaffold,
+      backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
         child: Column(
@@ -90,7 +90,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                     builder: (context, _, __) {
                       return PagedListView<int, LMChatRoomViewData>(
                         pagingController: homeFeedPagingController,
-                        padding: _style?.padding ??
+                        padding: _style.padding ??
                             const EdgeInsets.symmetric(
                               vertical: 8,
                               horizontal: 4,
@@ -332,7 +332,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       leading: LMChatProfilePicture(
         fallbackText: chatroom.header,
         imageUrl: chatroom.chatroomImageUrl,
-        style: _style?.profilePictureStyle ??
+        style: _style.profilePictureStyle ??
             const LMChatProfilePictureStyle(size: 48),
       ),
       title: Row(
@@ -400,22 +400,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                   chatroom.unseenCount! > 99
                       ? "99+"
                       : chatroom.unseenCount.toString(),
-                  style: LMChatTextStyle(
-                    maxLines: 1,
-                    backgroundColor: LMChatTheme.theme.primaryColor,
-                    borderRadius: 24,
-                    padding: const EdgeInsets.only(
-                      left: 7,
-                      right: 7,
-                      top: 2,
-                      bottom: 2,
-                    ),
-                    textStyle: TextStyle(
-                      fontSize: 12,
-                      color: LMChatTheme.theme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  style: _style.unReadCountTextStyle,
                 ),
               ),
             ],
@@ -468,6 +453,9 @@ class LMChatHomeFeedListStyle {
   /// [profilePictureStyle] is the style of the profile picture
   final LMChatProfilePictureStyle? profilePictureStyle;
 
+  /// [unReadCountTextStyle] is the style of the unread count
+  final LMChatTextStyle? unReadCountTextStyle;
+
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_home_feed_list_style}
@@ -475,6 +463,7 @@ class LMChatHomeFeedListStyle {
     this.backgroundColor,
     this.padding,
     this.profilePictureStyle,
+    this.unReadCountTextStyle,
   });
 
   /// Default style for the home feed list
@@ -483,6 +472,22 @@ class LMChatHomeFeedListStyle {
       backgroundColor: _themeData.scaffold,
       padding: const EdgeInsets.all(0),
       profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
+      unReadCountTextStyle: LMChatTextStyle(
+                    maxLines: 1,
+                    backgroundColor: LMChatTheme.theme.primaryColor,
+                    borderRadius: 24,
+                    padding: const EdgeInsets.only(
+                      left: 7,
+                      right: 7,
+                      top: 2,
+                      bottom: 2,
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      color: LMChatTheme.theme.onPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
     );
   }
 
@@ -492,11 +497,13 @@ class LMChatHomeFeedListStyle {
     Color? backgroundColor,
     EdgeInsets? padding,
     LMChatProfilePictureStyle? profilePictureStyle,
+    LMChatTextStyle? unReadCountTextStyle,
   }) {
     return LMChatHomeFeedListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
       profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,
+      unReadCountTextStyle: unReadCountTextStyle ?? this.unReadCountTextStyle,
     );
   }
 }

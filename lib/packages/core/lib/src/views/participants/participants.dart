@@ -72,7 +72,12 @@ class _LMChatroomParticipantsPageState
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       backgroundColor: LMChatTheme.instance.themeData.container,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _searchController,
+        _onSearchTap,
+        _defAppBar(),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -106,21 +111,21 @@ class _LMChatroomParticipantsPageState
             ),
             child: _showSearchBarTextField.value
                 ? TextField(
-                  focusNode: focusNode,
-                  keyboardType: TextInputType.text,
-                  textCapitalization: TextCapitalization.words,
-                  controller: _searchController,
-                  onChanged: _onSearchTextChange,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Search...",
-                    hintStyle:
-                        Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.grey,
-                              fontSize: 16,
-                            ),
-                  ),
-                )
+                    focusNode: focusNode,
+                    keyboardType: TextInputType.text,
+                    textCapitalization: TextCapitalization.words,
+                    controller: _searchController,
+                    onChanged: _onSearchTextChange,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Search...",
+                      hintStyle:
+                          Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                color: Colors.grey,
+                                fontSize: 16,
+                              ),
+                    ),
+                  )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -151,29 +156,7 @@ class _LMChatroomParticipantsPageState
             valueListenable: _showSearchBarTextField,
             builder: (context, value, __) {
               return GestureDetector(
-                onTap: () {
-                  if (_showSearchBarTextField.value) {
-                    searchTerm = null;
-                    _searchController.clear();
-                    _pagingController.nextPageKey = 2;
-                    _pagingController.itemList = <LMChatUserViewData>[];
-                    participantsBloc!.add(
-                      LMChatGetParticipantsEvent(
-                        chatroomId: widget.chatroomViewData.id,
-                        page: 1,
-                        pageSize: _pageSize,
-                        search: searchTerm,
-                        isSecret: widget.chatroomViewData.isSecret ?? false,
-                      ),
-                    );
-                  } else {
-                    if (focusNode.canRequestFocus) {
-                      focusNode.requestFocus();
-                    }
-                  }
-                  _showSearchBarTextField.value =
-                      !_showSearchBarTextField.value;
-                },
+                onTap: _onSearchTap,
                 child: LMChatIcon(
                     type: LMChatIconType.icon,
                     icon: value ? Icons.close : Icons.search,
@@ -184,6 +167,29 @@ class _LMChatroomParticipantsPageState
             }),
       ],
     );
+  }
+
+  void _onSearchTap() {
+    if (_showSearchBarTextField.value) {
+      searchTerm = null;
+      _searchController.clear();
+      _pagingController.nextPageKey = 2;
+      _pagingController.itemList = <LMChatUserViewData>[];
+      participantsBloc!.add(
+        LMChatGetParticipantsEvent(
+          chatroomId: widget.chatroomViewData.id,
+          page: 1,
+          pageSize: _pageSize,
+          search: searchTerm,
+          isSecret: widget.chatroomViewData.isSecret ?? false,
+        ),
+      );
+    } else {
+      if (focusNode.canRequestFocus) {
+        focusNode.requestFocus();
+      }
+    }
+    _showSearchBarTextField.value = !_showSearchBarTextField.value;
   }
 
   String get _memberCountText {

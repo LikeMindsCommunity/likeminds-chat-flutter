@@ -2,11 +2,22 @@ part of 'chat_bubble.dart';
 
 class LMChatBubbleHeader extends StatelessWidget {
   final LMChatUserViewData conversationUser;
+  final LMChatTextStyle? style;
 
   const LMChatBubbleHeader({
     super.key,
+    this.style,
     required this.conversationUser,
   });
+
+  LMChatBubbleHeader copyWith({
+    LMChatTextStyle? style,
+  }) {
+    return LMChatBubbleHeader(
+      conversationUser: conversationUser,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +26,12 @@ class LMChatBubbleHeader extends StatelessWidget {
       children: [
         LMChatText(
           conversationUser.name,
-          style: LMChatTextStyle(
-            textStyle: TextStyle(
-              color: LMChatTheme.theme.primaryColor,
-            ),
-          ),
+          style: style ??
+              LMChatTextStyle(
+                textStyle: TextStyle(
+                  color: LMChatTheme.theme.primaryColor,
+                ),
+              ),
         ),
       ],
     );

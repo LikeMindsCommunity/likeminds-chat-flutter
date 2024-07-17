@@ -34,6 +34,34 @@ class LMChatTextField extends StatefulWidget {
     this.scrollPhysics,
   });
 
+  LMChatTextField copyWith({
+    bool? isDown,
+    FocusNode? focusNode,
+    Function(LMChatTagViewData)? onTagSelected,
+    TextEditingController? controller,
+    InputDecoration? decoration,
+    TextStyle? style,
+    Function(String)? onChange,
+    int? chatroomId,
+    bool? isSecret,
+    bool? enabled,
+    ScrollPhysics? scrollPhysics,
+  }) {
+    return LMChatTextField(
+      isDown: isDown ?? this.isDown,
+      focusNode: focusNode ?? this.focusNode,
+      onTagSelected: onTagSelected ?? this.onTagSelected,
+      controller: controller ?? this.controller,
+      decoration: decoration ?? this.decoration,
+      style: style ?? this.style,
+      onChange: onChange ?? this.onChange,
+      chatroomId: chatroomId ?? this.chatroomId,
+      isSecret: isSecret ?? this.isSecret,
+      enabled: enabled ?? this.enabled,
+      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+    );
+  }
+
   @override
   State<LMChatTextField> createState() => _LMChatTextFieldState();
 }

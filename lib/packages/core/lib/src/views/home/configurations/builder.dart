@@ -123,6 +123,15 @@ class LMChatHomeBuilderDelegate {
     return appBar;
   }
 
+  /// Builds [TabBar] widget for home screen
+  PreferredSizeWidget tabBarBuilder(
+    BuildContext context,
+    TabController tabController,
+    TabBar tabBar,
+  ) {
+    return tabBar;
+  }
+
   // Builders for home feed list
 
   /// Builds a home feed chatroom tile

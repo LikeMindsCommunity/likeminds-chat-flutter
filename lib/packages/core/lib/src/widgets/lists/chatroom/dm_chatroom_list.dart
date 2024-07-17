@@ -39,10 +39,11 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
       LMChatCore.config.homeConfig.builder;
 
   /// [_style] is a style object to customize the look and feel of the list
-  final LMChatDMFeedListStyle? _style =
+  final LMChatDMFeedListStyle _style =
       LMChatCore.config.homeConfig.style.dmFeedListStyle?.call(
-    LMChatDMFeedListStyle.basic(),
-  );
+            LMChatDMFeedListStyle.basic(),
+          ) ??
+          LMChatDMFeedListStyle.basic();
 
   @override
   void initState() {
@@ -302,19 +303,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
                       chatroom.unseenCount! > 99
                           ? "99+"
                           : chatroom.unseenCount.toString(),
-                      style: LMChatTextStyle(
-                        padding: const EdgeInsets.only(
-                          left: 7,
-                          right: 5,
-                          top: 2,
-                          bottom: 2,
-                        ),
-                        textStyle: TextStyle(
-                          fontSize: 12,
-                          color: LMChatTheme.theme.onPrimary,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      style: _style.unreadCountTextStyle,
                     ),
                   ),
                 ),
@@ -376,6 +365,9 @@ class LMChatDMFeedListStyle {
   /// [profilePictureStyle] is the style of the profile picture
   final LMChatProfilePictureStyle? profilePictureStyle;
 
+  /// [unreadCountTextStyle] is the style of the unread count text
+  final LMChatTextStyle? unreadCountTextStyle;
+
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_dm_feed_list_style}
@@ -383,6 +375,7 @@ class LMChatDMFeedListStyle {
     this.backgroundColor,
     this.padding,
     this.profilePictureStyle,
+    this.unreadCountTextStyle,
   });
 
   /// {@macro lm_chat_dm_feed_list_style}
@@ -391,6 +384,19 @@ class LMChatDMFeedListStyle {
       backgroundColor: _themeData.scaffold,
       padding: EdgeInsets.zero,
       profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
+      unreadCountTextStyle: LMChatTextStyle(
+        padding: const EdgeInsets.only(
+          left: 7,
+          right: 5,
+          top: 2,
+          bottom: 2,
+        ),
+        textStyle: TextStyle(
+          fontSize: 12,
+          color: LMChatTheme.theme.onPrimary,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
     );
   }
 
@@ -400,11 +406,13 @@ class LMChatDMFeedListStyle {
     Color? backgroundColor,
     EdgeInsets? padding,
     LMChatProfilePictureStyle? profilePictureStyle,
+    LMChatTextStyle? unreadCountTextStyle,
   }) {
     return LMChatDMFeedListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
       profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,
+      unreadCountTextStyle: unreadCountTextStyle ?? this.unreadCountTextStyle,
     );
   }
 }

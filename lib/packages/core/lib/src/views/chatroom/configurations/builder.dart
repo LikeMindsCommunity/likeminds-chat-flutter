@@ -1,8 +1,12 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations/widget_source.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
@@ -181,11 +185,94 @@ class LMChatroomBuilderDelegate {
     return chatBar;
   }
 
+  /// Builds the chatroom text field.
+  Widget chatroomTextField(
+    BuildContext context,
+    TextEditingController textController,
+    LMChatTextField chatroomTextField,
+  ) {
+    return chatroomTextField;
+  }
+
+  /// Builds edit text field Header.
+  Widget editTextTextFieldHeader(
+    BuildContext context,
+    TextEditingController textController,
+    LMChatBarHeader chatBarHeader,
+  ) {
+    return chatBarHeader;
+  }
+
+  /// Builds the reply text field header.
+  Widget replyTextFieldHeader(
+    BuildContext context,
+    TextEditingController textController,
+    LMChatBarHeader chatBarHeader,
+  ) {
+    return chatBarHeader;
+  }
+
+  /// Builds the chatroom menu.
+  Widget sendButton(
+    BuildContext context,
+    TextEditingController textController,
+    VoidCallback onPressed,
+    LMChatButton sendButton,
+  ) {
+    return sendButton;
+  }
+
   /// Builds the chatroom menu
   Widget chatroomMenu(
     BuildContext context,
+    List<ChatroomAction> chatroomActions,
     LMChatroomMenu chatroomMenu,
   ) {
     return chatroomMenu;
+  }
+
+  /// Builds the reply button. This button is used to reply to a message.
+  Widget replyButton(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatButton replyButton,
+  ) {
+    return replyButton;
+  }
+
+  /// Builds the edit button. This button is used to edit a message.
+  Widget editButton(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatButton editButton,
+  ) {
+    return editButton;
+  }
+
+  /// Builds the copy button. This button is used to copy a message.
+  Widget copyButton(
+    BuildContext context,
+    List<LMChatConversationViewData> conversations,
+    LMChatButton copyButton,
+  ) {
+    return copyButton;
+  }
+
+  /// Builds the delete button. This button is used to delete a message.
+  Widget deleteButton(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatButton deleteButton,
+  ) {
+    return deleteButton;
+  }
+
+  /// Builds the more option button. This button is used to show more options.
+  Widget moreOptionButton(
+    BuildContext context,
+    Function(LMChatConversationViewData conversation) onTap,
+    Widget moreOptionButton,
+  ) {
+    return moreOptionButton;
   }
 }

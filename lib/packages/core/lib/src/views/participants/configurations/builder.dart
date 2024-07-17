@@ -133,6 +133,8 @@ class LMChatParticipantBuilderDelegate {
   /// Builds the app bar.
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
+    TextEditingController searchController,
+    VoidCallback onSearch,
     LMChatAppBar appBar,
   ) {
     return appBar;
