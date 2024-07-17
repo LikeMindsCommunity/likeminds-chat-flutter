@@ -182,8 +182,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         ),
       ),
       title: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 4.w,
+        padding: EdgeInsets.only(
+          left: 4.w,
+          right: 4,
         ),
         child: LMChatText(
           'Explore Chatrooms',
