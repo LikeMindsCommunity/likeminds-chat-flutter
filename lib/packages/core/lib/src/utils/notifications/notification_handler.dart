@@ -57,6 +57,10 @@ class LMChatNotificationHandler {
     }
   }
 
+  Future<void> handleBackgroundNotification(RemoteMessage message) {
+    return Future.value();
+  }
+
   /// Handle the notification when it is received
   /// This is called from the client side when notification [message] is received
   /// and is needed to be handled, i.e. shown and routed to the appropriate screen
@@ -65,14 +69,6 @@ class LMChatNotificationHandler {
     debugPrint("--- Notification received in LEVEL 2 ---");
     if (message.data.containsKey('category') &&
         message.data["category"].contains("Chat")) {
-      message.toMap().forEach((key, value) {
-        debugPrint("$key: $value");
-        if (key == "data") {
-          message.data.forEach((key, value) {
-            debugPrint("$key: $value");
-          });
-        }
-      });
       // First, check if the message contains a data payload.
       if (show && message.data.isNotEmpty) {
         //Add LM check for showing LM notifications

@@ -126,7 +126,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                               _screenBuilder
                                   .homeFeedNoItemsFoundIndicatorBuilder(
                             context,
-                            const SizedBox(),
+                            _defaultEmptyView(),
                           ),
                           noMoreItemsIndicatorBuilder: (context) =>
                               _screenBuilder
@@ -278,6 +278,32 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         homeFeedPagingController.appendPage(state.chatrooms, _page);
       }
     }
+  }
+
+  Widget _defaultEmptyView() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No chatrooms found.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
   }
 
   Widget _defaultErrorView() {
@@ -448,12 +474,11 @@ class LMChatHomeFeedListStyle {
       profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
       unReadCountTextStyle: LMChatTextStyle(
                     maxLines: 1,
-                    textAlign: TextAlign.end,
                     backgroundColor: LMChatTheme.theme.primaryColor,
                     borderRadius: 24,
                     padding: const EdgeInsets.only(
                       left: 7,
-                      right: 5,
+                      right: 7,
                       top: 2,
                       bottom: 2,
                     ),
@@ -462,7 +487,7 @@ class LMChatHomeFeedListStyle {
                       color: LMChatTheme.theme.onPrimary,
                       fontWeight: FontWeight.w500,
                     ),
-                  ),
+                  )
     );
   }
 

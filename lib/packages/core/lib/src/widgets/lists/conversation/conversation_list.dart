@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -129,9 +130,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               noItemsFoundIndicatorBuilder: (context) =>
                   _screenBuilder.noItemInListWidgetBuilder(
                 context,
-                const Center(
-                  child: LMChatText('No chats found!'),
-                ),
+                _defaultEmptyView(),
               ),
               firstPageProgressIndicatorBuilder: (context) =>
                   _screenBuilder.loadingListWidgetBuilder(
@@ -269,6 +268,32 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         state.setState(() {});
       },
     );
+  }
+
+  Widget _defaultEmptyView() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No conversations found.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
   }
 
   _addPaginationListener() {

@@ -9,6 +9,8 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
 import 'package:likeminds_chat_flutter_core/src/blocs/explore/bloc/explore_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -265,9 +267,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       padding: EdgeInsets.zero,
       physics: const ClampingScrollPhysics(),
       builderDelegate: PagedChildBuilderDelegate<ChatRoom>(
-        noItemsFoundIndicatorBuilder: (context) => const Center(
-          child: LMChatText("Oops, no chatrooms found!"),
-        ),
+        noItemsFoundIndicatorBuilder: (context) => _defaultEmptyView(),
         newPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         firstPageProgressIndicatorBuilder: (context) => const LMChatLoader(),
         itemBuilder: (context, item, index) =>
@@ -278,6 +278,32 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         ),
       ),
     );
+  }
+
+  Widget _defaultEmptyView() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No chatrooms found.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
   }
 
   LMChatExploreTile _defaultExploreTile(ChatRoom item, BuildContext context) {

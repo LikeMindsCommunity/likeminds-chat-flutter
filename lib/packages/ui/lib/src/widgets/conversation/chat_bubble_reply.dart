@@ -57,7 +57,7 @@ class LMChatBubbleReply extends StatelessWidget {
             ),
           ),
           kHorizontalPaddingMedium,
-          Flexible(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +98,6 @@ class LMChatBubbleReply extends StatelessWidget {
                             : replyToConversation.answer,
                         style: LMChatTextStyle(
                           maxLines: 1,
-                          minLines: 1,
                           textStyle: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             color: theme.onContainer,
