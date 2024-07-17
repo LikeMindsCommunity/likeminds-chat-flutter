@@ -211,12 +211,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               padding: EdgeInsets.only(
                 left: 2.w,
                 right: 2.w,
-                top: 1.h,
-                bottom: 2.h,
+                top: 1.5.h,
+                bottom: 1.5.h,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
@@ -295,7 +295,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         Container(
           width: 80.w,
           constraints: BoxConstraints(
-            minHeight: 3.h,
+            minHeight: 5.2.h,
             maxHeight: 24.h,
           ),
           decoration: BoxDecoration(
@@ -309,7 +309,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 4,
+              horizontal: 12,
               vertical: 2,
             ),
             child: _screenBuilder.chatroomTextField(
@@ -325,7 +325,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   LMChatTextField _defInnerTextField(BuildContext context) {
     return LMChatTextField(
-      key: const GlobalObjectKey('chatTextField'),
+      key: const ObjectKey('chatTextField'),
       isDown: false,
       enabled: false,
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
@@ -347,8 +347,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         border: InputBorder.none,
         enabled: true,
         hintMaxLines: 1,
-        hintStyle:
-            Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+        hintStyle: const TextStyle(fontSize: 14),
         hintText: _getChatBarHintText(),
       ),
       focusNode: _focusNode,
@@ -360,16 +359,21 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       onTap: _onSend,
       style: LMChatButtonStyle(
         backgroundColor: _themeData.primaryColor,
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 12,
+        ),
         borderRadius: 100,
-        height: 5.2.h,
-        width: 5.2.h,
+        height: 6.h,
+        width: 6.h,
       ),
       icon: LMChatIcon(
         type: LMChatIconType.icon,
         icon: Icons.send,
         style: LMChatIconStyle(
-          size: 24,
+          size: 28,
+          boxSize: 36,
+          boxPadding: const EdgeInsets.only(left: 2),
           color: _themeData.container,
         ),
       ),

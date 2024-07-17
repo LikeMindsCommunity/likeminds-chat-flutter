@@ -27,7 +27,6 @@ Future<void> _handleNotification(RemoteMessage message) async {
   debugPrint("--- Notification received in LEVEL 1 ---");
   await LMChatNotificationHandler.instance
       .handleBackgroundNotification(message);
-  // .handleNotification(message, false, rootNavigatorKey);
 }
 
 void main() async {
@@ -39,7 +38,6 @@ void main() async {
       ConversationState.memberLeftOpenChatroom,
       ConversationState.memberLeftSecretChatroom,
       ConversationState.memberAddedToChatroom,
-      ConversationState.firstConversation,
     ],
   );
   runApp(const LMChatSampleApp());
@@ -65,10 +63,6 @@ void setupNotifications() async {
   // Register device with LM, and listen for notifications
   LMChatNotificationHandler.instance.init(deviceId: devId, fcmToken: fcmToken);
   FirebaseMessaging.onBackgroundMessage(_handleNotification);
-  // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-  //   await LMChatNotificationHandler.instance
-  //       .handleNotification(message, true, rootNavigatorKey);
-  // });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     debugPrint("---The app is opened from a notification---");
     await LMChatNotificationHandler.instance
