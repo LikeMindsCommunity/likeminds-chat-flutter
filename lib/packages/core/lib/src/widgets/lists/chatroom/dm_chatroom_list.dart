@@ -189,7 +189,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
         ),
         const SizedBox(height: 12),
         LMChatText(
-          'Oops! No conversations found.',
+          'Oops! No direct messages.',
           style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
