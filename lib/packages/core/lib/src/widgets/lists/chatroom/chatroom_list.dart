@@ -402,12 +402,11 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                       : chatroom.unseenCount.toString(),
                   style: LMChatTextStyle(
                     maxLines: 1,
-                    textAlign: TextAlign.end,
                     backgroundColor: LMChatTheme.theme.primaryColor,
                     borderRadius: 24,
                     padding: const EdgeInsets.only(
                       left: 7,
-                      right: 5,
+                      right: 7,
                       top: 2,
                       bottom: 2,
                     ),
