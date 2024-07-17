@@ -347,7 +347,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: LMChatDefaultTheme.greyColor,
                       borderRadius: BorderRadius.all(
-                        Radius.circular(2.h),
+                        Radius.circular(3.h),
                       ),
                     ),
                   ),
