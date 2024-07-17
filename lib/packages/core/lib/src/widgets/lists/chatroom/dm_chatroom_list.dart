@@ -72,7 +72,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: _style?.backgroundColor ?? LMChatTheme.theme.scaffold,
+      backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
         child: BlocListener<LMChatDMFeedBloc, LMChatDMFeedState>(
@@ -85,7 +85,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
               builder: (context, _, __) {
                 return PagedListView<int, LMChatRoomViewData>(
                   pagingController: homeFeedPagingController,
-                  padding: _style?.padding ??
+                  padding: _style.padding ??
                       const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 4,
@@ -233,7 +233,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
       leading: LMChatProfilePicture(
         fallbackText: chatroomUser.name,
         imageUrl: chatroomUser.imageUrl,
-        style: _style?.profilePictureStyle ??
+        style: _style.profilePictureStyle ??
             const LMChatProfilePictureStyle(size: 48),
       ),
       title: LMChatText(
@@ -387,7 +387,7 @@ class LMChatDMFeedListStyle {
       unreadCountTextStyle: LMChatTextStyle(
         padding: const EdgeInsets.only(
           left: 7,
-          right: 5,
+          right: 7,
           top: 2,
           bottom: 2,
         ),
