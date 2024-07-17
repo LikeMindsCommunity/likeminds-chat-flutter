@@ -39,10 +39,14 @@ class LMChatBubbleReply extends StatelessWidget {
         color: inStyle.backgroundColor ?? theme.disabledColor.withOpacity(0.2),
         borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
       ),
+      constraints: BoxConstraints(
+        minWidth: 20.w,
+        maxWidth: 64.w,
+      ),
       margin: inStyle.margin ?? const EdgeInsets.symmetric(vertical: 4),
       padding: inStyle.padding,
       child: Row(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
@@ -63,6 +67,7 @@ class LMChatBubbleReply extends StatelessWidget {
                       replyToConversation.member!.name,
                       style: LMChatTextStyle(
                         maxLines: 1,
+                        minLines: 1,
                         textStyle: TextStyle(
                           overflow: TextOverflow.ellipsis,
                           color: theme.primaryColor,
@@ -93,6 +98,7 @@ class LMChatBubbleReply extends StatelessWidget {
                             : replyToConversation.answer,
                         style: LMChatTextStyle(
                           maxLines: 1,
+                          minLines: 1,
                           textStyle: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             color: theme.onContainer,
