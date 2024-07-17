@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 
 class LMAnalytics {
   static LMAnalytics? _instance;
