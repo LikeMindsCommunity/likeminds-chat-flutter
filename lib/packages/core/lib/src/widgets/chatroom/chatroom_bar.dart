@@ -216,7 +216,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
@@ -295,7 +295,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         Container(
           width: 80.w,
           constraints: BoxConstraints(
-            minHeight: 3.h,
+            minHeight: 5.2.h,
             maxHeight: 24.h,
           ),
           decoration: BoxDecoration(

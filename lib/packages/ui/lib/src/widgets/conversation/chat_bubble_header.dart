@@ -29,6 +29,7 @@ class LMChatBubbleHeader extends StatelessWidget {
           style: style ??
               LMChatTextStyle(
                 textStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
                   color: LMChatTheme.theme.primaryColor,
                 ),
               ),

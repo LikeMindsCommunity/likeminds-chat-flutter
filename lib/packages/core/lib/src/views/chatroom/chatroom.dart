@@ -63,6 +63,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   final LMChatroomBuilderDelegate _screenBuilder =
       LMChatCore.config.chatRoomConfig.builder;
   final CustomPopupMenuController _menuController = CustomPopupMenuController();
+  final MemberStateResponse? getMemberState =
+      LMChatLocalPreference.instance.getMemberRights();
 
   bool isAnyMessageSelected() {
     return _selectedIds.isNotEmpty;
@@ -244,9 +246,38 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 18),
         gap: 3.w,
       ),
-      backButtonCallback: () => _chatroomActionBloc.add(MarkReadChatroomEvent(
-        chatroomId: widget.chatroomId,
-      )),
+      leading: LMChatButton(
+        onTap: () {
+          if (_selectedIds.isNotEmpty) {
+            _selectedIds.clear();
+            rebuildAppBar.value = !rebuildAppBar.value;
+            rebuildConversationList.value = !rebuildConversationList.value;
+          } else {
+            Navigator.of(context).pop();
+            _chatroomActionBloc.add(
+              MarkReadChatroomEvent(
+                chatroomId: widget.chatroomId,
+              ),
+            );
+          }
+        },
+        style: LMChatButtonStyle(
+          height: 28,
+          width: 28,
+          borderRadius: 6,
+          padding: EdgeInsets.zero,
+          icon: LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.arrow_back,
+            style: LMChatIconStyle(
+              color: LMChatTheme.theme.onPrimary,
+              size: 20,
+              boxSize: 28,
+            ),
+          ),
+          backgroundColor: LMChatTheme.theme.primaryColor,
+        ),
+      ),
       banner: ValueListenableBuilder(
         valueListenable: rebuildAppBar,
         builder: (context, _, __) {
@@ -329,7 +360,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         LMChatMemberRightUtil.checkEditPermissions(conversationViewData!);
     return [
       // Reply button
-      if (_selectedIds.length == 1)
+      if (_selectedIds.length == 1 && _isRespondingAllowed()) ...[
+        const SizedBox(width: 8),
         _screenBuilder.replyButton(
             context,
             conversationViewData,
@@ -357,57 +389,60 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 ),
               ),
             )),
-      const SizedBox(width: 8),
+      ],
       // Copy button
-      _screenBuilder.copyButton(
-        context,
-        pagedListController.value.itemList
-                ?.where(
-                    (conversation) => _selectedIds.contains(conversation.id))
-                .toList() ??
-            [],
-        LMChatButton(
-          onTap: () {
-            // Store the answer in the clipboard
-            // and show a toast message
-            // if _selectedIds is more than 1, then copy answer with
-            // [date and time] conversation user name : answer format
-            bool isMultiple = _selectedIds.length > 1;
-            String copiedMessage = "";
-            if (isMultiple) {
-              for (int id in _selectedIds) {
-                LMChatConversationViewData conversation = pagedListController
-                    .value.itemList!
-                    .firstWhere((element) => element.id == id);
-                copiedMessage +=
-                    "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";
+      ...[
+        const SizedBox(width: 8),
+        _screenBuilder.copyButton(
+          context,
+          pagedListController.value.itemList
+                  ?.where(
+                      (conversation) => _selectedIds.contains(conversation.id))
+                  .toList() ??
+              [],
+          LMChatButton(
+            onTap: () {
+              // Store the answer in the clipboard
+              // and show a toast message
+              // if _selectedIds is more than 1, then copy answer with
+              // [date and time] conversation user name : answer format
+              bool isMultiple = _selectedIds.length > 1;
+              String copiedMessage = "";
+              if (isMultiple) {
+                for (int id in _selectedIds) {
+                  LMChatConversationViewData conversation = pagedListController
+                      .value.itemList!
+                      .firstWhere((element) => element.id == id);
+                  copiedMessage +=
+                      "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";
+                }
+              } else {
+                copiedMessage = conversationViewData.answer;
               }
-            } else {
-              copiedMessage = conversationViewData.answer;
-            }
-            Clipboard.setData(
-              ClipboardData(text: copiedMessage),
-            ).then((data) {
-              toast("Copied to clipboard");
-              _selectedIds.clear();
-              rebuildAppBar.value = !rebuildAppBar.value;
-              rebuildConversationList.value = !rebuildConversationList.value;
-            });
-          },
-          style: LMChatButtonStyle.basic().copyWith(
-            icon: LMChatIcon(
-              type: LMChatIconType.icon,
-              icon: Icons.copy,
-              style: LMChatIconStyle(
-                color: LMChatTheme.theme.primaryColor,
+              Clipboard.setData(
+                ClipboardData(text: copiedMessage),
+              ).then((data) {
+                toast("Copied to clipboard");
+                _selectedIds.clear();
+                rebuildAppBar.value = !rebuildAppBar.value;
+                rebuildConversationList.value = !rebuildConversationList.value;
+              });
+            },
+            style: LMChatButtonStyle.basic().copyWith(
+              icon: LMChatIcon(
+                type: LMChatIconType.icon,
+                icon: Icons.copy,
+                style: LMChatIconStyle(
+                  color: LMChatTheme.theme.primaryColor,
+                ),
               ),
             ),
           ),
         ),
-      ),
-      const SizedBox(width: 8),
+      ],
       // Edit button
-      if (haveEditPermission && _selectedIds.length == 1)
+      if (haveEditPermission && _selectedIds.length == 1) ...[
+        const SizedBox(width: 8),
         _screenBuilder.editButton(
           context,
           conversationViewData,
@@ -435,9 +470,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             ),
           ),
         ),
-      const SizedBox(width: 8),
+      ],
       // Delete button
-      if (haveDeletePermission && _selectedIds.length == 1)
+      if (haveDeletePermission && _selectedIds.length == 1) ...[
+        const SizedBox(width: 8),
         _screenBuilder.deleteButton(
           context,
           conversationViewData,
@@ -522,9 +558,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             ),
           ),
         ),
+      ],
       // pop up menu button for report
       if (_selectedIds.length == 1 &&
-          LMChatMemberRightUtil.isReportAllowed(conversationViewData))
+          LMChatMemberRightUtil.isReportAllowed(conversationViewData)) ...[
+        const SizedBox(width: 8),
         _screenBuilder.moreOptionButton(
           context,
           _moreAction,
@@ -569,6 +607,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             ),
           ),
         ),
+      ]
     ];
   }
 
@@ -645,6 +684,16 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         scrollController.position.viewportDimension) {
       showScrollButton = false;
       rebuildFloatingButton.value = !rebuildFloatingButton.value;
+    }
+  }
+
+  bool _isRespondingAllowed() {
+    if (getMemberState?.member?.state != 1 && chatroom.type == 7) {
+      return false;
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
+      return false;
+    } else {
+      return true;
     }
   }
 }
