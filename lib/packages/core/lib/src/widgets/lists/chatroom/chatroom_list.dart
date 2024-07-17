@@ -169,7 +169,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           top: 3.h,
           bottom: 1.h,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 6.w),
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
         height: 4.h,
       ),
       leading: LMChatIcon(
