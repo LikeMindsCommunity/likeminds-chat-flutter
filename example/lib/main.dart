@@ -38,6 +38,7 @@ void main() async {
       ConversationState.memberLeftOpenChatroom,
       ConversationState.memberLeftSecretChatroom,
       ConversationState.memberAddedToChatroom,
+      ConversationState.firstConversation,
     ],
   );
   runApp(const LMChatSampleApp());
