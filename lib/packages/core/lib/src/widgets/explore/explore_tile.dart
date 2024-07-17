@@ -197,7 +197,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
         size: 18,
         boxSize: 24,
         boxBorder: 2,
-        boxPadding: 4,
+        boxPadding: const EdgeInsets.all(4),
         boxBorderRadius: 12,
         color: LMChatTheme.theme.onContainer,
         backgroundColor: LMChatTheme.theme.container,

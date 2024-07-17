@@ -150,7 +150,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     color: LMChatTheme.theme.primaryColor,
                     size: 28,
                     boxSize: 28,
-                    boxPadding: 0,
                   ),
                 ),
           ],

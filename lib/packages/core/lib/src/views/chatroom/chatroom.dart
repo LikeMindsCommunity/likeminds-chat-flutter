@@ -575,7 +575,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           style: LMChatIconStyle(
             size: 28,
             boxSize: 28,
-            boxPadding: 2,
+            boxPadding: const EdgeInsets.all(2),
             color: LMChatTheme.theme.onContainer,
           ),
         ),

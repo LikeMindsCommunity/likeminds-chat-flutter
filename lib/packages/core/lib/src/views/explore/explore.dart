@@ -317,7 +317,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
           size: 18,
           boxBorder: 1,
           boxBorderRadius: 11,
-          boxPadding: 2,
+          boxPadding: const EdgeInsets.all(2),
           boxSize: 22,
           boxBorderColor: LMChatTheme.theme.onContainer,
         ),
