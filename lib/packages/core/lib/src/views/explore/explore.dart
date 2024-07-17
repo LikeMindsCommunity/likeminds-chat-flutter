@@ -337,17 +337,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   }
 
   void _refreshExploreFeed() {
-    _page = 1;
-    exploreBloc.add(
-      LMChatFetchExploreEvent(
-        getExploreFeedRequest: (GetExploreFeedRequestBuilder()
-              ..orderType(mapLMChatSpacesToInt(_space))
-              ..page(_page)
-              ..pinned(pinnedChatroom))
-            .build(),
-      ),
-    );
-    exploreFeedPagingController.itemList?.clear();
+    exploreFeedPagingController.refresh();
   }
 
   _addPaginationListener() {
