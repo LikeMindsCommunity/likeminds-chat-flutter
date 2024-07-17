@@ -126,7 +126,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           return Padding(
             padding: EdgeInsets.only(
               bottom: Platform.isIOS ? 48.0 : 72.0,
-              right: 2,
+              right: Platform.isIOS ? 2 : 6,
             ),
             child: showScrollButton
                 ? _screenBuilder.floatingActionButton(_defaultScrollButton())
