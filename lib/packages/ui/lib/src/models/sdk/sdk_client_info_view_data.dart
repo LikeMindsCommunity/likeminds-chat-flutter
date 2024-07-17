@@ -1,5 +1,3 @@
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-
 /// `LMChatSDKClientInfoViewData` is a model class that holds the data for the client info view.
 /// This class is used to display the client information in the chat screen.
 class LMChatSDKClientInfoViewData {
@@ -31,7 +29,6 @@ class LMChatSDKClientInfoViewData {
     );
   }
 }
-
 
 /// `LMChatSDKClientInfoViewDataBuilder` is a builder class used to create an instance of `LMChatSDKClientInfoViewData`.
 /// This class is used to create an instance of `LMChatSDKClientInfoViewData` with the provided values.
