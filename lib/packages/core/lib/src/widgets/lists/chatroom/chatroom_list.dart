@@ -40,8 +40,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       LMChatCore.config.homeConfig.builder;
   final LMChatHomeFeedListStyle _style =
       LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
-    LMChatHomeFeedListStyle.basic(),
-  ) ?? LMChatHomeFeedListStyle.basic();
+            LMChatHomeFeedListStyle.basic(),
+          ) ??
+          LMChatHomeFeedListStyle.basic();
 
   @override
   void initState() {
@@ -92,8 +93,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                         pagingController: homeFeedPagingController,
                         padding: _style.padding ??
                             const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 4,
+                              horizontal: 8,
                             ),
                         physics: const ClampingScrollPhysics(),
                         builderDelegate:
@@ -371,8 +371,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         ),
       ),
       trailing: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
               ? _screenBuilder.homeFeedMuteIconBuilder(
@@ -469,26 +468,28 @@ class LMChatHomeFeedListStyle {
   /// Default style for the home feed list
   factory LMChatHomeFeedListStyle.basic() {
     return LMChatHomeFeedListStyle(
-      backgroundColor: _themeData.scaffold,
-      padding: const EdgeInsets.all(0),
-      profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
-      unReadCountTextStyle: LMChatTextStyle(
-                    maxLines: 1,
-                    backgroundColor: LMChatTheme.theme.primaryColor,
-                    borderRadius: 24,
-                    padding: const EdgeInsets.only(
-                      left: 7,
-                      right: 7,
-                      top: 2,
-                      bottom: 2,
-                    ),
-                    textStyle: TextStyle(
-                      fontSize: 12,
-                      color: LMChatTheme.theme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  )
-    );
+        backgroundColor: _themeData.scaffold,
+        padding: const EdgeInsets.only(
+          right: 8,
+          left: 4,
+        ),
+        profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
+        unReadCountTextStyle: LMChatTextStyle(
+          maxLines: 1,
+          backgroundColor: LMChatTheme.theme.primaryColor,
+          borderRadius: 24,
+          padding: const EdgeInsets.only(
+            left: 7,
+            right: 7,
+            top: 2,
+            bottom: 2,
+          ),
+          textStyle: TextStyle(
+            fontSize: 12,
+            color: LMChatTheme.theme.onPrimary,
+            fontWeight: FontWeight.w500,
+          ),
+        ));
   }
 
   /// Creates a copy of this [LMChatHomeFeedListStyle] but with the given fields replaced with the new values.

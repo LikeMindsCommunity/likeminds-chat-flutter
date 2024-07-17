@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -122,7 +124,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         valueListenable: rebuildFloatingButton,
         builder: (context, _, __) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 48.0, right: 2),
+            padding: EdgeInsets.only(
+              bottom: Platform.isIOS ? 48.0 : 72.0,
+              right: 2,
+            ),
             child: showScrollButton
                 ? _screenBuilder.floatingActionButton(_defaultScrollButton())
                 : null,

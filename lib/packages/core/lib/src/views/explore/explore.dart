@@ -310,6 +310,10 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
     return LMChatExploreTile(
       style: LMChatTheme.theme.chatTileStyle.copyWith(
         gap: 6,
+        padding: EdgeInsets.symmetric(
+          horizontal: 4.w,
+          vertical: 1.h,
+        ),
       ),
       chatroom: item.toChatRoomViewData(),
       onTap: () {

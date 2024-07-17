@@ -138,11 +138,11 @@ class LMChatSkeletonChatBar extends StatelessWidget {
               child: LMChatSkeletonAnimation(
                 child: Container(
                   width: 80.w,
-                  height: 42,
-                  decoration: const BoxDecoration(
+                  height: 6.h,
+                  decoration: BoxDecoration(
                     color: LMChatDefaultTheme.greyColor,
                     borderRadius: BorderRadius.all(
-                      Radius.circular(21),
+                      Radius.circular(3.h),
                     ),
                   ),
                 ),
@@ -151,12 +151,12 @@ class LMChatSkeletonChatBar extends StatelessWidget {
             LMChatDefaultTheme.kHorizontalPaddingMedium,
             LMChatSkeletonAnimation(
               child: Container(
-                width: 42,
-                height: 42,
-                decoration: const BoxDecoration(
+                width: 6.h,
+                height: 6.h,
+                decoration: BoxDecoration(
                   color: LMChatDefaultTheme.greyColor,
                   borderRadius: BorderRadius.all(
-                    Radius.circular(21),
+                    Radius.circular(3.h),
                   ),
                 ),
               ),

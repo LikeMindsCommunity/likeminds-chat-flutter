@@ -86,7 +86,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   @override
   void dispose() {
     _convActionBloc.close();
-    _conversationBloc.close();
+    // _conversationBloc.close();
     super.dispose();
   }
 
@@ -170,7 +170,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     return LMChatStateBubble(
       message: message,
       style: LMChatTheme.theme.stateBubbleStyle.copyWith(
-        messageStyle: LMChatTextStyle.basic(),
+        messageStyle: LMChatTextStyle.basic().copyWith(
+          maxLines: 2,
+          textStyle: const TextStyle(fontSize: 12),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

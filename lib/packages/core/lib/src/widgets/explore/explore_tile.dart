@@ -156,20 +156,34 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             children: [
               Row(
                 children: [
-                  _screenBuilder.headerBuilder(
-                    context,
-                    LMChatText(
-                      chatroom.header,
-                      style: const LMChatTextStyle(
-                        maxLines: 1,
-                        textStyle: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                  chatroom.isSecret ?? false
+                      ? LMChatText(
+                          chatroom.header,
+                          style: const LMChatTextStyle(
+                            maxLines: 1,
+                            textStyle: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      : Expanded(
+                          child: _screenBuilder.headerBuilder(
+                            context,
+                            LMChatText(
+                              chatroom.header,
+                              style: const LMChatTextStyle(
+                                maxLines: 1,
+                                textStyle: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                   const SizedBox(width: 2),
                   if (chatroom.isSecret ?? false)
                     _screenBuilder.lockIconBuilder(

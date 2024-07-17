@@ -382,7 +382,10 @@ class LMChatDMFeedListStyle {
   factory LMChatDMFeedListStyle.basic() {
     return LMChatDMFeedListStyle(
       backgroundColor: _themeData.scaffold,
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.only(
+        left: 4,
+        right: 8,
+      ),
       profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
       unreadCountTextStyle: LMChatTextStyle(
         padding: const EdgeInsets.only(
