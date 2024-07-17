@@ -325,7 +325,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   LMChatTextField _defInnerTextField(BuildContext context) {
     return LMChatTextField(
-      key: const GlobalObjectKey('chatTextField'),
+      key: const ObjectKey('chatTextField'),
       isDown: false,
       enabled: false,
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
