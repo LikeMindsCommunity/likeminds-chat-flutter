@@ -107,11 +107,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         valueListenable: rebuildFloatingButton,
         builder: (context, _, __) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 96.0),
+            padding: const EdgeInsets.only(bottom: 48.0, right: 2),
             child: showScrollButton
-                ? _screenBuilder.floatingActionButton(
-                    _defaultScrollButton(),
-                  )
+                ? _screenBuilder.floatingActionButton(_defaultScrollButton())
                 : null,
           );
         },
