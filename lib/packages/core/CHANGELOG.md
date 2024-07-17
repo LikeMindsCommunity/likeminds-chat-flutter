@@ -6,7 +6,7 @@
 
 - Fixed a bug in `LMChatroomMenu` widget
 
-## 0.6.1
+## 0.6.0
 
 - Added Support for chatroom
 - Added conversation lists and actions

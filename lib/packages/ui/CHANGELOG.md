@@ -7,7 +7,7 @@
 
 - Fixed a bug in Core package
 
-## 0.6.1
+## 0.6.0
 
 - Added Support for chatroom
 - Added conversation lists and actions
