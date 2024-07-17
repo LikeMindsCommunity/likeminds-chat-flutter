@@ -47,20 +47,36 @@ class LMChatBubble extends StatefulWidget {
   /// The deleted text.
   final LMChatText? deletedText;
 
-  /// The content builder.
-  final LMChatBubbleContentBuilder? contentBuilder;
-
   /// The style of the bubble.
   final LMChatBubbleStyle? style;
 
   /// The selected state of the bubble.
   final bool isSelected;
 
+  /// The function to call when the bubble is tapped.
   final Function(bool isSelected, State<LMChatBubble> state)? onTap;
 
+  /// The function to call when the bubble is long pressed.
   final Function(bool isSelected, State<LMChatBubble> state)? onLongPress;
 
+  /// The function to call when the bubble is selectable on tap.
   final bool Function()? isSelectableOnTap;
+
+  /// The header builder.
+  final Widget Function(BuildContext context, LMChatBubbleHeader header)?
+      headerBuilder;
+
+  /// The content builder.
+  final Widget Function(BuildContext context, LMChatBubbleContent content)?
+      contentBuilder;
+
+  /// The footer builder.
+  final Widget Function(BuildContext context, LMChatBubbleFooter footer)?
+      footerBuilder;
+
+  /// The deleted text builder.
+  final Widget Function(BuildContext context, LMChatText text)?
+      deletedTextBuilder;
 
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
@@ -81,6 +97,9 @@ class LMChatBubble extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.isSelectableOnTap,
+    this.headerBuilder,
+    this.footerBuilder,
+    this.deletedTextBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -94,12 +113,18 @@ class LMChatBubble extends StatefulWidget {
     Function(LMChatConversationViewData)? onReply,
     Function(String tag)? onTagTap,
     LMChatText? deletedText,
-    LMChatBubbleContentBuilder? contentBuilder,
     LMChatBubbleStyle? style,
     bool? isSelected,
     Function(bool isSelected, State<LMChatBubble> state)? onTap,
     Function(bool isSelected, State<LMChatBubble> state)? onLongPress,
     bool Function()? isSelectableOnTap,
+    Widget Function(BuildContext context, LMChatBubbleContent content)?
+        contentBuilder,
+    Widget Function(BuildContext context, LMChatBubbleHeader header)?
+        headerBuilder,
+    Widget Function(BuildContext context, LMChatBubbleFooter footer)?
+        footerBuilder,
+    Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -110,12 +135,15 @@ class LMChatBubble extends StatefulWidget {
       replyIcon: replyIcon ?? this.replyIcon,
       avatar: avatar ?? this.avatar,
       deletedText: deletedText ?? this.deletedText,
-      contentBuilder: contentBuilder ?? this.contentBuilder,
       style: style ?? this.style,
       isSelected: isSelected ?? this.isSelected,
       onTap: onTap ?? this.onTap,
       onLongPress: onLongPress ?? this.onLongPress,
       isSelectableOnTap: isSelectableOnTap ?? this.isSelectableOnTap,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
+      headerBuilder: headerBuilder ?? this.headerBuilder,
+      footerBuilder: footerBuilder ?? this.footerBuilder,
+      deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
     );
   }
 
@@ -212,7 +240,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         },
         child: Container(
           foregroundDecoration: BoxDecoration(
-            color: _isSelected ? const Color.fromRGBO(0, 96, 86, 0.3) : null,
+            color: _isSelected
+                ? inStyle.selectedColor ?? const Color.fromRGBO(0, 96, 86, 0.3)
+                : null,
           ),
           padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.6.h),
           child: Row(
@@ -254,9 +284,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (inStyle.showHeader ?? true)
-                            LMChatBubbleHeader(
-                              conversationUser: widget.conversationUser,
-                            ),
+                            widget.headerBuilder?.call(
+                                    context,
+                                    LMChatBubbleHeader(
+                                      conversationUser: widget.conversationUser,
+                                    )) ??
+                                LMChatBubbleHeader(
+                                  conversationUser: widget.conversationUser,
+                                ),
                           if (conversation.replyConversationObject != null &&
                               conversation.deletedByUserId == null)
                             LMChatBubbleReply(
@@ -282,24 +317,18 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                             ),
                           conversation.deletedByUserId != null
                               ? widget.deletedText ??
-                                  LMChatText(
-                                    _getDeletedText(),
-                                    style: LMChatTextStyle(
-                                      textStyle:
-                                          conversation.deletedByUserId != null
-                                              ? TextStyle(
-                                                  fontStyle: FontStyle.italic,
-                                                  color: LMChatTheme
-                                                      .theme.disabledColor,
-                                                )
-                                              : TextStyle(
-                                                  fontSize: 14,
-                                                  color: LMChatTheme
-                                                      .theme.disabledColor,
-                                                ),
+                                  widget.deletedTextBuilder?.call(
+                                    context,
+                                    _defDeletedWidget(),
+                                  ) ??
+                                  _defDeletedWidget()
+                              : widget.contentBuilder?.call(
+                                    context,
+                                    LMChatBubbleContent(
+                                      conversation: conversation,
+                                      onTagTap: widget.onTagTap,
                                     ),
-                                  )
-                              : widget.contentBuilder?.call(conversation) ??
+                                  ) ??
                                   LMChatBubbleContent(
                                     conversation: conversation,
                                     onTagTap: widget.onTagTap,
@@ -328,6 +357,23 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     );
   }
 
+  LMChatText _defDeletedWidget() {
+    return LMChatText(
+      _getDeletedText(),
+      style: LMChatTextStyle(
+        textStyle: conversation.deletedByUserId != null
+            ? TextStyle(
+                fontStyle: FontStyle.italic,
+                color: LMChatTheme.theme.disabledColor,
+              )
+            : TextStyle(
+                fontSize: 14,
+                color: LMChatTheme.theme.disabledColor,
+              ),
+      ),
+    );
+  }
+
   String _getDeletedText() {
     return conversation.deletedByUserId == conversation.memberId
         ? conversation.deletedByUserId == currentUser.id
@@ -347,6 +393,7 @@ class LMChatBubbleStyle {
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? sentColor;
+  final Color? selectedColor;
 
   final bool? showActions;
   final bool? showHeader;
@@ -362,6 +409,7 @@ class LMChatBubbleStyle {
     this.borderWidth,
     this.height,
     this.sentColor,
+    this.selectedColor,
     this.showActions,
     this.width,
     this.showAvatar,
@@ -379,6 +427,7 @@ class LMChatBubbleStyle {
     Color? borderColor,
     Color? backgroundColor,
     Color? sentColor,
+    Color? selectedColor,
     bool? showActions,
     bool? showSides,
     bool? showAvatar,
@@ -394,6 +443,7 @@ class LMChatBubbleStyle {
       borderColor: borderColor ?? this.borderColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       sentColor: sentColor ?? this.sentColor,
+      selectedColor: selectedColor ?? this.selectedColor,
       showActions: showActions ?? this.showActions,
       showAvatar: showAvatar ?? this.showAvatar,
       showFooter: showFooter ?? this.showFooter,
@@ -405,6 +455,7 @@ class LMChatBubbleStyle {
   factory LMChatBubbleStyle.basic() {
     return LMChatBubbleStyle(
       backgroundColor: LMChatDefaultTheme.container,
+      selectedColor: const Color.fromRGBO(0, 96, 86, 0.3),
       showSides: true,
       showActions: true,
       showAvatar: true,

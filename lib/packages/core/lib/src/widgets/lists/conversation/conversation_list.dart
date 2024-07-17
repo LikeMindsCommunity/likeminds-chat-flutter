@@ -168,7 +168,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   LMChatStateBubble _defaultStateBubble(String message) {
-    return LMChatStateBubble(message: message);
+    return LMChatStateBubble(
+      message: message,
+      style: LMChatTheme.theme.stateBubbleStyle.copyWith(
+        messageStyle: LMChatTextStyle.basic(),
+      ),
+    );
   }
 
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {

@@ -6,10 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/blocs/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -65,6 +65,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   Timer? _debounce;
 
   final LMChatThemeData _themeData = LMChatTheme.instance.themeData;
+  final _screenBuilder = LMChatCore.config.chatRoomConfig.builder;
 
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
@@ -220,7 +221,13 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   _isRespondingAllowed()
                       ? _defTextField(context)
                       : _defDisabledTextField(context),
-                  if (_isRespondingAllowed()) _defSendButton(context),
+                  if (_isRespondingAllowed())
+                    _screenBuilder.sendButton(
+                      context,
+                      _textEditingController,
+                      _onSend,
+                      _defSendButton(context),
+                    ),
                 ],
               ),
             ),
@@ -273,8 +280,18 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (editConversation != null) _defEditConversationWidget(),
-        if (replyToConversation != null) _defReplyConversationWidget(),
+        if (editConversation != null)
+          _screenBuilder.editTextTextFieldHeader(
+            context,
+            _textEditingController,
+            _defEditConversationWidget(),
+          ),
+        if (replyToConversation != null)
+          _screenBuilder.replyTextFieldHeader(
+            context,
+            _textEditingController,
+            _defReplyConversationWidget(),
+          ),
         Container(
           width: 80.w,
           constraints: BoxConstraints(
@@ -295,43 +312,46 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               horizontal: 4,
               vertical: 2,
             ),
-            child: LMChatTextField(
-              key: const GlobalObjectKey('chatTextField'),
-              isDown: false,
-              enabled: false,
-              scrollPhysics: const AlwaysScrollableScrollPhysics(),
-              isSecret: widget.chatroom.isSecret ?? false,
-              chatroomId: widget.chatroom.id,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(fontSize: 14),
-              onTagSelected: (tag) {
-                tags.add(tag);
-                LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
-                  'community_id': widget.chatroom.id,
-                  'chatroom_name': widget.chatroom.title,
-                  'tagged_user_id': tag.id,
-                  'tagged_user_name': tag.name,
-                });
-              },
-              onChange: (value) {},
-              controller: _textEditingController,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                enabled: true,
-                hintMaxLines: 1,
-                hintStyle: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(fontSize: 14),
-                hintText: _getChatBarHintText(),
-              ),
-              focusNode: _focusNode,
+            child: _screenBuilder.chatroomTextField(
+              context,
+              _textEditingController,
+              _defInnerTextField(context),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  LMChatTextField _defInnerTextField(BuildContext context) {
+    return LMChatTextField(
+      key: const GlobalObjectKey('chatTextField'),
+      isDown: false,
+      enabled: false,
+      scrollPhysics: const AlwaysScrollableScrollPhysics(),
+      isSecret: widget.chatroom.isSecret ?? false,
+      chatroomId: widget.chatroom.id,
+      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+      onTagSelected: (tag) {
+        tags.add(tag);
+        LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
+          'community_id': widget.chatroom.id,
+          'chatroom_name': widget.chatroom.title,
+          'tagged_user_id': tag.id,
+          'tagged_user_name': tag.name,
+        });
+      },
+      onChange: (value) {},
+      controller: _textEditingController,
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        enabled: true,
+        hintMaxLines: 1,
+        hintStyle:
+            Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+        hintText: _getChatBarHintText(),
+      ),
+      focusNode: _focusNode,
     );
   }
 
@@ -469,166 +489,45 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     }
   }
 
-  Container _defReplyConversationWidget() {
+  LMChatBarHeader _defReplyConversationWidget() {
     String userText = replyToConversation?.member?.name ?? '';
     if (replyToConversation?.memberId == currentUser.id) {
       userText = 'You';
     }
-    return Container(
-      height: 8.h,
-      width: 80.w,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-          color: _themeData.container,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(12),
-          )),
-      child: Stack(
-        alignment: Alignment.topRight,
-        children: [
-          Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(6)),
-              color:
-                  LMChatTheme.instance.themeData.disabledColor.withOpacity(0.2),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 1.w,
-                  color: LMChatTheme.instance.themeData.primaryColor,
-                ),
-                kHorizontalPaddingMedium,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    LMChatText(
-                      userText,
-                      style: LMChatTextStyle(
-                        maxLines: 1,
-                        textStyle: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          color: _themeData.primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    kVerticalPaddingSmall,
-                    SizedBox(
-                      width: 55.w,
-                      child: Text(
-                        LMChatTaggingHelper.convertRouteToTag(
-                                replyToConversation?.answer) ??
-                            "",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              chatActionBloc.add(LMChatReplyRemoveEvent());
-              _textEditingController.clear();
-            },
-            icon: LMChatIcon(
-              type: LMChatIconType.icon,
-              icon: Icons.close,
-              style: LMChatIconStyle.basic().copyWith(
-                color: _themeData.inActiveColor,
-                backgroundColor: _themeData.container,
-                boxBorderRadius: 100,
-                size: 20,
-                boxSize: 28,
-              ),
-            ),
-          ),
-        ],
+    return LMChatBarHeader(
+      titleText: userText,
+      onCanceled: () {
+        chatActionBloc.add(LMChatReplyRemoveEvent());
+        _textEditingController.clear();
+      },
+      subtitle: LMChatText(
+        LMChatTaggingHelper.convertRouteToTag(replyToConversation?.answer) ??
+            "",
+        style: LMChatTextStyle(
+          textStyle: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
   }
 
-  Container _defEditConversationWidget() {
-    return Container(
-      height: 8.h,
-      width: 80.w,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-          color: _themeData.container,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(12),
-          )),
-      child: Stack(
-        alignment: Alignment.topRight,
-        children: [
-          Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              color:
-                  LMChatTheme.instance.themeData.disabledColor.withOpacity(0.2),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(6),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 1.w,
-                  color: LMChatTheme.instance.themeData.primaryColor,
-                ),
-                kHorizontalPaddingMedium,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Edit message",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    kVerticalPaddingSmall,
-                    SizedBox(
-                      width: 55.w,
-                      child: Text(
-                        LMChatTaggingHelper.convertRouteToTag(
-                                editConversation?.answer) ??
-                            "",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              chatActionBloc.add(LMChatEditRemoveEvent());
-              _textEditingController.clear();
-            },
-            icon: LMChatIcon(
-              type: LMChatIconType.icon,
-              icon: Icons.close,
-              style: LMChatIconStyle.basic().copyWith(
-                color: _themeData.inActiveColor,
-                backgroundColor: _themeData.container,
-                boxBorderRadius: 100,
-                size: 20,
-                boxSize: 28,
-              ),
-            ),
-          ),
-        ],
+  LMChatBarHeader _defEditConversationWidget() {
+    return LMChatBarHeader(
+      title: LMChatText(
+        "Edit message",
+        style: LMChatTextStyle(
+          textStyle: Theme.of(context).textTheme.bodyLarge,
+          maxLines: 1,
+        ),
+      ),
+      onCanceled: () {
+        chatActionBloc.add(LMChatEditRemoveEvent());
+        _textEditingController.clear();
+      },
+      subtitle: LMChatText(
+        LMChatTaggingHelper.convertRouteToTag(editConversation?.answer) ?? "",
+        style: LMChatTextStyle(
+          textStyle: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
   }

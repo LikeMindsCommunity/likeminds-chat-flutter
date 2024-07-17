@@ -14,13 +14,26 @@ class LMChatroomMenu extends StatefulWidget {
   final ChatRoom chatroom;
   final List<ChatroomAction> chatroomActions;
   final CustomPopupMenuController? controller;
+  final LMChatCustomPopupMenuStyle? style;
 
   const LMChatroomMenu({
     Key? key,
     required this.controller,
     required this.chatroom,
     required this.chatroomActions,
+    this.style,
   }) : super(key: key);
+  LMChatroomMenu copyWith({
+    CustomPopupMenuController? controller,
+    LMChatCustomPopupMenuStyle? style,
+  }) {
+    return LMChatroomMenu(
+      controller: controller ?? this.controller,
+      chatroom: chatroom,
+      chatroomActions: chatroomActions,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   State<LMChatroomMenu> createState() => _ChatroomMenuState();
@@ -56,11 +69,16 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       menuBuilder: () => ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Container(
+          width: widget.style?.menuBoxWidth,
+          height: widget.style?.menuBoxHeight,
           constraints: BoxConstraints(
             minWidth: 12.w,
             maxWidth: 60.w,
           ),
-          color: LMChatTheme.theme.container,
+          decoration: widget.style?.menuBoxDecoration ??
+              BoxDecoration(
+                color: LMChatTheme.theme.container,
+              ),
           child: ListView.builder(
             padding: EdgeInsets.zero,
             shrinkWrap: true,
@@ -95,12 +113,13 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           action.title,
           style: LMChatTextStyle(
             maxLines: 1,
-            textStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: LMChatTheme.theme.onContainer,
-              overflow: TextOverflow.ellipsis,
-            ),
+            textStyle: widget.style?.menuTextStyle ??
+                TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: LMChatTheme.theme.onContainer,
+                  overflow: TextOverflow.ellipsis,
+                ),
           ),
         ),
       ),

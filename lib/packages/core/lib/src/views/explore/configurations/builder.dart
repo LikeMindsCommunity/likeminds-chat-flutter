@@ -97,8 +97,94 @@ class LMChatExploreBuilderDelegate {
   /// Builds the explore menu
   Widget exploreMenuBuilder(
     BuildContext context,
+    VoidCallback onNewestTap,
+    VoidCallback onRecentlyActiveTap,
+    VoidCallback onMostParticipantsTap,
+    VoidCallback onMostMessagesTap,
     CustomPopupMenu menu,
   ) {
     return menu;
+  }
+
+  /// Builds Pin Button
+  Widget pinButtonBuilder(
+    BuildContext context,
+    LMChatButton pinButton,
+  ) {
+    return pinButton;
+  }
+
+  /// Builds Pinned Button
+  Widget pinnedButtonBuilder(
+    BuildContext context,
+    LMChatButton pinnedButton,
+  ) {
+    return pinnedButton;
+  }
+
+  /// Builds pin icon on the explore tile avatar
+  Widget pinIconBuilder(
+    BuildContext context,
+    LMChatIcon pinIcon,
+  ) {
+    return pinIcon;
+  }
+
+  /// Builds header for the explore screen tile
+  Widget headerBuilder(
+    BuildContext context,
+    LMChatText header,
+  ) {
+    return header;
+  }
+
+  /// Builds the lock icon in case of secret chatroom
+  Widget lockIconBuilder(
+    BuildContext context,
+    LMChatIcon lockIcon,
+  ) {
+    return lockIcon;
+  }
+
+  /// Builds the subtitle for the explore screen tile
+  Widget subtitleBuilder(
+    BuildContext context,
+    LMChatText subtitle,
+  ) {
+    return subtitle;
+  }
+
+  /// Builds the member count for the explore screen tile
+  Widget memberCountBuilder(
+    BuildContext context,
+    int memberCount,
+    LMChatText memberCountText,
+  ) {
+    return memberCountText;
+  }
+
+  /// Builds the member count icon for the explore screen tile
+  Widget memberCountIconBuilder(
+    BuildContext context,
+    LMChatIcon memberCountIcon,
+  ) {
+    return memberCountIcon;
+  }
+
+  /// Builds the unread count for the explore screen tile
+  Widget totalResponseCountBuilder(
+    BuildContext context,
+    int totalResponseCount,
+    LMChatText totalResponseCountText,
+  ) {
+    return totalResponseCountText;
+  }
+
+  /// Builds the unread count icon for the explore screen tile
+  Widget totalResponseCountIconBuilder(
+    BuildContext context,
+    LMChatIcon totalResponseCountIcon,
+  ) {
+    return totalResponseCountIcon;
   }
 }

@@ -10,7 +10,17 @@ class LMChatStateBubble extends StatelessWidget {
     required this.message,
   });
 
-
+  /// CopyWith function to get a new object of [LMChatStateBubble]
+  /// with specific single values passed
+  LMChatStateBubble copyWith({
+    LMChatStateBubbleStyle? style,
+    String? message,
+  }) {
+    return LMChatStateBubble(
+      style: style ?? this.style,
+      message: message ?? this.message,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +107,15 @@ class LMChatStateBubbleStyle {
   }
 
   factory LMChatStateBubbleStyle.basic() {
-    return LMChatStateBubbleStyle();
+    return LMChatStateBubbleStyle(
+      messageStyle: LMChatTextStyle(
+        textAlign: TextAlign.center,
+        textStyle: TextStyle(
+          fontSize: 12,
+          color: LMChatTheme.theme.onContainer,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
   }
 }

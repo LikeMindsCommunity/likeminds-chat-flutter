@@ -1,15 +1,15 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+
 import 'package:likeminds_chat_flutter_core/src/blocs/explore/bloc/explore_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_chat_flutter_core/src/views/chatroom/chatroom.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -44,6 +44,28 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   int pinnedChatroomCount = 0;
   int _page = 1;
   bool pinnedChatroom = false;
+  final LMChatCustomPopupMenuStyle _defMenuStyle = LMChatCustomPopupMenuStyle(
+    textStyle: const LMChatTextStyle(
+      maxLines: 1,
+      textStyle: TextStyle(
+        fontSize: 16,
+      ),
+    ),
+    iconStyle: const LMChatIconStyle(
+      size: 28,
+    ),
+    menuBoxWidth: 52.w,
+    menuBoxDecoration: BoxDecoration(
+      color: LMChatTheme.theme.container,
+      borderRadius: BorderRadius.circular(10),
+    ),
+  );
+
+  LMChatCustomPopupMenuStyle _popUpMenuStyle() =>
+      LMChatCore.config.exploreConfig.style.popUpMenuStyle?.call(
+        _defMenuStyle,
+      ) ??
+      _defMenuStyle;
 
   @override
   void initState() {
@@ -79,7 +101,14 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _screenBuilder.exploreMenuBuilder(context, _defaultExploreMenu()),
+              _screenBuilder.exploreMenuBuilder(
+                context,
+                _shortNewest,
+                _shortRecentlyActive,
+                _shortMostParticipants,
+                _shortMostMessages,
+                _defaultExploreMenu(),
+              ),
               const Spacer(),
               _defaultExplorePinButton(),
             ],
@@ -135,23 +164,22 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       child: ValueListenableBuilder(
           valueListenable: rebuildLMChatSpace,
           builder: (context, _, __) {
-            return Row(
-              children: [
-                LMChatText(
-                  getStateSpace(_space),
-                  style: const LMChatTextStyle(
-                    maxLines: 1,
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                    ),
+            return Container(
+              color: _popUpMenuStyle().backgroundColor,
+              child: Row(
+                children: [
+                  LMChatText(
+                    getStateSpace(_space),
+                    style: _popUpMenuStyle().textStyle,
                   ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_downward,
-                  size: 28,
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  LMChatIcon(
+                    type: LMChatIconType.icon,
+                    icon: Icons.arrow_downward,
+                    style: _popUpMenuStyle().iconStyle,
+                  ),
+                ],
+              ),
             );
           }),
     );
@@ -159,62 +187,76 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
 
   Container _defaultExploreMenuBox() {
     return Container(
-      width: 52.w,
-      decoration: BoxDecoration(
-        color: LMChatTheme.theme.container,
-        borderRadius: BorderRadius.circular(10),
-      ),
+      width: _popUpMenuStyle().menuBoxWidth ?? 52.w,
+      height: _popUpMenuStyle().menuBoxHeight,
+      decoration: _popUpMenuStyle().menuBoxDecoration ??
+          BoxDecoration(
+            color: LMChatTheme.theme.container,
+            borderRadius: BorderRadius.circular(10),
+          ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           ListTile(
-            title: const Text(
+            title: Text(
               "Newest",
+              style: _popUpMenuStyle().menuTextStyle,
             ),
-            onTap: () {
-              _controller.hideMenu();
-              _space = LMChatSpace.newest;
-              rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
-              _refreshExploreFeed();
-            },
+            onTap: _shortNewest,
           ),
           ListTile(
-            title: const Text(
+            title: Text(
               "Recently Active",
+              style: _popUpMenuStyle().menuTextStyle,
             ),
-            onTap: () {
-              _controller.hideMenu();
-              _space = LMChatSpace.active;
-              rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
-              _refreshExploreFeed();
-            },
+            onTap: _shortRecentlyActive,
           ),
           ListTile(
-            title: const Text(
+            title: Text(
               "Most Participants",
+              style: _popUpMenuStyle().menuTextStyle,
             ),
-            onTap: () {
-              _controller.hideMenu();
-              _space = LMChatSpace.mostParticipants;
-              rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
-              _refreshExploreFeed();
-            },
+            onTap: _shortMostParticipants,
           ),
           ListTile(
-            title: const Text(
+            title: Text(
               "Most Messages",
+              style: _popUpMenuStyle().menuTextStyle,
             ),
-            onTap: () {
-              _controller.hideMenu();
-              _space = LMChatSpace.mostMessages;
-              rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
-              _refreshExploreFeed();
-            },
+            onTap: _shortMostMessages,
           ),
         ],
       ),
     );
+  }
+
+  void _shortMostMessages() {
+    _controller.hideMenu();
+    _space = LMChatSpace.mostMessages;
+    rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
+    _refreshExploreFeed();
+  }
+
+  void _shortMostParticipants() {
+    _controller.hideMenu();
+    _space = LMChatSpace.mostParticipants;
+    rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
+    _refreshExploreFeed();
+  }
+
+  void _shortRecentlyActive() {
+    _controller.hideMenu();
+    _space = LMChatSpace.active;
+    rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
+    _refreshExploreFeed();
+  }
+
+  void _shortNewest() {
+    _controller.hideMenu();
+    _space = LMChatSpace.newest;
+    rebuildLMChatSpace.value = !rebuildLMChatSpace.value;
+    _refreshExploreFeed();
   }
 
   PagedListView<int, ChatRoom> _defaultExploreFeedList() {
@@ -265,8 +307,14 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         return pinnedChatroomCount <= 3
             ? const SizedBox()
             : pinnedChatroom
-                ? _defaultPinnedButton()
-                : _defaultPinButton();
+                ? _screenBuilder.pinnedButtonBuilder(
+                    context,
+                    _defaultPinnedButton(),
+                  )
+                : _screenBuilder.pinButtonBuilder(
+                    context,
+                    _defaultPinButton(),
+                  );
       },
     );
   }
