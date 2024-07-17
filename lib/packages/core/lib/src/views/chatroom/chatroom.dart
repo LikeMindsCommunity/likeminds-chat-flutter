@@ -86,6 +86,21 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   }
 
   @override
+  void didUpdateWidget(LMChatroomScreen old) {
+    super.didUpdateWidget(old);
+    Bloc.observer = LMChatBlocObserver();
+    currentUser = LMChatLocalPreference.instance.getUser();
+    _chatroomBloc = LMChatroomBloc.instance
+      ..add(LMChatFetchChatroomEvent(chatroomId: widget.chatroomId));
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
+    _conversationBloc = LMChatConversationBloc.instance;
+    _convActionBloc = LMChatConversationActionBloc.instance;
+    scrollController.addListener(() {
+      _showScrollToBottomButton();
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     ScreenSize.init(context);
