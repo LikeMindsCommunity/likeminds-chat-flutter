@@ -29,22 +29,22 @@ class LMChatText extends StatelessWidget {
   Widget build(BuildContext context) {
     LMChatTextStyle inStyle = style ?? LMChatTextStyle.basic();
 
-    return Container(
-      padding: inStyle.padding ?? EdgeInsets.zero,
-      decoration: BoxDecoration(
-        color: inStyle.backgroundColor ?? Colors.transparent,
-        borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 4),
-      ),
-      child: AbsorbPointer(
-        absorbing: onTap == null,
-        child: SelectableText(
-          text,
-          textAlign: inStyle.textAlign,
-          minLines: inStyle.minLines,
-          maxLines: inStyle.maxLines,
-          style: inStyle.textStyle,
-          enableInteractiveSelection: inStyle.selectable,
-          onTap: onTap,
+    return AbsorbPointer(
+      absorbing: onTap == null,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: inStyle.padding ?? EdgeInsets.zero,
+          decoration: BoxDecoration(
+            color: inStyle.backgroundColor ?? Colors.transparent,
+            borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 4),
+          ),
+          child: Text(
+            text,
+            textAlign: inStyle.textAlign,
+            maxLines: inStyle.maxLines,
+            style: inStyle.textStyle,
+          ),
         ),
       ),
     );
@@ -69,9 +69,6 @@ class LMChatText extends StatelessWidget {
 /// Style class for [LMChatText]; used for customization
 /// {@endtemplate}
 class LMChatTextStyle {
-  /// [bool] to determine whether the text is selectable or not
-  final bool selectable;
-
   /// [int] describing maximum lines a text spans
   final int? maxLines;
 
@@ -98,7 +95,6 @@ class LMChatTextStyle {
 
   /// {@macro lm_chat_text}
   const LMChatTextStyle({
-    this.selectable = false,
     this.textStyle,
     this.maxLines,
     this.minLines,
@@ -135,7 +131,6 @@ class LMChatTextStyle {
     Color? backgroundColor,
   }) {
     return LMChatTextStyle(
-      selectable: selectable ?? this.selectable,
       textStyle: textStyle ?? this.textStyle,
       maxLines: maxLines ?? this.maxLines,
       minLines: minLines ?? this.minLines,
