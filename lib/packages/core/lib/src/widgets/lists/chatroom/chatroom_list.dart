@@ -126,7 +126,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
                               _screenBuilder
                                   .homeFeedNoItemsFoundIndicatorBuilder(
                             context,
-                            const SizedBox(),
+                            _defaultEmptyView(),
                           ),
                           noMoreItemsIndicatorBuilder: (context) =>
                               _screenBuilder
@@ -278,6 +278,32 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         homeFeedPagingController.appendPage(state.chatrooms, _page);
       }
     }
+  }
+
+  Widget _defaultEmptyView() {
+    return Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const LMChatIcon(
+          type: LMChatIconType.png,
+          assetPath: emptyViewImage,
+          style: LMChatIconStyle(
+            size: 100,
+          ),
+        ),
+        const SizedBox(height: 12),
+        LMChatText(
+          'Oops! No conversations found.',
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.inActiveColor,
+            ),
+          ),
+        )
+      ],
+    ));
   }
 
   Widget _defaultErrorView() {
