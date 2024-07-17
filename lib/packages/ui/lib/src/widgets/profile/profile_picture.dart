@@ -31,7 +31,6 @@ class LMChatProfilePicture extends StatelessWidget {
         if (onTap != null) onTap!();
       },
       child: Stack(
-        // fit: StackFit.expand,
         alignment: Alignment.center,
         children: [
           Container(
@@ -61,23 +60,23 @@ class LMChatProfilePicture extends StatelessWidget {
                         )
                       : null,
             ),
+            padding: inStyle.textPadding ?? const EdgeInsets.all(5),
             child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
-                ? Center(
-                    child: LMChatText(
-                      getInitials(fallbackText).toUpperCase(),
-                      style: inStyle.fallbackTextStyle ??
-                          LMChatTextStyle(
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                            textStyle: TextStyle(
-                              overflow: TextOverflow.clip,
-                              color: LMChatTheme.theme.onPrimary,
-                              fontSize:
-                                  inStyle.size != null ? inStyle.size! / 2 : 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                ? LMChatText(
+                    getInitials(fallbackText).toUpperCase(),
+                    style: inStyle.fallbackTextStyle ??
+                        LMChatTextStyle(
+                          maxLines: 1,
+                          minLines: 1,
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            overflow: TextOverflow.clip,
+                            color: LMChatTheme.theme.onPrimary,
+                            fontSize:
+                                inStyle.size != null ? inStyle.size! / 2 : 24,
+                            fontWeight: FontWeight.w600,
                           ),
-                    ),
+                        ),
                   )
                 : null,
           ),
@@ -109,6 +108,7 @@ class LMChatProfilePictureStyle {
   final double? border;
   final Color? backgroundColor;
   final BoxShape? boxShape;
+  final EdgeInsets? textPadding;
 
   const LMChatProfilePictureStyle({
     this.size = 48,
@@ -116,6 +116,7 @@ class LMChatProfilePictureStyle {
     this.border = 0,
     this.backgroundColor,
     this.boxShape,
+    this.textPadding,
     this.fallbackTextStyle,
   });
 
@@ -140,6 +141,7 @@ class LMChatProfilePictureStyle {
     double? border,
     Color? backgroundColor,
     BoxShape? boxShape,
+    EdgeInsets? textPadding,
   }) {
     return LMChatProfilePictureStyle(
       size: size ?? this.size,
