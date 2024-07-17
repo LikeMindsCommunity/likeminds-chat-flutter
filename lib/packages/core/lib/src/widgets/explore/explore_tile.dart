@@ -102,7 +102,7 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           LMChatTheme.theme.chatTileStyle.copyWith(
             gap: 6,
           ),
-      leading: LMChatProfilePicture(
+      leading: widget.leading?? LMChatProfilePicture(
         fallbackText: chatroom.header,
         overlay: chatroom.externalSeen != null &&
                 chatroom.externalSeen! == false

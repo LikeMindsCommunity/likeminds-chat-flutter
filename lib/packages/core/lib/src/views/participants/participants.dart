@@ -72,7 +72,7 @@ class _LMChatroomParticipantsPageState
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       backgroundColor: LMChatTheme.instance.themeData.container,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(context,_searchController, _defAppBar()),
       body: SafeArea(
         child: Column(
           children: [

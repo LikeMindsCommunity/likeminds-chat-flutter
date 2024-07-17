@@ -83,6 +83,42 @@ class LMChatBubble extends StatefulWidget {
     this.isSelectableOnTap,
   });
 
+  /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
+  /// If the new values are null, then the old values are used.
+  LMChatBubble copyWith({
+    LMChatConversationViewData? conversation,
+    LMChatUserViewData? currentUser,
+    LMChatUserViewData? conversationUser,
+    LMChatIcon? replyIcon,
+    LMChatProfilePicture? avatar,
+    Function(LMChatConversationViewData)? onReply,
+    Function(String tag)? onTagTap,
+    LMChatText? deletedText,
+    LMChatBubbleContentBuilder? contentBuilder,
+    LMChatBubbleStyle? style,
+    bool? isSelected,
+    Function(bool isSelected, State<LMChatBubble> state)? onTap,
+    Function(bool isSelected, State<LMChatBubble> state)? onLongPress,
+    bool Function()? isSelectableOnTap,
+  }) {
+    return LMChatBubble(
+      conversation: conversation ?? this.conversation,
+      currentUser: currentUser ?? this.currentUser,
+      conversationUser: conversationUser ?? this.conversationUser,
+      onReply: onReply ?? this.onReply,
+      onTagTap: onTagTap ?? this.onTagTap,
+      replyIcon: replyIcon ?? this.replyIcon,
+      avatar: avatar ?? this.avatar,
+      deletedText: deletedText ?? this.deletedText,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
+      style: style ?? this.style,
+      isSelected: isSelected ?? this.isSelected,
+      onTap: onTap ?? this.onTap,
+      onLongPress: onLongPress ?? this.onLongPress,
+      isSelectableOnTap: isSelectableOnTap ?? this.isSelectableOnTap,
+    );
+  }
+
   @override
   State<LMChatBubble> createState() => _LMChatBubbleState();
 }

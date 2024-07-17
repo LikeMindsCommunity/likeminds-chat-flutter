@@ -10,6 +10,8 @@ class LMChatStateBubble extends StatelessWidget {
     required this.message,
   });
 
+
+
   @override
   Widget build(BuildContext context) {
     final inStyle = style ?? LMChatTheme.theme.stateBubbleStyle;
