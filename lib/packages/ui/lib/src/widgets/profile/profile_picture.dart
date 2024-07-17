@@ -62,21 +62,23 @@ class LMChatProfilePicture extends StatelessWidget {
             ),
             padding: inStyle.textPadding ?? const EdgeInsets.all(5),
             child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
-                ? LMChatText(
-                    getInitials(fallbackText).toUpperCase(),
-                    style: inStyle.fallbackTextStyle ??
-                        LMChatTextStyle(
-                          maxLines: 1,
-                          minLines: 1,
-                          textAlign: TextAlign.center,
-                          textStyle: TextStyle(
-                            overflow: TextOverflow.clip,
-                            color: LMChatTheme.theme.onPrimary,
-                            fontSize:
-                                inStyle.size != null ? inStyle.size! / 2 : 24,
-                            fontWeight: FontWeight.w600,
+                ? Center(
+                    child: LMChatText(
+                      getInitials(fallbackText).toUpperCase(),
+                      style: inStyle.fallbackTextStyle ??
+                          LMChatTextStyle(
+                            maxLines: 1,
+                            minLines: 1,
+                            textAlign: TextAlign.center,
+                            textStyle: TextStyle(
+                              overflow: TextOverflow.clip,
+                              color: LMChatTheme.theme.onPrimary,
+                              fontSize:
+                                  inStyle.size != null ? inStyle.size! / 2 : 24,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
+                    ),
                   )
                 : null,
           ),
