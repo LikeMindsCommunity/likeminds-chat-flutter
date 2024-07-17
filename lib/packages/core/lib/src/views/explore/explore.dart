@@ -282,6 +282,9 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
 
   LMChatExploreTile _defaultExploreTile(ChatRoom item, BuildContext context) {
     return LMChatExploreTile(
+      style: LMChatTheme.theme.chatTileStyle.copyWith(
+        gap: 6,
+      ),
       chatroom: item.toChatRoomViewData(),
       onTap: () {
         LMChatRealtime.instance.chatroomId = item.id;

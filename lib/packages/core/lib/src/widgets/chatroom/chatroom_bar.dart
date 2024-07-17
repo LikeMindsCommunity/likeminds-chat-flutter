@@ -495,6 +495,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       userText = 'You';
     }
     return LMChatBarHeader(
+      style: LMChatBarHeaderStyle.basic(),
       titleText: userText,
       onCanceled: () {
         chatActionBloc.add(LMChatReplyRemoveEvent());
@@ -512,6 +513,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   LMChatBarHeader _defEditConversationWidget() {
     return LMChatBarHeader(
+      style: LMChatBarHeaderStyle.basic(),
       title: LMChatText(
         "Edit message",
         style: LMChatTextStyle(

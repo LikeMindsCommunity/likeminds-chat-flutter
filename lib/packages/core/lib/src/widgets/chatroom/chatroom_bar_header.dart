@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -20,6 +19,7 @@ class LMChatBarHeader extends StatelessWidget {
     this.titleBuilder,
     this.subtitleBuilder,
     this.trailingBuilder,
+    this.style,
   });
 
   /// The title of the chat bar header.
@@ -46,6 +46,8 @@ class LMChatBarHeader extends StatelessWidget {
   /// The trailing builder of the chat bar header.
   final Widget Function(LMChatIcon trailing)? trailingBuilder;
 
+  final LMChatBarHeaderStyle? style;
+
   /// Creates a copy of this [LMChatBarHeader] but with the given fields replaced with the new values.
   LMChatBarHeader copyWith({
     LMChatText? title,
@@ -56,6 +58,7 @@ class LMChatBarHeader extends StatelessWidget {
     Widget Function(LMChatText title)? titleBuilder,
     Widget Function(LMChatText subtitle)? subtitleBuilder,
     Widget Function(LMChatIcon trailing)? trailingBuilder,
+    LMChatBarHeaderStyle? style,
   }) {
     return LMChatBarHeader(
       title: title ?? this.title,
@@ -66,6 +69,7 @@ class LMChatBarHeader extends StatelessWidget {
       titleBuilder: titleBuilder ?? this.titleBuilder,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       trailingBuilder: trailingBuilder ?? this.trailingBuilder,
+      style: style ?? this.style,
     );
   }
 
@@ -74,14 +78,15 @@ class LMChatBarHeader extends StatelessWidget {
     final LMChatThemeData themeData = LMChatTheme.theme;
 
     return Container(
-      height: 8.h,
-      width: 80.w,
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-          color: themeData.container,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(12),
-          )),
+      height: style?.height ?? 8.h,
+      width: style?.width ?? 80.w,
+      padding: style?.padding ?? const EdgeInsets.all(8),
+      decoration: style?.decoration ??
+          BoxDecoration(
+              color: themeData.container,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              )),
       child: Stack(
         alignment: Alignment.topRight,
         children: [
@@ -155,5 +160,60 @@ class LMChatBarHeader extends StatelessWidget {
             ),
           ),
         );
+  }
+}
+
+/// {@template lm_chat_bar_header_style}
+/// A class to style the chat bar header.
+/// {@endtemplate}
+class LMChatBarHeaderStyle {
+  /// [height] of the chat bar header.
+  final double? height;
+
+  /// [width] of the chat bar header.
+  final double? width;
+
+  /// [padding] of the chat bar header.
+  final EdgeInsetsGeometry? padding;
+
+  /// [decoration] of the chat bar header.
+  final BoxDecoration? decoration;
+
+  /// {@macro lm_chat_bar_header_style}
+  const LMChatBarHeaderStyle({
+    this.height,
+    this.width,
+    this.padding,
+    this.decoration,
+  });
+
+  /// A basic style for the chat bar header.
+  factory LMChatBarHeaderStyle.basic() {
+    return LMChatBarHeaderStyle(
+      height: 8.h,
+      width: 80.w,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: LMChatTheme.theme.container,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  /// Creates a copy of this [LMChatBarHeaderStyle] but with the given fields replaced with the new values.
+  LMChatBarHeaderStyle copyWith({
+    double? height,
+    double? width,
+    EdgeInsetsGeometry? padding,
+    BoxDecoration? decoration,
+  }) {
+    return LMChatBarHeaderStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      padding: padding ?? this.padding,
+      decoration: decoration ?? this.decoration,
+    );
   }
 }

@@ -165,7 +165,7 @@ class LMChatThemeData {
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
       chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
-      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(),
+      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
       appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
     );
   }

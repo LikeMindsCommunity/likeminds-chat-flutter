@@ -106,13 +106,13 @@ class LMChatStateBubbleStyle {
     );
   }
 
-  factory LMChatStateBubbleStyle.basic() {
+  factory LMChatStateBubbleStyle.basic(Color? onContainer) {
     return LMChatStateBubbleStyle(
       messageStyle: LMChatTextStyle(
         textAlign: TextAlign.center,
         textStyle: TextStyle(
           fontSize: 12,
-          color: LMChatTheme.theme.onContainer,
+          color: onContainer,
           overflow: TextOverflow.ellipsis,
         ),
       ),
