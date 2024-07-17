@@ -310,6 +310,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             const LMChatProfilePictureStyle(size: 48),
       ),
       title: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           LMChatText(
             chatroom.header,
@@ -345,13 +346,13 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       ),
       trailing: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
               ? _screenBuilder.homeFeedMuteIconBuilder(
                   _defMuteIcon(),
                 )
               : const SizedBox.shrink(),
-          const SizedBox(width: 8),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -410,9 +411,18 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   }
 
   LMChatIcon _defMuteIcon() {
-    return const LMChatIcon(
+    return LMChatIcon(
       type: LMChatIconType.icon,
       icon: Icons.volume_off_outlined,
+      style: LMChatIconStyle(
+        backgroundColor: LMChatTheme.theme.scaffold,
+        boxSize: 36,
+        boxPadding: const EdgeInsets.only(
+          left: 6,
+          right: 4,
+        ),
+        fit: BoxFit.contain,
+      ),
     );
   }
 
