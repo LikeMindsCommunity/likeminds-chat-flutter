@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
+import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/constants/constants.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
 class LMChatRoomTopic extends StatelessWidget {
@@ -17,7 +17,7 @@ class LMChatRoomTopic extends StatelessWidget {
     this.backGroundColor,
   });
 
-  final Conversation conversation;
+  final LMChatConversationViewData conversation;
   final VoidCallback onTap;
   final Widget? leading;
   final Widget? trailing;
@@ -26,7 +26,7 @@ class LMChatRoomTopic extends StatelessWidget {
   final LMChatText? date;
   final Color? backGroundColor;
 
-  Widget generateIcon(Conversation conversation) {
+  Widget generateIcon(LMChatConversationViewData conversation) {
     Widget? icon;
     if (conversation.attachments == null) {
       if (conversation.ogTags != null) icon = const Icon(Icons.link);
@@ -57,7 +57,7 @@ class LMChatRoomTopic extends StatelessWidget {
     }
   }
 
-  String generateSubtext(Conversation conversation) {
+  String generateSubtext(LMChatConversationViewData conversation) {
     if (conversation.answer.isNotEmpty) {
       return conversation.answer;
     }
@@ -208,5 +208,3 @@ class LMChatRoomTopic extends StatelessWidget {
     );
   }
 }
-
-Attachment? attachment;

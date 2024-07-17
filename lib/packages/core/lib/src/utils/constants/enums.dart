@@ -1,3 +1,8 @@
-enum LMChatWidgetSource { home, explore, chatroom }
+/// Enum for the type of chatroom
+enum LMChatroomType {
+  /// Direct Message
+  dm,
 
-enum LMChatroomType { dm, group }
+  /// Group
+  group,
+}

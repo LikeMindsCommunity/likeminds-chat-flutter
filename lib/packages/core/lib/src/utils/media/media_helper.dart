@@ -32,7 +32,7 @@ const List<String> mediaExtentions = [
 ];
 
 String getDeletedText(Conversation conversation, User user) {
-  return conversation.deletedByUserId == conversation.userId
+  return conversation.deletedByUserId == conversation.memberId
       ? conversation.deletedByUserId == user.id
           ? 'This message was deleted'
           : "This message was deleted by user"
@@ -193,7 +193,6 @@ Widget getChatItemAttachmentTile(
           style: const LMChatIconStyle(
             color: LMChatDefaultTheme.greyColor,
             size: 16,
-            boxPadding: 0,
             boxSize: 16,
           ),
         ),

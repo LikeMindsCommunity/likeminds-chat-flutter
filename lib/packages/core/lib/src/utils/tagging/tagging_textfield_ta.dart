@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/tag/tag_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -16,6 +17,7 @@ class LMChatTextField extends StatefulWidget {
   final int chatroomId;
   final bool isSecret;
   final bool enabled;
+  final ScrollPhysics? scrollPhysics;
 
   const LMChatTextField({
     super.key,
@@ -29,7 +31,36 @@ class LMChatTextField extends StatefulWidget {
     this.style,
     this.decoration,
     this.onChange,
+    this.scrollPhysics,
   });
+
+  LMChatTextField copyWith({
+    bool? isDown,
+    FocusNode? focusNode,
+    Function(LMChatTagViewData)? onTagSelected,
+    TextEditingController? controller,
+    InputDecoration? decoration,
+    TextStyle? style,
+    Function(String)? onChange,
+    int? chatroomId,
+    bool? isSecret,
+    bool? enabled,
+    ScrollPhysics? scrollPhysics,
+  }) {
+    return LMChatTextField(
+      isDown: isDown ?? this.isDown,
+      focusNode: focusNode ?? this.focusNode,
+      onTagSelected: onTagSelected ?? this.onTagSelected,
+      controller: controller ?? this.controller,
+      decoration: decoration ?? this.decoration,
+      style: style ?? this.style,
+      onChange: onChange ?? this.onChange,
+      chatroomId: chatroomId ?? this.chatroomId,
+      isSecret: isSecret ?? this.isSecret,
+      enabled: enabled ?? this.enabled,
+      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+    );
+  }
 
   @override
   State<LMChatTextField> createState() => _LMChatTextFieldState();
@@ -107,12 +138,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           if (taggingData.groupTags != null &&
               taggingData.groupTags!.isNotEmpty) {
             tagViewData.addAll(taggingData.groupTags!
-                .map((e) => LMChatTagViewData.fromGroupTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           if (taggingData.members != null && taggingData.members!.isNotEmpty) {
             tagViewData.addAll(taggingData.members!
-                .map((e) => LMChatTagViewData.fromUserTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           return tagViewData;
@@ -120,12 +151,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           if (taggingData.groupTags != null &&
               taggingData.groupTags!.isNotEmpty) {
             tagViewData.addAll(taggingData.groupTags!
-                .map((e) => LMChatTagViewData.fromGroupTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           if (taggingData.members != null && taggingData.members!.isNotEmpty) {
             tagViewData.addAll(taggingData.members!
-                .map((e) => LMChatTagViewData.fromUserTag(e))
+                .map((e) => e.toLMChatTagViewData())
                 .toList());
           }
           return tagViewData;
@@ -147,19 +178,20 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
         bottom: 4.0,
       ),
       child: TypeAheadField<LMChatTagViewData>(
+        scrollPhysics: widget.scrollPhysics ?? const FixedExtentScrollPhysics(),
         tagColor: LMChatTheme.theme.secondaryColor,
         onTagTap: (p) {
           // print(p);
         },
         suggestionsBoxController: _suggestionsBoxController,
-        suggestionsBoxDecoration: const SuggestionsBoxDecoration(
+        suggestionsBoxDecoration: SuggestionsBoxDecoration(
           offsetX: -2,
           elevation: 2,
-          color: LMChatDefaultTheme.whiteColor,
+          color: LMChatTheme.theme.container,
           clipBehavior: Clip.hardEdge,
-          borderRadius: BorderRadius.all(Radius.circular(12.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(12.0)),
           hasScrollbar: false,
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             maxHeight: 72,
             minWidth: 240,
           ),
@@ -178,6 +210,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           focusNode: _focusNode,
           minLines: 1,
           maxLines: 200,
+          scrollPadding: const EdgeInsets.all(2),
           enabled: widget.decoration?.enabled ?? true,
           decoration: widget.decoration ??
               InputDecoration(

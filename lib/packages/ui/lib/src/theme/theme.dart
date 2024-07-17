@@ -48,6 +48,7 @@ class LMChatThemeData {
   final Color container;
   final Color onContainer;
   final Color onPrimary;
+  final Color scaffold;
 
   const LMChatThemeData({
     required this.primaryColor,
@@ -63,6 +64,7 @@ class LMChatThemeData {
     required this.container,
     required this.onContainer,
     required this.onPrimary,
+    required this.scaffold,
     required this.textFieldStyle,
     required this.dialogStyle,
     required this.popUpMenuStyle,
@@ -89,7 +91,7 @@ class LMChatThemeData {
       disabledColor: theme.disabledColor,
       errorColor: theme.colorScheme.error,
       inActiveColor: theme.unselectedWidgetColor,
-      container: theme.colorScheme.surface,
+      container: theme.colorScheme.primaryContainer,
       onContainer: theme.colorScheme.onPrimaryContainer,
       onPrimary: theme.colorScheme.onPrimary,
     );
@@ -106,14 +108,15 @@ class LMChatThemeData {
     Color? tagColor,
     Color? hashTagColor,
     Color? linkColor,
+    Color? scaffold,
+    Color? container,
+    Color? onContainer,
+    Color? onPrimary,
     LMChatButtonStyle? buttonStyle,
     LMChatIconStyle? iconStyle,
     LMChatTextFieldStyle? textFieldStyle,
     LMChatDialogStyle? dialogStyle,
     LMChatPopUpMenuStyle? popUpMenuStyle,
-    Color? container,
-    Color? onContainer,
-    Color? onPrimary,
     LMChatLoaderStyle? loaderStyle,
     LMChatBottomSheetStyle? bottomSheetStyle,
     LMChatSnackBarStyle? snackBarTheme,
@@ -136,6 +139,7 @@ class LMChatThemeData {
       errorColor: errorColor ?? LMChatDefaultTheme.errorColor,
       inActiveColor: inActiveColor ?? LMChatDefaultTheme.inactiveColor,
       container: container ?? LMChatDefaultTheme.container,
+      scaffold: scaffold ?? LMChatDefaultTheme.container,
       onContainer: onContainer ?? LMChatDefaultTheme.onContainer,
       onPrimary: onPrimary ?? LMChatDefaultTheme.onPrimary,
       hashTagColor: hashTagColor ?? LMChatDefaultTheme.hashTagColor,
@@ -161,7 +165,7 @@ class LMChatThemeData {
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
       chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
-      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(),
+      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
       appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
     );
   }
@@ -177,11 +181,12 @@ class LMChatThemeData {
     Color? tagColor,
     Color? hashTagColor,
     Color? linkColor,
-    LMChatButtonStyle? buttonStyle,
-    LMChatIconStyle? iconStyle,
     Color? container,
     Color? onContainer,
     Color? onPrimary,
+    Color? scaffold,
+    LMChatButtonStyle? buttonStyle,
+    LMChatIconStyle? iconStyle,
     LMChatTextFieldStyle? textFieldStyle,
     LMChatDialogStyle? dialogStyle,
     LMChatPopUpMenuStyle? popUpMenuStyle,
@@ -210,6 +215,7 @@ class LMChatThemeData {
       hashTagColor: hashTagColor ?? this.hashTagColor,
       linkColor: linkColor ?? this.linkColor,
       container: container ?? this.container,
+      scaffold: scaffold ?? this.scaffold,
       onContainer: onContainer ?? this.onContainer,
       onPrimary: onPrimary ?? this.onPrimary,
       dialogStyle: dialogStyle ?? this.dialogStyle,
@@ -257,20 +263,6 @@ class LMChatTextFieldStyle {
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
       ),
-    );
-  }
-}
-
-class LMChatDialogStyle {
-  final Color? backgroundColor;
-
-  const LMChatDialogStyle({
-    this.backgroundColor,
-  });
-
-  LMChatDialogStyle copyWith({Color? backgroundColor}) {
-    return LMChatDialogStyle(
-      backgroundColor: backgroundColor ?? this.backgroundColor,
     );
   }
 }
@@ -386,10 +378,16 @@ extension ScreenWidth on num {
   double get w => (this / 100) * ScreenSize.width;
 }
 
+extension ScreenPoints on double {
+  double get sp => ScreenSize.textScale.scale(this);
+}
+
 // Class to initialize the screen size
 class ScreenSize {
   static late double width;
   static late double height;
+  static late double pixelRatio;
+  static late TextScaler textScale;
   static late double blockSizeHorizontal;
   static late double blockSizeVertical;
   static late double _safeAreaHorizontal;
@@ -399,6 +397,8 @@ class ScreenSize {
 
   static init(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    pixelRatio = mediaQuery.devicePixelRatio;
+    textScale = mediaQuery.textScaler;
     width = mediaQuery.size.width;
     height = mediaQuery.size.height;
     blockSizeHorizontal = width / 100;

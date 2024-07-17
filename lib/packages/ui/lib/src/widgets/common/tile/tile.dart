@@ -9,10 +9,13 @@ class LMChatTile extends StatelessWidget {
     this.title,
     this.subtitle,
     this.trailing,
+    this.absorbTouch,
   });
 
   final VoidCallback? onTap;
   final LMChatTileStyle? style;
+
+  final bool? absorbTouch;
 
   final Widget? leading;
   final Widget? title;
@@ -28,7 +31,7 @@ class LMChatTile extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: AbsorbPointer(
-        absorbing: true,
+        absorbing: absorbTouch ?? true,
         child: Container(
           height: inStyle.height,
           width: inStyle.width,
@@ -39,6 +42,7 @@ class LMChatTile extends StatelessWidget {
               Radius.circular(inStyle.borderRadius ?? 0),
             ),
           ),
+          margin: inStyle.margin ?? const EdgeInsets.all(0),
           padding: inStyle.padding ?? const EdgeInsets.all(8),
           child: Row(
             mainAxisAlignment:
@@ -55,10 +59,11 @@ class LMChatTile extends StatelessWidget {
                       color: Colors.grey,
                     ),
                   ),
-              SizedBox(width: inStyle.margin ?? 8),
+              SizedBox(width: inStyle.gap * 3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     title ??
                         Container(
@@ -68,6 +73,7 @@ class LMChatTile extends StatelessWidget {
                             color: Colors.grey,
                           ),
                         ),
+                    SizedBox(height: inStyle.gap),
                     subtitle ?? const SizedBox(),
                   ],
                 ),
@@ -81,14 +87,16 @@ class LMChatTile extends StatelessWidget {
     );
   }
 
-  LMChatTile copyWith(
+  /// `copyWith` method to update the properties of the tile
+  /// with new values without changing the original tile
+  LMChatTile copyWith({
     Function()? onTap,
     LMChatTileStyle? style,
     Widget? leading,
     Widget? title,
     Widget? subtitle,
     Widget? trailing,
-  ) {
+  }) {
     return LMChatTile(
       onTap: onTap ?? this.onTap,
       style: style ?? this.style,
@@ -119,9 +127,17 @@ class LMChatTileStyle {
   /// padding from exterior bounds (borders)
   final EdgeInsets? padding;
 
+  /// margin around the tile
+  final EdgeInsets? margin;
+
+  /// height of the tile
   final double? height;
+
+  /// width of the tile
   final double? width;
-  final double? margin;
+
+  /// gap between the tiles
+  final double gap;
 
   const LMChatTileStyle({
     this.backgroundColor,
@@ -130,9 +146,10 @@ class LMChatTileStyle {
     this.mainAxisAlignment,
     this.crossAxisAlignment,
     this.padding,
+    this.margin,
     this.height,
     this.width,
-    this.margin,
+    required this.gap,
   });
 
   LMChatTileStyle copyWith({
@@ -142,9 +159,10 @@ class LMChatTileStyle {
     MainAxisAlignment? mainAxisAlignment,
     CrossAxisAlignment? crossAxisAlignment,
     EdgeInsets? padding,
+    EdgeInsets? margin,
     double? height,
     double? width,
-    double? margin,
+    double? gap,
   }) {
     return LMChatTileStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -153,9 +171,10 @@ class LMChatTileStyle {
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
       padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
       height: height ?? this.height,
       width: width ?? this.width,
-      margin: margin ?? this.margin,
+      gap: gap ?? this.gap,
     );
   }
 
@@ -167,7 +186,7 @@ class LMChatTileStyle {
       crossAxisAlignment: CrossAxisAlignment.center,
       padding: EdgeInsets.all(12),
       width: double.infinity,
-      margin: 12,
+      gap: 4,
     );
   }
 }

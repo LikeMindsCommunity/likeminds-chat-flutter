@@ -10,8 +10,15 @@ part 'chatroom_action_state.dart';
 class LMChatroomActionBloc
     extends Bloc<ChatroomActionEvent, ChatroomActionState> {
   static LMChatroomActionBloc? _instance;
-  static LMChatroomActionBloc get instance =>
-      _instance ??= LMChatroomActionBloc._();
+  // Creating a singleton instance of the LMChatHomeFeedBloc
+  static LMChatroomActionBloc get instance {
+    if (_instance == null || _instance!.isClosed) {
+      return _instance = LMChatroomActionBloc._();
+    } else {
+      return _instance!;
+    }
+  }
+
   LMChatroomActionBloc._() : super(ChatroomActionInitial()) {
     on<ChatroomActionEvent>((event, emit) async {
       if (event is MarkReadChatroomEvent) {
@@ -22,19 +29,13 @@ class LMChatroomActionBloc
       } else if (event is SetChatroomTopicEvent) {
         try {
           emit(ChatroomActionLoading());
-          LMResponse<SetChatroomTopicResponse> response = await LMChatCore
-              .client
+          LMResponse<void> response = await LMChatCore.client
               .setChatroomTopic((SetChatroomTopicRequestBuilder()
                     ..chatroomId(event.chatroomId)
                     ..conversationId(event.conversationId))
                   .build());
           if (response.success) {
-            if (response.data!.success) {
-              emit(ChatroomTopicSet(event.topic));
-            } else {
-              emit(ChatroomTopicError(
-                  errorMessage: response.data!.errorMessage!));
-            }
+            emit(ChatroomTopicSet(event.topic));
           } else {
             emit(ChatroomTopicError(errorMessage: response.errorMessage!));
           }

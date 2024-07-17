@@ -1,49 +1,62 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
+import 'package:likeminds_chat_flutter_core/src/views/participants/participants.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMChatroomMenu extends StatefulWidget {
   final ChatRoom chatroom;
   final List<ChatroomAction> chatroomActions;
+  final CustomPopupMenuController? controller;
+  final LMChatCustomPopupMenuStyle? style;
 
   const LMChatroomMenu({
     Key? key,
+    required this.controller,
     required this.chatroom,
     required this.chatroomActions,
+    this.style,
   }) : super(key: key);
+  LMChatroomMenu copyWith({
+    CustomPopupMenuController? controller,
+    LMChatCustomPopupMenuStyle? style,
+  }) {
+    return LMChatroomMenu(
+      controller: controller ?? this.controller,
+      chatroom: chatroom,
+      chatroomActions: chatroomActions,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   State<LMChatroomMenu> createState() => _ChatroomMenuState();
 }
 
 class _ChatroomMenuState extends State<LMChatroomMenu> {
-  CustomPopupMenuController? _controller;
   late List<ChatroomAction> chatroomActions;
 
   ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
 
-  LMChatHomeBloc? homeBloc;
+  LMChatHomeFeedBloc? homeBloc;
   @override
   void initState() {
     super.initState();
-    homeBloc = LMChatHomeBloc.instance;
+    homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
-    _controller = CustomPopupMenuController();
   }
 
   @override
   void didUpdateWidget(LMChatroomMenu old) {
     super.didUpdateWidget(old);
-    homeBloc = LMChatHomeBloc.instance;
+    homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
-    _controller = CustomPopupMenuController();
   }
 
   @override
@@ -51,16 +64,21 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     return CustomPopupMenu(
       pressType: PressType.singleClick,
       showArrow: false,
-      controller: _controller,
+      controller: widget.controller,
       enablePassEvent: false,
       menuBuilder: () => ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Container(
+          width: widget.style?.menuBoxWidth,
+          height: widget.style?.menuBoxHeight,
           constraints: BoxConstraints(
             minWidth: 12.w,
-            maxWidth: 50.w,
+            maxWidth: 60.w,
           ),
-          color: LMChatTheme.theme.container,
+          decoration: widget.style?.menuBoxDecoration ??
+              BoxDecoration(
+                color: LMChatTheme.theme.container,
+              ),
           child: ListView.builder(
             padding: EdgeInsets.zero,
             shrinkWrap: true,
@@ -95,12 +113,13 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           action.title,
           style: LMChatTextStyle(
             maxLines: 1,
-            textStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: LMChatTheme.theme.onContainer,
-              overflow: TextOverflow.ellipsis,
-            ),
+            textStyle: widget.style?.menuTextStyle ??
+                TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: LMChatTheme.theme.onContainer,
+                  overflow: TextOverflow.ellipsis,
+                ),
           ),
         ),
       ),
@@ -110,14 +129,15 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   void performAction(ChatroomAction action) {
     switch (action.id) {
       case 2:
-        // _controller.hideMenu();
-        _controller!.hideMenu();
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return ChatroomParticipantsPage(
-        //     chatroom: widget.chatroom,
-        //   );
-        // }));
-        break;
+        {
+          widget.controller!.hideMenu();
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return LMChatroomParticipantsPage(
+              chatroomViewData: widget.chatroom.toChatRoomViewData(),
+            );
+          }));
+          break;
+        }
       case 6:
         muteChatroom(action);
         break;
@@ -125,15 +145,15 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         muteChatroom(action);
         break;
       case 9:
-        leaveChatroom();
+        showLeaveDialog();
         break;
       case 15:
-        leaveChatroom();
+        showLeaveDialog();
         break;
       default:
         unimplemented();
     }
-    _controller!.hideMenu();
+    widget.controller!.hideMenu();
   }
 
   void unimplemented() {
@@ -147,7 +167,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               ..value(!widget.chatroom.muteStatus!))
             .build());
     if (response.success) {
-      // _controller.hideMenu();
+      // widget.controller.hideMenu();
       // rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       if (action.title.toLowerCase() == "mute notifications") {
         LMAnalytics.get().track(
@@ -165,8 +185,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
       }
       toast((action.title.toLowerCase() == "mute notifications")
-          ? "Chatroom muted"
-          : "Chatroom unmuted");
+          ? "Notifications muted for this space!"
+          : "Notifications unmuted for this space!");
       chatroomActions = chatroomActions.map((element) {
         if (element.title.toLowerCase() == "mute notifications") {
           element.title = "Unmute notifications";
@@ -177,15 +197,16 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         return element;
       }).toList();
       rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
-      _controller!.hideMenu();
-      homeBloc!.add(LMChatUpdateHomeEvent());
+      widget.controller!.hideMenu();
+      homeBloc!.add(LMChatRefreshHomeFeedEvent());
     } else {
       toast(response.errorMessage!);
     }
   }
 
   void leaveChatroom() async {
-    final User user = LMChatPreferences.instance.getCurrentUser;
+    final User user = LMChatLocalPreference.instance.getUser();
+
     if (!(widget.chatroom.isSecret ?? false)) {
       final response =
           await LMChatCore.client.followChatroom((FollowChatroomRequestBuilder()
@@ -204,8 +225,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           },
         );
         toast("Chatroom left");
-        _controller!.hideMenu();
-        homeBloc?.add(LMChatUpdateHomeEvent());
+        widget.controller!.hideMenu();
+        homeBloc?.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
@@ -227,21 +248,60 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           },
         );
         toast("Chatroom left");
-        _controller!.hideMenu();
-        homeBloc?.add(LMChatUpdateHomeEvent());
+        widget.controller!.hideMenu();
+        homeBloc?.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
       }
     }
-    // final response =
-    //     await LMChatCore.client.leaveChatroom(LeaveChatroomRequest(
-    //   chatroomId: chatroom.id,
-    // ));
-    // if (response.success) {
-    //   toast("Chatroom left");
-    // } else {
-    //   toast(response.errorMessage!);
-    // }
+  }
+
+  void showLeaveDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => LMChatDialog(
+        title: const Text("Leave chatroom"),
+        content: Text(
+          widget.chatroom.isSecret != null && widget.chatroom.isSecret!
+              ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
+              : 'Are you sure you want to leave this group?',
+        ),
+        // actionText: 'Confirm',
+        // onActionPressed: onTap,
+        actions: [
+          LMChatText(
+            'Cancel',
+            onTap: () {
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          LMChatText(
+            'Confirm',
+            onTap: () {
+              leaveChatroom();
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -9,17 +9,19 @@ class LMChatRealtime {
       _instance ??= LMChatRealtime._internal();
 
   late final FirebaseDatabase database;
-  final int _communityId = LMChatPreferences.instance.getCommunity()!.id;
+  final int _communityId =
+      LMChatLocalPreference.instance.getCommunityData()!.id;
   int? _chatroomId;
 
   LMChatRealtime._internal() {
     debugPrint('LMRealtime initialized');
     FirebaseApp app = Firebase.app('likeminds_chat');
     database = FirebaseDatabase.instanceFor(app: app);
-    debugPrint("Database is $database");
+    debugPrint("Database is ${database.toString()}");
   }
 
   set chatroomId(int chatroomId) {
+    debugPrint("Chatroom ID set to $chatroomId");
     _chatroomId = chatroomId;
   }
 

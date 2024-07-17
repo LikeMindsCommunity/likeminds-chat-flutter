@@ -5,3 +5,5 @@ export 'conversation/conversation_bloc.dart';
 export 'conversation_action/conversation_action_bloc.dart';
 export 'participants/participants_bloc.dart';
 export 'dm/dm_bloc.dart';
+export 'profile/profile_bloc.dart';
+export 'analytics/analytics_bloc.dart';

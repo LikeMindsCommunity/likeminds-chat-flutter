@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 
@@ -14,21 +15,71 @@ part 'chat_bubble_reply.dart';
 part 'chat_bubble_sides.dart';
 part 'chat_bubble_state.dart';
 
+/// {@template lm_chat_bubble}
+/// The chat bubble widget.
+/// This widget is used to display the chat bubble.
+/// {@endtemplate}
 class LMChatBubble extends StatefulWidget {
-  final Conversation conversation;
-  final User currentUser;
-  final User conversationUser;
+  /// [LMChatConversationViewData] is data of the conversation.
+  final LMChatConversationViewData conversation;
 
+  /// The current user.
+  final LMChatUserViewData currentUser;
+
+  /// The user of the conversation.
+  final LMChatUserViewData conversationUser;
+
+  /// is the message sent by the current user.
   final bool? isSent;
+
+  /// The reply icon.
   final LMChatIcon? replyIcon;
+
+  /// The avatar of the user.
   final LMChatProfilePicture? avatar;
-  final Function(Conversation)? onReply;
+
+  /// The function to call when a reply is made.
+  final Function(LMChatConversationViewData)? onReply;
+
+  /// The function to call when a tag is tapped.
   final Function(String tag) onTagTap;
 
+  /// The deleted text.
   final LMChatText? deletedText;
-  final LMChatBubbleContentBuilder? contentBuilder;
+
+  /// The style of the bubble.
   final LMChatBubbleStyle? style;
 
+  /// The selected state of the bubble.
+  final bool isSelected;
+
+  /// The function to call when the bubble is tapped.
+  final Function(bool isSelected, State<LMChatBubble> state)? onTap;
+
+  /// The function to call when the bubble is long pressed.
+  final Function(bool isSelected, State<LMChatBubble> state)? onLongPress;
+
+  /// The function to call when the bubble is selectable on tap.
+  final bool Function()? isSelectableOnTap;
+
+  /// The header builder.
+  final Widget Function(BuildContext context, LMChatBubbleHeader header)?
+      headerBuilder;
+
+  /// The content builder.
+  final Widget Function(BuildContext context, LMChatBubbleContent content)?
+      contentBuilder;
+
+  /// The footer builder.
+  final Widget Function(BuildContext context, LMChatBubbleFooter footer)?
+      footerBuilder;
+
+  /// The deleted text builder.
+  final Widget Function(BuildContext context, LMChatText text)?
+      deletedTextBuilder;
+
+  /// The [LMChatBubble] widget constructor.
+  /// used to display the chat bubble.
   const LMChatBubble({
     super.key,
     required this.conversation,
@@ -42,7 +93,59 @@ class LMChatBubble extends StatefulWidget {
     this.avatar,
     this.isSent,
     this.deletedText,
+    this.isSelected = false,
+    this.onTap,
+    this.onLongPress,
+    this.isSelectableOnTap,
+    this.headerBuilder,
+    this.footerBuilder,
+    this.deletedTextBuilder,
   });
+
+  /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
+  /// If the new values are null, then the old values are used.
+  LMChatBubble copyWith({
+    LMChatConversationViewData? conversation,
+    LMChatUserViewData? currentUser,
+    LMChatUserViewData? conversationUser,
+    LMChatIcon? replyIcon,
+    LMChatProfilePicture? avatar,
+    Function(LMChatConversationViewData)? onReply,
+    Function(String tag)? onTagTap,
+    LMChatText? deletedText,
+    LMChatBubbleStyle? style,
+    bool? isSelected,
+    Function(bool isSelected, State<LMChatBubble> state)? onTap,
+    Function(bool isSelected, State<LMChatBubble> state)? onLongPress,
+    bool Function()? isSelectableOnTap,
+    Widget Function(BuildContext context, LMChatBubbleContent content)?
+        contentBuilder,
+    Widget Function(BuildContext context, LMChatBubbleHeader header)?
+        headerBuilder,
+    Widget Function(BuildContext context, LMChatBubbleFooter footer)?
+        footerBuilder,
+    Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
+  }) {
+    return LMChatBubble(
+      conversation: conversation ?? this.conversation,
+      currentUser: currentUser ?? this.currentUser,
+      conversationUser: conversationUser ?? this.conversationUser,
+      onReply: onReply ?? this.onReply,
+      onTagTap: onTagTap ?? this.onTagTap,
+      replyIcon: replyIcon ?? this.replyIcon,
+      avatar: avatar ?? this.avatar,
+      deletedText: deletedText ?? this.deletedText,
+      style: style ?? this.style,
+      isSelected: isSelected ?? this.isSelected,
+      onTap: onTap ?? this.onTap,
+      onLongPress: onLongPress ?? this.onLongPress,
+      isSelectableOnTap: isSelectableOnTap ?? this.isSelectableOnTap,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
+      headerBuilder: headerBuilder ?? this.headerBuilder,
+      footerBuilder: footerBuilder ?? this.footerBuilder,
+      deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
+    );
+  }
 
   @override
   State<LMChatBubble> createState() => _LMChatBubbleState();
@@ -50,39 +153,47 @@ class LMChatBubble extends StatefulWidget {
 
 class _LMChatBubbleState extends State<LMChatBubble> {
   bool isSent = false;
-  late Conversation conversation;
-  late User currentUser;
-  late User conversationUser;
+  late LMChatConversationViewData conversation;
+  late LMChatUserViewData currentUser;
+  late LMChatUserViewData conversationUser;
+  bool _isSelected = false;
+  bool _isDeleted = false;
+  final LMChatThemeData theme = LMChatTheme.theme;
 
   @override
   void initState() {
+    super.initState();
     conversation = widget.conversation;
     currentUser = widget.currentUser;
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
-    super.initState();
+    _isSelected = widget.isSelected;
+    _isDeleted = conversation.deletedByUserId != null;
   }
 
   @override
   void didUpdateWidget(LMChatBubble old) {
+    super.didUpdateWidget(old);
     conversation = widget.conversation;
     currentUser = widget.currentUser;
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
-    super.didUpdateWidget(old);
+    _isSelected = widget.isSelected;
+    _isDeleted = conversation.deletedByUserId != null;
   }
 
   @override
   Widget build(BuildContext context) {
     final inStyle = widget.style ?? LMChatTheme.theme.bubbleStyle;
     return Swipeable(
-      dismissThresholds: const {SwipeDirection.startToEnd: 0.2},
+      dismissThresholds: const {SwipeDirection.startToEnd: 0.0},
       movementDuration: const Duration(milliseconds: 50),
-      key: ValueKey(conversation.id),
+      key: GlobalObjectKey(conversation.id),
       onSwipe: (direction) {
-        // if (widget.onReply != null) {
-        //   widget.onReply!(conversation!);
-        // }
+        if (widget.onReply != null &&
+            widget.conversation.deletedByUserId == null) {
+          widget.onReply!(conversation);
+        }
       },
       background: Padding(
         padding: EdgeInsets.only(
@@ -103,113 +214,172 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     color: LMChatTheme.theme.primaryColor,
                     size: 28,
                     boxSize: 28,
-                    boxPadding: 0,
                   ),
                 ),
           ],
         ),
       ),
       direction: SwipeDirection.startToEnd,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Column(
-            crossAxisAlignment:
-                isSent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      child: GestureDetector(
+        onLongPress: () {
+          if (_isDeleted) return;
+          _isSelected = !_isSelected;
+          widget.onLongPress?.call(_isSelected, this);
+        },
+        onTap: () {
+          if (_isDeleted) return;
+          if (_isSelected) {
+            _isSelected = false;
+            widget.onTap?.call(_isSelected, this);
+          } else {
+            if (widget.isSelectableOnTap?.call() ?? false) {
+              _isSelected = !_isSelected;
+              widget.onTap?.call(_isSelected, this);
+            }
+          }
+        },
+        child: Container(
+          foregroundDecoration: BoxDecoration(
+            color: _isSelected
+                ? inStyle.selectedColor ?? const Color.fromRGBO(0, 96, 86, 0.3)
+                : null,
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.6.h),
+          child: Row(
+            mainAxisAlignment:
+                isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Padding(
-                padding: EdgeInsets.only(
-                  left: widget.avatar != null ? 48.0 : 18.0,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 0.6.h,
-                ),
-                child: Row(
-                  mainAxisAlignment:
-                      isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    !isSent
-                        ? widget.avatar ?? const SizedBox()
-                        : const SizedBox(),
-                    const SizedBox(width: 4),
-                    AbsorbPointer(
-                      absorbing: conversation.deletedByUserId != null,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          minHeight: 2.h,
-                          minWidth: 5.w,
-                          maxWidth: 50.w,
-                        ),
-                        padding: EdgeInsets.all(
-                          conversation.attachmentCount != 0 ? 8.0 : 12.0,
-                        ),
-                        decoration: BoxDecoration(
-                          color: inStyle.backgroundColor ??
-                              LMChatTheme.theme.container,
-                          borderRadius: inStyle.borderRadius ??
-                              BorderRadius.circular(
-                                inStyle.borderRadiusNum ?? 6,
+              if (!isSent) widget.avatar ?? const SizedBox(),
+              const SizedBox(width: 6),
+              AbsorbPointer(
+                absorbing: conversation.deletedByUserId != null,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: 2.h,
+                    minWidth:
+                        conversation.answer.split('\n').length > 4 ? 40.w : 5.w,
+                    maxWidth: 60.w,
+                  ),
+                  child: PhysicalShape(
+                    clipper: LMChatBubbleClipper(
+                      isSent: isSent,
+                    ),
+                    color: inStyle.backgroundColor ?? theme.container,
+                    child: Padding(
+                      padding: isSent
+                          ? EdgeInsets.only(
+                              top: 1.h,
+                              bottom: 1.h,
+                              left: 2.w,
+                              right: 4.w,
+                            )
+                          : EdgeInsets.only(
+                              top: 1.h,
+                              bottom: 1.h,
+                              left: 4.w,
+                              right: 2.w,
+                            ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (inStyle.showHeader ?? true)
+                            widget.headerBuilder?.call(
+                                    context,
+                                    LMChatBubbleHeader(
+                                      conversationUser: widget.conversationUser,
+                                    )) ??
+                                LMChatBubbleHeader(
+                                  conversationUser: widget.conversationUser,
+                                ),
+                          if (conversation.replyConversationObject != null &&
+                              conversation.deletedByUserId == null)
+                            LMChatBubbleReply(
+                              replyToConversation:
+                                  conversation.replyConversationObject!,
+                              title: LMChatText(
+                                currentUser.id ==
+                                        conversation
+                                            .replyConversationObject!.memberId
+                                    ? "You"
+                                    : conversation
+                                        .replyConversationObject!.member!.name,
+                                style: LMChatTextStyle(
+                                  maxLines: 1,
+                                  textStyle: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    color: theme.primaryColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const LMChatBubbleHeader(),
-                            conversation.deletedByUserId != null
-                                ? widget.deletedText ??
-                                    LMChatText(
-                                      "Deleted message",
-                                      style: LMChatTextStyle(
-                                        textStyle:
-                                            conversation.deletedByUserId != null
-                                                ? TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    color: LMChatTheme
-                                                        .theme.disabledColor,
-                                                  )
-                                                : TextStyle(
-                                                    fontSize: 14,
-                                                    color: LMChatTheme
-                                                        .theme.disabledColor,
-                                                  ),
-                                      ),
-                                    )
-                                : widget.contentBuilder?.call(conversation) ??
+                            ),
+                          conversation.deletedByUserId != null
+                              ? widget.deletedText ??
+                                  widget.deletedTextBuilder?.call(
+                                    context,
+                                    _defDeletedWidget(),
+                                  ) ??
+                                  _defDeletedWidget()
+                              : widget.contentBuilder?.call(
+                                    context,
                                     LMChatBubbleContent(
                                       conversation: conversation,
                                       onTagTap: widget.onTagTap,
                                     ),
-                            const LMChatBubbleMedia(),
-                            IntrinsicWidth(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: LMChatBubbleFooter(
-                                  conversation: conversation,
-                                ),
+                                  ) ??
+                                  LMChatBubbleContent(
+                                    conversation: conversation,
+                                    onTagTap: widget.onTagTap,
+                                  ),
+                          const LMChatBubbleMedia(),
+                          if (conversation.deletedByUserId == null &&
+                              inStyle.showFooter == true)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: LMChatBubbleFooter(
+                                conversation: conversation,
                               ),
                             ),
-                          ],
-                        ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    isSent
-                        ? widget.avatar ?? const SizedBox()
-                        : const SizedBox(),
-                  ],
+                  ),
                 ),
               ),
+              const SizedBox(width: 6),
+              if (isSent) widget.avatar ?? const SizedBox(),
             ],
           ),
-        ],
+        ),
       ),
     );
-    // );
+  }
+
+  LMChatText _defDeletedWidget() {
+    return LMChatText(
+      _getDeletedText(),
+      style: LMChatTextStyle(
+        textStyle: conversation.deletedByUserId != null
+            ? TextStyle(
+                fontStyle: FontStyle.italic,
+                color: LMChatTheme.theme.disabledColor,
+              )
+            : TextStyle(
+                fontSize: 14,
+                color: LMChatTheme.theme.disabledColor,
+              ),
+      ),
+    );
+  }
+
+  String _getDeletedText() {
+    return conversation.deletedByUserId == conversation.memberId
+        ? conversation.deletedByUserId == currentUser.id
+            ? 'You deleted this message'
+            : "This message was deleted"
+        : "This message was deleted by a community manager";
   }
 }
 
@@ -223,8 +393,13 @@ class LMChatBubbleStyle {
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? sentColor;
+  final Color? selectedColor;
 
   final bool? showActions;
+  final bool? showHeader;
+  final bool? showFooter;
+  final bool? showSides;
+  final bool? showAvatar;
 
   LMChatBubbleStyle({
     this.backgroundColor,
@@ -234,8 +409,13 @@ class LMChatBubbleStyle {
     this.borderWidth,
     this.height,
     this.sentColor,
+    this.selectedColor,
     this.showActions,
     this.width,
+    this.showAvatar,
+    this.showFooter,
+    this.showHeader,
+    this.showSides,
   });
 
   LMChatBubbleStyle copyWith({
@@ -247,7 +427,12 @@ class LMChatBubbleStyle {
     Color? borderColor,
     Color? backgroundColor,
     Color? sentColor,
+    Color? selectedColor,
     bool? showActions,
+    bool? showSides,
+    bool? showAvatar,
+    bool? showHeader,
+    bool? showFooter,
   }) {
     return LMChatBubbleStyle(
       width: width ?? this.width,
@@ -258,321 +443,24 @@ class LMChatBubbleStyle {
       borderColor: borderColor ?? this.borderColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       sentColor: sentColor ?? this.sentColor,
+      selectedColor: selectedColor ?? this.selectedColor,
       showActions: showActions ?? this.showActions,
+      showAvatar: showAvatar ?? this.showAvatar,
+      showFooter: showFooter ?? this.showFooter,
+      showHeader: showHeader ?? this.showHeader,
+      showSides: showSides ?? this.showSides,
     );
   }
 
   factory LMChatBubbleStyle.basic() {
     return LMChatBubbleStyle(
       backgroundColor: LMChatDefaultTheme.container,
-      borderRadiusNum: 16,
+      selectedColor: const Color.fromRGBO(0, 96, 86, 0.3),
+      showSides: true,
+      showActions: true,
+      showAvatar: true,
+      showFooter: true,
+      showHeader: true,
     );
   }
 }
-
-
-
-//   @override
-//   State<LMChatBubble> createState() => _LMChatBubbleState();
-// }
-
-// class _LMChatBubbleState extends State<LMChatBubble> {
-//   Conversation? conversation;
-//   Conversation? replyingTo;
-//   User? sender;
-//   User? currentUser;
-//   bool isSent = false;
-//   bool isDeleted = false;
-//   bool isEdited = false;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     isSent = widget.isSent ?? false;
-//     conversation = widget.conversation;
-//     sender = widget.sender;
-//     currentUser = widget.currentUser;
-//     replyingTo = widget.replyingTo;
-//     isEdited = widget.conversation.isEdited ?? false;
-//     isDeleted = widget.conversation.deletedByUserId != null;
-//   }
-
-//   @override
-//   void didUpdateWidget(LMChatBubble oldWidget) {
-//     super.didUpdateWidget(oldWidget);
-//     setState(() {
-//       conversation = widget.conversation;
-//       sender = widget.sender;
-//       replyingTo = widget.replyingTo;
-//       currentUser = widget.currentUser;
-//       isEdited = widget.conversation.isEdited ?? false;
-//       isDeleted = widget.conversation.deletedByUserId != null;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Swipeable(
-//       dismissThresholds: const {SwipeDirection.startToEnd: 0.2},
-//       movementDuration: const Duration(milliseconds: 50),
-//       key: ValueKey(conversation!.id),
-//       onSwipe: (direction) {
-//         if (widget.onReply != null) {
-//           widget.onReply!(conversation!);
-//         }
-//       },
-//       background: Padding(
-//         padding: EdgeInsets.only(
-//           left: 2.w,
-//           right: 2.w,
-//           top: 0.2.h,
-//           bottom: 0.2.h,
-//         ),
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             widget.replyIcon ??
-//                 const LMChatIcon(
-//                   type: LMChatIconType.icon,
-//                   icon: Icons.reply_outlined,
-//                   color: kLinkColor,
-//                   size: 28,
-//                   boxSize: 28,
-//                   boxPadding: 0,
-//                 ),
-//           ],
-//         ),
-//       ),
-//       direction: SwipeDirection.startToEnd,
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.end,
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Column(
-//             crossAxisAlignment:
-//                 isSent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-//             children: [
-//               SizedBox(height: widget.outsideTitle != null ? 10 : 0),
-//               Padding(
-//                 padding: EdgeInsets.only(
-//                   left: widget.avatar != null ? 48.0 : 28.0,
-//                 ),
-//                 child: widget.outsideTitle ?? const SizedBox(),
-//               ),
-//               const SizedBox(height: 2),
-//               Padding(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 18,
-//                   vertical: 6,
-//                 ),
-//                 child: Row(
-//                   mainAxisAlignment:
-//                       isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
-//                   crossAxisAlignment: CrossAxisAlignment.end,
-//                   children: [
-//                     !isSent
-//                         ? widget.avatar ?? const SizedBox()
-//                         : const SizedBox(),
-//                     const SizedBox(width: 4),
-//                     AbsorbPointer(
-//                       absorbing: isDeleted,
-//                       child: widget.menuBuilder != null
-//                           ? widget.menuBuilder!(chatBubbleContent())
-//                           : chatBubbleContent(),
-//                     ),
-//                     const SizedBox(width: 4),
-//                     isSent
-//                         ? widget.avatar ?? const SizedBox()
-//                         : const SizedBox(),
-//                   ],
-//                 ),
-//               ),
-//               Padding(
-//                 padding: EdgeInsets.only(
-//                   right: widget.avatar != null ? 48.0 : 24.0,
-//                   left: widget.avatar != null ? 48.0 : 28.0,
-//                 ),
-//                 child: widget.outsideFooter ?? const SizedBox.shrink(),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//     // );
-//   }
-
-//   Container chatBubbleContent() {
-//     return Container(
-//       constraints: BoxConstraints(
-//         minHeight: 4.h,
-//         minWidth: 10.w,
-//         maxWidth: 60.w,
-//       ),
-//       padding: EdgeInsets.all(
-//         widget.mediaWidget != null ? 8.0 : 12.0,
-//       ),
-//       decoration: BoxDecoration(
-//         color: widget.backgroundColor ?? Colors.white,
-//         borderRadius: widget.borderRadius ??
-//             BorderRadius.circular(
-//               widget.borderRadiusNum ?? 6,
-//             ),
-//       ),
-//       child: Column(
-//         crossAxisAlignment:
-//             isSent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-//         children: [
-//           widget.replyItem == null
-//               ? replyingTo != null
-//                   ? isDeleted
-//                       ? const SizedBox.shrink()
-//                       : LMReplyItem(
-//                           replyToConversation: replyingTo!,
-//                           backgroundColor: Colors.white,
-//                           highlightColor: Theme.of(context).primaryColor,
-//                           title: LMChatText(
-//                             text: replyingTo!.member!.name,
-//                             textStyle: const TextStyle(
-//                               fontSize: 12,
-//                               fontWeight: FontWeight.w600,
-//                             ),
-//                           ),
-//                           subtitle: LMChatText(
-//                             text: replyingTo!.answer,
-//                             textStyle: const TextStyle(
-//                               fontSize: 12,
-//                               color: Colors.black,
-//                               fontWeight: FontWeight.w400,
-//                             ),
-//                           ),
-//                         )
-//                   : const SizedBox.shrink()
-//               : isDeleted
-//                   ? const SizedBox.shrink()
-//                   : widget.replyItem!,
-//           replyingTo != null
-//               ? const SizedBox(height: 8)
-//               : const SizedBox.shrink(),
-//           isSent ? const SizedBox() : widget.title ?? const SizedBox.shrink(),
-//           isDeleted
-//               ? const SizedBox.shrink()
-//               : ((widget.mediaWidget != null && widget.content != null) ||
-//                       widget.conversation.hasFiles!)
-//                   ? Padding(
-//                       padding: const EdgeInsets.symmetric(
-//                           vertical: 0, horizontal: 0),
-//                       child: widget.mediaWidget,
-//                     )
-//                   : const SizedBox(),
-//           isDeleted
-//               ? widget.deletedText != null
-//                   ? widget.deletedText!
-//                   : conversation!.deletedByUserId == conversation!.userId
-//                       ? LMChatText(
-//                           currentUser!.id == conversation!.deletedByUserId
-//                               ? "You deleted this message"
-//                               : "This message was deleted",
-//                           style: LMChatTextStyle(
-//                             textStyle: widget.content!.textStyle!.copyWith(
-//                               fontStyle: FontStyle.italic,
-//                             ),
-//                           ),
-//                         )
-//                       : LMChatText(
-//                           text:
-//                               "This message was deleted by a community managers",
-//                           textStyle: widget.content!.textStyle!.copyWith(
-//                             fontStyle: FontStyle.italic,
-//                           ),
-//                         )
-//               : replyingTo != null
-//                   ? Align(
-//                       alignment: Alignment.topLeft,
-//                       child: Padding(
-//                         padding: EdgeInsets.only(
-//                           top: widget.mediaWidget != null ? 4.0 : 0,
-//                         ),
-//                         child: widget.content ??
-//                             LMChatContent(
-//                               conversation: widget.conversation,
-//                               linkStyle: TextStyle(
-//                                 color: Theme.of(context).primaryColor,
-//                                 fontSize: 14,
-//                                 fontWeight: FontWeight.w400,
-//                               ),
-//                               textStyle: const TextStyle(
-//                                 fontSize: 14,
-//                                 fontWeight: FontWeight.w400,
-//                               ),
-//                             ),
-//                       ),
-//                     )
-//                   : widget.mediaWidget != null
-//                       ? Align(
-//                           alignment: Alignment.centerLeft,
-//                           child: Padding(
-//                             padding: EdgeInsets.only(
-//                                 top: widget.mediaWidget != null ? 4.0 : 0),
-//                             child: widget.content ??
-//                                 LMChatContent(
-//                                   conversation: widget.conversation,
-//                                   linkStyle: TextStyle(
-//                                     color: Theme.of(context).primaryColor,
-//                                     fontSize: 14,
-//                                     fontWeight: FontWeight.w400,
-//                                   ),
-//                                   textStyle: const TextStyle(
-//                                     fontSize: 14,
-//                                     fontWeight: FontWeight.w400,
-//                                   ),
-//                                   visibleLines: 4,
-//                                   animation: true,
-//                                 ),
-//                           ),
-//                         )
-//                       : Padding(
-//                           padding: EdgeInsets.only(
-//                               top: widget.mediaWidget != null ? 4.0 : 0),
-//                           child: widget.content ??
-//                               LMChatContent(
-//                                 conversation: widget.conversation,
-//                                 linkStyle: TextStyle(
-//                                   color: Theme.of(context).primaryColor,
-//                                   fontSize: 14,
-//                                   fontWeight: FontWeight.w400,
-//                                 ),
-//                                 textStyle: const TextStyle(
-//                                   fontSize: 14,
-//                                   fontWeight: FontWeight.w400,
-//                                 ),
-//                                 visibleLines: 4,
-//                                 animation: true,
-//                               ),
-//                         ),
-//           if (widget.footer != null && widget.footer!.isNotEmpty && !isDeleted)
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: widget.footer!,
-//             ),
-//           ((widget.conversation.hasFiles == null ||
-//                       !widget.conversation.hasFiles!) ||
-//                   (widget.conversation.attachmentsUploaded != null &&
-//                       widget.conversation.attachmentsUploaded!) ||
-//                   isDeleted)
-//               ? const SizedBox()
-//               : const LMChatIcon(
-//                   type: LMChatIconType.icon,
-//                   icon: Icons.timer_outlined,
-//                   style: LMChatIconStyle(
-//                     size: 12,
-//                     boxSize: 18,
-//                     boxPadding: 6,
-//                   ),
-//                 ),
-//         ],
-//       ),
-//     );
-//   }
-// }

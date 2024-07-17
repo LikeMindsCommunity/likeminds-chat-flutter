@@ -4,9 +4,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/constants/strings.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:shimmer/shimmer.dart';
 
 enum LMChatMediaType { photo, video, document, audio, gif, voiceNote, link }
@@ -188,7 +186,7 @@ Widget getChatBubbleImage(LMChatMedia mediaFile,
                         LMChatDefaultTheme.whiteColor.withOpacity(0.7),
                     size: 24,
                     boxBorderRadius: 16,
-                    boxPadding: 6,
+                    boxPadding: const EdgeInsets.all(6),
                   ),
                 ),
               )
@@ -234,7 +232,7 @@ Widget getFileImageTile(LMChatMedia mediaFile,
                         LMChatDefaultTheme.whiteColor.withOpacity(0.7),
                     size: 24,
                     boxBorderRadius: 18,
-                    boxPadding: 8,
+                    boxPadding: const EdgeInsets.all(8),
                   ),
                 ),
               )

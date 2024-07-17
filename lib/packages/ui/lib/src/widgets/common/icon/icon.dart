@@ -66,13 +66,16 @@ class LMChatIcon extends StatelessWidget {
     return Container(
       height: inStyle.boxSize ?? inStyle.size,
       width: inStyle.boxSize ?? inStyle.size,
-      padding: EdgeInsets.all(
-        inStyle.boxPadding?.abs() ?? 0,
-      ),
+      padding: inStyle.boxPadding ?? const EdgeInsets.all(0),
       decoration: BoxDecoration(
         color: inStyle.backgroundColor,
         borderRadius: BorderRadius.all(
           Radius.circular(inStyle.boxBorderRadius ?? 0),
+        ),
+        border: Border.all(
+          width: inStyle.boxBorder ?? 0.0,
+          strokeAlign: BorderSide.strokeAlignOutside,
+          color: inStyle.boxBorderColor ?? Colors.transparent,
         ),
       ),
       child: getIconWidget(inStyle),
@@ -107,11 +110,14 @@ class LMChatIconStyle {
   /// weight of the border around the box
   final double? boxBorder;
 
+  /// weight of the border around the box
+  final Color? boxBorderColor;
+
   /// radius of the box around the icon
   final double? boxBorderRadius;
 
   /// padding around icon with respect to the box
-  final double? boxPadding;
+  final EdgeInsets? boxPadding;
 
   /// color of the box, or background color of icon
   final Color? backgroundColor;
@@ -124,6 +130,7 @@ class LMChatIconStyle {
     this.size,
     this.boxSize,
     this.boxBorder,
+    this.boxBorderColor,
     this.boxBorderRadius,
     this.boxPadding,
     this.backgroundColor,
@@ -133,7 +140,7 @@ class LMChatIconStyle {
   factory LMChatIconStyle.basic() {
     return const LMChatIconStyle(
       size: 24,
-      boxPadding: 0,
+      boxPadding: EdgeInsets.zero,
       fit: BoxFit.contain,
     );
   }
@@ -144,7 +151,8 @@ class LMChatIconStyle {
     double? boxSize,
     double? boxBorder,
     double? boxBorderRadius,
-    double? boxPadding,
+    Color? boxBorderColor,
+    EdgeInsets? boxPadding,
     Color? backgroundColor,
     BoxFit? fit,
   }) {
@@ -153,6 +161,7 @@ class LMChatIconStyle {
       size: size ?? this.size,
       boxSize: boxSize ?? this.boxSize,
       boxBorder: boxBorder ?? this.boxBorder,
+      boxBorderColor: boxBorderColor ?? this.boxBorderColor,
       boxBorderRadius: boxBorderRadius ?? this.boxBorderRadius,
       boxPadding: boxPadding ?? this.boxPadding,
       backgroundColor: backgroundColor ?? this.backgroundColor,

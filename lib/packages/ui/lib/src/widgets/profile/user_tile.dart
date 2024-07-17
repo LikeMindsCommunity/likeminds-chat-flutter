@@ -3,79 +3,90 @@ import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
+/// [LMChatUserTile] is a [LMChatTile] that represents a user in a chat room.
 class LMChatUserTile extends LMChatTile {
-  final LMChatUserViewData user;
-  @override
-  final VoidCallback? onTap;
-  @override
-  final LMChatTileStyle? style;
-  @override
-  final Widget? title;
-  @override
-  final Widget? subtitle;
+  /// [userViewData] is the user to be displayed in the tile.
+  final LMChatUserViewData userViewData;
 
-  const LMChatUserTile({
-    Key? key,
-    required this.user,
-    this.onTap,
-    this.style,
-    this.title,
-    this.subtitle,
-  }) : super(
-          key: key,
-          onTap: onTap,
-          style: style,
-          title: title,
-          subtitle: subtitle,
-        );
+  final LMChatThemeData _chatTheme = LMChatTheme.theme;
+
+  /// [LMChatUserTile] constructor to create an instance of [LMChatUserTile].
+  LMChatUserTile({
+    super.key,
+    required this.userViewData,
+    super.onTap,
+    super.style,
+    super.leading,
+    super.title,
+    super.subtitle,
+    super.trailing,
+    super.absorbTouch,
+  });
 
   @override
   Widget build(BuildContext context) {
-    LMChatThemeData feedTheme = LMChatTheme.theme;
+    return _defUserTile();
+  }
+
+  LMChatTile _defUserTile() {
     return LMChatTile(
       onTap: onTap,
       style: style ??
           LMChatTileStyle(
-            backgroundColor: feedTheme.container,
-            margin: 12,
+            backgroundColor: _chatTheme.container,
+            gap: 4,
+            // margin: 12,
           ),
-      leading: LMChatProfilePicture(
-        style: LMChatProfilePictureStyle.basic().copyWith(
-          backgroundColor: feedTheme.primaryColor,
-          size: 42,
-          fallbackTextStyle: LMChatTextStyle(
-            textStyle: TextStyle(
-              fontSize: LMChatDefaultTheme.kFontMedium,
-              fontWeight: FontWeight.w500,
-              color: feedTheme.onPrimary,
+      leading: leading ??
+          LMChatProfilePicture(
+            style: LMChatProfilePictureStyle.basic().copyWith(
+              backgroundColor: _chatTheme.primaryColor,
+              size: 48,
+              fallbackTextStyle: LMChatTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: _chatTheme.onPrimary,
+                ),
+              ),
             ),
+            fallbackText: userViewData.name,
+            imageUrl: userViewData.imageUrl,
+            onTap: onTap,
           ),
-        ),
-        fallbackText: user.name,
-        imageUrl: user.imageUrl,
-        onTap: onTap,
-      ),
       title: title ??
           LMChatText(
-            user.name,
+            userViewData.name,
             style: const LMChatTextStyle(
               textStyle: TextStyle(
-                fontSize: LMChatDefaultTheme.kFontMedium,
-                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),
-      subtitle: subtitle ??
-          LMChatText(
-            "@${user.name.toLowerCase().split(' ').join()} ",
-            style: const LMChatTextStyle(
-              textStyle: TextStyle(
-                fontSize: LMChatDefaultTheme.kFontSmall,
-                color: Colors.grey,
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-          ),
+      subtitle: subtitle,
+    );
+  }
+
+  /// `copyWith()` method to create a copy of the [LMChatUserTile] instance with the new values.
+  @override
+  LMChatTile copyWith({
+    LMChatUserViewData? userViewData,
+    VoidCallback? onTap,
+    LMChatTileStyle? style,
+    Widget? leading,
+    Widget? title,
+    Widget? subtitle,
+    Widget? trailing,
+  }) {
+    return LMChatUserTile(
+      userViewData: userViewData ?? this.userViewData,
+      onTap: onTap ?? this.onTap,
+      style: style ?? this.style,
+      leading: leading ?? this.leading,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      trailing: trailing ?? this.trailing,
     );
   }
 }

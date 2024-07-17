@@ -1,88 +1,47 @@
-import 'dart:convert';
-
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
-abstract class ILMPreferenceService {
-  Future<void> initialize();
-  void storeUserData(User user);
-  User? getUser();
-  void clearUserData();
-  void storeMemberRights(MemberStateResponse memberState);
-  MemberStateResponse? getMemberRights();
-  bool fetchMemberRight(int id);
-  void clearMemberRights();
-  void storeCommunityData(Community community);
-  Community? getCommunity();
-  void clearCommunityData();
-  void clearLocalPrefs();
-}
-
-class LMChatPreferences extends ILMPreferenceService {
+/// [LMChatLocalPreference] is responsible for handling the local preferences of the chat.
+/// It has a singleton instance [instance] which is used to access the preferences.
+/// It has functions to store and fetch the user data, member rights, community data, cache data and clear the local data.
+class LMChatLocalPreference {
   // Singleton instance of LMChatPreference class
-  static LMChatPreferences? _instance;
-  static LMChatPreferences get instance => _instance ??= LMChatPreferences._();
+  static LMChatLocalPreference? _instance;
 
-  late SharedPreferences _sharedPreferences;
+  /// Singleton instance of [LMChatLocalPreference]
+  static LMChatLocalPreference get instance =>
+      _instance ??= LMChatLocalPreference._();
 
-  LMChatPreferences._();
+  LMChatLocalPreference._();
 
-  User? currentUser;
-
-  set setCurrentUser(User user) => currentUser = user;
-  get getCurrentUser => currentUser;
-
-  @override
-  Future<void> initialize() async {
-    _sharedPreferences = await SharedPreferences.getInstance();
-  }
-
-  @override
+  /// This function is used to store the user data in the local preferences.
   Future<void> storeUserData(User user) async {
-    setCurrentUser = user;
-    UserEntity userEntity = user.toEntity();
-    Map<String, dynamic> userData = userEntity.toJson();
-    String userString = jsonEncode(userData);
-    await _sharedPreferences.setString('user', userString);
+    await LMChatCore.instance.lmChatClient.insertOrUpdateLoggedInUser(user);
   }
 
-  @override
-  User? getUser() {
-    String? userString = _sharedPreferences.getString('user');
-    if (userString != null) {
-      Map<String, dynamic> userData = jsonDecode(userString);
-      UserEntity userEntity = UserEntity.fromJson(userData);
-      return User.fromEntity(userEntity);
-    }
-    return null;
+  /// This function is used to fetch the user data from the local preferences.
+  User getUser() {
+    final User? user = LMChatCore.instance.lmChatClient.getLoggedInUser().data;
+    return user ?? (throw Exception('User not found'));
   }
 
-  @override
-  void clearUserData() {
-    _sharedPreferences.remove('user');
+  /// This function is used to clear the user data from the local preferences.
+  Future<void> clearUserData() async {
+    await LMChatCore.instance.lmChatClient.deleteLoggedInUser();
   }
 
-  @override
+  /// This function is used to store the member rights in the local preferences.
   Future<void> storeMemberRights(MemberStateResponse memberState) async {
-    MemberStateResponseEntity memberStateEntity = memberState.toEntity();
-    Map<String, dynamic> memberStateData = memberStateEntity.toJson();
-    String memberStateString = jsonEncode(memberStateData);
-    await _sharedPreferences.setString('memberState', memberStateString);
+    await LMChatCore.instance.lmChatClient
+        .insertOrUpdateLoggedInMemberState(memberState);
   }
 
-  @override
+  /// This function is used to fetch the member rights from the local preferences.
   MemberStateResponse? getMemberRights() {
-    String? memberStateString = _sharedPreferences.getString('memberState');
-    if (memberStateString != null) {
-      Map<String, dynamic> memberStateData = jsonDecode(memberStateString);
-      MemberStateResponseEntity memberStateEntity =
-          MemberStateResponseEntity.fromJson(memberStateData);
-      return MemberStateResponse.fromEntity(memberStateEntity);
-    }
-    return null;
+    return LMChatCore.instance.lmChatClient.getLoggedInMemberState().data;
   }
 
-  @override
+  /// This function is used to fetch the member right of a particular state from the local preferences.
   bool fetchMemberRight(int id) {
     final memberStateResponse = getMemberRights();
     if (memberStateResponse == null) {
@@ -101,37 +60,58 @@ class LMChatPreferences extends ILMPreferenceService {
     }
   }
 
-  @override
-  void clearMemberRights() {
-    _sharedPreferences.remove('memberState');
+  /// This function is used to clear the member rights from the local preferences.
+  Future<void> clearMemberRights() async {
+    await LMChatCore.instance.lmChatClient.deleteLoggedInMemberState();
   }
 
-  @override
+  /// This function is used to store the community data in the local preferences.
   Future<void> storeCommunityData(Community community) async {
-    CommunityEntity communityEntity = community.toEntity();
-    Map<String, dynamic> communityData = communityEntity.toJson();
-    String communityString = jsonEncode(communityData);
-    await _sharedPreferences.setString('community', communityString);
+    await clearCommunityData();
+    await LMChatCore.instance.lmChatClient.insertOrUpdateCommunity(community);
   }
 
-  @override
-  Community? getCommunity() {
-    String? communityString = _sharedPreferences.getString('community');
-    if (communityString != null) {
-      Map<String, dynamic> communityData = jsonDecode(communityString);
-      CommunityEntity communityEntity = CommunityEntity.fromJson(communityData);
-      return Community.fromEntity(communityEntity);
+  /// This function is used to fetch the community data from the local preferences.
+  Community? getCommunityData() {
+    return LMChatCore.instance.lmChatClient.getCommunity().data;
+  }
+
+  /// This function is used to clear the community data from the local preferences.
+  Future<void> clearCommunityData() async {
+    await LMChatCore.instance.lmChatClient.deleteCommunity();
+  }
+
+  /// This function is used to store the cache data in the local preferences.
+  Future<LMResponse> storeCache(LMChatCache cache) {
+    return LMChatCore.client.insertOrUpdateCache(cache);
+  }
+
+  /// This function is used to fetch the cache data from the local preferences.
+  LMChatCache? fetchCache(String key) {
+    LMResponse response = LMChatCore.client.getCache(key);
+
+    if (response.success) {
+      return response.data!;
+    } else {
+      return null;
     }
-    return null;
   }
 
-  @override
-  void clearCommunityData() {
-    _sharedPreferences.remove('community');
+  /// This function is used to delete the cache data from the local preferences.
+  Future<LMResponse> deleteCache(String key) {
+    return LMChatCore.client.deleteCache(key);
   }
 
-  @override
-  void clearLocalPrefs() {
-    _sharedPreferences.clear();
+  /// This function is used to clear the cache data from the local preferences.
+  Future<LMResponse> clearCache() {
+    return LMChatCore.client.clearCache();
+  }
+
+  /// This function is used to clear the local data from the local preferences.
+  Future<void> clearLocalData() async {
+    await clearUserData();
+    await clearMemberRights();
+    await clearCommunityData();
+    await clearCache();
   }
 }

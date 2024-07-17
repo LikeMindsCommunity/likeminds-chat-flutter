@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
@@ -21,17 +22,23 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 /// Call [LMChatNotificationHandler.instance.handleNotification] in this function
 /// to handle notifications at the second level (inside the app)
 /// Make sure to call [setupNotifications] before this function
+@pragma('vm:entry-point')
 Future<void> _handleNotification(RemoteMessage message) async {
   debugPrint("--- Notification received in LEVEL 1 ---");
   await LMChatNotificationHandler.instance
-      .handleNotification(message, false, rootNavigatorKey);
+      .handleBackgroundNotification(message);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
   await LMChatCore.instance.initialize(
-    apiKey: "YOUR-API-KEY",
+    excludedConversationStates: [
+      ConversationState.memberJoinedOpenChatroom,
+      ConversationState.memberLeftOpenChatroom,
+      ConversationState.memberLeftSecretChatroom,
+      ConversationState.memberAddedToChatroom,
+    ],
   );
   runApp(const LMChatSampleApp());
 }
@@ -56,10 +63,6 @@ void setupNotifications() async {
   // Register device with LM, and listen for notifications
   LMChatNotificationHandler.instance.init(deviceId: devId, fcmToken: fcmToken);
   FirebaseMessaging.onBackgroundMessage(_handleNotification);
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    await LMChatNotificationHandler.instance
-        .handleNotification(message, true, rootNavigatorKey);
-  });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     debugPrint("---The app is opened from a notification---");
     await LMChatNotificationHandler.instance
@@ -96,17 +99,22 @@ Future<String> deviceId() async {
 /// 4. Return FCM token
 Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
+  // messaging.setForegroundNotificationPresentationOptions(
+  //   alert: true,
+  //   badge: true,
+  //   sound: true,
+  // );
+  await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: true,
+    sound: true,
+  );
   if (Platform.isIOS) {
-    await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
+    messaging.getAPNSToken();
   }
-
   final token = await messaging.getToken();
   debugPrint("Token - $token");
   return token.toString();

@@ -1,4 +1,5 @@
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:intl/intl.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
@@ -11,18 +12,17 @@ List<int> getChatroomTypes(LMChatroomType type) {
   return chatrooms;
 }
 
-String getChatroomPreviewMessage(
-  Conversation conversation,
-  User conversationUser,
-  User chatroomUser,
-  User chatroomWithUser,
+String getDMChatroomPreviewMessage(
+  LMChatConversationViewData conversation,
+  LMChatUserViewData conversationUser,
+  LMChatUserViewData chatroomUser,
+  LMChatUserViewData chatroomWithUser,
 ) {
   String personLabel = "";
-  final user = LMChatPreferences.instance.getCurrentUser;
+  final user = LMChatLocalPreference.instance.getUser();
   bool a = conversationUser.id == chatroomWithUser.id &&
-      user!.id == chatroomWithUser.id;
-  bool b =
-      conversationUser.id == chatroomUser.id && user!.id == chatroomUser.id;
+      user.id == chatroomWithUser.id;
+  bool b = conversationUser.id == chatroomUser.id && user.id == chatroomUser.id;
   personLabel = a
       ? 'You: '
       : b
@@ -35,6 +35,37 @@ String getChatroomPreviewMessage(
           conversation.answer,
           withTilde: false,
         )}'
-      : getDeletedText(conversation, user!);
+      : getDeletedText(conversation, user.toUserViewData());
   return message;
+}
+
+String getHomeChatroomPreviewMessage(
+  LMChatConversationViewData conversation,
+) {
+  String personLabel = "";
+  final user = LMChatLocalPreference.instance.getUser();
+  bool isByCurrentUser = conversation.member!.id == user.id;
+  personLabel = isByCurrentUser
+      ? 'You: '
+      : '${conversation.member!.name.split(' ').first}: ';
+  String message = conversation.deletedByUserId == null
+      ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+          conversation.answer,
+        ) : LMChatTaggingHelper.convertRouteToTag(
+          conversation.answer,
+          withTilde: false,
+        )}'
+      : getDeletedText(conversation, user.toUserViewData());
+  return message;
+}
+
+String getTime(String time) {
+  final int time0 = int.tryParse(time) ?? 0;
+  final DateTime now = DateTime.now();
+  final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(time0);
+  final Duration difference = now.difference(messageTime);
+  if (difference.inDays > 0 || now.day != messageTime.day) {
+    return DateFormat('dd/MM/yyyy').format(messageTime);
+  }
+  return DateFormat('kk:mm').format(messageTime);
 }

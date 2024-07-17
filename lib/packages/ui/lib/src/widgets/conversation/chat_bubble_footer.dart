@@ -1,7 +1,7 @@
 part of 'chat_bubble.dart';
 
 class LMChatBubbleFooter extends StatelessWidget {
-  final Conversation conversation;
+  final LMChatConversationViewData conversation;
 
   final LMChatText? timeStamp;
   final LMChatIcon? pendingTimer;
@@ -23,6 +23,26 @@ class LMChatBubbleFooter extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        if (conversation.isEdited ?? false) ...[
+          LMChatText(
+            'Edited',
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                fontSize: 10,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.6),
+              ),
+            ),
+          ),
+          LMChatText(
+            ' • ',
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                fontSize: 10,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.6),
+              ),
+            ),
+          ),
+        ],
         conversation.createdAt.isNotEmpty
             ? LMChatText(
                 conversation.createdAt,
@@ -46,7 +66,7 @@ class LMChatBubbleFooter extends StatelessWidget {
   }
 
   LMChatBubbleFooter copyWith({
-    Conversation? conversation,
+    LMChatConversationViewData? conversation,
     LMChatText? timeStamp,
     LMChatIcon? pendingTimer,
     LMChatBubbleFooterStyle? style,
