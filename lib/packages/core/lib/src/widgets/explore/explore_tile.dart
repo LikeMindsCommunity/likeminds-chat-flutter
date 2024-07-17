@@ -115,7 +115,13 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
                     : const SizedBox.shrink(),
               ),
         imageUrl: chatroom.chatroomImageUrl,
-        style: LMChatProfilePictureStyle.basic().copyWith(size: 56),
+        style: LMChatProfilePictureStyle.basic().copyWith(
+          size: 56,
+          textPadding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 9,
+          ),
+        ),
       ),
       title: _defaulltExploreTitle(),
       subtitle: LMChatText(

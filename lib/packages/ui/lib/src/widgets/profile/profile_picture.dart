@@ -150,6 +150,7 @@ class LMChatProfilePictureStyle {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       boxShape: boxShape ?? this.boxShape,
       fallbackTextStyle: fallbackTextStyle ?? this.fallbackTextStyle,
+      textPadding: textPadding ?? this.textPadding,
     );
   }
 }
