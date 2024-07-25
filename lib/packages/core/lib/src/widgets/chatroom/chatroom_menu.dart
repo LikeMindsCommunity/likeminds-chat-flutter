@@ -45,10 +45,14 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
 
   LMChatHomeFeedBloc? homeBloc;
+  LMChatConversationBloc? conversationBloc;
+  LMChatConversationActionBloc? conversationActionBloc;
   @override
   void initState() {
     super.initState();
     homeBloc = LMChatHomeFeedBloc.instance;
+    conversationBloc = LMChatConversationBloc.instance;
+    conversationActionBloc = LMChatConversationActionBloc.instance;
     chatroomActions = widget.chatroomActions;
   }
 
@@ -56,6 +60,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
   void didUpdateWidget(LMChatroomMenu old) {
     super.didUpdateWidget(old);
     homeBloc = LMChatHomeFeedBloc.instance;
+    conversationBloc = LMChatConversationBloc.instance;
+    conversationActionBloc = LMChatConversationActionBloc.instance;
     chatroomActions = widget.chatroomActions;
   }
 
@@ -363,6 +369,30 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     final response = await LMChatCore.client.blockMember(request);
     if (response.success) {
       toast(action.id == 27 ? "Member blocked" : "Member unblocked");
+
+      chatroomActions = chatroomActions.map((element) {
+        if (element.title.toLowerCase() == "block") {
+          element.id = 28;
+          element.title = "Unblock";
+        } else if (element.title.toLowerCase() == "unblock") {
+          element.id = 27;
+          element.title = "Block";
+        }
+
+        return element;
+      }).toList();
+      rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
+      final conversation = response.data!.conversation!;
+
+      conversationBloc!.add(LMChatLocalConversationEvent(
+        conversation: conversation.toConversationViewData(),
+      ));
+      conversationActionBloc!.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom.toChatRoomViewData().copyWith(
+              chatRequestState: 2,
+            ),
+      ));
+
       widget.controller!.hideMenu();
       // Navigator.pop(context);
     } else {
