@@ -151,7 +151,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         showLeaveDialog();
         break;
       case 27:
-        blockDM(action);
+        showBlockDialog(action);
         break;
       case 28:
         blockDM(action);
@@ -311,5 +311,62 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     );
   }
 
-  void blockDM(ChatroomAction action) {}
+  void showBlockDialog(ChatroomAction action) {
+    showDialog(
+      context: context,
+      builder: (context) => LMChatDialog(
+        title: const Text("Block direct messaging"),
+        content: const Text(
+          'Are you sure you do not want to receive new messages from this user?',
+        ),
+        actions: [
+          LMChatText(
+            'Cancel',
+            onTap: () {
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          LMChatText(
+            'Confirm',
+            onTap: () {
+              blockDM(action);
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void blockDM(ChatroomAction action) async {
+    final request = (BlockMemberRequestBuilder()
+          ..chatroomId(widget.chatroom.id)
+          ..status(action.id == 27 ? 0 : 1))
+        .build();
+    final response = await LMChatCore.client.blockMember(request);
+    if (response.success) {
+      toast(action.id == 27 ? "Member blocked" : "Member unblocked");
+      widget.controller!.hideMenu();
+      // Navigator.pop(context);
+    } else {
+      toast(response.errorMessage!);
+    }
+  }
 }
