@@ -370,6 +370,17 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
     if (response.success) {
       toast(action.id == 27 ? "Member blocked" : "Member unblocked");
 
+      final conversation = response.data!.conversation!;
+
+      conversationBloc!.add(LMChatLocalConversationEvent(
+        conversation: conversation.toConversationViewData(),
+      ));
+      conversationActionBloc!.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom.toChatRoomViewData().copyWith(
+              chatRequestState: action.id == 27 ? 2 : 1,
+            ),
+      ));
+
       chatroomActions = chatroomActions.map((element) {
         if (element.title.toLowerCase() == "block") {
           element.id = 28;
@@ -382,17 +393,6 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         return element;
       }).toList();
       rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
-      final conversation = response.data!.conversation!;
-
-      conversationBloc!.add(LMChatLocalConversationEvent(
-        conversation: conversation.toConversationViewData(),
-      ));
-      conversationActionBloc!.add(LMChatRefreshBarEvent(
-        chatroom: widget.chatroom.toChatRoomViewData().copyWith(
-              chatRequestState: 2,
-            ),
-      ));
-
       widget.controller!.hideMenu();
       // Navigator.pop(context);
     } else {
