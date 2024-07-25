@@ -17,6 +17,7 @@ part 'handler/post_multimedia_conversation_handler.dart';
 part 'handler/fetch_conversation_handler.dart';
 part 'handler/update_conversation_handler.dart';
 part 'handler/initialise_conversations_handler.dart';
+part 'handler/local_conversation_handler.dart';
 
 /// LMChatConversationBloc is the BLoC that manages conversations
 ///
@@ -54,6 +55,8 @@ class LMChatConversationBloc
         postMultimediaConversationEventHandler);
     // Handle update conversations event through handler
     on<LMChatUpdateConversationsEvent>(updateConversationsEventHandler);
+    // Handle adding of local conversation through handler
+    on<LMChatLocalConversationEvent>(localConversationEventHandler);
   }
 
   @override
