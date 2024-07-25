@@ -137,6 +137,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       return false;
     } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return false;
+    } else if (widget.chatroom.chatRequestState == 2) {
+      return false;
     } else {
       return true;
     }
@@ -147,6 +149,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       return 'Only Community Managers can respond here';
     } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
+    } else if (widget.chatroom.chatRequestState == 2) {
+      return "You can not respond to a rejected connection.";
     } else {
       return "Type your response";
     }
