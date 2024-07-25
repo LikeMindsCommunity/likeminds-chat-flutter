@@ -11,6 +11,7 @@ part 'conversation_action_state.dart';
 part 'handler/delete_conversation_event_handler.dart';
 part 'handler/edit_conversation_event_handler.dart';
 part 'handler/reply_conversation_event_handler.dart';
+part 'handler/refresh_bar_event_handler.dart';
 
 /// [LMChatConversationActionBloc] is responsible for handling the conversation actions.
 /// It extends [Bloc] and uses [LMChatConversationActionEvent] and [LMChatConversationActionState].
@@ -35,5 +36,6 @@ class LMChatConversationActionBloc
     on<LMChatReplyConversationEvent>(_replyEventHandler);
     on<LMChatReplyRemoveEvent>(_replyRemoveEventHandler);
     on<LMChatDeleteConversationEvent>(_deleteConversationEventHandler);
+    on<LMChatRefreshBarEvent>(_refreshBarEventHandler);
   }
 }
