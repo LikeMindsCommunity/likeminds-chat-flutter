@@ -150,6 +150,12 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       case 15:
         showLeaveDialog();
         break;
+      case 27:
+        blockDM(action);
+        break;
+      case 28:
+        blockDM(action);
+        break;
       default:
         unimplemented();
     }
@@ -304,4 +310,6 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       ),
     );
   }
+
+  void blockDM(ChatroomAction action) {}
 }
