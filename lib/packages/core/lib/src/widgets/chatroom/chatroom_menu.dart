@@ -44,24 +44,20 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
 
-  LMChatHomeFeedBloc? homeBloc;
-  LMChatConversationBloc? conversationBloc;
-  LMChatConversationActionBloc? conversationActionBloc;
+  final LMChatHomeFeedBloc homeBloc = LMChatHomeFeedBloc.instance;
+  final LMChatConversationBloc conversationBloc =
+      LMChatConversationBloc.instance;
+  final LMChatConversationActionBloc conversationActionBloc =
+      LMChatConversationActionBloc.instance;
   @override
   void initState() {
     super.initState();
-    homeBloc = LMChatHomeFeedBloc.instance;
-    conversationBloc = LMChatConversationBloc.instance;
-    conversationActionBloc = LMChatConversationActionBloc.instance;
     chatroomActions = widget.chatroomActions;
   }
 
   @override
   void didUpdateWidget(LMChatroomMenu old) {
     super.didUpdateWidget(old);
-    homeBloc = LMChatHomeFeedBloc.instance;
-    conversationBloc = LMChatConversationBloc.instance;
-    conversationActionBloc = LMChatConversationActionBloc.instance;
     chatroomActions = widget.chatroomActions;
   }
 
@@ -210,7 +206,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       }).toList();
       rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       widget.controller!.hideMenu();
-      homeBloc!.add(LMChatRefreshHomeFeedEvent());
+      homeBloc.add(LMChatRefreshHomeFeedEvent());
     } else {
       toast(response.errorMessage!);
     }
@@ -238,7 +234,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
         toast("Chatroom left");
         widget.controller!.hideMenu();
-        homeBloc?.add(LMChatRefreshHomeFeedEvent());
+        homeBloc.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
@@ -261,7 +257,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
         toast("Chatroom left");
         widget.controller!.hideMenu();
-        homeBloc?.add(LMChatRefreshHomeFeedEvent());
+        homeBloc.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
@@ -372,10 +368,10 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
       final conversation = response.data!.conversation!;
 
-      conversationBloc!.add(LMChatLocalConversationEvent(
+      conversationBloc.add(LMChatLocalConversationEvent(
         conversation: conversation.toConversationViewData(),
       ));
-      conversationActionBloc!.add(LMChatRefreshBarEvent(
+      conversationActionBloc.add(LMChatRefreshBarEvent(
         chatroom: widget.chatroom.toChatRoomViewData().copyWith(
               chatRequestState: action.id == 27 ? 2 : 1,
             ),

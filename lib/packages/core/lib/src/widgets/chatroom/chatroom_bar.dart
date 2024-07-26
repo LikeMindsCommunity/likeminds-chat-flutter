@@ -85,12 +85,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   @override
-  void didUpdateWidget(covariant LMChatroomBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    chatroom = widget.chatroom;
-  }
-
-  @override
   void dispose() {
     _popupMenuController.dispose();
     _textEditingController.dispose();
@@ -228,35 +222,30 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                 return Container(color: Colors.red);
               }),
             ),
-            ValueListenableBuilder(
-              valueListenable: rebuildChatBar,
-              builder: ((context, value, child) {
-                return Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.only(
-                    left: 2.w,
-                    right: 2.w,
-                    top: 1.5.h,
-                    bottom: 1.5.h,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _isRespondingAllowed()
-                          ? _defTextField(context)
-                          : _defDisabledTextField(context),
-                      if (_isRespondingAllowed())
-                        _screenBuilder.sendButton(
-                          context,
-                          _textEditingController,
-                          _onSend,
-                          _defSendButton(context),
-                        ),
-                    ],
-                  ),
-                );
-              }),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                left: 2.w,
+                right: 2.w,
+                top: 1.5.h,
+                bottom: 1.5.h,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _isRespondingAllowed()
+                      ? _defTextField(context)
+                      : _defDisabledTextField(context),
+                  if (_isRespondingAllowed())
+                    _screenBuilder.sendButton(
+                      context,
+                      _textEditingController,
+                      _onSend,
+                      _defSendButton(context),
+                    ),
+                ],
+              ),
             ),
           ],
         );
