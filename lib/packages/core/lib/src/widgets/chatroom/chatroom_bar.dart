@@ -55,8 +55,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   List<LMChatTagViewData> tags = [];
   String? result;
+  LMChatRoomViewData? chatroom;
 
   ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
+  ValueNotifier<bool> rebuildChatBar = ValueNotifier(false);
+
   String previewLink = '';
   LMChatMediaModel? linkModel;
   bool showLinkPreview =
@@ -73,6 +76,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     } else {
       return "";
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    chatroom = widget.chatroom;
   }
 
   @override
@@ -137,6 +146,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       return false;
     } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return false;
+    } else if (chatroom!.chatRequestState == 2) {
+      return false;
     } else {
       return true;
     }
@@ -147,6 +158,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       return 'Only Community Managers can respond here';
     } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
+    } else if (chatroom!.chatRequestState == 2) {
+      return "You can not respond to a rejected connection.";
     } else {
       return "Type your response";
     }
@@ -195,6 +208,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         } else if (state is LMChatReplyRemoveState) {
           replyToConversation = null;
           _focusNode.requestFocus();
+        } else if (state is LMChatRefreshBarState) {
+          chatroom = state.chatroom;
+          rebuildChatBar.value = !rebuildChatBar.value;
         }
       },
       builder: (context, state) {

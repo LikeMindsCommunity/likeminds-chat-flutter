@@ -8,6 +8,7 @@ abstract class LMChatConversationActionEvent extends Equatable {}
 class LMChatEditConversationEvent extends LMChatConversationActionEvent {
   /// [EditConversationRequest] editConversationRequest is the request to edit a conversation.
   final EditConversationRequest editConversationRequest;
+
   /// [Conversation] replyConversation is the conversation to be replied.
   final Conversation? replyConversation;
 
@@ -21,13 +22,14 @@ class LMChatEditConversationEvent extends LMChatConversationActionEvent {
       ];
 }
 
-
 /// {@macro lm_chat_editing_conversation_event} is used to emit an editing conversation state.
 class LMChatEditingConversationEvent extends LMChatConversationActionEvent {
   /// [int] conversationId is the id of the conversation to be edited.
   final int conversationId;
+
   /// [int] chatroomId is the id of the chatroom.
   final int chatroomId;
+
   /// [LMChatConversationViewData] editConversation is the conversation to be edited.
   final LMChatConversationViewData editConversation;
 
@@ -77,8 +79,10 @@ class LMChatDeleteConversationEvent extends LMChatConversationActionEvent {
 class LMChatReplyConversationEvent extends LMChatConversationActionEvent {
   /// [int] conversationId is the id of the conversation to be replied.
   final int conversationId;
+
   /// [int] chatroomId is the id of the chatroom.
   final int chatroomId;
+
   /// [LMChatConversationViewData] replyConversation is the conversation to be replied.
   final LMChatConversationViewData replyConversation;
 
@@ -103,4 +107,15 @@ class LMChatReplyRemoveEvent extends LMChatConversationActionEvent {
   final int time = DateTime.now().millisecondsSinceEpoch;
   @override
   List<Object> get props => [time];
+}
+
+class LMChatRefreshBarEvent extends LMChatConversationActionEvent {
+  final LMChatRoomViewData chatroom;
+
+  LMChatRefreshBarEvent({
+    required this.chatroom,
+  });
+
+  @override
+  List<Object> get props => [chatroom];
 }
