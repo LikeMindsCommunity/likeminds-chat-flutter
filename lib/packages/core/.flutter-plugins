@@ -1,6 +1,6 @@
 # This is a generated file; do not edit or check into version control.
 device_info_plus=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/device_info_plus-10.1.0/
-file_picker=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/file_picker-8.0.3/
+file_picker=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/file_picker-8.0.6/
 firebase_core=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/firebase_core-2.32.0/
 firebase_core_web=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/firebase_core_web-2.17.1/
 firebase_database=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/firebase_database-10.5.7/
@@ -20,8 +20,6 @@ path_provider_android=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provi
 path_provider_foundation=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.0/
 path_provider_linux=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
 path_provider_windows=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/path_provider_windows-2.2.1/
-pdf_bitmaps=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/pdf_bitmaps-1.0.1/
-pdf_render=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/pdf_render-1.4.8/
 permission_handler=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/permission_handler-11.3.1/
 permission_handler_android=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/permission_handler_android-12.0.6/
 permission_handler_apple=/Users/divyanshgandhi/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.5/

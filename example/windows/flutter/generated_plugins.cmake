@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
-  file_selector_windows
   firebase_core
   media_kit_video
   permission_handler_windows
