@@ -11,3 +11,9 @@ Fixed a bug in Core package
 - Added Support for chatroom
 - Added conversation lists and actions
 - enhancements and minor feature additions
+
+## 0.6.1
+
+- Added Support for block member
+- Support for targetSDK v34 out of the box
+- Updating dependencies to support Flutter `v3.22.0`
