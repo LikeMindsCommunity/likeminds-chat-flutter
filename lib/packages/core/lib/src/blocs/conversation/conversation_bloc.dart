@@ -72,13 +72,15 @@ class LMChatConversationBloc
     _currentChatroomId = event.chatroomId;
     lastConversationId = event.conversationId;
 
-    realTime.onChildChanged.listen(
+    realTime.onValue.listen(
       (event) {
         if (event.snapshot.value != null && _currentChatroomId != null) {
           final response = event.snapshot.value as Map;
-          final conversationId = int.parse(response["collabcard"]["answer_id"]);
+          final conversationId =
+              int.tryParse(response["collabcard"]["answer_id"]);
           if (lastConversationId != null &&
-              conversationId != lastConversationId) {
+              conversationId != lastConversationId &&
+              conversationId != null) {
             LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
               chatroomId: _currentChatroomId!,
               conversationId: conversationId,
