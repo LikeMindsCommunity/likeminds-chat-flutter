@@ -50,7 +50,7 @@ postConversationEventHandler(
         );
       }
       emit(LMChatConversationPostedState(conversationViewData));
-
+      LMChatConversationBloc.instance.lastConversationId = conversation.id;
       return false;
     } else {
       emit(LMChatConversationErrorState(

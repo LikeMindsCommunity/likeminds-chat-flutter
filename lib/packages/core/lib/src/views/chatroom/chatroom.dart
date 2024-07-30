@@ -167,12 +167,21 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               actions = chatroomState.actions;
               return Column(
                 children: [
-                  _screenBuilder.appBarBuilder.call(
-                    context,
-                    chatroom.toChatRoomViewData(),
-                    _defaultAppBar(
-                      chatroom,
-                      chatroomState.participantCount,
+                  BlocListener<LMChatConversationActionBloc,
+                      LMChatConversationActionState>(
+                    bloc: _convActionBloc,
+                    listener: (context, state) {
+                      if (state is LMChatRefreshBarState) {
+                        chatroom = state.chatroom.toChatRoom();
+                      }
+                    },
+                    child: _screenBuilder.appBarBuilder.call(
+                      context,
+                      chatroom.toChatRoomViewData(),
+                      _defaultAppBar(
+                        chatroom,
+                        chatroomState.participantCount,
+                      ),
                     ),
                   ),
                   Expanded(

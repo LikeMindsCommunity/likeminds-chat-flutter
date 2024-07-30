@@ -90,7 +90,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   @override
   void dispose() {
     _convActionBloc.close();
-    // _conversationBloc.close();
+    _conversationBloc.close();
     super.dispose();
   }
 
