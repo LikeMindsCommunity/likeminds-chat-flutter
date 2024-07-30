@@ -7,8 +7,6 @@ import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart'
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:pdf_bitmaps/pdf_bitmaps.dart';
-import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 const List<String> videoExtentions = [
@@ -213,18 +211,18 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-Widget getDocumentThumbnail(File document, {Size? size}) {
-  return PdfDocumentLoader.openFile(
-    document.path,
-    onError: (error) {},
-    pageNumber: 1,
-    pageBuilder: (context, textureBuilder, pageSize) {
-      return textureBuilder(
-        size: size,
-      );
-    },
-  );
-}
+// Widget getDocumentThumbnail(File document, {Size? size}) {
+//   return PdfDocumentLoader.openFile(
+//     document.path,
+//     onError: (error) {},
+//     pageNumber: 1,
+//     pageBuilder: (context, textureBuilder, pageSize) {
+//       return textureBuilder(
+//         size: size,
+//       );
+//     },
+//   );
+// }
 
 Widget getDocumentDetails(LMChatMedia document) {
   return SizedBox(
@@ -364,30 +362,30 @@ Future<List<LMChatMedia>> pickVideoFiles() async {
 //   }
 // }
 
-Future<List<LMChatMedia>> pickDocumentFiles() async {
-  FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
-      allowMultiple: true, type: FileType.custom, allowedExtensions: ['pdf']);
-  if (pickedFiles == null) {
-    return [];
-  }
-  List<LMChatMedia> mediaList = <LMChatMedia>[];
-  if (pickedFiles.files.isNotEmpty) {
-    for (int i = 0; i < pickedFiles.files.length; i++) {
-      File file = File(pickedFiles.paths[i]!);
-      int? pageCount;
-      if (Platform.isAndroid) {
-        pageCount = await PdfBitmaps().pdfPageCount(
-          params: PDFPageCountParams(pdfPath: file.path),
-        );
-      }
-      LMChatMedia media = LMChatMedia(
-        mediaType: LMChatMediaType.document,
-        mediaFile: file,
-        size: pickedFiles.files[i].size,
-        pageCount: pageCount,
-      );
-      mediaList.add(media);
-    }
-  }
-  return mediaList;
-}
+// Future<List<LMChatMedia>> pickDocumentFiles() async {
+//   FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
+//       allowMultiple: true, type: FileType.custom, allowedExtensions: ['pdf']);
+//   if (pickedFiles == null) {
+//     return [];
+//   }
+//   List<LMChatMedia> mediaList = <LMChatMedia>[];
+//   if (pickedFiles.files.isNotEmpty) {
+//     for (int i = 0; i < pickedFiles.files.length; i++) {
+//       File file = File(pickedFiles.paths[i]!);
+//       int? pageCount;
+//       if (Platform.isAndroid) {
+//         pageCount = await PdfBitmaps().pdfPageCount(
+//           params: PDFPageCountParams(pdfPath: file.path),
+//         );
+//       }
+//       LMChatMedia media = LMChatMedia(
+//         mediaType: LMChatMediaType.document,
+//         mediaFile: file,
+//         size: pickedFiles.files[i].size,
+//         pageCount: pageCount,
+//       );
+//       mediaList.add(media);
+//     }
+//   }
+//   return mediaList;
+// }
