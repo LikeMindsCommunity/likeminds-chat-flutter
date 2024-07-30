@@ -517,7 +517,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       titleText: userText,
       onCanceled: () {
         chatActionBloc.add(LMChatReplyRemoveEvent());
-        _textEditingController.clear();
       },
       subtitle: LMChatText(
         LMChatTaggingHelper.convertRouteToTag(replyToConversation?.answer) ??
