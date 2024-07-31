@@ -1,6 +1,6 @@
 name: likeminds_chat_flutter_core
 description: The core package of LikeMinds Flutter Chat SDK
-version: 0.6.0
+version: 0.6.1
 homepage: https://likeminds.community
 
 environment:
@@ -12,43 +12,40 @@ dependencies:
     sdk: flutter
 
   # Other LM packages
-  likeminds_chat_fl: ^1.7.0
-  likeminds_chat_flutter_ui: ^0.6.0
+  likeminds_chat_fl: ^1.7.1
+  likeminds_chat_flutter_ui: ^0.6.1
 
-  envied: ^0.5.4
+  envied: ^0.5.4+1
   flutter_bloc: ^8.1.5
   equatable: ^2.0.5
   infinite_scroll_pagination: ^4.0.0
   url_launcher: ^6.2.6
-  firebase_core: ^2.31.0
-  firebase_database: ^10.5.5
-  extended_text_field: ^14.0.0
+  firebase_core: ^3.2.0
+  firebase_database: ^11.0.3
+  extended_text_field: ^15.0.0
   flutter_keyboard_visibility: ^6.0.0
   simple_s3: ^0.3.2
   path: ^1.9.0
-  firebase_messaging: ^14.9.2
+  firebase_messaging: ^15.0.3
   overlay_support: ^2.1.0
   shared_preferences: ^2.2.3
   video_thumbnail: ^0.5.3
-  image_picker: ^1.1.1
-  file_picker: ^8.0.3
+  file_picker: ^8.0.6
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
   date_format: ^2.0.7
   intl: ^0.19.0
   permission_handler: ^11.3.1
   device_info_plus: ^10.1.0
-  pdf_render: ^1.4.7
-  pdf_bitmaps: ^1.0.1
   custom_pop_up_menu: ^1.2.4
   bloc: ^8.1.4
-  meta: ^1.12.0
+  meta: ^1.11.0
 
 dependency_overrides:
   js: ^0.7.1
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
 

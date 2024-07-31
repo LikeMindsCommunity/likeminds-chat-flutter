@@ -133,3 +133,16 @@ class LMChatUpdateConversationsEvent extends LMChatConversationEvent {
         chatroomId,
       ];
 }
+
+class LMChatLocalConversationEvent extends LMChatConversationEvent {
+  final LMChatConversationViewData conversation;
+
+  LMChatLocalConversationEvent({
+    required this.conversation,
+  });
+
+  @override
+  List<Object> get props => [
+        conversation,
+      ];
+}

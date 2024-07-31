@@ -44,18 +44,20 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
 
-  LMChatHomeFeedBloc? homeBloc;
+  final LMChatHomeFeedBloc homeBloc = LMChatHomeFeedBloc.instance;
+  final LMChatConversationBloc conversationBloc =
+      LMChatConversationBloc.instance;
+  final LMChatConversationActionBloc conversationActionBloc =
+      LMChatConversationActionBloc.instance;
   @override
   void initState() {
     super.initState();
-    homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
   }
 
   @override
   void didUpdateWidget(LMChatroomMenu old) {
     super.didUpdateWidget(old);
-    homeBloc = LMChatHomeFeedBloc.instance;
     chatroomActions = widget.chatroomActions;
   }
 
@@ -150,6 +152,12 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       case 15:
         showLeaveDialog();
         break;
+      case 27:
+        showBlockDialog(action);
+        break;
+      case 28:
+        blockDM(action);
+        break;
       default:
         unimplemented();
     }
@@ -198,7 +206,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       }).toList();
       rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       widget.controller!.hideMenu();
-      homeBloc!.add(LMChatRefreshHomeFeedEvent());
+      homeBloc.add(LMChatRefreshHomeFeedEvent());
     } else {
       toast(response.errorMessage!);
     }
@@ -226,7 +234,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
         toast("Chatroom left");
         widget.controller!.hideMenu();
-        homeBloc?.add(LMChatRefreshHomeFeedEvent());
+        homeBloc.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
@@ -249,7 +257,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         );
         toast("Chatroom left");
         widget.controller!.hideMenu();
-        homeBloc?.add(LMChatRefreshHomeFeedEvent());
+        homeBloc.add(LMChatRefreshHomeFeedEvent());
         Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
@@ -303,5 +311,88 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         ],
       ),
     );
+  }
+
+  void showBlockDialog(ChatroomAction action) {
+    showDialog(
+      context: context,
+      builder: (context) => LMChatDialog(
+        title: const Text("Block direct messaging"),
+        content: const Text(
+          'Are you sure you do not want to receive new messages from this user?',
+        ),
+        actions: [
+          LMChatText(
+            'Cancel',
+            onTap: () {
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          LMChatText(
+            'Confirm',
+            onTap: () {
+              blockDM(action);
+              Navigator.pop(context);
+            },
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void blockDM(ChatroomAction action) async {
+    final request = (BlockMemberRequestBuilder()
+          ..chatroomId(widget.chatroom.id)
+          ..status(action.id == 27 ? 0 : 1))
+        .build();
+    final response = await LMChatCore.client.blockMember(request);
+    if (response.success) {
+      toast(action.id == 27 ? "Member blocked" : "Member unblocked");
+
+      final conversation = response.data!.conversation!;
+
+      conversationBloc.add(LMChatLocalConversationEvent(
+        conversation: conversation.toConversationViewData(),
+      ));
+      conversationActionBloc.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom.toChatRoomViewData().copyWith(
+              chatRequestState: action.id == 27 ? 2 : 1,
+            ),
+      ));
+
+      chatroomActions = chatroomActions.map((element) {
+        if (element.title.toLowerCase() == "block") {
+          element.id = 28;
+          element.title = "Unblock";
+        } else if (element.title.toLowerCase() == "unblock") {
+          element.id = 27;
+          element.title = "Block";
+        }
+
+        return element;
+      }).toList();
+      rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
+      widget.controller!.hideMenu();
+      // Navigator.pop(context);
+    } else {
+      toast(response.errorMessage!);
+    }
   }
 }

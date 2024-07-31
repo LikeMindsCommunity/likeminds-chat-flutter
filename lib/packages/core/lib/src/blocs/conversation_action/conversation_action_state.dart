@@ -139,3 +139,14 @@ class LMChatEditRemoveState extends LMChatConversationActionState {
   @override
   List<Object> get props => [];
 }
+
+class LMChatRefreshBarState extends LMChatConversationActionState {
+  final LMChatRoomViewData chatroom;
+
+  LMChatRefreshBarState({
+    required this.chatroom,
+  });
+
+  @override
+  List<Object> get props => [chatroom];
+}

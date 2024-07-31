@@ -17,6 +17,7 @@ part 'handler/post_multimedia_conversation_handler.dart';
 part 'handler/fetch_conversation_handler.dart';
 part 'handler/update_conversation_handler.dart';
 part 'handler/initialise_conversations_handler.dart';
+part 'handler/local_conversation_handler.dart';
 
 /// LMChatConversationBloc is the BLoC that manages conversations
 ///
@@ -54,6 +55,8 @@ class LMChatConversationBloc
         postMultimediaConversationEventHandler);
     // Handle update conversations event through handler
     on<LMChatUpdateConversationsEvent>(updateConversationsEventHandler);
+    // Handle adding of local conversation through handler
+    on<LMChatLocalConversationEvent>(localConversationEventHandler);
   }
 
   @override
@@ -73,9 +76,10 @@ class LMChatConversationBloc
       (event) {
         if (event.snapshot.value != null && _currentChatroomId != null) {
           final response = event.snapshot.value as Map;
-          final conversationId = int.parse(response["collabcard"]["answer_id"]);
+          final conversationId = int.tryParse(response["answer_id"]);
           if (lastConversationId != null &&
-              conversationId != lastConversationId) {
+              conversationId != lastConversationId &&
+              conversationId != null) {
             LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
               chatroomId: _currentChatroomId!,
               conversationId: conversationId,
