@@ -27,5 +27,4 @@ export 'conversation/chat_bubble.dart';
 
 export 'common/menu/menu.dart';
 export 'common/menu/menu_item.dart';
-export 'common/menu/custom_pop_up_menu_style.dart';
 export 'common/dialog/dialog.dart';

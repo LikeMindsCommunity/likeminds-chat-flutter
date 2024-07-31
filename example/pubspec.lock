@@ -638,21 +638,21 @@ packages:
       path: "../../LikeMinds-Flutter-GroupChat-SDK"
       relative: true
     source: path
-    version: "1.7.0"
+    version: "1.7.1"
   likeminds_chat_flutter_core:
     dependency: "direct main"
     description:
       path: "../lib/packages/core"
       relative: true
     source: path
-    version: "0.6.0"
+    version: "0.6.1"
   likeminds_chat_flutter_ui:
     dependency: "direct overridden"
     description:
       path: "../lib/packages/ui"
       relative: true
     source: path
-    version: "0.6.0"
+    version: "0.6.1"
   lints:
     dependency: transitive
     description:
