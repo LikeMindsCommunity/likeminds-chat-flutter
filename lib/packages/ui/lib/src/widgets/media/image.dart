@@ -6,7 +6,7 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
-/// {@template chat_image}
+/// {@template lm_chat_image}
 /// A widget to display an image in a post.
 /// The image can be fetched from a URL or from a file.
 /// The [LMChatImage] can be customized by passing in the required parameters
@@ -16,28 +16,36 @@ import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 /// and can be used in a post.
 /// {@endtemplate}
 class LMChatImage extends StatefulWidget {
+  ///{@macro lm_chat_image}
   const LMChatImage({
     super.key,
     this.imageUrl,
     this.imageFile,
     this.onError,
     this.style,
-    this.onMediaTap,
+    this.onTap,
   }) : assert(imageUrl != null || imageFile != null);
 
+  /// The URL of the image (image from network)
   final String? imageUrl;
+
+  /// The file of the image (image from file)
   final File? imageFile;
 
   /// {@macro chat_error_handler}
   final LMChatErrorHandler? onError;
 
+  /// The style class of this widget, used for customisation
   final LMChatImageStyle? style;
 
-  final VoidCallback? onMediaTap;
+  /// onTap callback for the widget; triggered when tapped
+  final VoidCallback? onTap;
 
   @override
   State<LMChatImage> createState() => _LMImageState();
 
+  /// copyWith function that returns a new instance of LMChatImage
+  /// with the values copied from the old one.
   LMChatImage copyWith({
     String? imageUrl,
     File? imageFile,
@@ -50,7 +58,7 @@ class LMChatImage extends StatefulWidget {
       imageFile: imageFile ?? this.imageFile,
       style: style ?? this.style,
       onError: onError ?? this.onError,
-      onMediaTap: onMediaTap ?? this.onMediaTap,
+      onTap: onMediaTap ?? onTap,
     );
   }
 }
@@ -62,14 +70,15 @@ class _LMImageState extends State<LMChatImage> {
   Widget build(BuildContext context) {
     style = widget.style ?? LMChatTheme.theme.imageStyle;
     return GestureDetector(
-      onTap: () => widget.onMediaTap?.call(),
+      onTap: () => widget.onTap?.call(),
       child: widget.imageUrl != null
           ? Container(
               padding: style?.padding,
               margin: style?.margin,
               decoration: BoxDecoration(
-                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                  color: style?.backgroundColor),
+                borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                color: style?.backgroundColor,
+              ),
               clipBehavior: Clip.hardEdge,
               child: CachedNetworkImage(
                 cacheKey: widget.imageUrl!,
@@ -111,8 +120,8 @@ class _LMImageState extends State<LMChatImage> {
                         ),
                       );
                 },
-                // progressIndicatorBuilder: (context, url, progress) =>
-                //     style!.shimmerWidget ?? const LMPostMediaShimmer(),
+                progressIndicatorBuilder: (context, url, progress) =>
+                    style!.shimmerWidget ?? const SizedBox(),
               ),
             )
           : widget.imageFile != null
@@ -134,21 +143,47 @@ class _LMImageState extends State<LMChatImage> {
   }
 }
 
+/// {@template lm_chat_image_style}
+/// The style class for [LMChatImage]
+///
+/// Provides multiple levels of customisations.
+/// {@endtemplate}
 class LMChatImageStyle {
+  /// Height of the image widget
   final double? height;
+
+  /// Width of the image widget
   final double? width;
+
+  /// Aspect ratio of the image widget
   final double? aspectRatio;
+
+  /// Radius of the border of the image widget
   final BorderRadius? borderRadius;
+
+  /// Color of the border of the image widget
   final Color? borderColor;
+
+  /// Padding of the image widget
   final EdgeInsets? padding;
+
+  /// Margin of the image widget from outside
   final EdgeInsets? margin;
+
+  /// Fit of the container box of the image
+  final BoxFit? boxFit;
+
+  /// Color of the background of the image widget
   final Color? backgroundColor;
 
+  /// Widget to show while the network image loads
   final Widget? loaderWidget;
-  final Widget? errorWidget;
-  final Widget? shimmerWidget;
 
-  final BoxFit? boxFit;
+  /// Widget to show if the network image fails to load
+  final Widget? errorWidget;
+
+  /// Widget to show a shimmer while presenting the image
+  final Widget? shimmerWidget;
 
   const LMChatImageStyle({
     this.height,
