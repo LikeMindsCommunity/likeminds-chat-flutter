@@ -59,7 +59,7 @@ class LMChatMediaService {
 
       return response;
     } on Exception catch (err) {
-      return LMResponse(success: false, errorMessage: err.toString());
+      return LMResponse.error(errorMessage: err.toString());
     }
   }
 }
