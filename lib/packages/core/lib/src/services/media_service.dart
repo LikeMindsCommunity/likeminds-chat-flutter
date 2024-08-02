@@ -33,12 +33,17 @@ class LMChatMediaService {
     return instance._uploadFile(bytes, postUuid, fileName: fileName);
   }
 
-  Future<LMResponse<String>> _uploadFile(Uint8List bytes, String uuid,
-      {String? fileName}) async {
+  Future<LMResponse<String>> _uploadFile(
+    Uint8List bytes,
+    String uuid, {
+    String? fileName,
+    String? chatroomId,
+    String? conversationId,
+  }) async {
     try {
       String url = "https://$_bucketName.s3.$_region.amazonaws.com/";
-      // TODO: Update the folder structure, based on chat structure
-      String folderName = "posts/$uuid";
+      String folderName =
+          "files/collabcard/$chatroomId/conversation/$conversationId/";
       String generateFileName =
           fileName ?? "$uuid-${DateTime.now().millisecondsSinceEpoch}";
       LMResponse<String> response = await LMChatAWSClient.uploadFile(
