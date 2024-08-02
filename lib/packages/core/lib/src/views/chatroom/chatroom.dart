@@ -167,12 +167,21 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               actions = chatroomState.actions;
               return Column(
                 children: [
-                  _screenBuilder.appBarBuilder.call(
-                    context,
-                    chatroom.toChatRoomViewData(),
-                    _defaultAppBar(
-                      chatroom,
-                      chatroomState.participantCount,
+                  BlocListener<LMChatConversationActionBloc,
+                      LMChatConversationActionState>(
+                    bloc: _convActionBloc,
+                    listener: (context, state) {
+                      if (state is LMChatRefreshBarState) {
+                        chatroom = state.chatroom.toChatRoom();
+                      }
+                    },
+                    child: _screenBuilder.appBarBuilder.call(
+                      context,
+                      chatroom.toChatRoomViewData(),
+                      _defaultAppBar(
+                        chatroom,
+                        chatroomState.participantCount,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -360,9 +369,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         ?.firstWhere((element) => element.id == _selectedIds.first);
 
     bool haveDeletePermission = conversationViewData != null &&
-        LMChatMemberRightUtil.checkDeletePermissions(conversationViewData);
+        LMChatMemberRightUtil.checkDeletePermissions(conversationViewData) &&
+        chatroom.chatRequestState != 2;
     bool haveEditPermission =
-        LMChatMemberRightUtil.checkEditPermissions(conversationViewData!);
+        LMChatMemberRightUtil.checkEditPermissions(conversationViewData!) &&
+            chatroom.chatRequestState != 2;
     return [
       // Reply button
       if (_selectedIds.length == 1 && _isRespondingAllowed()) ...[
@@ -566,7 +577,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       ],
       // pop up menu button for report
       if (_selectedIds.length == 1 &&
-          LMChatMemberRightUtil.isReportAllowed(conversationViewData)) ...[
+          LMChatMemberRightUtil.isReportAllowed(conversationViewData) &&
+          chatroom.chatRequestState != 2) ...[
         const SizedBox(width: 8),
         _screenBuilder.moreOptionButton(
           context,
@@ -696,6 +708,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     if (getMemberState?.member?.state != 1 && chatroom.type == 7) {
       return false;
     } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
+      return false;
+    } else if (chatroom.chatRequestState == 2) {
       return false;
     } else {
       return true;
