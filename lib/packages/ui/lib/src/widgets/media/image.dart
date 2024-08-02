@@ -6,7 +6,7 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
-/// {@template chat_image}
+/// {@template lm_chat_image}
 /// A widget to display an image in a post.
 /// The image can be fetched from a URL or from a file.
 /// The [LMChatImage] can be customized by passing in the required parameters
@@ -16,14 +16,14 @@ import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 /// and can be used in a post.
 /// {@endtemplate}
 class LMChatImage extends StatefulWidget {
-  ///{@macro chat_image}
+  ///{@macro lm_chat_image}
   const LMChatImage({
     super.key,
     this.imageUrl,
     this.imageFile,
     this.onError,
     this.style,
-    this.onMediaTap,
+    this.onTap,
   }) : assert(imageUrl != null || imageFile != null);
 
   /// The URL of the image (image from network)
@@ -39,12 +39,12 @@ class LMChatImage extends StatefulWidget {
   final LMChatImageStyle? style;
 
   /// onTap callback for the widget; triggered when tapped
-  final VoidCallback? onMediaTap;
+  final VoidCallback? onTap;
 
   @override
   State<LMChatImage> createState() => _LMImageState();
 
-  /// copyWuth function that returns a new instance of LMChatImage
+  /// copyWith function that returns a new instance of LMChatImage
   /// with the values copied from the old one.
   LMChatImage copyWith({
     String? imageUrl,
@@ -58,7 +58,7 @@ class LMChatImage extends StatefulWidget {
       imageFile: imageFile ?? this.imageFile,
       style: style ?? this.style,
       onError: onError ?? this.onError,
-      onMediaTap: onMediaTap ?? this.onMediaTap,
+      onTap: onMediaTap ?? onTap,
     );
   }
 }
@@ -70,7 +70,7 @@ class _LMImageState extends State<LMChatImage> {
   Widget build(BuildContext context) {
     style = widget.style ?? LMChatTheme.theme.imageStyle;
     return GestureDetector(
-      onTap: () => widget.onMediaTap?.call(),
+      onTap: () => widget.onTap?.call(),
       child: widget.imageUrl != null
           ? Container(
               padding: style?.padding,
