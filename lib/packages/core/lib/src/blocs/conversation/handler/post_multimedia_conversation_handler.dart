@@ -5,7 +5,7 @@ postMultimediaConversationEventHandler(
   LMChatPostMultiMediaConversationEvent event,
   Emitter<LMChatConversationState> emit,
 ) async {
-  final mediaService = LMChatAWSUtility(!isDebug);
+  // final mediaService = LMChatMediaService.instance;
   try {
     DateTime dateTime = DateTime.now();
     User user = LMChatLocalPreference.instance.getUser();
@@ -51,11 +51,11 @@ postMultimediaConversationEventHandler(
         int length = event.mediaFiles.length;
         for (int i = 0; i < length; i++) {
           LMChatMedia media = event.mediaFiles[i];
-          String? url = await mediaService.uploadFile(
-            media.mediaFile!,
-            event.postConversationRequest.chatroomId,
-            postConversationResponse.conversation!.id,
-          );
+          // String? url = await mediaService.uploadFile(
+          //   media.mediaFile!,
+          //   event.postConversationRequest.chatroomId,
+          //   postConversationResponse.conversation!.id,
+          // );
           String? thumbnailUrl;
           if (media.mediaType == LMChatMediaType.video) {
             // If the thumbnail file is not present in media object
@@ -63,11 +63,11 @@ postMultimediaConversationEventHandler(
             if (media.thumbnailFile == null) {
               await getVideoThumbnail(media);
             }
-            thumbnailUrl = await mediaService.uploadFile(
-              media.thumbnailFile!,
-              event.postConversationRequest.chatroomId,
-              postConversationResponse.conversation!.id,
-            );
+            // thumbnailUrl = await mediaService.uploadFile(
+            //   media.thumbnailFile!,
+            //   event.postConversationRequest.chatroomId,
+            //   postConversationResponse.conversation!.id,
+            // );
           }
 
           String attachmentType = mapMediaTypeToString(media.mediaType);
@@ -82,8 +82,7 @@ postMultimediaConversationEventHandler(
                   'number_of_page': media.pageCount,
                 })
                 ..type(attachmentType)
-                ..thumbnailUrl(thumbnailUrl)
-                ..url(url!))
+                ..thumbnailUrl(thumbnailUrl))
               .build();
           LMResponse<PutMediaResponse> uploadFileResponse =
               await LMChatCore.client.putMultimedia(putMediaRequest);

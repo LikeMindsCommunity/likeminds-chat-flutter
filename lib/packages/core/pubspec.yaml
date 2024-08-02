@@ -40,6 +40,8 @@ dependencies:
   custom_pop_up_menu: ^1.2.4
   bloc: ^8.1.4
   meta: ^1.11.0
+  http: ^1.2.2
+  amazon_cognito_identity_dart_2: ^3.6.5
 
 dependency_overrides:
   js: ^0.7.1

@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/aws/aws.dart';
+// import 'package:likeminds_chat_flutter_core/src/services/media_service.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
