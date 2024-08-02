@@ -85,7 +85,7 @@ class LMChatBarHeader extends StatelessWidget {
           BoxDecoration(
               color: themeData.container,
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(12),
+                top: Radius.circular(8),
               )),
       child: Stack(
         alignment: Alignment.topRight,

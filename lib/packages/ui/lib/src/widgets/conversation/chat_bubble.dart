@@ -158,7 +158,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   late LMChatUserViewData conversationUser;
   bool _isSelected = false;
   bool _isDeleted = false;
-  final LMChatThemeData theme = LMChatTheme.theme;
+  final LMChatThemeData _themeData = LMChatTheme.theme;
 
   @override
   void initState() {
@@ -265,7 +265,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     clipper: LMChatBubbleClipper(
                       isSent: isSent,
                     ),
-                    color: inStyle.backgroundColor ?? theme.container,
+                    color: inStyle.backgroundColor ?? _themeData.container,
                     child: Padding(
                       padding: isSent
                           ? EdgeInsets.only(
@@ -292,6 +292,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 LMChatBubbleHeader(
                                   conversationUser: widget.conversationUser,
                                 ),
+                          // link preview widget
+                          _defLinkPreviewWidget(conversation),
                           if (conversation.replyConversationObject != null &&
                               conversation.deletedByUserId == null)
                             LMChatBubbleReply(
@@ -308,7 +310,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   maxLines: 1,
                                   textStyle: TextStyle(
                                     overflow: TextOverflow.ellipsis,
-                                    color: theme.primaryColor,
+                                    color: _themeData.primaryColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -354,6 +356,22 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _defLinkPreviewWidget(LMChatConversationViewData conversation) {
+    // final ogTags = conversation.ogTags;
+    return LMChatLinkPreview(
+      ogTags: (LMChatOGTagsViewDataBuilder()
+          ..title(
+              "Yahoo | Mail, Weather, Search, Politics, News, Finance, Sports & Videos")
+          ..description(
+            "Latest news coverage, email, free stock quotes, live scores and video are just the beginning. Discover more every day at Yahoo!",
+          )
+          ..imageUrl(
+              "https://s.yimg.com/cv/apiv2/social/images/yahoo_default_logo.png")
+          ..url('yahoo.com'))
+        .build(),
     );
   }
 

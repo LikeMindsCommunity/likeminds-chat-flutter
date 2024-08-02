@@ -41,8 +41,6 @@ dependencies:
   bloc: ^8.1.4
   meta: ^1.11.0
 
-dependency_overrides:
-  js: ^0.7.1
 
 dev_dependencies:
   flutter_lints: ^4.0.0

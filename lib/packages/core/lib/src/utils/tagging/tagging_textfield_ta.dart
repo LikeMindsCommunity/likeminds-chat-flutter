@@ -219,7 +219,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
                 border: InputBorder.none,
               ),
           onChanged: ((value) {
-            widget.onChange!(value);
+            widget.onChange?.call(value);
             final int newTagCount = '@'.allMatches(value).length;
             final int completeCount = '~'.allMatches(value).length;
             if (newTagCount == completeCount) {
