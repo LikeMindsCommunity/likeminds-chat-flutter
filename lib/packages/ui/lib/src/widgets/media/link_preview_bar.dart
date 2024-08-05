@@ -3,6 +3,7 @@ import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// {@template chat_link_preview_bar}
 /// A widget to display a link preview bar on top of the chat bar textfield.
@@ -16,6 +17,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
     super.key,
     required this.ogTags,
     this.onCanceled,
+    this.onTap,
   });
 
   /// The [LMChatOGTagsViewData] to be displayed in the link preview bar.
@@ -24,78 +26,99 @@ class LMChatLinkPreviewBar extends StatelessWidget {
   /// The onCanceled function of the link preview bar.
   final VoidCallback? onCanceled;
 
+  /// The onTap function of the link preview bar.
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
     final themeData = LMChatTheme.theme;
-    return Container(
-      width: 80.w,
-      decoration: BoxDecoration(
-        color: themeData.container,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(8),
+    return GestureDetector(
+      onTap: () {
+        if (onTap != null) {
+          onTap!();
+        } else if (ogTags.url != null && ogTags.url!.isNotEmpty) {
+          launchUrl(Uri.parse(ogTags.url!));
+        }
+      },
+      child: Container(
+        width: 80.w,
+        decoration: BoxDecoration(
+          color: themeData.container,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(8),
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+          alignment: Alignment.topRight,
           children: [
-            LMChatImage(
-              imageUrl: ogTags.imageUrl,
-              style: const LMChatImageStyle(
-                height: 80,
-                width: 80,
-                boxFit: BoxFit.fill,
-                margin: EdgeInsets.symmetric(horizontal: 6),
-                errorWidget: LMChatIcon(
-                  type: LMChatIconType.icon,
-                  icon: Icons.link,
-                  style: LMChatIconStyle(
-                    size: 32,
-                  ),
-                ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 8,
+                left: 8,
+                right: 30,
               ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  LMChatText(
-                    ogTags.title ?? "",
-                    style: LMChatTextStyle(
-                      padding: EdgeInsets.symmetric(horizontal: 1.w),
-                      textStyle: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        overflow: TextOverflow.ellipsis,
+                  LMChatImage(
+                    imageUrl: ogTags.imageUrl,
+                    style: const LMChatImageStyle(
+                      height: 80,
+                      width: 80,
+                      boxFit: BoxFit.fill,
+                      margin: EdgeInsets.symmetric(horizontal: 6),
+                      errorWidget: LMChatIcon(
+                        type: LMChatIconType.icon,
+                        icon: Icons.link,
+                        style: LMChatIconStyle(
+                          size: 32,
+                        ),
                       ),
-                      maxLines: 2,
                     ),
                   ),
-                  LMChatText(
-                    ogTags.description ?? "",
-                    style: LMChatTextStyle(
-                      padding: EdgeInsets.symmetric(horizontal: 1.w),
-                      textStyle: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      maxLines: 2,
-                    ),
-                  ),
-                  LMChatText(
-                    ogTags.url ?? "",
-                    style: LMChatTextStyle(
-                      padding: EdgeInsets.symmetric(horizontal: 1.w),
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      maxLines: 1,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LMChatText(
+                          ogTags.title ?? "",
+                          style: LMChatTextStyle(
+                            padding: EdgeInsets.symmetric(horizontal: 1.w),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 2,
+                          ),
+                        ),
+                        LMChatText(
+                          ogTags.description ?? "",
+                          style: LMChatTextStyle(
+                            padding: EdgeInsets.symmetric(horizontal: 1.w),
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w400,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 2,
+                          ),
+                        ),
+                        LMChatText(
+                          ogTags.url ?? "",
+                          style: LMChatTextStyle(
+                            padding: EdgeInsets.symmetric(horizontal: 1.w),
+                            textStyle: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w400,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -114,6 +137,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 padding: EdgeInsets.all(6),
                 borderRadius: 100,
+                margin: EdgeInsets.all(8),
               ),
             ),
           ],

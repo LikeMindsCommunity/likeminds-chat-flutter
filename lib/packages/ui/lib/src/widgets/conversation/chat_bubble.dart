@@ -360,9 +360,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   }
 
   Widget _defLinkPreviewWidget(LMChatConversationViewData conversation) {
-    // final ogTags = conversation.ogTags;
-    return LMChatLinkPreview(
-      ogTags: (LMChatOGTagsViewDataBuilder()
+    final ogTags = conversation.ogTags;
+    (LMChatOGTagsViewDataBuilder()
           ..title(
               "Yahoo | Mail, Weather, Search, Politics, News, Finance, Sports & Videos")
           ..description(
@@ -371,8 +370,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           ..imageUrl(
               "https://s.yimg.com/cv/apiv2/social/images/yahoo_default_logo.png")
           ..url('yahoo.com'))
-        .build(),
-    );
+        .build();
+    return ogTags!=null? LMChatLinkPreview(
+      ogTags: ogTags,
+    ):const SizedBox.shrink();
   }
 
   LMChatText _defDeletedWidget() {

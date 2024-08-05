@@ -41,19 +41,21 @@ class LMChatLinkPreview extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if(ogTags.imageUrl != null && ogTags.imageUrl!.isNotEmpty)
-              LMChatImage(
-                imageUrl: ogTags.imageUrl,
-                style: const LMChatImageStyle(
-                    height: 190,
-                    width: 225,
-                    boxFit: BoxFit.fill,
-                    errorWidget: LMChatIcon(
-                      type: LMChatIconType.icon,
-                      icon: Icons.link,
-                      style: LMChatIconStyle(
-                        size: 32,
-                      ),
-                    )),
+              AbsorbPointer(
+                child: LMChatImage(
+                  imageUrl: ogTags.imageUrl,
+                  style: const LMChatImageStyle(
+                      height: 190,
+                      width: 225,
+                      boxFit: BoxFit.fill,
+                      errorWidget: LMChatIcon(
+                        type: LMChatIconType.icon,
+                        icon: Icons.link,
+                        style: LMChatIconStyle(
+                          size: 32,
+                        ),
+                      )),
+                ),
               ),
               if(ogTags.title != null && ogTags.title!.isNotEmpty)
               LMChatText(
