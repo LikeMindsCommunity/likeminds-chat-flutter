@@ -185,45 +185,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return BlocConsumer<LMChatConversationActionBloc,
         LMChatConversationActionState>(
       bloc: chatActionBloc,
-      listener: (context, state) {
-        if (state is LMChatEditConversationState) {
-          replyToConversation = null;
-          editConversation = state.editConversation;
-          _setupEditText();
-        } else if (state is LMChatEditRemoveState) {
-          editConversation = null;
-          _setupEditText();
-        } else if (state is LMChatReplyConversationState) {
-          editConversation = null;
-          _setupEditText();
-          replyToConversation = state.conversation;
-          _setupReplyText();
-          _focusNode.requestFocus();
-        } else if (state is LMChatReplyRemoveState) {
-          replyToConversation = null;
-          _focusNode.requestFocus();
-        } else if (state is LMChatRefreshBarState) {
-          chatroom = state.chatroom;
-        } else if (state is LMChatLinkAttachedState) {
-          // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
-          if (_isSentBeforeLinkFetched) {
-            _isSentBeforeLinkFetched = false;
-            return;
-          }
-          linkModel = LMChatMediaModel(
-            mediaType: LMMediaType.link,
-            ogTags: state.ogTags,
-            link: state.link,
-          );
-          previewLink = state.link;
-          isActiveLink = true;
-        } else if (state is LMChatLinkRemovedState) {
-          linkModel = null;
-          previewLink = '';
-          isActiveLink = false;
-          showLinkPreview = !state.isPermanentlyRemoved;
-        }
-      },
+      listener: _blocListener,
       builder: (context, state) {
         return Container(
           width: double.infinity,
@@ -252,6 +214,46 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         );
       },
     );
+  }
+
+  void _blocListener(context, state) {
+    if (state is LMChatEditConversationState) {
+      replyToConversation = null;
+      editConversation = state.editConversation;
+      _setupEditText();
+    } else if (state is LMChatEditRemoveState) {
+      editConversation = null;
+      _setupEditText();
+    } else if (state is LMChatReplyConversationState) {
+      editConversation = null;
+      _setupEditText();
+      replyToConversation = state.conversation;
+      _setupReplyText();
+      _focusNode.requestFocus();
+    } else if (state is LMChatReplyRemoveState) {
+      replyToConversation = null;
+      _focusNode.requestFocus();
+    } else if (state is LMChatRefreshBarState) {
+      chatroom = state.chatroom;
+    } else if (state is LMChatLinkAttachedState) {
+      // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
+      if (_isSentBeforeLinkFetched) {
+        _isSentBeforeLinkFetched = false;
+        return;
+      }
+      linkModel = LMChatMediaModel(
+        mediaType: LMMediaType.link,
+        ogTags: state.ogTags,
+        link: state.link,
+      );
+      previewLink = state.link;
+      isActiveLink = true;
+    } else if (state is LMChatLinkRemovedState) {
+      linkModel = null;
+      previewLink = '';
+      isActiveLink = false;
+      showLinkPreview = !state.isPermanentlyRemoved;
+    }
   }
 
   Widget _defDisabledTextField(BuildContext context) {
