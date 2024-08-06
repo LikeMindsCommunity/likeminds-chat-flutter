@@ -57,19 +57,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatRoomViewData? chatroom;
   String _textFieldValue = '';
   String previewLink = '';
-  LMChatMediaModel? mediaModel = LMChatMediaModel(
-    mediaType: LMMediaType.link,
-    ogTags: (LMChatOGTagsViewDataBuilder()
-          ..title(
-              "Yahoo | Mail, Weather, Search, Politics, News, Finance, Sports & Videos")
-          ..description(
-            "Latest news coverage, email, free stock quotes, live scores and video are just the beginning. Discover more every day at Yahoo!",
-          )
-          ..imageUrl(
-              "https://s.yimg.com/cv/apiv2/social/images/yahoo_default_logo.png")
-          ..url(''))
-        .build(),
-  );
   LMChatMediaModel? linkModel;
   // if set to false link preview should not be displayed
   bool showLinkPreview = true;
@@ -314,7 +301,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
             replyToConversation == null &&
             editConversation == null &&
             !_isSentBeforeLinkFetched)
-          _defLinkPreview(linkModel!.ogTags!),
+          _screenBuilder.linkPreviewBar(
+            context,
+            _defLinkPreview(linkModel!.ogTags!),
+          ),
         Container(
           width: 80.w,
           constraints: BoxConstraints(
@@ -554,9 +544,13 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
-  Widget _defLinkPreview(LMChatOGTagsViewData ogTags) {
+  LMChatLinkPreviewBar _defLinkPreview(LMChatOGTagsViewData ogTags) {
     return LMChatLinkPreviewBar(
       ogTags: ogTags,
+      style: LMChatLinkPreviewBarStyle.basic(
+        inActiveColor: _themeData.inActiveColor,
+        containerColor: _themeData.onContainer,
+      ),
       onCanceled: () {
         chatActionBloc.add(
           LMChatLinkPreviewRemovedEvent(

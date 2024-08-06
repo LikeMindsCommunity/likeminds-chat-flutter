@@ -144,3 +144,42 @@ typedef LMChatUserTileBuilder = Widget Function(
   LMChatUserViewData user,
   LMChatUserTile oldUserTile,
 );
+
+/// {@template lm_chat_image_builder}
+/// The image builder function for the chat screen.
+/// This function is called to build the image for the chat screen.
+/// The [LMChatImageBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatImage] oldImage: The old image.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatImageBuilder = Widget Function(
+  BuildContext context,
+  LMChatImage oldImage,
+);
+
+/// {@template lm_chat_text_builder}
+/// The text builder function for the chat screen.
+/// This function is called to build the text for the chat screen.
+/// The [LMChatTextBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatText] oldText: The old text.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatTextBuilder = Widget Function(
+  BuildContext context,
+  LMChatText oldText,
+);
+
+/// {@template lm_chat_icon_builder}
+/// The icon builder function for the chat screen.
+/// This function is called to build the icon for the chat screen.
+/// The [LMChatIconBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatIcon] oldIcon: The old icon.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatIconBuilder = Widget Function(
+  BuildContext context,
+  LMChatIcon oldIcon,
+);

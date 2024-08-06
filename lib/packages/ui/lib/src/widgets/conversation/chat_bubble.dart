@@ -78,6 +78,11 @@ class LMChatBubble extends StatefulWidget {
   final Widget Function(BuildContext context, LMChatText text)?
       deletedTextBuilder;
 
+  /// The Link Preview widget builder.
+  final Widget Function(
+          LMChatOGTagsViewData ogTags, LMChatLinkPreview oldLinkPreviewWidget)?
+      linkPreviewBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -100,6 +105,7 @@ class LMChatBubble extends StatefulWidget {
     this.headerBuilder,
     this.footerBuilder,
     this.deletedTextBuilder,
+    this.linkPreviewBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -125,6 +131,9 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(BuildContext context, LMChatBubbleFooter footer)?
         footerBuilder,
     Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
+    Widget Function(LMChatOGTagsViewData ogTags,
+            LMChatLinkPreview oldLinkPreviewWidget)?
+        linkPreviewBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -144,6 +153,7 @@ class LMChatBubble extends StatefulWidget {
       headerBuilder: headerBuilder ?? this.headerBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
+      linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
     );
   }
 
@@ -293,7 +303,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   conversationUser: widget.conversationUser,
                                 ),
                           // link preview widget
-                          _defLinkPreviewWidget(conversation),
+                          if (conversation.ogTags != null)
+                            widget.linkPreviewBuilder?.call(
+                                  conversation.ogTags!,
+                                  _defLinkPreviewWidget(conversation.ogTags!),
+                                ) ??
+                                _defLinkPreviewWidget(conversation.ogTags!),
                           if (conversation.replyConversationObject != null &&
                               conversation.deletedByUserId == null)
                             LMChatBubbleReply(
@@ -359,21 +374,15 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     );
   }
 
-  Widget _defLinkPreviewWidget(LMChatConversationViewData conversation) {
-    final ogTags = conversation.ogTags;
-    (LMChatOGTagsViewDataBuilder()
-          ..title(
-              "Yahoo | Mail, Weather, Search, Politics, News, Finance, Sports & Videos")
-          ..description(
-            "Latest news coverage, email, free stock quotes, live scores and video are just the beginning. Discover more every day at Yahoo!",
-          )
-          ..imageUrl(
-              "https://s.yimg.com/cv/apiv2/social/images/yahoo_default_logo.png")
-          ..url('yahoo.com'))
-        .build();
-    return ogTags!=null? LMChatLinkPreview(
+  LMChatLinkPreview _defLinkPreviewWidget(LMChatOGTagsViewData ogTags) {
+    return LMChatLinkPreview(
       ogTags: ogTags,
-    ):const SizedBox.shrink();
+      style: widget.style?.linkPreviewStyle ??
+          LMChatLinkPreviewStyle.basic(
+            inactiveColor: _themeData.inActiveColor,
+            containerColor: _themeData.onContainer,
+          ),
+    );
   }
 
   LMChatText _defDeletedWidget() {
@@ -419,6 +428,7 @@ class LMChatBubbleStyle {
   final bool? showFooter;
   final bool? showSides;
   final bool? showAvatar;
+  final LMChatLinkPreviewStyle? linkPreviewStyle;
 
   LMChatBubbleStyle({
     this.backgroundColor,
@@ -435,6 +445,7 @@ class LMChatBubbleStyle {
     this.showFooter,
     this.showHeader,
     this.showSides,
+    this.linkPreviewStyle,
   });
 
   LMChatBubbleStyle copyWith({
@@ -452,6 +463,7 @@ class LMChatBubbleStyle {
     bool? showAvatar,
     bool? showHeader,
     bool? showFooter,
+    LMChatLinkPreviewStyle? linkPreviewStyle,
   }) {
     return LMChatBubbleStyle(
       width: width ?? this.width,
@@ -468,6 +480,7 @@ class LMChatBubbleStyle {
       showFooter: showFooter ?? this.showFooter,
       showHeader: showHeader ?? this.showHeader,
       showSides: showSides ?? this.showSides,
+      linkPreviewStyle: linkPreviewStyle ?? this.linkPreviewStyle,
     );
   }
 
