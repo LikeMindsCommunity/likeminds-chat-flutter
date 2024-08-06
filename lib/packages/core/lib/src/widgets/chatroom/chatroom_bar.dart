@@ -40,7 +40,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatConversationBloc conversationBloc = LMChatConversationBloc.instance;
   FilePicker filePicker = FilePicker.platform;
   LMChatConversationViewData? replyToConversation;
-  List<LMChatMedia>? replyConversationAttachments;
+  List<LMChatMediaModel>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
   final CustomPopupMenuController _popupMenuController =
       CustomPopupMenuController();
@@ -114,8 +114,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       if (response.success == true) {
         OgTags? responseTags = response.data!.ogTags;
         linkModel = LMChatMediaModel(
-          mediaType: LMMediaType.link,
-          link: previewLink,
+          mediaType: LMChatMediaType.link,
+          mediaUrl: previewLink,
           ogTags: responseTags?.toLMChatOGTagViewData(),
         );
         LMAnalytics.get().track(
@@ -433,12 +433,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                     ..text(result!)
                     ..replyId(replyToConversation?.id)
                     ..ogTags(linkModel!.ogTags!.toOGTag())
-                    ..shareLink(linkModel!.link!))
+                    ..shareLink(linkModel!.mediaUrl!))
                   .build(),
               [
-                LMChatMedia(
+                LMChatMediaModel(
                   mediaType: LMChatMediaType.link,
-                  ogTags: linkModel!.ogTags?.toOGTag(),
+                  ogTags: linkModel!.ogTags,
                 ),
               ],
             ),

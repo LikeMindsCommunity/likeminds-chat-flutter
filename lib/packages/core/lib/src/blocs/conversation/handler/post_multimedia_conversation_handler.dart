@@ -47,10 +47,10 @@ postMultimediaConversationEventHandler(
           ),
         );
       } else {
-        List<LMChatMedia> fileLink = [];
+        List<LMChatMediaModel> fileLink = [];
         int length = event.mediaFiles.length;
         for (int i = 0; i < length; i++) {
-          LMChatMedia media = event.mediaFiles[i];
+          LMChatMediaModel media = event.mediaFiles[i];
           // String? url = await mediaService.uploadFile(
           //   media.mediaFile!,
           //   event.postConversationRequest.chatroomId,
