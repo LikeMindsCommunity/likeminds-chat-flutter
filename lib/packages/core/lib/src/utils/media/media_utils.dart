@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,12 +7,31 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
-enum LMChatMediaType { photo, video, document, audio, gif, voiceNote, link }
+const List<String> videoExtentions = [
+  'mp4',
+  'mov',
+  'wmv',
+  'avi',
+  'mkv',
+  'flv',
+];
+
+const List<String> photoExtentions = [
+  'jpg',
+  'jpeg',
+  'png',
+];
+
+const List<String> mediaExtentions = [
+  ...photoExtentions,
+  ...videoExtentions,
+];
 
 String mapMediaTypeToString(LMChatMediaType mediaType) {
   switch (mediaType) {
-    case LMChatMediaType.photo:
+    case LMChatMediaType.image:
       return kAttachmentTypeImage;
     case LMChatMediaType.video:
       return kAttachmentTypeVideo;
@@ -33,7 +53,7 @@ String mapMediaTypeToString(LMChatMediaType mediaType) {
 LMChatMediaType mapStringToMediaType(String mediaType) {
   switch (mediaType) {
     case kAttachmentTypeImage:
-      return LMChatMediaType.photo;
+      return LMChatMediaType.image;
     case kAttachmentTypeVideo:
       return LMChatMediaType.video;
     case kAttachmentTypePDF:
@@ -47,44 +67,214 @@ LMChatMediaType mapStringToMediaType(String mediaType) {
     case 'link':
       return LMChatMediaType.link;
     default:
-      return LMChatMediaType.photo;
+      return LMChatMediaType.image;
   }
 }
 
-class LMChatMedia {
-  File? mediaFile;
-  LMChatMediaType mediaType;
-  String? mediaUrl;
-  int? width;
-  int? height;
-  String? thumbnailUrl;
-  File? thumbnailFile;
-  int? pageCount;
-  int? size; // In bytes
-  OgTags? ogTags;
+Widget getChatItemAttachmentTile(
+    List<LMChatMediaModel> mediaFiles, Conversation conversation) {
+  String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
+          withTilde: false) ??
+      '';
+  if (mediaFiles.isEmpty && conversation.answer.isEmpty) {
+    return const SizedBox();
+  } else if (mediaFiles.isEmpty) {
+    return LMChatText(
+      answerText,
+      style: const LMChatTextStyle(
+        maxLines: 1,
+        textStyle: TextStyle(
+          overflow: TextOverflow.ellipsis,
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
+    );
+  } else {
+    IconData iconData = Icons.camera_alt;
+    String text = '';
+    if (mediaFiles.first.mediaType == LMChatMediaType.document) {
+      iconData = Icons.insert_drive_file;
+      if (conversation.answer.isEmpty) {
+        text = mediaFiles.length > 1 ? "Documents" : "Document";
+      } else {
+        text = answerText;
+      }
+    } else {
+      int videoCount = 0;
+      int imageCount = 0;
+      for (LMChatMediaModel media in mediaFiles) {
+        if (media.mediaType == LMChatMediaType.video) {
+          videoCount++;
+        } else {
+          imageCount++;
+        }
+      }
+      if (videoCount != 0 && imageCount != 0) {
+        return Row(
+          children: <Widget>[
+            LMChatText(
+              videoCount.toString(),
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            LMChatDefaultTheme.kHorizontalPaddingSmall,
+            const LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.video_camera_back,
+              style: LMChatIconStyle(
+                color: LMChatDefaultTheme.greyColor,
+                size: 16,
+              ),
+            ),
+            LMChatDefaultTheme.kHorizontalPaddingMedium,
+            LMChatText(
+              imageCount.toString(),
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            LMChatDefaultTheme.kHorizontalPaddingSmall,
+            const LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.image,
+              style: LMChatIconStyle(
+                color: LMChatDefaultTheme.greyColor,
+                size: 16,
+              ),
+            ),
+            LMChatDefaultTheme.kHorizontalPaddingSmall,
+            Expanded(
+              child: LMChatText(
+                answerText,
+                style: const LMChatTextStyle(
+                  maxLines: 1,
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            )
+          ],
+        );
+      } else if (videoCount == 0) {
+        iconData = Icons.image;
+        if (conversation.answer.isEmpty) {
+          text = mediaFiles.length > 1 ? "Images" : "Image";
+        } else {
+          text = answerText;
+        }
+      } else if (imageCount == 0) {
+        iconData = Icons.video_camera_back;
+        if (conversation.answer.isEmpty) {
+          text = mediaFiles.length > 1 ? "Videos" : "Video";
+        } else {
+          text = answerText;
+        }
+      }
+    }
+    return Row(
+      children: <Widget>[
+        mediaFiles.length > 1
+            ? LMChatText(
+                '${mediaFiles.length}',
+                style: const LMChatTextStyle(
+                  maxLines: 1,
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
+            : const SizedBox(),
+        mediaFiles.length > 1
+            ? LMChatDefaultTheme.kHorizontalPaddingSmall
+            : const SizedBox(),
+        LMChatIcon(
+          type: LMChatIconType.icon,
+          icon: iconData,
+          style: const LMChatIconStyle(
+            color: LMChatDefaultTheme.greyColor,
+            size: 16,
+            boxSize: 16,
+          ),
+        ),
+        LMChatDefaultTheme.kHorizontalPaddingSmall,
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-  LMChatMedia({
-    this.mediaFile,
-    required this.mediaType,
-    this.mediaUrl,
-    this.height,
-    this.pageCount,
-    this.size,
-    this.thumbnailFile,
-    this.thumbnailUrl,
-    this.width,
-    this.ogTags,
+Widget getDocumentDetails(LMChatMediaModel document) {
+  return SizedBox(
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '●'} ${getFileSizeString(bytes: document.size!)} ● PDF',
+          style: const TextStyle(
+            color: LMChatDefaultTheme.whiteColor,
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
+  String? thumbnailPath = await VideoThumbnail.thumbnailFile(
+    video: media.mediaFile!.path,
+    imageFormat: ImageFormat.JPEG,
+    maxWidth: 300,
+    quality: 50,
+    timeMs: 100,
+  ).onError((error, stackTrace) {
+    debugPrint(error.toString());
+    return null;
   });
 
-  static LMChatMedia fromJson(dynamic json) => LMChatMedia(
-      mediaType: mapStringToMediaType(json['type']),
-      height: json['height'] as int?,
-      mediaUrl: json['url'] ?? json['file_url'],
-      size: json['meta']?['size'],
-      width: json['width'] as int?,
-      thumbnailUrl: json['thumbnail_url'] as String?,
-      pageCount: json['meta']?['number_of_page'] as int?,
-      ogTags: OgTags.fromEntity(OgTagsEntity.fromJson(json['og_tags'] ?? {})));
+  File? thumbnailFile;
+  thumbnailFile = File(thumbnailPath!);
+  ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
+  media.width = image.width;
+  media.height = image.height;
+  media.thumbnailFile ??= thumbnailFile;
+
+  return thumbnailFile;
+}
+
+LMChatMediaType getMediaTypeFromExtention(String extention) {
+  if (videoExtentions.contains(extention)) {
+    return LMChatMediaType.video;
+  } else {
+    return LMChatMediaType.image;
+  }
 }
 
 Widget mediaErrorWidget({bool isPP = false}) {
@@ -152,7 +342,7 @@ double getFileSizeInDouble(int bytes) {
   return (bytes / pow(1000, 2));
 }
 
-Widget getChatBubbleImage(LMChatMedia mediaFile,
+Widget getChatBubbleImage(LMChatMediaModel mediaFile,
     {double? width, double? height}) {
   return Container(
     height: height,
@@ -164,7 +354,7 @@ Widget getChatBubbleImage(LMChatMedia mediaFile,
     child: Stack(
       children: [
         CachedNetworkImage(
-          imageUrl: mediaFile.mediaType == LMChatMediaType.photo
+          imageUrl: mediaFile.mediaType == LMChatMediaType.image
               ? mediaFile.mediaUrl ?? ''
               : mediaFile.thumbnailUrl ?? '',
           fit: BoxFit.cover,
@@ -196,7 +386,7 @@ Widget getChatBubbleImage(LMChatMedia mediaFile,
   );
 }
 
-Widget getFileImageTile(LMChatMedia mediaFile,
+Widget getFileImageTile(LMChatMediaModel mediaFile,
     {double? width, double? height}) {
   if (mediaFile.mediaFile == null && mediaFile.thumbnailFile == null) {
     return mediaErrorWidget();
@@ -211,7 +401,7 @@ Widget getFileImageTile(LMChatMedia mediaFile,
     child: Stack(
       children: [
         Image.file(
-          mediaFile.mediaType == LMChatMediaType.photo
+          mediaFile.mediaType == LMChatMediaType.image
               ? mediaFile.mediaFile!
               : mediaFile.thumbnailFile!,
           fit: BoxFit.cover,
@@ -242,7 +432,8 @@ Widget getFileImageTile(LMChatMedia mediaFile,
   );
 }
 
-Widget getImageFileMessage(BuildContext context, List<LMChatMedia> mediaFiles) {
+Widget getImageFileMessage(
+    BuildContext context, List<LMChatMediaModel> mediaFiles) {
   if (mediaFiles.length == 1) {
     return GestureDetector(
       child: getFileImageTile(
