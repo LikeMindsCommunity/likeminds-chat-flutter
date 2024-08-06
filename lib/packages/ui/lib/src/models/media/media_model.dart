@@ -2,38 +2,54 @@ import 'dart:io';
 
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 
-enum LMMediaType { video, image, document, link }
+enum LMChatMediaType {
+  video,
+  image,
+  document,
+  link,
+  audio,
+  gif,
+  voiceNote,
+}
 
 class LMChatMediaModel {
-  // defines the type of media
-  LMMediaType mediaType;
-  // one of mediaFile or link must be provided
-  File? mediaFile; // Photo Video or Document File
-  String? link; // Photo Video, Document or Link Preview URL
-  int? duration; // required for video url
-  String? format; // required for documents
-  int? size; // required for documents
-  LMChatOGTagsViewData? ogTags; // required for links (attachment type 4)
+  File? mediaFile;
+  LMChatMediaType mediaType;
+  String? mediaUrl;
+  int? width;
+  int? height;
+  String? thumbnailUrl;
+  File? thumbnailFile;
+  int? pageCount;
+  int? size; // In bytes
+  double? duration;
+  LMChatOGTagsViewData? ogTags;
+  Map<String, dynamic>? meta;
 
   LMChatMediaModel({
-    required this.mediaType,
     this.mediaFile,
-    this.link,
-    this.duration,
-    this.format,
+    required this.mediaType,
+    this.mediaUrl,
+    this.height,
+    this.pageCount,
     this.size,
+    this.thumbnailFile,
+    this.thumbnailUrl,
+    this.width,
+    this.duration,
     this.ogTags,
+    this.meta,
   });
 
   // convert
   int mapMediaTypeToInt() {
-    if (mediaType == LMMediaType.image) {
+    if (mediaType == LMChatMediaType.image) {
       return 1;
-    } else if (mediaType == LMMediaType.video) {
+    } else if (mediaType == LMChatMediaType.video) {
       return 2;
-    } else if (mediaType == LMMediaType.document) {
+    } else if (mediaType == LMChatMediaType.document) {
       return 3;
-    } else if (mediaType == LMMediaType.link) {
+    } else if (mediaType == LMChatMediaType.link) {
       return 4;
     } else {
       throw 'no valid media type provided';
@@ -41,15 +57,15 @@ class LMChatMediaModel {
   }
 }
 
-LMMediaType mapIntToMediaType(int attachmentType) {
+LMChatMediaType mapIntToMediaType(int attachmentType) {
   if (attachmentType == 1) {
-    return LMMediaType.image;
+    return LMChatMediaType.image;
   } else if (attachmentType == 2) {
-    return LMMediaType.video;
+    return LMChatMediaType.video;
   } else if (attachmentType == 3) {
-    return LMMediaType.document;
+    return LMChatMediaType.document;
   } else if (attachmentType == 4) {
-    return LMMediaType.link;
+    return LMChatMediaType.link;
   } else {
     throw 'no valid media type provided';
   }
