@@ -75,6 +75,7 @@ class LMChatMediaHandler {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
+      compressionQuality: 0,
     );
     const double sizeLimit = 5;
 
