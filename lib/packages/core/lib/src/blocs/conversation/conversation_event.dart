@@ -96,7 +96,7 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
 /// Event responsible for creating and posting a multimedia conversation
 class LMChatPostMultiMediaConversationEvent extends LMChatConversationEvent {
   final PostConversationRequest postConversationRequest;
-  final List<LMChatMedia> mediaFiles;
+  final List<LMChatMediaModel> mediaFiles;
 
   /// Creates and returns a new instance of [LMChatPostMultiMediaConversationEvent]
   LMChatPostMultiMediaConversationEvent(
