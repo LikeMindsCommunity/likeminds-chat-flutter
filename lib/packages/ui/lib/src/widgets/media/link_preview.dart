@@ -244,8 +244,8 @@ class LMChatLinkPreviewStyle {
   /// Creates a new instance of LMChatLinkPreviewStyle with the default values.
   /// {@macro chat_link_preview_style}
   factory LMChatLinkPreviewStyle.basic({
-    required Color? inactiveColor,
-    required Color? containerColor,
+    Color? inactiveColor,
+    Color? containerColor,
   }) {
     return LMChatLinkPreviewStyle(
       decoration: BoxDecoration(
