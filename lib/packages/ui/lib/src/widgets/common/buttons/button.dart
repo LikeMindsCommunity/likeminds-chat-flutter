@@ -30,7 +30,7 @@ class LMChatButton extends StatefulWidget {
   final LMChatIcon? icon;
 
   /// Action to perform after tapping on the button
-  final Function() onTap;
+  final VoidCallback? onTap;
 
   /// Text to be displayed in the button if the button is active
   final LMChatText? activeText;
@@ -84,7 +84,7 @@ class _LMButtonState extends State<LMChatButton> {
         setState(() {
           _active = !_active;
         });
-        widget.onTap();
+        widget.onTap?.call();
       },
       behavior: HitTestBehavior.opaque,
       child: Container(

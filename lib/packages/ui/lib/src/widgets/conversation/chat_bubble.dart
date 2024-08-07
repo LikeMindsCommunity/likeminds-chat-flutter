@@ -78,6 +78,11 @@ class LMChatBubble extends StatefulWidget {
   final Widget Function(BuildContext context, LMChatText text)?
       deletedTextBuilder;
 
+  /// The Link Preview widget builder.
+  final Widget Function(
+          LMChatOGTagsViewData ogTags, LMChatLinkPreview oldLinkPreviewWidget)?
+      linkPreviewBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -100,6 +105,7 @@ class LMChatBubble extends StatefulWidget {
     this.headerBuilder,
     this.footerBuilder,
     this.deletedTextBuilder,
+    this.linkPreviewBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -125,6 +131,9 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(BuildContext context, LMChatBubbleFooter footer)?
         footerBuilder,
     Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
+    Widget Function(LMChatOGTagsViewData ogTags,
+            LMChatLinkPreview oldLinkPreviewWidget)?
+        linkPreviewBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -144,6 +153,7 @@ class LMChatBubble extends StatefulWidget {
       headerBuilder: headerBuilder ?? this.headerBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
+      linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
     );
   }
 
@@ -158,7 +168,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   late LMChatUserViewData conversationUser;
   bool _isSelected = false;
   bool _isDeleted = false;
-  final LMChatThemeData theme = LMChatTheme.theme;
+  final LMChatThemeData _themeData = LMChatTheme.theme;
 
   @override
   void initState() {
@@ -265,7 +275,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     clipper: LMChatBubbleClipper(
                       isSent: isSent,
                     ),
-                    color: inStyle.backgroundColor ?? theme.container,
+                    color: inStyle.backgroundColor ?? _themeData.container,
                     child: Padding(
                       padding: isSent
                           ? EdgeInsets.only(
@@ -292,6 +302,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 LMChatBubbleHeader(
                                   conversationUser: widget.conversationUser,
                                 ),
+                          // link preview widget
+                          if (conversation.ogTags != null)
+                            widget.linkPreviewBuilder?.call(
+                                  conversation.ogTags!,
+                                  _defLinkPreviewWidget(conversation.ogTags!),
+                                ) ??
+                                _defLinkPreviewWidget(conversation.ogTags!),
                           if (conversation.replyConversationObject != null &&
                               conversation.deletedByUserId == null)
                             LMChatBubbleReply(
@@ -308,7 +325,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   maxLines: 1,
                                   textStyle: TextStyle(
                                     overflow: TextOverflow.ellipsis,
-                                    color: theme.primaryColor,
+                                    color: _themeData.primaryColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -357,6 +374,17 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     );
   }
 
+  LMChatLinkPreview _defLinkPreviewWidget(LMChatOGTagsViewData ogTags) {
+    return LMChatLinkPreview(
+      ogTags: ogTags,
+      style: widget.style?.linkPreviewStyle ??
+          LMChatLinkPreviewStyle.basic(
+            inactiveColor: _themeData.inActiveColor,
+            containerColor: _themeData.onContainer,
+          ),
+    );
+  }
+
   LMChatText _defDeletedWidget() {
     return LMChatText(
       _getDeletedText(),
@@ -400,6 +428,7 @@ class LMChatBubbleStyle {
   final bool? showFooter;
   final bool? showSides;
   final bool? showAvatar;
+  final LMChatLinkPreviewStyle? linkPreviewStyle;
 
   LMChatBubbleStyle({
     this.backgroundColor,
@@ -416,6 +445,7 @@ class LMChatBubbleStyle {
     this.showFooter,
     this.showHeader,
     this.showSides,
+    this.linkPreviewStyle,
   });
 
   LMChatBubbleStyle copyWith({
@@ -433,6 +463,7 @@ class LMChatBubbleStyle {
     bool? showAvatar,
     bool? showHeader,
     bool? showFooter,
+    LMChatLinkPreviewStyle? linkPreviewStyle,
   }) {
     return LMChatBubbleStyle(
       width: width ?? this.width,
@@ -449,6 +480,7 @@ class LMChatBubbleStyle {
       showFooter: showFooter ?? this.showFooter,
       showHeader: showHeader ?? this.showHeader,
       showSides: showSides ?? this.showSides,
+      linkPreviewStyle: linkPreviewStyle ?? this.linkPreviewStyle,
     );
   }
 

@@ -4,7 +4,12 @@ part of 'conversation_action_bloc.dart';
 @immutable
 abstract class LMChatConversationActionEvent extends Equatable {}
 
-///{@macro lm_chat_edit_conversation_event}  is used to edit a conversation.
+///{@template lm_chat_edit_conversation_event}
+/// [LMChatEditConversationEvent] is used to edit a conversation.
+/// It extends [LMChatConversationActionEvent] and has the following properties:
+/// - [EditConversationRequest] editConversationRequest is the request to edit a conversation.
+/// - [Conversation] replyConversation is the conversation to be replied.
+/// {@endtemplate}
 class LMChatEditConversationEvent extends LMChatConversationActionEvent {
   /// [EditConversationRequest] editConversationRequest is the request to edit a conversation.
   final EditConversationRequest editConversationRequest;
@@ -22,7 +27,13 @@ class LMChatEditConversationEvent extends LMChatConversationActionEvent {
       ];
 }
 
-/// {@macro lm_chat_editing_conversation_event} is used to emit an editing conversation state.
+/// {@template lm_chat_editing_conversation_event}
+/// [LMChatEditingConversationEvent] is used to edit a conversation.
+/// It extends [LMChatConversationActionEvent] and has the following properties:
+/// - [int] conversationId is the id of the conversation to be edited.
+/// - [int] chatroomId is the id of the chatroom.
+/// - [LMChatConversationViewData] editConversation is the conversation to be edited.
+/// {@endtemplate}
 class LMChatEditingConversationEvent extends LMChatConversationActionEvent {
   /// [int] conversationId is the id of the conversation to be edited.
   final int conversationId;
@@ -48,7 +59,7 @@ class LMChatEditingConversationEvent extends LMChatConversationActionEvent {
       ];
 }
 
-/// {@macro lm_chat_edit_remove_event} is used to remove the editing state.
+/// 
 class LMChatEditRemoveEvent extends LMChatConversationActionEvent {
   @override
   List<Object> get props => [];
@@ -109,6 +120,8 @@ class LMChatReplyRemoveEvent extends LMChatConversationActionEvent {
   List<Object> get props => [time];
 }
 
+/// {@templete lm_chat_refresh_bar_event} is used to refresh the chatroom bar.}
+/// 
 class LMChatRefreshBarEvent extends LMChatConversationActionEvent {
   final LMChatRoomViewData chatroom;
 
@@ -118,4 +131,28 @@ class LMChatRefreshBarEvent extends LMChatConversationActionEvent {
 
   @override
   List<Object> get props => [chatroom];
+}
+
+class LMChatConversationTextChangeEvent extends LMChatConversationActionEvent {
+  final String text;
+  final String previousLink;
+
+  LMChatConversationTextChangeEvent({
+    required this.text,
+    required this.previousLink,
+  });
+
+  @override
+  List<Object> get props => [text, previousLink];
+}
+
+class LMChatLinkPreviewRemovedEvent extends LMChatConversationActionEvent {
+  final bool isPermanentlyRemoved;
+   LMChatLinkPreviewRemovedEvent({
+    this.isPermanentlyRemoved = false,
+  });
+  @override
+  List<Object> get props => [
+    isPermanentlyRemoved,
+  ];
 }
