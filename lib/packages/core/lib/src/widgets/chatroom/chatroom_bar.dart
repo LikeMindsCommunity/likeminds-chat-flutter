@@ -230,7 +230,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
@@ -326,10 +326,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               horizontal: 12,
               vertical: 2,
             ),
-            child: _screenBuilder.chatroomTextField(
-              context,
-              _textEditingController,
-              _defInnerTextField(context),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _screenBuilder.chatroomTextField(
+                    context,
+                    _textEditingController,
+                    _defInnerTextField(context),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                _defAttachmentButton(),
+              ],
             ),
           ),
         ),
@@ -392,6 +401,140 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         ),
       ),
     );
+  }
+
+  Widget _defAttachmentButton() {
+    return _isRespondingAllowed()
+        ? CustomPopupMenu(
+            controller: _popupMenuController,
+            enablePassEvent: false,
+            arrowColor: Colors.white,
+            showArrow: false,
+            menuBuilder: () => Container(
+              margin: EdgeInsets.only(bottom: 1.h),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 100.w,
+                  // height: ,
+                  color: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 6.w,
+                      horizontal: 5.w,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(width: 12.w),
+                            LMChatButton(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        LMChatMediaForwardingScreen(
+                                      chatroomId: widget.chatroom.id,
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: LMChatIcon(
+                                type: LMChatIconType.icon,
+                                icon: Icons.camera,
+                                style: LMChatIconStyle(
+                                  color: LMChatTheme.theme.container,
+                                  size: 32,
+                                ),
+                              ),
+                              style: const LMChatButtonStyle(
+                                height: 48,
+                                width: 48,
+                                borderRadius: 24,
+                                backgroundColor:
+                                    Color.fromRGBO(229, 162, 86, 1),
+                              ),
+                              text: LMChatText(
+                                'Camera',
+                                style: LMChatTextStyle(
+                                  textStyle:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ),
+                            LMChatButton(
+                              onTap: () {},
+                              icon: LMChatIcon(
+                                type: LMChatIconType.icon,
+                                icon: Icons.camera,
+                                style: LMChatIconStyle(
+                                  color: LMChatTheme.theme.container,
+                                  size: 32,
+                                ),
+                              ),
+                              style: const LMChatButtonStyle(
+                                height: 48,
+                                width: 48,
+                                borderRadius: 24,
+                                backgroundColor:
+                                    Color.fromRGBO(229, 162, 86, 1),
+                              ),
+                              text: LMChatText(
+                                'Camera',
+                                style: LMChatTextStyle(
+                                  textStyle:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ),
+                            LMChatButton(
+                              onTap: () {},
+                              icon: LMChatIcon(
+                                type: LMChatIconType.icon,
+                                icon: Icons.camera,
+                                style: LMChatIconStyle(
+                                  color: LMChatTheme.theme.container,
+                                  size: 32,
+                                ),
+                              ),
+                              style: const LMChatButtonStyle(
+                                height: 48,
+                                width: 48,
+                                borderRadius: 24,
+                                backgroundColor:
+                                    Color.fromRGBO(229, 162, 86, 1),
+                              ),
+                              text: LMChatText(
+                                'Camera',
+                                style: LMChatTextStyle(
+                                  textStyle:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            pressType: PressType.singleClick,
+            child: LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.attachment,
+              style: LMChatIconStyle(
+                size: 24,
+                boxSize: 32,
+                color: LMChatTheme.theme.inActiveColor,
+              ),
+            ),
+          )
+        : const SizedBox();
   }
 
   void _onSend() {

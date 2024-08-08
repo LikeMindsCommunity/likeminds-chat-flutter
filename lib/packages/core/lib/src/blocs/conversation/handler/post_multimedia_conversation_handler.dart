@@ -51,56 +51,67 @@ postMultimediaConversationEventHandler(
         int length = event.mediaFiles.length;
         for (int i = 0; i < length; i++) {
           LMChatMediaModel media = event.mediaFiles[i];
-          // String? url = await mediaService.uploadFile(
-          //   media.mediaFile!,
-          //   event.postConversationRequest.chatroomId,
-          //   postConversationResponse.conversation!.id,
-          // );
-          String? thumbnailUrl;
-          if (media.mediaType == LMChatMediaType.video) {
-            // If the thumbnail file is not present in media object
-            // then generate the thumbnail and upload it to the server
-            if (media.thumbnailFile == null) {
-              await getVideoThumbnail(media);
-            }
-            // thumbnailUrl = await mediaService.uploadFile(
-            //   media.thumbnailFile!,
-            //   event.postConversationRequest.chatroomId,
-            //   postConversationResponse.conversation!.id,
-            // );
-          }
 
-          String attachmentType = mapMediaTypeToString(media.mediaType);
-          PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
-                ..conversationId(postConversationResponse.conversation!.id)
-                ..filesCount(length)
-                ..index(i)
-                ..height(media.height)
-                ..width(media.width)
-                ..meta({
-                  'size': media.size,
-                  'number_of_page': media.pageCount,
-                })
-                ..type(attachmentType)
-                ..thumbnailUrl(thumbnailUrl))
-              .build();
-          LMResponse<PutMediaResponse> uploadFileResponse =
-              await LMChatCore.client.putMultimedia(putMediaRequest);
-          if (!uploadFileResponse.success) {
-            emit(
-              LMChatMultiMediaConversationErrorState(
-                uploadFileResponse.errorMessage!,
-                event.postConversationRequest.temporaryId,
-              ),
+          try {
+            String? url;
+            final response = await LMChatMediaService.uploadFile(
+              media.mediaFile!.readAsBytesSync(),
+              LMChatLocalPreference.instance.getUser().userUniqueId!,
+              chatroomId: event.postConversationRequest.chatroomId,
+              conversationId: postConversationResponse.conversation!.id,
             );
-          } else {
-            emit(
-              LMChatMultiMediaConversationErrorState(
-                uploadFileResponse.errorMessage!,
-                event.postConversationRequest.temporaryId,
-              ),
-            );
-          }
+
+            if (response.success) {
+              url = response.data;
+            }
+
+            String? thumbnailUrl;
+            if (media.mediaType == LMChatMediaType.video) {
+              // If the thumbnail file is not present in media object
+              // then generate the thumbnail and upload it to the server
+              if (media.thumbnailFile == null) {
+                await getVideoThumbnail(media);
+              }
+              // thumbnailUrl = await mediaService.uploadFile(
+              //   media.thumbnailFile!,
+              //   event.postConversationRequest.chatroomId,
+              //   postConversationResponse.conversation!.id,
+              // );
+            }
+
+            String attachmentType = mapMediaTypeToString(media.mediaType);
+            PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
+                  ..conversationId(postConversationResponse.conversation!.id)
+                  ..filesCount(length)
+                  ..index(i)
+                  ..height(media.height)
+                  ..width(media.width)
+                  ..meta({
+                    'size': media.size,
+                    'number_of_page': media.pageCount,
+                  })
+                  ..type(attachmentType)
+                  ..url(url!)
+                  ..thumbnailUrl(thumbnailUrl))
+                .build();
+            LMResponse<PutMediaResponse> uploadFileResponse =
+                await LMChatCore.client.putMultimedia(putMediaRequest);
+            if (!uploadFileResponse.success) {
+              emit(
+                LMChatMultiMediaConversationErrorState(
+                  uploadFileResponse.errorMessage!,
+                  event.postConversationRequest.temporaryId,
+                ),
+              );
+            } else {
+              emit(
+                LMChatMultiMediaConversationErrorState(
+                  uploadFileResponse.errorMessage!,
+                  event.postConversationRequest.temporaryId,
+                ),
+              );
+            }
+          } catch (e) {}
         }
         LMChatConversationBloc.instance.lastConversationId =
             response.data!.conversation!.id;
