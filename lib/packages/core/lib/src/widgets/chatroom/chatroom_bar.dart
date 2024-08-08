@@ -230,7 +230,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _isRespondingAllowed()
                       ? _defTextField(context)
@@ -326,10 +326,35 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               horizontal: 12,
               vertical: 2,
             ),
-            child: _screenBuilder.chatroomTextField(
-              context,
-              _textEditingController,
-              _defInnerTextField(context),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _screenBuilder.chatroomTextField(
+                    context,
+                    _textEditingController,
+                    _defInnerTextField(context),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                LMChatButton(
+                  onTap: () {},
+                  icon: const LMChatIcon(
+                    type: LMChatIconType.icon,
+                    icon: Icons.attachment,
+                    style: LMChatIconStyle(
+                      size: 24,
+                      boxSize: 32,
+                    ),
+                  ),
+                  style: const LMChatButtonStyle(
+                    height: 48,
+                    width: 32,
+                    padding: EdgeInsets.only(bottom: 6),
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
