@@ -28,17 +28,28 @@ class LMChatMediaService {
         _prod ? LMChatAWSCredsProd.secretKey : LMChatAWSCredsDev.secretKey;
   }
 
-  static Future<LMResponse<String>> uploadFile(Uint8List bytes, String postUuid,
-      {String? fileName}) async {
-    return instance._uploadFile(bytes, postUuid, fileName: fileName);
+  static Future<LMResponse<String>> uploadFile(
+    Uint8List bytes,
+    String uuid, {
+    String? fileName,
+    int? chatroomId,
+    int? conversationId,
+  }) async {
+    return instance._uploadFile(
+      bytes,
+      uuid,
+      fileName: fileName,
+      chatroomId: chatroomId,
+      conversationId: conversationId,
+    );
   }
 
   Future<LMResponse<String>> _uploadFile(
     Uint8List bytes,
     String uuid, {
     String? fileName,
-    String? chatroomId,
-    String? conversationId,
+    int? chatroomId,
+    int? conversationId,
   }) async {
     try {
       String url = "https://$_bucketName.s3.$_region.amazonaws.com/";
