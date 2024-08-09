@@ -68,14 +68,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   final LMChatThemeData _themeData = LMChatTheme.instance.themeData;
   final _screenBuilder = LMChatCore.config.chatRoomConfig.builder;
 
-  String getText() {
-    if (_textEditingController.text.isNotEmpty) {
-      return _textEditingController.text;
-    } else {
-      return "";
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -180,12 +172,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _focusNode.requestFocus();
     tags = LMChatTaggingHelper.addUserTagsIfMatched(
         editConversation?.answer ?? '');
-  }
-
-  void _setupReplyText() {
-    if (replyToConversation != null) {
-      // _focusNode.requestFocus();
-    }
   }
 
   @override
