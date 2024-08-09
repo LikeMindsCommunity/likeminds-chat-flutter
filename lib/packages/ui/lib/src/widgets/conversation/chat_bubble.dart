@@ -29,6 +29,9 @@ class LMChatBubble extends StatefulWidget {
   /// The user of the conversation.
   final LMChatUserViewData conversationUser;
 
+  /// The list of attachments for this chat bubble
+  final List<LMChatAttachmentViewData>? attachments;
+
   /// is the message sent by the current user.
   final bool? isSent;
 
@@ -86,6 +89,7 @@ class LMChatBubble extends StatefulWidget {
     required this.currentUser,
     required this.conversationUser,
     required this.onTagTap,
+    this.attachments,
     this.style,
     this.contentBuilder,
     this.onReply,
@@ -315,6 +319,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
+                          LMChatBubbleMedia(
+                            conversation: conversation,
+                            attachments: widget.attachments ?? [],
+                            count: conversation.attachmentCount ?? 0,
+                            attachmentUploaded:
+                                conversation.attachmentsUploaded ?? false,
+                          ),
                           conversation.deletedByUserId != null
                               ? widget.deletedText ??
                                   widget.deletedTextBuilder?.call(
@@ -333,7 +344,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                     conversation: conversation,
                                     onTagTap: widget.onTagTap,
                                   ),
-                          const LMChatBubbleMedia(),
                           if (conversation.deletedByUserId == null &&
                               inStyle.showFooter == true)
                             Padding(
