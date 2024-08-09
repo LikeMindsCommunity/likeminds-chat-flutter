@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_handler.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/media/media_utils.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/media/media_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/permission_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -342,7 +343,8 @@ class _LMChatMediaForwardingScreenState
                                               BorderRadius.circular(8.0),
                                           child: FutureBuilder(
                                             future: getVideoThumbnail(
-                                                mediaList[index]),
+                                                mediaList[index]
+                                                    .toAttachmentViewData()),
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState ==
                                                   ConnectionState.waiting) {

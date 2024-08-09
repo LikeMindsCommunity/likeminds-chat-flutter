@@ -70,7 +70,7 @@ postMultimediaConversationEventHandler(
               // If the thumbnail file is not present in media object
               // then generate the thumbnail and upload it to the server
               if (media.thumbnailFile == null) {
-                await getVideoThumbnail(media);
+                await getVideoThumbnail(media.toAttachmentViewData());
               }
               // thumbnailUrl = await mediaService.uploadFile(
               //   media.thumbnailFile!,
