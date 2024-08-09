@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -46,6 +47,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   late ValueNotifier<bool> rebuildAppBar;
 
   Map<String, Conversation> conversationMeta = <String, Conversation>{};
+  Map<String, dynamic> conversationAttachmentsMeta = <String, dynamic>{};
   Map<int, User?> userMeta = <int, User?>{};
   List<int> _selectedIds = [];
 
@@ -182,6 +184,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
+      attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -227,6 +230,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
+      attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -323,6 +327,24 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         conversationMeta
             .addAll(state.getConversationResponse.conversationMeta!);
       }
+      if (state.getConversationResponse.conversationAttachmentsMeta != null &&
+          state.getConversationResponse.conversationAttachmentsMeta!
+              .isNotEmpty) {
+        Map<String, List<LMChatAttachmentViewData>>
+            getConversationAttachmentData = state
+                .getConversationResponse.conversationAttachmentsMeta!
+                .map((key, value) {
+          return MapEntry(
+            key,
+            (value as List<Attachment>?)
+                    ?.map((e) => e.toAttachmentViewData())
+                    .toList() ??
+                [],
+          );
+        });
+        conversationAttachmentsMeta.addAll(getConversationAttachmentData);
+      }
+
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
@@ -357,6 +379,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         );
         lastConversationId = state.conversationViewData.id;
       }
+    }
+    if (state is LMChatMultiMediaConversationPostedState) {
+      addConversationToPagedList(
+        state.postConversationResponse.conversation!.toConversationViewData(),
+      );
     }
   }
 
