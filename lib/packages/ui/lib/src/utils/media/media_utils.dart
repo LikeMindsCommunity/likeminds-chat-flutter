@@ -29,50 +29,8 @@ const List<String> mediaExtentions = [
   ...videoExtentions,
 ];
 
-String mapMediaTypeToString(LMChatMediaType mediaType) {
-  switch (mediaType) {
-    case LMChatMediaType.image:
-      return kAttachmentTypeImage;
-    case LMChatMediaType.video:
-      return kAttachmentTypeVideo;
-    case LMChatMediaType.document:
-      return kAttachmentTypePDF;
-    case LMChatMediaType.audio:
-      return kAttachmentTypeAudio;
-    case LMChatMediaType.gif:
-      return kAttachmentTypeGIF;
-    case LMChatMediaType.voiceNote:
-      return kAttachmentTypeVoiceNote;
-    case LMChatMediaType.link:
-      return 'link';
-    default:
-      return kAttachmentTypeImage;
-  }
-}
-
-LMChatMediaType mapStringToMediaType(String mediaType) {
-  switch (mediaType) {
-    case kAttachmentTypeImage:
-      return LMChatMediaType.image;
-    case kAttachmentTypeVideo:
-      return LMChatMediaType.video;
-    case kAttachmentTypePDF:
-      return LMChatMediaType.document;
-    case kAttachmentTypeAudio:
-      return LMChatMediaType.audio;
-    case kAttachmentTypeGIF:
-      return LMChatMediaType.gif;
-    case kAttachmentTypeVoiceNote:
-      return LMChatMediaType.voiceNote;
-    case 'link':
-      return LMChatMediaType.link;
-    default:
-      return LMChatMediaType.image;
-  }
-}
-
 Widget getChatItemAttachmentTile(
-    List<LMChatMediaModel> mediaFiles, Conversation conversation) {
+    List<LMChatAttachmentViewData> mediaFiles, Conversation conversation) {
   String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
           withTilde: false) ??
       '';
@@ -93,7 +51,8 @@ Widget getChatItemAttachmentTile(
   } else {
     IconData iconData = Icons.camera_alt;
     String text = '';
-    if (mediaFiles.first.mediaType == LMChatMediaType.document) {
+    if (mapStringToMediaType(mediaFiles.first.type!) ==
+        LMChatMediaType.document) {
       iconData = Icons.insert_drive_file;
       if (conversation.answer.isEmpty) {
         text = mediaFiles.length > 1 ? "Documents" : "Document";
@@ -103,8 +62,8 @@ Widget getChatItemAttachmentTile(
     } else {
       int videoCount = 0;
       int imageCount = 0;
-      for (LMChatMediaModel media in mediaFiles) {
-        if (media.mediaType == LMChatMediaType.video) {
+      for (LMChatAttachmentViewData media in mediaFiles) {
+        if (mapStringToMediaType(media.type!) == LMChatMediaType.video) {
           videoCount++;
         } else {
           imageCount++;
@@ -230,26 +189,26 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-Widget getDocumentDetails(LMChatMediaModel document) {
-  return SizedBox(
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '●'} ${getFileSizeString(bytes: document.size!)} ● PDF',
-          style: const TextStyle(
-            color: LMChatDefaultTheme.whiteColor,
-          ),
-        )
-      ],
-    ),
-  );
-}
+// Widget getDocumentDetails(LMChatAttachmentViewData document) {
+//   return SizedBox(
+//     child: Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       mainAxisSize: MainAxisSize.min,
+//       children: <Widget>[
+//         Text(
+//           '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '●'} ${getFileSizeString(bytes: document.size!)} ● PDF',
+//           style: const TextStyle(
+//             color: LMChatDefaultTheme.whiteColor,
+//           ),
+//         )
+//       ],
+//     ),
+//   );
+// }
 
-Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
+Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
   String? thumbnailPath = await VideoThumbnail.thumbnailFile(
-    video: media.mediaFile!.path,
+    video: media.thumbnailFile!.path,
     imageFormat: ImageFormat.JPEG,
     maxWidth: 300,
     quality: 50,
@@ -262,9 +221,9 @@ Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
   File? thumbnailFile;
   thumbnailFile = File(thumbnailPath!);
   ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
-  media.width = image.width;
-  media.height = image.height;
-  media.thumbnailFile ??= thumbnailFile;
+  // media.width = image.width;
+  // media.height = image.height;
+  // media. ??= thumbnailFile;
 
   return thumbnailFile;
 }
@@ -342,7 +301,7 @@ double getFileSizeInDouble(int bytes) {
   return (bytes / pow(1000, 2));
 }
 
-Widget getChatBubbleImage(LMChatMediaModel mediaFile,
+Widget getChatBubbleImage(LMChatAttachmentViewData mediaFile,
     {double? width, double? height}) {
   return Container(
     height: height,
@@ -354,16 +313,17 @@ Widget getChatBubbleImage(LMChatMediaModel mediaFile,
     child: Stack(
       children: [
         CachedNetworkImage(
-          imageUrl: mediaFile.mediaType == LMChatMediaType.image
-              ? mediaFile.mediaUrl ?? ''
-              : mediaFile.thumbnailUrl ?? '',
+          imageUrl:
+              mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
+                  ? mediaFile.url ?? ''
+                  : mediaFile.thumbnailUrl ?? '',
           fit: BoxFit.cover,
           height: height,
           width: width,
           errorWidget: (context, url, error) => mediaErrorWidget(),
           progressIndicatorBuilder: (context, url, progress) => mediaShimmer(),
         ),
-        mediaFile.mediaType == LMChatMediaType.video &&
+        mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
                 mediaFile.thumbnailUrl != null
             ? Center(
                 child: LMChatIcon(
@@ -386,9 +346,9 @@ Widget getChatBubbleImage(LMChatMediaModel mediaFile,
   );
 }
 
-Widget getFileImageTile(LMChatMediaModel mediaFile,
+Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
     {double? width, double? height}) {
-  if (mediaFile.mediaFile == null && mediaFile.thumbnailFile == null) {
+  if (mediaFile.attachmentFile == null && mediaFile.thumbnailFile == null) {
     return mediaErrorWidget();
   }
   return Container(
@@ -401,15 +361,15 @@ Widget getFileImageTile(LMChatMediaModel mediaFile,
     child: Stack(
       children: [
         Image.file(
-          mediaFile.mediaType == LMChatMediaType.image
-              ? mediaFile.mediaFile!
+          mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
+              ? mediaFile.attachmentFile!
               : mediaFile.thumbnailFile!,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) => mediaErrorWidget(),
           height: height,
           width: width,
         ),
-        mediaFile.mediaType == LMChatMediaType.video &&
+        mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
                 mediaFile.thumbnailFile != null
             ? Center(
                 child: LMChatIcon(
@@ -433,7 +393,7 @@ Widget getFileImageTile(LMChatMediaModel mediaFile,
 }
 
 Widget getImageFileMessage(
-    BuildContext context, List<LMChatMediaModel> mediaFiles) {
+    BuildContext context, List<LMChatAttachmentViewData> mediaFiles) {
   if (mediaFiles.length == 1) {
     return GestureDetector(
       child: getFileImageTile(

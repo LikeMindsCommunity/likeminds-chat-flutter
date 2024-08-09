@@ -9,6 +9,7 @@ const String kAttachmentTypeVideo = "video";
 const String kAttachmentTypeAudio = "audio";
 const String kAttachmentTypePDF = "pdf";
 const String kAttachmentTypeGIF = "gif";
+const String kAttachmentTypeLink = "link";
 const String kAttachmentTypeVoiceNote = "voice_note";
 
 const double kFontSmall = 12;
