@@ -528,7 +528,18 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                 Column(
                   children: [
                     LMChatButton(
-                      onTap: () {},
+                      onTap: () async {
+                        await LMChatMediaHandler.instance.pickImages();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LMChatMediaForwardingScreen(
+                              chatroomId: widget.chatroom.id,
+                            ),
+                          ),
+                        );
+                        _popupMenuController.hideMenu();
+                      },
                       icon: LMChatIcon(
                         type: LMChatIconType.icon,
                         icon: Icons.camera_alt_outlined,
@@ -566,6 +577,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             ),
                           ),
                         );
+                        _popupMenuController.hideMenu();
                       },
                       icon: LMChatIcon(
                         type: LMChatIconType.icon,

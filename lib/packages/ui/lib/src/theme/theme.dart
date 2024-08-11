@@ -5,10 +5,12 @@ class LMChatTheme {
   static LMChatTheme? _instance;
   static LMChatTheme get instance => _instance ??= LMChatTheme._();
   static LMChatThemeData get theme => instance.themeData;
+  static TextTheme get text => instance.textTheme;
 
   LMChatTheme._();
 
   late final LMChatThemeData themeData;
+  late final TextTheme textTheme;
 
   void initialise({
     LMChatThemeData? theme,
@@ -165,7 +167,8 @@ class LMChatThemeData {
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
       chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
-      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
+      stateBubbleStyle:
+          stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
       appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
     );
   }

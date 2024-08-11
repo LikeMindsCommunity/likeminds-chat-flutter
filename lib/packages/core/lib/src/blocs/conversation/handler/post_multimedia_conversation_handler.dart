@@ -47,7 +47,6 @@ postMultimediaConversationEventHandler(
           ),
         );
       } else {
-        List<LMChatMediaModel> fileLink = [];
         int length = event.mediaFiles.length;
         for (int i = 0; i < length; i++) {
           LMChatMediaModel media = event.mediaFiles[i];
@@ -72,11 +71,13 @@ postMultimediaConversationEventHandler(
               if (media.thumbnailFile == null) {
                 await getVideoThumbnail(media.toAttachmentViewData());
               }
-              // thumbnailUrl = await mediaService.uploadFile(
-              //   media.thumbnailFile!,
-              //   event.postConversationRequest.chatroomId,
-              //   postConversationResponse.conversation!.id,
-              // );
+              final response = await LMChatMediaService.uploadFile(
+                media.thumbnailFile!.readAsBytesSync(),
+                LMChatLocalPreference.instance.getUser().userUniqueId!,
+                chatroomId: event.postConversationRequest.chatroomId,
+                conversationId: postConversationResponse.conversation!.id,
+              );
+              thumbnailUrl = response.data;
             }
 
             String attachmentType = mapMediaTypeToString(media.mediaType);
@@ -118,7 +119,7 @@ postMultimediaConversationEventHandler(
         emit(
           LMChatMultiMediaConversationPostedState(
             postConversationResponse,
-            fileLink,
+            event.mediaFiles,
           ),
         );
 

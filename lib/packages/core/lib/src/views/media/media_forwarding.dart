@@ -206,7 +206,7 @@ class _LMChatMediaForwardingScreenState
           maxLines: 1,
           textStyle: Theme.of(context)
               .textTheme
-              .bodyMedium
+              .bodyLarge
               ?.copyWith(fontWeight: FontWeight.w500),
         ),
       ),

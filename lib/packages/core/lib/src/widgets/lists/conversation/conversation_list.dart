@@ -372,6 +372,22 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     } else if (state is LMChatConversationErrorState) {
       toast(state.message);
     }
+
+    if (state is LMChatMultiMediaConversationLoadingState) {
+      if (!userMeta.containsKey(user.id)) {
+        userMeta[user.id] = user;
+      }
+      conversationAttachmentsMeta[state.postConversation.temporaryId!] =
+          state.mediaFiles;
+
+      addLocalConversationToPagedList(
+          state.postConversation.toConversationViewData());
+    }
+    if (state is LMChatMultiMediaConversationPostedState) {
+      addConversationToPagedList(
+        state.postConversationResponse.conversation!.toConversationViewData(),
+      );
+    }
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId) {
         addConversationToPagedList(
@@ -379,11 +395,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         );
         lastConversationId = state.conversationViewData.id;
       }
-    }
-    if (state is LMChatMultiMediaConversationPostedState) {
-      addConversationToPagedList(
-        state.postConversationResponse.conversation!.toConversationViewData(),
-      );
     }
   }
 

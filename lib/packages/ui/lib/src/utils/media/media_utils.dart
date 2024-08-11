@@ -189,23 +189,6 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-// Widget getDocumentDetails(LMChatAttachmentViewData document) {
-//   return SizedBox(
-//     child: Row(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       mainAxisSize: MainAxisSize.min,
-//       children: <Widget>[
-//         Text(
-//           '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '●'} ${getFileSizeString(bytes: document.size!)} ● PDF',
-//           style: const TextStyle(
-//             color: LMChatDefaultTheme.whiteColor,
-//           ),
-//         )
-//       ],
-//     ),
-//   );
-// }
-
 Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
   String? thumbnailPath = await VideoThumbnail.thumbnailFile(
     video: media.thumbnailFile!.path,
