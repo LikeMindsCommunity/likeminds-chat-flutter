@@ -3,11 +3,8 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/media_handler.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/media/media_utils.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/media/permission_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 /// {@template lm_chat_media_forwarding_screen}
 /// A screen to preview media before attaching of LMChat
@@ -38,6 +35,23 @@ class _LMChatMediaForwardingScreenState
   int currPosition = 0;
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
   LMChatConversationBloc? conversationBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    mediaList = LMChatMediaHandler.instance.pickedMedia;
+  }
+
+  @override
+  void didUpdateWidget(covariant LMChatMediaForwardingScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    mediaList = LMChatMediaHandler.instance.pickedMedia;
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,43 +126,10 @@ class _LMChatMediaForwardingScreenState
                               icon: Icons.attachment,
                             ),
                             onTap: () async {
-                              if (await handlePermissions(1)) {
-                                LMChatMediaType mediaType = mediaList.isNotEmpty
-                                    ? mediaList.first.mediaType
-                                    : LMChatMediaType.image;
-                                List<LMChatMediaModel> pickedMediaFiles =
-                                    (mediaType == LMChatMediaType.document
-                                            ? await LMChatMediaHandler
-                                                .pickDocuments(mediaList.length)
-                                            : mediaType == LMChatMediaType.video
-                                                ? await LMChatMediaHandler
-                                                    .pickVideos(
-                                                        mediaList.length)
-                                                : await LMChatMediaHandler
-                                                    .pickImages(
-                                                        mediaList.length))
-                                        .data!;
-                                if (pickedMediaFiles.isNotEmpty) {
-                                  if (mediaList.length +
-                                          pickedMediaFiles.length >
-                                      10) {
-                                    toast('Only 10 attachments can be sent');
-                                    return;
-                                  }
-                                  // for (LMChatMediaModel media
-                                  //     in pickedMediaFiles) {
-                                  //   if (getFileSizeInDouble(media.size!) >
-                                  //       100) {
-                                  //     toast(
-                                  //       'File size should be smaller than 100MB',
-                                  //     );
-                                  //     pickedMediaFiles.remove(media);
-                                  //   }
-                                  // }
-                                  mediaList.addAll(pickedMediaFiles);
-                                }
-                                rebuildCurr.value = !rebuildCurr.value;
-                              }
+                              await LMChatMediaHandler.instance.pickImages();
+                              mediaList =
+                                  LMChatMediaHandler.instance.pickedMedia;
+                              rebuildCurr.value = !rebuildCurr.value;
                             },
                           ),
                         ),
@@ -169,7 +150,7 @@ class _LMChatMediaForwardingScreenState
                             ..temporaryId(DateTime.now()
                                 .millisecondsSinceEpoch
                                 .toString())
-                            ..text('Dummy text')
+                            ..text(_textEditingController.text)
                             ..hasFiles(true))
                           .build(),
                       mediaList,
@@ -211,6 +192,7 @@ class _LMChatMediaForwardingScreenState
       ),
       leading: LMChatButton(
         onTap: () {
+          LMChatMediaHandler.instance.clearPickedMedia();
           Navigator.pop(context);
         },
         icon: const LMChatIcon(
@@ -218,27 +200,15 @@ class _LMChatMediaForwardingScreenState
           icon: Icons.cancel_outlined,
         ),
       ),
-      title: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          LMChatText(
-            "Participants",
-            style: LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          kVerticalPaddingSmall,
-          Text(
-            '_memberCountText',
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
-        ],
+      title: LMChatText(
+        "Add Media",
+        style: LMChatTextStyle(
+          maxLines: 1,
+          textStyle: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(fontWeight: FontWeight.w500),
+        ),
       ),
     );
   }
@@ -271,109 +241,101 @@ class _LMChatMediaForwardingScreenState
             ),
             const Spacer(),
             Container(
-              decoration: BoxDecoration(
-                  color: LMChatTheme.theme.container,
-                  border: Border(
-                    top: BorderSide(
-                      color: LMChatTheme.theme.disabledColor,
-                      width: 0.1,
-                    ),
-                  )),
-              padding: EdgeInsets.only(
-                left: 5.0,
-                right: 5.0,
-                top: 2.h,
-                bottom: 12.h,
-              ),
-              child: true
-                  ? SizedBox(
-                      height: 15.w,
-                      width: 100.w,
-                      child: Center(
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: mediaList.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => GestureDetector(
-                            onTap: () {
-                              currPosition = index;
-
-                              rebuildCurr.value = !rebuildCurr.value;
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 3.0,
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  border: currPosition == index
-                                      ? Border.all(
-                                          color:
-                                              LMChatDefaultTheme.disabledColor,
-                                          width: 4.0,
-                                          // strokeAlign:
-                                          //     BorderSide.strokeAlignOutside,
-                                        )
-                                      : null),
-                              width: 15.w,
-                              height: 15.w,
-                              child: mediaList[index].mediaType ==
-                                      LMChatMediaType.image
+                decoration: BoxDecoration(
+                    color: LMChatTheme.theme.container,
+                    border: Border(
+                      top: BorderSide(
+                        color: LMChatTheme.theme.disabledColor,
+                        width: 0.1,
+                      ),
+                    )),
+                padding: EdgeInsets.only(
+                  left: 5.0,
+                  right: 5.0,
+                  top: 2.h,
+                  bottom: 12.h,
+                ),
+                child: SizedBox(
+                  height: 15.w,
+                  width: 100.w,
+                  child: Center(
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: mediaList.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) => GestureDetector(
+                        onTap: () {
+                          currPosition = index;
+                          rebuildCurr.value = !rebuildCurr.value;
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 3.0,
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: currPosition == index
+                                  ? Border.all(
+                                      color: LMChatDefaultTheme.disabledColor,
+                                      width: 4.0,
+                                      // strokeAlign:
+                                      //     BorderSide.strokeAlignOutside,
+                                    )
+                                  : null),
+                          width: 15.w,
+                          height: 15.w,
+                          child: mediaList[index].mediaType ==
+                                  LMChatMediaType.image
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.file(
+                                    mediaList[index].mediaFile!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              // check if thumbnail file is there in the media object
+                              // if not then get the thumbnail from the video file
+                              : mediaList[index].thumbnailFile != null
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(8.0),
                                       child: Image.file(
-                                        mediaList[index].mediaFile!,
+                                        mediaList[index].thumbnailFile!,
                                         fit: BoxFit.cover,
                                       ),
                                     )
-                                  // check if thumbnail file is there in the media object
-                                  // if not then get the thumbnail from the video file
-                                  : mediaList[index].thumbnailFile != null
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: Image.file(
-                                            mediaList[index].thumbnailFile!,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
-                                      : ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          child: FutureBuilder(
-                                            future: getVideoThumbnail(
-                                                mediaList[index]
-                                                    .toAttachmentViewData()),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return mediaShimmer();
-                                              } else if (snapshot.data !=
-                                                  null) {
-                                                return Image.file(
-                                                  snapshot.data!,
-                                                  fit: BoxFit.cover,
-                                                );
-                                              } else {
-                                                return SizedBox(
-                                                  child: Icon(
-                                                    Icons.error,
-                                                    color: LMChatTheme
-                                                        .theme.secondaryColor,
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                        ),
-                            ),
-                          ),
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: FutureBuilder(
+                                        future: getVideoThumbnail(
+                                            mediaList[index]
+                                                .toAttachmentViewData()),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return mediaShimmer();
+                                          } else if (snapshot.data != null) {
+                                            return Image.file(
+                                              snapshot.data!,
+                                              fit: BoxFit.cover,
+                                            );
+                                          } else {
+                                            return SizedBox(
+                                              child: Icon(
+                                                Icons.error,
+                                                color: LMChatTheme
+                                                    .theme.secondaryColor,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
                         ),
                       ),
-                    )
-                  : const SizedBox(),
-            )
+                    ),
+                  ),
+                ))
           ],
         ),
       );
