@@ -121,6 +121,8 @@ postMultimediaConversationEventHandler(
             fileLink,
           ),
         );
+
+        LMChatMediaHandler.instance.clearPickedMedia();
       }
     } else {
       emit(
