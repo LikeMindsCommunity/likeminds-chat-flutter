@@ -3,16 +3,49 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// A class to manage all media picking, and accessing
 ///
 /// Gives access to functions that handles media picking natively
 class LMChatMediaHandler {
-  /// A function that returns a List of videos from device storage
-  static Future<LMResponse<List<LMChatMediaModel>>> pickVideos(
-      int currentMediaLength) async {
+  static final LMChatMediaHandler _instance = LMChatMediaHandler._internal();
+
+  LMChatMediaHandler._internal();
+
+  /// Returns the singleton instance of [LMChatMediaHandler].
+  ///
+  /// This getter provides access to the singleton instance of [LMChatMediaHandler],
+  /// which is used to manage media picking and accessing.
+  ///
+  /// Returns a [LMChatMediaHandler] object.
+  static LMChatMediaHandler get instance => _instance;
+
+  final List<LMChatMediaModel> pickedMedia = [];
+
+  /// Adds one or more media items to the pickedMedia list
+  ///
+  /// [media] can be a single LMChatMediaModel or a List<LMChatMediaModel>
+  void addPickedMedia(dynamic media) {
+    if (media is LMChatMediaModel) {
+      pickedMedia.add(media);
+    } else if (media is List<LMChatMediaModel>) {
+      pickedMedia.addAll(media);
+    }
+  }
+
+  /// Clears all items from the pickedMedia list
+  void clearPickedMedia() {
+    pickedMedia.clear();
+  }
+
+  /// Picks multiple video files from the device storage
+  ///
+  /// [currentMediaLength] is the current number of media items already selected
+  /// Returns an [LMResponse] containing a list of [LMChatMediaModel] for videos
+  /// Enforces a size limit of 100MB per video file
+  Future<LMResponse<List<LMChatMediaModel>>> pickVideos(
+      {int mediaCount = 0}) async {
     try {
       List<LMChatMediaModel> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
@@ -25,7 +58,12 @@ class LMChatMediaHandler {
       }
 
       const double sizeLimit = 100;
-
+      if (mediaCount + pickedMedia.length + pickedFiles.files.length > 10) {
+        return LMResponse(
+            success: false,
+            errorMessage:
+                'A total of 10 attachments can be added to a message');
+      }
       for (PlatformFile pFile in pickedFiles.files) {
         double fileSize = getFileSizeInDouble(pFile.size);
 
@@ -58,6 +96,7 @@ class LMChatMediaHandler {
             );
           }
           videoFiles.add(videoFile);
+          addPickedMedia(videoFile);
         }
         return LMResponse(success: true, data: videoFiles);
       }
@@ -70,8 +109,11 @@ class LMChatMediaHandler {
     }
   }
 
-  /// A function that returns an image from device storage
-  static Future<LMResponse<LMChatMediaModel>> pickSingleImage() async {
+  /// Picks a single image file from the device storage
+  ///
+  /// Returns an [LMResponse] containing an [LMChatMediaModel] for the selected image
+  /// Enforces a size limit of 5MB for the image file
+  Future<LMResponse<LMChatMediaModel>> pickSingleImage() async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
@@ -106,9 +148,13 @@ class LMChatMediaHandler {
     }
   }
 
-  /// A function that returns a List of images from device storage
-  static Future<LMResponse<List<LMChatMediaModel>>> pickImages(
-      int mediaCount) async {
+  /// Picks multiple image files from the device storage
+  ///
+  /// [mediaCount] is the current number of media items already selected
+  /// Returns an [LMResponse] containing a list of [LMChatMediaModel] for images
+  /// Enforces a size limit of 5MB per image file and a maximum of 10 total attachments
+  Future<LMResponse<List<LMChatMediaModel>>> pickImages(
+      {int mediaCount = 0}) async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.image,
@@ -117,7 +163,7 @@ class LMChatMediaHandler {
     const double sizeLimit = 5;
 
     if (list != null && list.files.isNotEmpty) {
-      if (mediaCount + list.files.length > 10) {
+      if (mediaCount + pickedMedia.length + list.files.length > 10) {
         return LMResponse(
             success: false,
             errorMessage:
@@ -146,15 +192,20 @@ class LMChatMediaHandler {
             });
       }).toList();
 
+      addPickedMedia(attachedImages);
       return LMResponse(success: true, data: attachedImages);
     } else {
       return LMResponse(success: true);
     }
   }
 
-  /// A function that returns a List of documents from device storage
-  static Future<LMResponse<List<LMChatMediaModel>>> pickDocuments(
-      int currentMediaLength) async {
+  /// Picks multiple document files (PDFs) from the device storage
+  ///
+  /// [currentMediaLength] is the current number of media items already selected
+  /// Returns an [LMResponse] containing a list of [LMChatMediaModel] for documents
+  /// Enforces a size limit of 100MB per document file
+  Future<LMResponse<List<LMChatMediaModel>>> pickDocuments(
+      {int mediaCount = 0}) async {
     try {
       final pickedFiles = await FilePicker.platform.pickFiles(
         allowMultiple: true,
@@ -165,7 +216,6 @@ class LMChatMediaHandler {
         ],
       );
       if (pickedFiles != null) {
-        List<LMChatMediaModel> attachedFiles = [];
         for (var pickedFile in pickedFiles.files) {
           if (getFileSizeInDouble(pickedFile.size) > 100) {
             return LMResponse(
@@ -181,11 +231,11 @@ class LMChatMediaHandler {
                   'file_name': pickedFile.name,
                 });
 
-            attachedFiles.add(documentFile);
+            pickedMedia.add(documentFile);
           }
         }
 
-        return LMResponse(success: true, data: attachedFiles);
+        return LMResponse(success: true, data: pickedMedia);
       } else {
         return LMResponse(success: true);
       }

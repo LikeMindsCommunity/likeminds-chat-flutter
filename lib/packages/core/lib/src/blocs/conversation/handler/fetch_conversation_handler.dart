@@ -21,9 +21,9 @@ fetchConversationsEventHandler(
   if (response.success) {
     GetConversationResponse conversationResponse = response.data;
     for (var element in conversationResponse.conversationData!) {
+      //Assigning member to the conversation from userMeta
       element.member = conversationResponse.userMeta?[element.memberId];
-    }
-    for (var element in conversationResponse.conversationData!) {
+      //Assigning reply to the conversation from conversationMeta
       String? replyId = element.replyId == null
           ? element.replyConversation?.toString()
           : element.replyId.toString();
@@ -31,6 +31,7 @@ fetchConversationsEventHandler(
           conversationResponse.conversationMeta?[replyId];
       element.replyConversationObject?.member = conversationResponse
           .userMeta?[element.replyConversationObject?.memberId];
+      //Assigning attachment to the conversation from attachmentMeta
     }
     emit(LMChatConversationLoadedState(conversationResponse));
   } else {
