@@ -223,6 +223,18 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
       },
+      onMediaTap: () {
+        LMChatMediaHandler.instance.addPickedMedia(
+            conversationAttachmentsMeta[conversation.id.toString()]);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMChatMediaPreviewScreen(
+              conversation: conversation,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -274,6 +286,18 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+      },
+      onMediaTap: () {
+        LMChatMediaHandler.instance.addPickedMedia(
+            conversationAttachmentsMeta[conversation.id.toString()]);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMChatMediaPreviewScreen(
+              conversation: conversation,
+            ),
+          ),
+        );
       },
     );
   }
