@@ -69,76 +69,79 @@ class _LMImageState extends State<LMChatImage> {
   @override
   Widget build(BuildContext context) {
     style = widget.style ?? LMChatTheme.theme.imageStyle;
-    return GestureDetector(
-      onTap: () => widget.onTap?.call(),
-      child: widget.imageUrl != null
-          ? Container(
-              padding: style?.padding,
-              margin: style?.margin,
-              decoration: BoxDecoration(
-                borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                color: style?.backgroundColor,
-              ),
-              clipBehavior: Clip.hardEdge,
-              child: CachedNetworkImage(
-                cacheKey: widget.imageUrl!,
-                height: style!.height,
-                width: style!.width,
-                imageUrl: widget.imageUrl!,
-                fit: style!.boxFit ?? BoxFit.contain,
-                fadeInDuration: const Duration(
-                  milliseconds: 100,
+    return AbsorbPointer(
+      absorbing: true,
+      child: GestureDetector(
+        onTap: () => widget.onTap?.call(),
+        child: widget.imageUrl != null
+            ? Container(
+                padding: style?.padding,
+                margin: style?.margin,
+                decoration: BoxDecoration(
+                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                  color: style?.backgroundColor,
                 ),
-                errorWidget: (context, url, error) {
-                  if (widget.onError != null) {
-                    widget.onError!(error.toString(), StackTrace.empty);
-                  }
-                  return style!.errorWidget ??
-                      Container(
-                        color: Colors.grey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.error_outline,
-                              style: LMChatIconStyle(
-                                size: 24,
-                                color: Colors.grey.shade300,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            const LMChatText(
-                              "An error occurred fetching media",
-                              style: LMChatTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 14,
+                clipBehavior: Clip.hardEdge,
+                child: CachedNetworkImage(
+                  cacheKey: widget.imageUrl!,
+                  height: style!.height,
+                  width: style!.width,
+                  imageUrl: widget.imageUrl!,
+                  fit: style!.boxFit ?? BoxFit.contain,
+                  fadeInDuration: const Duration(
+                    milliseconds: 100,
+                  ),
+                  errorWidget: (context, url, error) {
+                    if (widget.onError != null) {
+                      widget.onError!(error.toString(), StackTrace.empty);
+                    }
+                    return style!.errorWidget ??
+                        Container(
+                          color: Colors.grey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              LMChatIcon(
+                                type: LMChatIconType.icon,
+                                icon: Icons.error_outline,
+                                style: LMChatIconStyle(
+                                  size: 24,
+                                  color: Colors.grey.shade300,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                },
-                progressIndicatorBuilder: (context, url, progress) =>
-                    style!.shimmerWidget ?? const SizedBox(),
-              ),
-            )
-          : widget.imageFile != null
-              ? Container(
-                  padding: style?.padding,
-                  margin: style?.margin,
-                  decoration: BoxDecoration(
-                      borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                      color: style?.backgroundColor),
-                  child: Image.file(
-                    widget.imageFile!,
-                    height: style!.height,
-                    width: style!.width,
-                    fit: style!.boxFit ?? BoxFit.contain,
-                  ),
-                )
-              : const SizedBox(),
+                              const SizedBox(height: 24),
+                              const LMChatText(
+                                "An error occurred fetching media",
+                                style: LMChatTextStyle(
+                                  textStyle: TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                  },
+                  progressIndicatorBuilder: (context, url, progress) =>
+                      style!.shimmerWidget ?? const SizedBox(),
+                ),
+              )
+            : widget.imageFile != null
+                ? Container(
+                    padding: style?.padding,
+                    margin: style?.margin,
+                    decoration: BoxDecoration(
+                        borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                        color: style?.backgroundColor),
+                    child: Image.file(
+                      widget.imageFile!,
+                      height: style!.height,
+                      width: style!.width,
+                      fit: style!.boxFit ?? BoxFit.contain,
+                    ),
+                  )
+                : const SizedBox(),
+      ),
     );
   }
 }

@@ -203,7 +203,7 @@ Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
 
   File? thumbnailFile;
   thumbnailFile = File(thumbnailPath!);
-  ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
+  // ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
   // media.width = image.width;
   // media.height = image.height;
   // media. ??= thumbnailFile;
@@ -284,47 +284,55 @@ double getFileSizeInDouble(int bytes) {
   return (bytes / pow(1000, 2));
 }
 
-Widget getChatBubbleImage(LMChatAttachmentViewData mediaFile,
-    {double? width, double? height}) {
-  return Container(
-    height: height,
-    width: width,
-    clipBehavior: Clip.hardEdge,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8.0),
-    ),
-    child: Stack(
-      children: [
-        CachedNetworkImage(
-          imageUrl:
-              mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
-                  ? mediaFile.url ?? mediaFile.fileUrl ?? ''
-                  : mediaFile.thumbnailUrl ?? '',
-          fit: BoxFit.cover,
-          height: height,
-          width: width,
-          errorWidget: (context, url, error) => mediaErrorWidget(),
-          progressIndicatorBuilder: (context, url, progress) => mediaShimmer(),
-        ),
-        mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
-                mediaFile.thumbnailUrl != null
-            ? Center(
-                child: LMChatIcon(
-                  type: LMChatIconType.icon,
-                  icon: Icons.play_arrow,
-                  style: LMChatIconStyle(
-                    color: LMChatDefaultTheme.blackColor,
-                    boxSize: 32,
-                    backgroundColor:
-                        LMChatDefaultTheme.whiteColor.withOpacity(0.7),
-                    size: 24,
-                    boxBorderRadius: 16,
-                    boxPadding: const EdgeInsets.all(6),
+Widget getChatBubbleImage(
+  LMChatAttachmentViewData mediaFile, {
+  double? width,
+  double? height,
+  void Function()? onTap,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      height: height,
+      width: width,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Stack(
+        children: [
+          CachedNetworkImage(
+            imageUrl:
+                mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
+                    ? mediaFile.url ?? mediaFile.fileUrl ?? ''
+                    : mediaFile.thumbnailUrl ?? '',
+            fit: BoxFit.cover,
+            height: height,
+            width: width,
+            errorWidget: (context, url, error) => mediaErrorWidget(),
+            progressIndicatorBuilder: (context, url, progress) =>
+                mediaShimmer(),
+          ),
+          mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
+                  mediaFile.thumbnailUrl != null
+              ? Center(
+                  child: LMChatIcon(
+                    type: LMChatIconType.icon,
+                    icon: Icons.play_arrow,
+                    style: LMChatIconStyle(
+                      color: LMChatDefaultTheme.blackColor,
+                      boxSize: 32,
+                      backgroundColor:
+                          LMChatDefaultTheme.whiteColor.withOpacity(0.7),
+                      size: 24,
+                      boxBorderRadius: 16,
+                      boxPadding: const EdgeInsets.all(6),
+                    ),
                   ),
-                ),
-              )
-            : const SizedBox(),
-      ],
+                )
+              : const SizedBox(),
+        ],
+      ),
     ),
   );
 }

@@ -59,6 +59,9 @@ class LMChatBubble extends StatefulWidget {
   /// The function to call when the bubble is tapped.
   final Function(bool isSelected, State<LMChatBubble> state)? onTap;
 
+  /// The function to call when the bubble media is tapped.
+  final void Function()? onMediaTap;
+
   /// The function to call when the bubble is long pressed.
   final Function(bool isSelected, State<LMChatBubble> state)? onLongPress;
 
@@ -99,6 +102,7 @@ class LMChatBubble extends StatefulWidget {
     this.deletedText,
     this.isSelected = false,
     this.onTap,
+    this.onMediaTap,
     this.onLongPress,
     this.isSelectableOnTap,
     this.headerBuilder,
@@ -236,6 +240,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             _isSelected = false;
             widget.onTap?.call(_isSelected, this);
           } else {
+            if (widget.attachments != null) {
+              widget.onMediaTap?.call();
+            }
             if (widget.isSelectableOnTap?.call() ?? false) {
               _isSelected = !_isSelected;
               widget.onTap?.call(_isSelected, this);

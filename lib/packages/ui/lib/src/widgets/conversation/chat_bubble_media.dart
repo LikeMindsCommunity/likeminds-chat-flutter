@@ -26,7 +26,6 @@ class LMChatBubbleMedia extends StatelessWidget {
     // show local files
     Widget? mediaWidget;
     if (attachmentUploaded && count > 0) {
-      Widget? mediaWidget;
       if (attachments.first.type ==
               mapMediaTypeToString(LMChatMediaType.image) ||
           attachments.first.type ==
