@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/media/media_handler.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_chat_flutter_core/src/views/media/configurations/builder.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
+import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
+import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// {@template lm_chat_media_forwarding_screen}
-/// A screen to preview media before attaching of LMChat
+/// A screen to preview media before adding attachments to a conversation
 ///
 /// Creates a new instance for [LMChatMediaForwardingScreen]
 ///
@@ -112,7 +112,7 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  Container _defTextField() {
+  Widget _defTextField() {
     return Container(
       constraints: BoxConstraints(
         minHeight: 8.w,
@@ -150,35 +150,34 @@ class _LMChatMediaForwardingScreenState
               ),
             ),
           ),
-          _defAttachmentButton(),
+          _screenBuilder.attachmentButton(
+            context,
+            _defAttachmentButton(),
+          )
         ],
       ),
     );
   }
 
-  Padding _defAttachmentButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 2.w,
-        vertical: 3.w,
+  LMChatButton _defAttachmentButton() {
+    return LMChatButton(
+      icon: const LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.attachment,
       ),
-      child: SizedBox(
+      style: LMChatButtonStyle(
         height: 4.h,
-        child: _screenBuilder.attachmentButton(
-          context,
-          LMChatButton(
-            icon: const LMChatIcon(
-              type: LMChatIconType.icon,
-              icon: Icons.attachment,
-            ),
-            onTap: () async {
-              await LMChatMediaHandler.instance.pickImages();
-              mediaList = LMChatMediaHandler.instance.pickedMedia;
-              rebuildCurr.value = !rebuildCurr.value;
-            },
-          ),
+        margin: EdgeInsets.symmetric(
+          horizontal: 2.w,
+          vertical: 3.w,
         ),
+        backgroundColor: Colors.transparent,
       ),
+      onTap: () async {
+        await LMChatMediaHandler.instance.pickImages();
+        mediaList = LMChatMediaHandler.instance.pickedMedia;
+        rebuildCurr.value = !rebuildCurr.value;
+      },
     );
   }
 

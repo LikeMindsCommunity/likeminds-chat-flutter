@@ -17,6 +17,9 @@ enum LMChatWidgetSource {
   /// report screen
   report,
 
+  /// media forwarding screen
+  mediaForwarding,
+
   /// other screen
   other,
 }

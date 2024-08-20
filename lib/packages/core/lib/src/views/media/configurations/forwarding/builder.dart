@@ -41,7 +41,7 @@ class LMChatMediaForwardingBuilderDelegate {
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true,
     String? restorationId,
-    LMChatWidgetSource source = LMChatWidgetSource.home,
+    LMChatWidgetSource source = LMChatWidgetSource.mediaForwarding,
     bool canPop = true,
     Function(bool)? onPopInvoked,
   }) {

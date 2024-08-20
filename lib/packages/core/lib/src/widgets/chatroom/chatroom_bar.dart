@@ -9,7 +9,7 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 
 /// {@template lm_chatroom_bar}

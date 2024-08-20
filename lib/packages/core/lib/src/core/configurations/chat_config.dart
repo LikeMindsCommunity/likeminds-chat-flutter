@@ -3,7 +3,7 @@ import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
-import 'package:likeminds_chat_flutter_core/src/views/media/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
 
