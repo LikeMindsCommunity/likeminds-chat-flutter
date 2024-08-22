@@ -655,7 +655,7 @@ packages:
     source: path
     version: "0.6.1"
   likeminds_chat_flutter_ui:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../lib/packages/ui"
       relative: true
