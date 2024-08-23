@@ -69,7 +69,7 @@ postMultimediaConversationEventHandler(
               // If the thumbnail file is not present in media object
               // then generate the thumbnail and upload it to the server
               if (media.thumbnailFile == null) {
-                await getVideoThumbnail(media.toAttachmentViewData());
+                await getVideoThumbnail(media);
               }
               final response = await LMChatMediaService.uploadFile(
                 media.thumbnailFile!.readAsBytesSync(),
@@ -104,15 +104,15 @@ postMultimediaConversationEventHandler(
                   event.postConversationRequest.temporaryId,
                 ),
               );
-            } else {
-              emit(
-                LMChatMultiMediaConversationErrorState(
-                  uploadFileResponse.errorMessage!,
-                  event.postConversationRequest.temporaryId,
-                ),
-              );
             }
-          } catch (e) {}
+          } on Exception catch (e) {
+            emit(
+              LMChatMultiMediaConversationErrorState(
+                e.toString(),
+                event.postConversationRequest.temporaryId,
+              ),
+            );
+          }
         }
         LMChatConversationBloc.instance.lastConversationId =
             response.data!.conversation!.id;

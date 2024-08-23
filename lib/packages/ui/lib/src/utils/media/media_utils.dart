@@ -189,9 +189,9 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
+Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
   String? thumbnailPath = await VideoThumbnail.thumbnailFile(
-    video: media.thumbnailFile!.path,
+    video: media.mediaFile!.path,
     imageFormat: ImageFormat.JPEG,
     maxWidth: 300,
     quality: 50,
@@ -203,10 +203,10 @@ Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
 
   File? thumbnailFile;
   thumbnailFile = File(thumbnailPath!);
-  // ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
-  // media.width = image.width;
-  // media.height = image.height;
-  // media. ??= thumbnailFile;
+  ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
+  media.width = image.width;
+  media.height = image.height;
+  media.thumbnailFile ??= thumbnailFile;
 
   return thumbnailFile;
 }
