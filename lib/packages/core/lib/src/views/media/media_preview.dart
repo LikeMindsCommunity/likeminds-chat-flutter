@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -239,42 +238,20 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     );
   }
 
-  Container _defVideo() => Container();
+  LMChatVideo _defVideo() => LMChatVideo(
+        media: mediaList[currPosition],
+        key: ObjectKey(mediaList[currPosition].hashCode),
+      );
 
   Widget _defVideoThumbnail(int index) {
-    return mediaList[index].thumbnailFile != null
-        ? ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: LMChatImage(
-              imageFile: mediaList[index].thumbnailFile!,
-              style: const LMChatImageStyle(
-                boxFit: BoxFit.cover,
-              ),
-            ),
-          )
-        : ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: FutureBuilder(
-              future:
-                  getVideoThumbnail(mediaList[index].toAttachmentViewData()),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return mediaShimmer();
-                } else if (snapshot.data != null) {
-                  return Image.file(
-                    snapshot.data!,
-                    fit: BoxFit.cover,
-                  );
-                } else {
-                  return SizedBox(
-                    child: Icon(
-                      Icons.error,
-                      color: LMChatTheme.theme.secondaryColor,
-                    ),
-                  );
-                }
-              },
-            ),
-          );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8.0),
+      child: LMChatImage(
+        imageUrl: mediaList[index].thumbnailUrl!,
+        style: const LMChatImageStyle(
+          boxFit: BoxFit.cover,
+        ),
+      ),
+    );
   }
 }
