@@ -529,16 +529,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   children: [
                     LMChatButton(
                       onTap: () async {
-                        await LMChatMediaHandler.instance.pickImages();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LMChatMediaForwardingScreen(
-                              chatroomId: widget.chatroom.id,
+                        final res =
+                            await LMChatMediaHandler.instance.pickImages();
+                        if (res.data != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LMChatMediaForwardingScreen(
+                                chatroomId: widget.chatroom.id,
+                              ),
                             ),
-                          ),
-                        );
-                        _popupMenuController.hideMenu();
+                          );
+                          _popupMenuController.hideMenu();
+                        }
                       },
                       icon: LMChatIcon(
                         type: LMChatIconType.icon,
@@ -568,16 +571,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   children: [
                     LMChatButton(
                       onTap: () async {
-                        await LMChatMediaHandler.instance.pickImages();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LMChatMediaForwardingScreen(
-                              chatroomId: widget.chatroom.id,
+                        final res =
+                            await LMChatMediaHandler.instance.pickMedia();
+                        if (res.data != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LMChatMediaForwardingScreen(
+                                chatroomId: widget.chatroom.id,
+                              ),
                             ),
-                          ),
-                        );
-                        _popupMenuController.hideMenu();
+                          );
+                          _popupMenuController.hideMenu();
+                        }
                       },
                       icon: LMChatIcon(
                         type: LMChatIconType.icon,
