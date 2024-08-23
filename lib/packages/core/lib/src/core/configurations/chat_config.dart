@@ -4,6 +4,7 @@ import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/co
 import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
 
@@ -36,6 +37,9 @@ class LMChatConfig {
   /// {@macro lm_chat_media_forwarding_config}
   final LMChatMediaForwardingConfig mediaForwardingConfig;
 
+  /// {@macro lm_chat_media_preview_config}
+  final LMChatMediaPreviewConfig mediaPreviewConfig;
+
   /// {@macro lm_widget_builder_delegate}
   final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
@@ -50,6 +54,7 @@ class LMChatConfig {
     this.participantConfig = const LMChatParticipantConfig(),
     this.reportConfig = const LMChatReportConfig(),
     this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),
+    this.mediaPreviewConfig = const LMChatMediaPreviewConfig(),
     this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });

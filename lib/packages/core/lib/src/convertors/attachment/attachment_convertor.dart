@@ -65,13 +65,13 @@ extension MediaConvertor on LMChatAttachmentViewData {
   LMChatMediaModel toMediaModel() {
     return LMChatMediaModel(
       mediaType: mapStringToMediaType(type!),
-      mediaUrl: url,
+      mediaUrl: url ?? fileUrl,
       mediaFile: attachmentFile,
       thumbnailUrl: thumbnailUrl,
       thumbnailFile: thumbnailFile,
       meta: meta,
       height: height,
-      width: int.tryParse(width),
+      width: width,
     );
   }
 }

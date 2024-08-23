@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// A class to manage all media picking, and accessing
@@ -31,6 +32,12 @@ class LMChatMediaHandler {
       pickedMedia.add(media);
     } else if (media is List<LMChatMediaModel>) {
       pickedMedia.addAll(media);
+    } else if (media is LMChatAttachmentViewData) {
+      pickedMedia.add(media.toMediaModel());
+    } else if (media is List<LMChatAttachmentViewData>) {
+      pickedMedia.addAll(media.map((e) => e.toMediaModel()).toList());
+    } else {
+      throw Exception('Incorrect format for adding media');
     }
   }
 
