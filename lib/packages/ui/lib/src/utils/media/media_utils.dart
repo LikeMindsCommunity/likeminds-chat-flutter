@@ -315,20 +315,51 @@ Widget getChatBubbleImage(
           ),
           mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
                   mediaFile.thumbnailUrl != null
-              ? Center(
-                  child: LMChatIcon(
-                    type: LMChatIconType.icon,
-                    icon: Icons.play_arrow,
-                    style: LMChatIconStyle(
-                      color: LMChatDefaultTheme.blackColor,
-                      boxSize: 32,
-                      backgroundColor:
-                          LMChatDefaultTheme.whiteColor.withOpacity(0.7),
-                      size: 24,
-                      boxBorderRadius: 16,
-                      boxPadding: const EdgeInsets.all(6),
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(height: 2.h),
+                    LMChatIcon(
+                      type: LMChatIconType.icon,
+                      icon: Icons.play_arrow,
+                      style: LMChatIconStyle(
+                        color: LMChatDefaultTheme.whiteColor,
+                        boxSize: 32,
+                        backgroundColor:
+                            LMChatDefaultTheme.blackColor.withOpacity(0.3),
+                        size: 24,
+                        boxBorderRadius: 16,
+                        boxPadding: const EdgeInsets.all(2),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: Row(
+                        children: [
+                          LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.video_camera_back_outlined,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.onPrimary,
+                              boxSize: 20,
+                              size: 18,
+                              boxPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          mediaFile.meta["duration"] != null
+                              ? LMChatText(
+                                  mediaFile.meta["duration"],
+                                  style: LMChatTextStyle.basic().copyWith(
+                                    backgroundColor:
+                                        LMChatTheme.theme.onPrimary,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ],
+                      ),
+                    )
+                  ],
                 )
               : const SizedBox(),
         ],
