@@ -153,7 +153,8 @@ class _LMChatVideoState extends State<LMChatVideo> {
       builder: (context, state, _) {
         return IconButton(
           onPressed: () {
-            // LMFeedVideoProvider.instance.toggleVolumeState();
+            state ? _player!.setVolume(100) : _player!.setVolume(0);
+            isMuted!.value = !isMuted!.value;
           },
           icon: LMChatIcon(
             type: LMChatIconType.icon,
