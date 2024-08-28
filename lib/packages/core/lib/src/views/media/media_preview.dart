@@ -78,7 +78,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   LMChatAppBar _defAppBar() {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
-        height: 72,
+        height: 60,
         gap: 12,
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
