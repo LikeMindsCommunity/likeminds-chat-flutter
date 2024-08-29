@@ -6,6 +6,26 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
+const List<String> videoExtentions = [
+  'mp4',
+  'mov',
+  'wmv',
+  'avi',
+  'mkv',
+  'flv',
+];
+
+const List<String> photoExtentions = [
+  'jpg',
+  'jpeg',
+  'png',
+];
+
+const List<String> mediaExtentions = [
+  ...photoExtentions,
+  ...videoExtentions,
+];
+
 /// A class to manage all media picking, and accessing
 ///
 /// Gives access to functions that handles media picking natively
@@ -206,6 +226,74 @@ class LMChatMediaHandler {
     }
   }
 
+  Future<LMResponse<List<LMChatMediaModel>>> pickMedia(
+      {int mediaCount = 0}) async {
+    final FilePickerResult? list = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.media,
+    );
+
+    List<LMChatMediaModel> attachedMedia = [];
+    if (list != null && list.files.isNotEmpty) {
+      if (mediaCount + pickedMedia.length + list.files.length > 10) {
+        return LMResponse(
+            success: false,
+            errorMessage:
+                'A total of 10 attachments can be added to a message');
+      }
+      for (PlatformFile file in list.files) {
+        if (checkFileType(file)) {
+          // image case
+          const double sizeLimit = 5;
+          int fileBytes = file.size;
+          double fileSize = getFileSizeInDouble(fileBytes);
+          if (fileSize > sizeLimit) {
+            return LMResponse(
+              success: false,
+              errorMessage:
+                  'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+            );
+          }
+          attachedMedia.add(
+            LMChatMediaModel(
+              mediaType: LMChatMediaType.image,
+              mediaFile: File(file.path!),
+              meta: {
+                'file_name': file.name,
+              },
+            ),
+          );
+        } else {
+          // video case
+          const double sizeLimit = 100;
+          int fileBytes = file.size;
+          double fileSize = getFileSizeInDouble(fileBytes);
+          if (fileSize > sizeLimit) {
+            return LMResponse(
+              success: false,
+              errorMessage:
+                  'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+            );
+          }
+        }
+        attachedMedia.add(
+          LMChatMediaModel(
+            mediaType: LMChatMediaType.video,
+            mediaFile: File(file.path!),
+            meta: {
+              'file_name': file.name,
+            },
+          ),
+        );
+      }
+
+      addPickedMedia(attachedMedia);
+      return LMResponse(success: true, data: attachedMedia);
+    } else {
+      return LMResponse(success: true);
+    }
+  }
+
   /// Picks multiple document files (PDFs) from the device storage
   ///
   /// [currentMediaLength] is the current number of media items already selected
@@ -252,5 +340,9 @@ class LMChatMediaHandler {
         errorMessage: 'An error occurred\n${err.toString()}',
       );
     }
+  }
+
+  bool checkFileType(PlatformFile file) {
+    return photoExtentions.contains(file.extension);
   }
 }

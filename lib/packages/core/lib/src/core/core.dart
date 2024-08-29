@@ -3,6 +3,8 @@ import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_config.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/firebase/firebase.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
+
+import 'package:media_kit/media_kit.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// {@template lm_chat_core}
@@ -49,7 +51,8 @@ class LMChatCore {
   /// The function returns a [LMResponse] object.
   /// If the initialization is successful, the [LMResponse] object give [success] as true and [data] as null.
   Future<LMResponse<void>> initialize({
-    @Deprecated("Use [LMChatCore.instance.client] to get an instance of [LMChatClient] instead of passing it as a parameter.")
+    @Deprecated(
+        "Use [LMChatCore.instance.client] to get an instance of [LMChatClient] instead of passing it as a parameter.")
     LMChatClient? lmChatClient,
     String? domain,
     LMChatConfig? config,
@@ -88,6 +91,7 @@ class LMChatCore {
       });
     }
     await initFirebase();
+    MediaKit.ensureInitialized();
     return LMResponse.success(data: null);
   }
 

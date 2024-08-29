@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
@@ -56,7 +55,6 @@ class _LMChatMediaForwardingScreenState
 
   @override
   void deactivate() {
-    LMChatMediaHandler.instance.clearPickedMedia();
     super.deactivate();
   }
 
@@ -200,7 +198,7 @@ class _LMChatMediaForwardingScreenState
   LMChatAppBar _defAppBar() {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
-        height: 72,
+        height: 60,
         gap: 12,
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
@@ -372,7 +370,10 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  Container _defVideo() => Container();
+  LMChatVideo _defVideo() => LMChatVideo(
+        media: mediaList[currPosition],
+        key: ObjectKey(mediaList[currPosition].hashCode),
+      );
 
   Widget _defVideoThumbnail(int index) {
     return mediaList[index].thumbnailFile != null
@@ -388,8 +389,7 @@ class _LMChatMediaForwardingScreenState
         : ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: FutureBuilder(
-              future:
-                  getVideoThumbnail(mediaList[index].toAttachmentViewData()),
+              future: getVideoThumbnail(mediaList[index]),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return mediaShimmer();

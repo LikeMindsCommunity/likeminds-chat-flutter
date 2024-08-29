@@ -189,9 +189,9 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
+Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
   String? thumbnailPath = await VideoThumbnail.thumbnailFile(
-    video: media.thumbnailFile!.path,
+    video: media.mediaFile!.path,
     imageFormat: ImageFormat.JPEG,
     maxWidth: 300,
     quality: 50,
@@ -203,10 +203,10 @@ Future<File?> getVideoThumbnail(LMChatAttachmentViewData media) async {
 
   File? thumbnailFile;
   thumbnailFile = File(thumbnailPath!);
-  // ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
-  // media.width = image.width;
-  // media.height = image.height;
-  // media. ??= thumbnailFile;
+  ui.Image image = await decodeImageFromList(thumbnailFile.readAsBytesSync());
+  media.width = image.width;
+  media.height = image.height;
+  media.thumbnailFile ??= thumbnailFile;
 
   return thumbnailFile;
 }
@@ -315,20 +315,51 @@ Widget getChatBubbleImage(
           ),
           mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
                   mediaFile.thumbnailUrl != null
-              ? Center(
-                  child: LMChatIcon(
-                    type: LMChatIconType.icon,
-                    icon: Icons.play_arrow,
-                    style: LMChatIconStyle(
-                      color: LMChatDefaultTheme.blackColor,
-                      boxSize: 32,
-                      backgroundColor:
-                          LMChatDefaultTheme.whiteColor.withOpacity(0.7),
-                      size: 24,
-                      boxBorderRadius: 16,
-                      boxPadding: const EdgeInsets.all(6),
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(height: 2.h),
+                    LMChatIcon(
+                      type: LMChatIconType.icon,
+                      icon: Icons.play_arrow,
+                      style: LMChatIconStyle(
+                        color: LMChatDefaultTheme.whiteColor,
+                        boxSize: 32,
+                        backgroundColor:
+                            LMChatDefaultTheme.blackColor.withOpacity(0.3),
+                        size: 24,
+                        boxBorderRadius: 16,
+                        boxPadding: const EdgeInsets.all(2),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                      child: Row(
+                        children: [
+                          LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.video_camera_back_outlined,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.onPrimary,
+                              boxSize: 20,
+                              size: 18,
+                              boxPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          mediaFile.meta["duration"] != null
+                              ? LMChatText(
+                                  mediaFile.meta["duration"],
+                                  style: LMChatTextStyle.basic().copyWith(
+                                    backgroundColor:
+                                        LMChatTheme.theme.onPrimary,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ],
+                      ),
+                    )
+                  ],
                 )
               : const SizedBox(),
         ],
@@ -390,196 +421,180 @@ Widget getImageMessage(
   if (conversationAttachments == null || conversationAttachments.isEmpty) {
     return const SizedBox();
   }
-  void onTap() {}
 
   if (conversationAttachments.length == 1) {
-    return GestureDetector(
-      onTap: onTap,
-      child: getChatBubbleImage(
-        conversationAttachments.first,
-        height: 55.w,
-        width: 55.w,
-      ),
+    return getChatBubbleImage(
+      conversationAttachments.first,
+      height: 55.w,
+      width: 55.w,
     );
   } else if (conversationAttachments.length == 2) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          getChatBubbleImage(
-            conversationAttachments[0],
-            height: 26.w,
-            width: 26.w,
-          ),
-          kHorizontalPaddingSmall,
-          getChatBubbleImage(
-            conversationAttachments[1],
-            height: 26.w,
-            width: 26.w,
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        getChatBubbleImage(
+          conversationAttachments[0],
+          height: 26.w,
+          width: 26.w,
+        ),
+        kHorizontalPaddingSmall,
+        getChatBubbleImage(
+          conversationAttachments[1],
+          height: 26.w,
+          width: 26.w,
+        ),
+      ],
     );
   } else if (conversationAttachments.length == 3) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          getChatBubbleImage(
-            conversationAttachments[0],
-            height: 26.w,
-            width: 26.w,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        getChatBubbleImage(
+          conversationAttachments[0],
+          height: 26.w,
+          width: 26.w,
+        ),
+        kHorizontalPaddingSmall,
+        Container(
+          height: 26.w,
+          width: 26.w,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6.0),
           ),
-          kHorizontalPaddingSmall,
-          Container(
-            height: 26.w,
-            width: 26.w,
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6.0),
-            ),
-            child: Stack(
-              children: [
-                getChatBubbleImage(
-                  conversationAttachments[1],
+          child: Stack(
+            children: [
+              getChatBubbleImage(
+                conversationAttachments[1],
+                height: 26.w,
+                width: 26.w,
+              ),
+              Positioned(
+                child: Container(
                   height: 26.w,
                   width: 26.w,
-                ),
-                Positioned(
-                  child: Container(
-                    height: 26.w,
-                    width: 26.w,
-                    alignment: Alignment.center,
-                    color: LMChatTheme.theme.container.withOpacity(0.5),
-                    child: LMChatText(
-                      '+2',
-                      style: LMChatTextStyle(
-                        textStyle: TextStyle(
-                          color: LMChatTheme.theme.onContainer,
-                          fontSize: 20,
-                        ),
+                  alignment: Alignment.center,
+                  color: LMChatTheme.theme.container.withOpacity(0.5),
+                  child: LMChatText(
+                    '+2',
+                    style: LMChatTextStyle(
+                      textStyle: TextStyle(
+                        color: LMChatTheme.theme.onContainer,
+                        fontSize: 20,
                       ),
                     ),
                   ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+                ),
+              )
+            ],
+          ),
+        )
+      ],
     );
   } else if (conversationAttachments.length == 4) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              getChatBubbleImage(
-                conversationAttachments[0],
-                height: 26.w,
-                width: 26.w,
-              ),
-              kHorizontalPaddingSmall,
-              getChatBubbleImage(
-                conversationAttachments[1],
-                height: 26.w,
-                width: 26.w,
-              ),
-            ],
-          ),
-          kVerticalPaddingSmall,
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              getChatBubbleImage(
-                conversationAttachments[2],
-                height: 26.w,
-                width: 26.w,
-              ),
-              kHorizontalPaddingSmall,
-              getChatBubbleImage(
-                conversationAttachments[3],
-                height: 26.w,
-                width: 26.w,
-              ),
-            ],
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            getChatBubbleImage(
+              conversationAttachments[0],
+              height: 26.w,
+              width: 26.w,
+            ),
+            kHorizontalPaddingSmall,
+            getChatBubbleImage(
+              conversationAttachments[1],
+              height: 26.w,
+              width: 26.w,
+            ),
+          ],
+        ),
+        kVerticalPaddingSmall,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            getChatBubbleImage(
+              conversationAttachments[2],
+              height: 26.w,
+              width: 26.w,
+            ),
+            kHorizontalPaddingSmall,
+            getChatBubbleImage(
+              conversationAttachments[3],
+              height: 26.w,
+              width: 26.w,
+            ),
+          ],
+        ),
+      ],
     );
   } else {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              getChatBubbleImage(
-                conversationAttachments[0],
-                height: 26.w,
-                width: 26.w,
-              ),
-              kHorizontalPaddingSmall,
-              getChatBubbleImage(
-                conversationAttachments[1],
-                height: 26.w,
-                width: 26.w,
-              ),
-            ],
-          ),
-          kVerticalPaddingSmall,
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              getChatBubbleImage(
-                conversationAttachments[2],
-                height: 26.w,
-                width: 26.w,
-              ),
-              kHorizontalPaddingSmall,
-              Container(
-                height: 26.w,
-                width: 26.w,
-                clipBehavior: Clip.hardEdge,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(6.0)),
-                child: Stack(
-                  children: [
-                    getChatBubbleImage(
-                      conversationAttachments[3],
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            getChatBubbleImage(
+              conversationAttachments[0],
+              height: 26.w,
+              width: 26.w,
+            ),
+            kHorizontalPaddingSmall,
+            getChatBubbleImage(
+              conversationAttachments[1],
+              height: 26.w,
+              width: 26.w,
+            ),
+          ],
+        ),
+        kVerticalPaddingSmall,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            getChatBubbleImage(
+              conversationAttachments[2],
+              height: 26.w,
+              width: 26.w,
+            ),
+            kHorizontalPaddingSmall,
+            Container(
+              height: 26.w,
+              width: 26.w,
+              clipBehavior: Clip.hardEdge,
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(6.0)),
+              child: Stack(
+                children: [
+                  getChatBubbleImage(
+                    conversationAttachments[3],
+                    height: 26.w,
+                    width: 26.w,
+                  ),
+                  Positioned(
+                    child: Container(
                       height: 26.w,
                       width: 26.w,
-                    ),
-                    Positioned(
-                      child: Container(
-                        height: 26.w,
-                        width: 26.w,
-                        alignment: Alignment.center,
-                        color: LMChatTheme.theme.container.withOpacity(0.5),
-                        child: LMChatText(
-                          '+2',
-                          style: LMChatTextStyle(
-                            textStyle: TextStyle(
-                              color: LMChatTheme.theme.onContainer,
-                              fontSize: 20,
-                            ),
+                      alignment: Alignment.center,
+                      color: LMChatTheme.theme.container.withOpacity(0.5),
+                      child: LMChatText(
+                        '+2',
+                        style: LMChatTextStyle(
+                          textStyle: TextStyle(
+                            color: LMChatTheme.theme.onContainer,
+                            fontSize: 20,
                           ),
                         ),
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

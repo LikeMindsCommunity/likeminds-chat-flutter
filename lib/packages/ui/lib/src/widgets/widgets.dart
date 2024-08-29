@@ -22,6 +22,7 @@ export 'shimmers/chatroom_skeleton.dart';
 export 'shimmers/skeleton_chat_box.dart';
 
 export 'media/image.dart';
+export 'media/video.dart';
 
 export 'conversation/chat_bubble.dart';
 
