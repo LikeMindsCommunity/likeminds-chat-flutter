@@ -54,11 +54,6 @@ class _LMChatMediaForwardingScreenState
   }
 
   @override
-  void deactivate() {
-    super.deactivate();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       backgroundColor: LMChatTheme.theme.scaffold,
