@@ -123,9 +123,9 @@ class _DocumentThumbnailFileState extends State<DocumentThumbnailFile> {
                         kHorizontalPaddingMedium,
                         const LMChatIcon(
                           type: LMChatIconType.icon,
-                          icon: Icons.insert_drive_file_outlined,
+                          icon: Icons.picture_as_pdf_outlined,
                           style: LMChatIconStyle(
-                            size: 32,
+                            size: 28,
                             boxSize: 32,
                             boxPadding: EdgeInsets.zero,
                           ),
@@ -317,9 +317,9 @@ class _DocumentTileState extends State<DocumentTile> {
                       kHorizontalPaddingMedium,
                       const LMChatIcon(
                         type: LMChatIconType.icon,
-                        icon: Icons.insert_drive_file,
+                        icon: Icons.picture_as_pdf_outlined,
                         style: LMChatIconStyle(
-                          size: 32,
+                          size: 28,
                           boxSize: 32,
                           boxPadding: EdgeInsets.zero,
                           color: LMChatDefaultTheme.greyColor,
