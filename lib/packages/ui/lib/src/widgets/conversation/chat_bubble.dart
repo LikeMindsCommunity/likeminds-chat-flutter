@@ -241,9 +241,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             _isSelected = false;
             widget.onTap?.call(_isSelected, this);
           } else {
-            if (widget.attachments != null) {
-              widget.onMediaTap?.call();
-            }
             if (widget.isSelectableOnTap?.call() ?? false) {
               _isSelected = !_isSelected;
               widget.onTap?.call(_isSelected, this);
@@ -327,12 +324,22 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
-                          LMChatBubbleMedia(
-                            conversation: conversation,
-                            attachments: widget.attachments ?? [],
-                            count: conversation.attachmentCount ?? 0,
-                            attachmentUploaded:
-                                conversation.attachmentsUploaded ?? false,
+                          AbsorbPointer(
+                            absorbing: _isSelected,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (widget.attachments != null) {
+                                  widget.onMediaTap?.call();
+                                }
+                              },
+                              child: LMChatBubbleMedia(
+                                conversation: conversation,
+                                attachments: widget.attachments ?? [],
+                                count: conversation.attachmentCount ?? 0,
+                                attachmentUploaded:
+                                    conversation.attachmentsUploaded ?? false,
+                              ),
+                            ),
                           ),
                           conversation.deletedByUserId != null
                               ? widget.deletedText ??
