@@ -630,22 +630,27 @@ class _DocumentFactoryState extends State<DocumentFactory> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     mediaList = widget.mediaList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: rebuildCurr,
       builder: (context, _, __) {
         return Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 65.h),
+              constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  getDocumentThumbnail(
-                    mediaList![currPosition].mediaFile!,
-                    size: Size(100.w, 52.h),
+                  Expanded(
+                    child: getDocumentThumbnail(
+                      mediaList![currPosition].mediaFile!,
+                    ),
                   ),
                   kVerticalPaddingXLarge,
                   Column(
@@ -687,7 +692,7 @@ class _DocumentFactoryState extends State<DocumentFactory> {
                 left: 5.0,
                 right: 5.0,
                 top: 2.h,
-                bottom: 12.h,
+                bottom: 2.h,
               ),
               child: Column(
                 children: [
@@ -712,14 +717,14 @@ class _DocumentFactoryState extends State<DocumentFactory> {
                                         ? Border.all(
                                             color: LMChatTheme
                                                 .theme.secondaryColor,
-                                            width: 5.0,
+                                            width: 3.0,
                                           )
                                         : null),
                                 width: 15.w,
                                 height: 15.w,
                                 child: getDocumentThumbnail(
-                                    mediaList![index].mediaFile!,
-                                    size: Size(100.w, 58.h)),
+                                  mediaList![index].mediaFile!,
+                                ),
                               ),
                             ),
                           ),
