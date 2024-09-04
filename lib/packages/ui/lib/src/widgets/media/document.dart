@@ -272,7 +272,7 @@ class _DocumentTileState extends State<DocumentTile> {
       final String url = widget.media.mediaUrl!;
       file = File(url);
     }
-    _fileSize = getFileSizeString(bytes: widget.media.size!);
+    _fileSize = getFileSizeString(bytes: widget.media.size ?? 0);
     _fileName = basenameWithoutExtension(file.path);
     return file;
   }
@@ -538,10 +538,10 @@ class GetMultipleDocPreview extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<GetMultipleDocPreview> createState() => GgetMultipleDocPreviewState();
+  State<GetMultipleDocPreview> createState() => GetMultipleDocPreviewState();
 }
 
-class GgetMultipleDocPreviewState extends State<GetMultipleDocPreview> {
+class GetMultipleDocPreviewState extends State<GetMultipleDocPreview> {
   List<LMChatMediaModel>? mediaList;
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
   int length = 2;
