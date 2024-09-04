@@ -279,7 +279,7 @@ class _LMChatMediaForwardingScreenState
         ],
       );
     } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return Container();
+      return DocumentFactory(mediaList: mediaList);
     }
     return const SizedBox();
   }

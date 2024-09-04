@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/media/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';

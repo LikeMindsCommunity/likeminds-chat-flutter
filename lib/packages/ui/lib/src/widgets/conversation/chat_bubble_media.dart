@@ -33,7 +33,8 @@ class LMChatBubbleMedia extends StatelessWidget {
         mediaWidget = _defaultMediaWidget(context);
       } else if (attachments.first.type ==
           mapMediaTypeToString(LMChatMediaType.document)) {
-        mediaWidget = const SizedBox.shrink();
+        mediaWidget = documentPreviewFactory(
+            attachments.map((e) => e.toMediaModel()).toList());
       } else if (conversation.ogTags != null) {
         mediaWidget = const SizedBox.shrink();
       } else {
