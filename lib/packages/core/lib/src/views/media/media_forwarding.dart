@@ -167,7 +167,14 @@ class _LMChatMediaForwardingScreenState
         backgroundColor: Colors.transparent,
       ),
       onTap: () async {
-        await LMChatMediaHandler.instance.pickImages();
+        if (mediaList.first.mediaType == LMChatMediaType.image) {
+          await LMChatMediaHandler.instance.pickImages();
+        } else if (mediaList.first.mediaType == LMChatMediaType.video) {
+          await LMChatMediaHandler.instance.pickVideos();
+        } else if (mediaList.first.mediaType == LMChatMediaType.document) {
+          await LMChatMediaHandler.instance.pickDocuments();
+        }
+
         mediaList = LMChatMediaHandler.instance.pickedMedia;
         rebuildCurr.value = !rebuildCurr.value;
       },
