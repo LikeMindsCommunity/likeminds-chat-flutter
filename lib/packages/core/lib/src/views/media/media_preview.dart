@@ -152,7 +152,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         ],
       );
     } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return DocumentFactory(mediaList: mediaList);
+      return LMChatDocumentPreview(mediaList: mediaList);
     }
     return const SizedBox();
   }

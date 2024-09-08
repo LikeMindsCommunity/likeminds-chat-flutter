@@ -259,9 +259,7 @@ class _LMChatMediaForwardingScreenState
         mediaList.first.mediaType == LMChatMediaType.video) {
       return Column(
         children: [
-          SizedBox(
-            height: 2.h,
-          ),
+          SizedBox(height: 2.h),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
             child: Center(
@@ -286,7 +284,7 @@ class _LMChatMediaForwardingScreenState
         ],
       );
     } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return DocumentFactory(mediaList: mediaList);
+      return LMChatDocumentPreview(mediaList: mediaList);
     }
     return const SizedBox();
   }
@@ -345,7 +343,9 @@ class _LMChatMediaForwardingScreenState
           height: 15.w,
           child: mediaList[index].mediaType == LMChatMediaType.image
               ? _defImageThumbnail(index)
-              : _defVideoThumbnail(index),
+              : mediaList[index].mediaType == LMChatMediaType.video
+                  ? _defVideoThumbnail(index)
+                  : _defDocumentThumbnail(index),
         ),
       ),
     );
@@ -360,16 +360,17 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  ClipRRect _defImageThumbnail(int index) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8.0),
-      child: LMChatImage(
-        imageFile: mediaList[index].mediaFile!,
-        style: const LMChatImageStyle(
-          boxFit: BoxFit.cover,
-        ),
+  LMChatImage _defImageThumbnail(int index) {
+    return LMChatImage(
+      imageFile: mediaList[index].mediaFile!,
+      style: const LMChatImageStyle(
+        boxFit: BoxFit.cover,
       ),
     );
+  }
+
+  LMChatDocumentThumbnail _defDocumentThumbnail(int index) {
+    return LMChatDocumentThumbnail(media: mediaList[index]);
   }
 
   LMChatVideo _defVideo() => LMChatVideo(

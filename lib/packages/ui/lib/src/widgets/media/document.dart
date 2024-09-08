@@ -8,41 +8,48 @@ import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DocumentThumbnailFile extends StatefulWidget {
-  final int? index;
+/// A widget that displays a thumbnail for a document.
+class LMChatDocumentThumbnail extends StatefulWidget {
+  /// The document to display.
   final LMChatMediaModel media;
 
-  const DocumentThumbnailFile({
-    Key? key,
+  const LMChatDocumentThumbnail({
+    super.key,
     required this.media,
-    this.index,
-  }) : super(key: key);
+  });
 
   @override
-  State<DocumentThumbnailFile> createState() => _DocumentThumbnailFileState();
+  State<LMChatDocumentThumbnail> createState() =>
+      _LMChatDocumentThumbnailState();
 }
 
-class _DocumentThumbnailFileState extends State<DocumentThumbnailFile> {
-  String? _fileName;
-  final String _fileExtension = 'pdf';
-  String? _fileSize;
+/// The state for the LMChatDocumentThumbnail widget.
+class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
+  /// The URL of the file.
   String? url;
+
+  /// The file object.
   File? file;
+
+  /// A future that loads the file.
   Future? loadedFile;
+
+  /// The widget that displays the document file.
   Widget? documentFile;
 
+  /// Loads the file from the URL or local storage.
   Future loadFile() async {
     url = widget.media.mediaUrl;
     if (widget.media.mediaFile != null) {
       file = widget.media.mediaFile;
-      _fileName = basenameWithoutExtension(file!.path);
+      // _fileName = basenameWithoutExtension(file!.path);
     } else {
       final String url = widget.media.mediaUrl!;
-      _fileName = basenameWithoutExtension(url);
+      // _fileName = basenameWithoutExtension(url);
       file = await DefaultCacheManager().getSingleFile(url);
     }
 
-    _fileSize = getFileSizeString(bytes: widget.media.size ?? 0);
+    // _fileSize = getFileSizeString(bytes: widget.media.size ?? 0);
     documentFile = PdfDocumentLoader.openFile(
       file!.path,
       pageNumber: 1,
@@ -59,9 +66,10 @@ class _DocumentThumbnailFileState extends State<DocumentThumbnailFile> {
           child: FittedBox(
             fit: BoxFit.cover,
             child: textureBuilder(
-                allowAntialiasingIOS: true,
-                backgroundFill: true,
-                size: Size(pageSize.width, pageSize.height)),
+              allowAntialiasingIOS: true,
+              backgroundFill: true,
+              size: Size(pageSize.width, pageSize.height),
+            ),
           ),
         ),
       ),
@@ -100,135 +108,11 @@ class _DocumentThumbnailFileState extends State<DocumentThumbnailFile> {
                 ),
                 Positioned(
                   bottom: 0,
-                  child: Container(
-                    height: 70,
-                    width: 54.w,
-                    decoration: BoxDecoration(
-                      color: LMChatTheme.theme.container.withOpacity(0.8),
-                      border: Border.all(color: LMChatDefaultTheme.greyColor),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(
-                          kBorderRadiusMedium,
-                        ),
-                        bottomRight: Radius.circular(
-                          kBorderRadiusMedium,
-                        ),
-                      ),
-                    ),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: kPaddingLarge),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        kHorizontalPaddingMedium,
-                        const LMChatIcon(
-                          type: LMChatIconType.icon,
-                          icon: Icons.picture_as_pdf_outlined,
-                          style: LMChatIconStyle(
-                            size: 28,
-                            boxSize: 32,
-                            boxPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                        kHorizontalPaddingMedium,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: LMChatText(
-                                  _fileName ?? '',
-                                  style: const LMChatTextStyle(
-                                    textAlign: TextAlign.left,
-                                    textStyle: TextStyle(
-                                      fontSize: 12,
-                                      overflow: TextOverflow.ellipsis,
-                                      color: LMChatDefaultTheme.greyColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              kVerticalPaddingSmall,
-                              Row(
-                                children: [
-                                  widget.media.pageCount != null
-                                      ? Row(
-                                          children: <Widget>[
-                                            kHorizontalPaddingXSmall,
-                                            LMChatText(
-                                              "${widget.media.pageCount!} ${widget.media.pageCount! > 1 ? "Pages" : "Page"}",
-                                              style: const LMChatTextStyle(
-                                                textAlign: TextAlign.left,
-                                                textStyle: TextStyle(
-                                                  fontSize: 10,
-                                                  color: LMChatDefaultTheme
-                                                      .greyColor,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ),
-                                            kHorizontalPaddingXSmall,
-                                            const LMChatText(
-                                              '·',
-                                              style: LMChatTextStyle(
-                                                textAlign: TextAlign.left,
-                                                textStyle: TextStyle(
-                                                  fontSize: 10,
-                                                  color: LMChatDefaultTheme
-                                                      .greyColor,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : const SizedBox(),
-                                  kHorizontalPaddingXSmall,
-                                  LMChatText(
-                                    _fileSize!.toUpperCase(),
-                                    style: const LMChatTextStyle(
-                                      textAlign: TextAlign.left,
-                                      textStyle: TextStyle(
-                                        fontSize: 10,
-                                        color: LMChatDefaultTheme.greyColor,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                  kHorizontalPaddingXSmall,
-                                  const LMChatText(
-                                    '·',
-                                    style: LMChatTextStyle(
-                                      textAlign: TextAlign.left,
-                                      textStyle: TextStyle(
-                                        fontSize: 10,
-                                        color: LMChatDefaultTheme.greyColor,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                  kHorizontalPaddingXSmall,
-                                  LMChatText(
-                                    _fileExtension.toUpperCase(),
-                                    style: const LMChatTextStyle(
-                                      textAlign: TextAlign.left,
-                                      textStyle: TextStyle(
-                                        fontSize: 10,
-                                        color: LMChatDefaultTheme.greyColor,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                        kHorizontalPaddingXSmall,
-                      ],
+                  child: LMChatDocumentTile(
+                    media: widget.media,
+                    style: LMChatDocumentTileStyle(
+                      padding: EdgeInsets.zero,
+                      width: 54.w,
                     ),
                   ),
                 ),
@@ -245,25 +129,53 @@ class _DocumentThumbnailFileState extends State<DocumentThumbnailFile> {
   }
 }
 
-class DocumentTile extends StatefulWidget {
+/// A widget that displays a tile for a document.
+class LMChatDocumentTile extends StatefulWidget {
+  /// The document to display.
   final LMChatMediaModel media;
 
-  const DocumentTile({
+  /// The title of the document.
+  final Widget? title;
+
+  /// The subtitle of the document.
+  final Widget? subtitle;
+
+  /// The icon to display for the document.
+  final LMChatIcon? documentIcon;
+
+  /// The style for the document tile.
+  final LMChatDocumentTileStyle? style;
+
+  const LMChatDocumentTile({
     super.key,
     required this.media,
+    this.style,
+    this.title,
+    this.subtitle,
+    this.documentIcon,
   });
 
   @override
-  State<DocumentTile> createState() => _DocumentTileState();
+  State<LMChatDocumentTile> createState() => _LMChatDocumentTileState();
 }
 
-class _DocumentTileState extends State<DocumentTile> {
+/// The state for the LMChatDocumentTile widget.
+class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
+  /// The name of the file.
   String? _fileName;
+
+  /// The extension of the file.
   final String _fileExtension = 'pdf';
+
+  /// The size of the file.
   String? _fileSize;
-  File? file;
+
+  /// A future that loads the file.
   Future? loadedFile;
 
+  late LMChatDocumentTileStyle style;
+
+  /// Loads the file from the URL or local storage.
   Future loadFile() async {
     File file;
     if (widget.media.mediaFile != null) {
@@ -281,6 +193,7 @@ class _DocumentTileState extends State<DocumentTile> {
   void initState() {
     super.initState();
     loadedFile = loadFile();
+    style = widget.style ?? LMChatDocumentTileStyle();
   }
 
   @override
@@ -301,172 +214,219 @@ class _DocumentTileState extends State<DocumentTile> {
                 }
               },
               child: Padding(
-                padding: const EdgeInsets.only(bottom: kPaddingSmall),
+                padding: const EdgeInsets.symmetric(
+                  vertical: kPaddingXSmall,
+                ),
                 child: Container(
-                  height: 70,
-                  width: 60.w,
+                  height: style.height ?? 72,
+                  width: style.width ?? 60.w,
                   decoration: BoxDecoration(
                     border: Border.all(color: LMChatDefaultTheme.greyColor),
                     borderRadius: BorderRadius.circular(kBorderRadiusMedium),
                     color: LMChatTheme.theme.container.withOpacity(0.8),
                   ),
-                  padding: const EdgeInsets.symmetric(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      kHorizontalPaddingMedium,
-                      const LMChatIcon(
-                        type: LMChatIconType.icon,
-                        icon: Icons.picture_as_pdf_outlined,
-                        style: LMChatIconStyle(
-                          size: 28,
-                          boxSize: 32,
-                          boxPadding: EdgeInsets.zero,
-                          color: LMChatDefaultTheme.greyColor,
+                  child: Padding(
+                    padding: style.padding ??
+                        const EdgeInsets.symmetric(
+                          vertical: 0,
+                          horizontal: kPaddingXSmall,
                         ),
-                      ),
-                      kHorizontalPaddingMedium,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            LMChatText(
-                              _fileName ?? '',
-                              style: const LMChatTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 12,
-                                  color: LMChatDefaultTheme.greyColor,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                            kVerticalPaddingSmall,
-                            Row(
-                              children: [
-                                widget.media.pageCount != null
-                                    ? Row(
-                                        children: <Widget>[
-                                          widget.media.pageCount == null
-                                              ? const SizedBox()
-                                              : kHorizontalPaddingXSmall,
-                                          widget.media.pageCount == null
-                                              ? const SizedBox()
-                                              : LMChatText(
-                                                  "${widget.media.pageCount!} ${widget.media.pageCount! > 1 ? "Pages" : "Page"}",
-                                                  style: const LMChatTextStyle(
-                                                    textStyle: TextStyle(
-                                                      fontSize: 10,
-                                                      color: LMChatDefaultTheme
-                                                          .greyColor,
-                                                    ),
-                                                  ),
-                                                ),
-                                          kHorizontalPaddingXSmall,
-                                          const LMChatText(
-                                            '·',
-                                            style: LMChatTextStyle(
-                                              textStyle: TextStyle(
-                                                fontSize: 10,
-                                                color: LMChatDefaultTheme
-                                                    .greyColor,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : const SizedBox(),
-                                kHorizontalPaddingXSmall,
-                                LMChatText(
-                                  _fileSize!.toUpperCase(),
-                                  style: const LMChatTextStyle(
-                                    textStyle: TextStyle(
-                                      fontSize: 10,
-                                      color: LMChatDefaultTheme.greyColor,
-                                    ),
-                                  ),
-                                ),
-                                kHorizontalPaddingXSmall,
-                                const LMChatText(
-                                  '·',
-                                  style: LMChatTextStyle(
-                                    textStyle: TextStyle(
-                                      fontSize: 10,
-                                      color: LMChatDefaultTheme.greyColor,
-                                    ),
-                                  ),
-                                ),
-                                kHorizontalPaddingXSmall,
-                                LMChatText(
-                                  _fileExtension.toUpperCase(),
-                                  style: const LMChatTextStyle(
-                                    textStyle: TextStyle(
-                                      fontSize: 10,
-                                      color: LMChatDefaultTheme.greyColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
+                    child: Row(
+                      mainAxisAlignment: style.rowMainAxisAlignment ??
+                          MainAxisAlignment.center,
+                      children: [
+                        kHorizontalPaddingMedium,
+                        widget.documentIcon ?? _defaultDocumentIcon(),
+                        kHorizontalPaddingMedium,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: style.crossAxisAlignment ??
+                                CrossAxisAlignment.start,
+                            mainAxisAlignment: style.mainAxisAlignment ??
+                                MainAxisAlignment.center,
+                            children: [
+                              widget.title ?? _defaultTitle(),
+                              kVerticalPaddingSmall,
+                              widget.subtitle ?? _defaultSubtitle()
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return getDocumentTileShimmer();
           } else {
-            return const SizedBox.shrink();
+            return getDocumentTileShimmer();
           }
         });
   }
+
+  Row _defaultSubtitle() {
+    return Row(
+      children: [
+        widget.media.pageCount != null
+            ? Row(
+                children: <Widget>[
+                  widget.media.pageCount == null
+                      ? const SizedBox()
+                      : kHorizontalPaddingXSmall,
+                  widget.media.pageCount == null
+                      ? const SizedBox()
+                      : LMChatText(
+                          "${widget.media.pageCount!} ${widget.media.pageCount! > 1 ? "Pages" : "Page"}",
+                          style: const LMChatTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 10,
+                              color: LMChatDefaultTheme.greyColor,
+                            ),
+                          ),
+                        ),
+                  kHorizontalPaddingXSmall,
+                  const LMChatText(
+                    '·',
+                    style: LMChatTextStyle(
+                      textStyle: TextStyle(
+                        fontSize: 10,
+                        color: LMChatDefaultTheme.greyColor,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : const SizedBox(),
+        kHorizontalPaddingXSmall,
+        LMChatText(
+          _fileSize!.toUpperCase(),
+          style: const LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 10,
+              color: LMChatDefaultTheme.greyColor,
+            ),
+          ),
+        ),
+        kHorizontalPaddingXSmall,
+        const LMChatText(
+          '·',
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 10,
+              color: LMChatDefaultTheme.greyColor,
+            ),
+          ),
+        ),
+        kHorizontalPaddingXSmall,
+        LMChatText(
+          _fileExtension.toUpperCase(),
+          style: const LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 10,
+              color: LMChatDefaultTheme.greyColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  LMChatText _defaultTitle() {
+    return LMChatText(
+      _fileName ?? '',
+      style: const LMChatTextStyle(
+        textStyle: TextStyle(
+          fontSize: 12,
+          color: LMChatDefaultTheme.greyColor,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+
+  LMChatIcon _defaultDocumentIcon() {
+    return const LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.picture_as_pdf_outlined,
+      style: LMChatIconStyle(
+        size: 28,
+        boxSize: 32,
+        boxPadding: EdgeInsets.zero,
+        color: LMChatDefaultTheme.greyColor,
+      ),
+    );
+  }
 }
 
-// ChatBubble for Single Document Attachment
-Widget getSingleDocPreview(LMChatMediaModel media) {
-  return DocumentThumbnailFile(
-    media: media,
-  );
+/// Defines the style properties for a document tile in the LMChat UI.
+class LMChatDocumentTileStyle {
+  /// The height of the document tile.
+  final double? height;
+
+  /// The width of the document tile.
+  final double? width;
+
+  /// The border of the document tile.
+  final Border? border;
+
+  /// The border radius of the document tile.
+  final BorderRadius? borderRadius;
+
+  /// The cross-axis alignment of the document tile's content.
+  final CrossAxisAlignment? crossAxisAlignment;
+
+  /// The main-axis alignment of the document tile's content.
+  final MainAxisAlignment? mainAxisAlignment;
+
+  /// The main-axis alignment of the row within the document tile.
+  final MainAxisAlignment? rowMainAxisAlignment;
+
+  /// The padding of the document tile.
+  final EdgeInsets? padding;
+
+  /// The background color of the document tile.
+  final Color? backgroundColor;
+
+  /// The color of the icon in the document tile.
+  final Color? iconColor;
+
+  /// The color of the text in the document tile.
+  final Color? textColor;
+
+  /// The style for the title text in the document tile.
+  final LMChatTextStyle? titleStyle;
+
+  /// The style for the subtitle text in the document tile.
+  final LMChatTextStyle? subtitleStyle;
+
+  /// Constructor for LMChatDocumentTileStyle.
+  LMChatDocumentTileStyle({
+    this.height,
+    this.width,
+    this.border,
+    this.borderRadius,
+    this.crossAxisAlignment,
+    this.mainAxisAlignment,
+    this.rowMainAxisAlignment,
+    this.padding,
+    this.backgroundColor,
+    this.iconColor,
+    this.textColor,
+    this.titleStyle,
+    this.subtitleStyle,
+  });
 }
 
+/// Factory function that returns a widget to display a document preview.
 Widget documentPreviewFactory(List<LMChatMediaModel> mediaList) {
   switch (mediaList.length) {
     case 1:
-      return getSingleDocPreview(mediaList.first);
-    case 2:
-      return getDualDocPreview(mediaList);
+      return LMChatDocumentThumbnail(media: mediaList.first);
     default:
       return GetMultipleDocPreview(mediaList: mediaList);
   }
 }
 
-// ChatBubble for Two Document Attachment
-/// A widget to display a list of two documents in a chat bubble.
-///
-/// The list of documents is passed as a parameter to this function.
-/// The widget is a column with two document tiles.
-/// The media list is expected to have two elements.
-///
-Widget getDualDocPreview(List<LMChatMediaModel> mediaList) {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: <Widget>[
-      DocumentTile(
-        media: mediaList.first,
-      ),
-      DocumentTile(
-        media: mediaList[1],
-      )
-    ],
-  );
-}
-
+/// Returns a shimmer effect for a document tile.
 Widget getDocumentTileShimmer() {
   return Container(
     height: 78,
@@ -528,10 +488,11 @@ Widget getDocumentTileShimmer() {
   );
 }
 
-// ChatBubble for more than two Document Attachment
-
+/// A widget that displays multiple document previews.
 class GetMultipleDocPreview extends StatefulWidget {
+  /// The list of documents to display.
   final List<LMChatMediaModel> mediaList;
+
   const GetMultipleDocPreview({
     Key? key,
     required this.mediaList,
@@ -541,11 +502,18 @@ class GetMultipleDocPreview extends StatefulWidget {
   State<GetMultipleDocPreview> createState() => GetMultipleDocPreviewState();
 }
 
+/// The state for the GetMultipleDocPreview widget.
 class GetMultipleDocPreviewState extends State<GetMultipleDocPreview> {
+  /// The list of documents to display.
   List<LMChatMediaModel>? mediaList;
+
+  /// A notifier that triggers a rebuild of the widget.
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
+
+  /// The number of documents to display initially.
   int length = 2;
 
+  /// Callback for when the "more" button is tapped.
   void onMoreButtonTap() {
     length = mediaList!.length;
     rebuildCurr.value = !rebuildCurr.value;
@@ -565,7 +533,7 @@ class GetMultipleDocPreviewState extends State<GetMultipleDocPreview> {
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: length,
-              itemBuilder: (context, index) => DocumentTile(
+              itemBuilder: (context, index) => LMChatDocumentTile(
                 media: mediaList![index],
               ),
             ),
@@ -599,32 +567,41 @@ class GetMultipleDocPreviewState extends State<GetMultipleDocPreview> {
   }
 }
 
-class DocumentFactory extends StatefulWidget {
+/// A widget that displays a document preview with multiple attachments.
+class LMChatDocumentPreview extends StatefulWidget {
+  /// The list of documents to display.
   final List<LMChatMediaModel> mediaList;
-  const DocumentFactory({
+
+  const LMChatDocumentPreview({
     Key? key,
     required this.mediaList,
   }) : super(key: key);
 
   @override
-  State<DocumentFactory> createState() => _DocumentFactoryState();
+  State<LMChatDocumentPreview> createState() => _LMChatDocumentPreviewState();
 }
 
-class _DocumentFactoryState extends State<DocumentFactory> {
+/// The state for the DocumentFactory widget.
+class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
+  /// The list of documents to display.
   List<LMChatMediaModel>? mediaList;
-  final TextEditingController _textEditingController = TextEditingController();
+
+  /// A notifier that triggers a rebuild of the widget.
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
-  List<LMChatTagViewData> tags = [];
+
+  /// The result of the document preview.
   String? result;
+
+  /// The current position in the list of documents.
   int currPosition = 0;
 
+  /// Checks if there are multiple attachments.
   bool checkIfMultipleAttachments() {
     return mediaList!.length > 1;
   }
 
   @override
   void dispose() {
-    _textEditingController.dispose();
     rebuildCurr.dispose();
     super.dispose();
   }
