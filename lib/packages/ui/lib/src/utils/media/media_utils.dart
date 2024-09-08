@@ -211,7 +211,7 @@ Widget getDocumentDetails(LMChatMediaModel document) {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
-          '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '●'} ${getFileSizeString(bytes: document.size!)} ● PDF',
+          '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '·'} ${getFileSizeString(bytes: document.size!)} ● PDF',
           style: TextStyle(
             color: LMChatTheme.theme.onContainer,
           ),

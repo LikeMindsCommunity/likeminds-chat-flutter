@@ -33,8 +33,17 @@ class LMChatBubbleMedia extends StatelessWidget {
         mediaWidget = _defaultMediaWidget(context);
       } else if (attachments.first.type ==
           mapMediaTypeToString(LMChatMediaType.document)) {
-        mediaWidget = documentPreviewFactory(
-            attachments.map((e) => e.toMediaModel()).toList());
+        switch (attachments.length) {
+          case 1:
+            mediaWidget = LMChatDocumentThumbnail(
+              media: attachments.first.toMediaModel(),
+              style: LMChatDocumentThumbnailStyle(height: 140, width: 55.w),
+              showOverlay: true,
+            );
+          default:
+            mediaWidget = LMChatDocumentTilePreview(
+                mediaList: attachments.map((e) => e.toMediaModel()).toList());
+        }
       } else if (conversation.ogTags != null) {
         mediaWidget = const SizedBox.shrink();
       } else {
