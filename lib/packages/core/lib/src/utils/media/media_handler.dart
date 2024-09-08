@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:giphy_get/giphy_get.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/credentials/credentials.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 const List<String> videoExtentions = [
@@ -345,5 +348,40 @@ class LMChatMediaHandler {
 
   bool checkFileType(PlatformFile file) {
     return photoExtentions.contains(file.extension);
+  }
+
+  Future<LMResponse<LMChatMediaModel>> pickGIF(BuildContext context) async {
+    try {
+      GiphyGif? gif = await GiphyGet.getGif(
+        context: context, //Required
+        apiKey: GIPHY_API_KEY, //Required.
+        lang: GiphyLanguage.english, //Optional - Language for query.
+        randomID: "lm-gif", // Optional - An ID/proxy for a specific user.
+        tabColor:
+            LMChatTheme.theme.primaryColor, // Optional- default accent color.
+        debounceTimeInMilliseconds:
+            350, // Optional- time to pause between search keystrokes
+      );
+
+      if (gif == null) {
+        return LMResponse.error(errorMessage: "No GIF picked up");
+      }
+
+      LMChatMediaModel pickedGif = LMChatMediaModel(
+          mediaType: LMChatMediaType.gif,
+          mediaUrl: gif.images?.original?.url,
+          height: int.tryParse(gif.images?.fixedHeight?.height ?? "0"),
+          width: int.tryParse(gif.images?.fixedHeight?.width ?? "0"),
+          meta: {
+            "title": gif.title ?? "GIF from GIPHY",
+            "url": gif.url,
+          });
+
+      addPickedMedia(pickedGif);
+      return LMResponse(success: true, data: pickedGif);
+    } catch (e) {
+      debugPrint(e.toString());
+      return LMResponse.error(errorMessage: "An error in picking up GIF");
+    }
   }
 }

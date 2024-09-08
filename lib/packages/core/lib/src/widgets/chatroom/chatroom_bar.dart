@@ -615,6 +615,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                     ),
                   ],
                 ),
+                SizedBox(height: 2.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -665,8 +666,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                       children: [
                         LMChatButton(
                           onTap: () async {
-                            final res =
-                                await LMChatMediaHandler.instance.pickMedia();
+                            _popupMenuController.hideMenu();
+                            final res = await LMChatMediaHandler.instance
+                                .pickGIF(context);
                             if (res.data != null) {
                               Navigator.push(
                                 context,
