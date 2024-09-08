@@ -17,8 +17,10 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 /// To configure the page, use [LMChatMediaForwardingScreenConfig]
 /// {@endtemplate}
 class LMChatMediaForwardingScreen extends StatefulWidget {
+  /// Required chatrooom ID for th chatroom media is being sent to
   final int chatroomId;
 
+  ///{@macro lm_chat_media_forwarding_screen}
   const LMChatMediaForwardingScreen({
     super.key,
     required this.chatroomId,
@@ -211,7 +213,7 @@ class _LMChatMediaForwardingScreenState
         },
         icon: const LMChatIcon(
           type: LMChatIconType.icon,
-          icon: Icons.cancel_outlined,
+          icon: Icons.arrow_back,
         ),
       ),
       title: LMChatText(
@@ -284,7 +286,14 @@ class _LMChatMediaForwardingScreenState
         ],
       );
     } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return LMChatDocumentPreview(mediaList: mediaList);
+      return Column(
+        children: [
+          SizedBox(height: 2.h),
+          _screenBuilder.document(context, _defDocument(mediaList)),
+          const Spacer(),
+          _defPreviewBar()
+        ],
+      );
     }
     return const SizedBox();
   }
@@ -369,8 +378,18 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
+  LMChatDocumentPreview _defDocument(List<LMChatMediaModel> mediaList) {
+    return LMChatDocumentPreview(mediaList: mediaList);
+  }
+
   LMChatDocumentThumbnail _defDocumentThumbnail(int index) {
-    return LMChatDocumentThumbnail(media: mediaList[index]);
+    return LMChatDocumentThumbnail(
+      media: mediaList[index],
+      style: LMChatDocumentThumbnailStyle(
+        height: 15.w,
+        width: 15.w,
+      ),
+    );
   }
 
   LMChatVideo _defVideo() => LMChatVideo(
