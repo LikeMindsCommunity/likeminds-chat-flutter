@@ -94,8 +94,29 @@ class LMChatMultiMediaConversationLoadingState extends LMChatConversationState {
   /// The list of media files associated with the conversation.
   final List<LMChatMediaModel> mediaFiles;
 
+  final dynamic responseStream;
+
   /// Creates and returns a new instance of [LMChatMultiMediaConversationLoadingState]
   LMChatMultiMediaConversationLoadingState(
+    this.postConversation,
+    this.mediaFiles,
+    this.responseStream,
+  );
+
+  @override
+  List<Object> get props => [mediaFiles, postConversation];
+}
+
+/// Represents the loaded state for a multimedia conversation.
+class LMChatMultiMediaConversationLoadedState extends LMChatConversationState {
+  /// The conversation being posted.
+  final Conversation postConversation;
+
+  /// The list of media files associated with the conversation.
+  final List<LMChatMediaModel> mediaFiles;
+
+  /// Creates and returns a new instance of [LMChatMultiMediaConversationLoadedState]
+  LMChatMultiMediaConversationLoadedState(
     this.postConversation,
     this.mediaFiles,
   );

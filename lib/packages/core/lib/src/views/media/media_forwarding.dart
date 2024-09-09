@@ -109,8 +109,9 @@ class _LMChatMediaForwardingScreenState
 
   Widget _defTextField() {
     return Container(
+      width: 80.w,
       constraints: BoxConstraints(
-        minHeight: 8.w,
+        minHeight: 5.2.h,
         maxHeight: 24.h,
       ),
       decoration: BoxDecoration(

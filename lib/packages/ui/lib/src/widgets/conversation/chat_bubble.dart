@@ -63,6 +63,9 @@ class LMChatBubble extends StatefulWidget {
   /// The function to call when the bubble media is tapped.
   final void Function()? onMediaTap;
 
+  /// The function to call when media upload is failed and to trigger retry.
+  final void Function()? onRetry;
+
   /// The function to call when the bubble is long pressed.
   final Function(bool isSelected, State<LMChatBubble> state)? onLongPress;
 
@@ -104,6 +107,7 @@ class LMChatBubble extends StatefulWidget {
     this.isSelected = false,
     this.onTap,
     this.onMediaTap,
+    this.onRetry,
     this.onLongPress,
     this.isSelectableOnTap,
     this.headerBuilder,

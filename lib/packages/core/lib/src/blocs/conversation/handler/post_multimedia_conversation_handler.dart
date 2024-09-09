@@ -25,12 +25,6 @@ postMultimediaConversationEventHandler(
       ogTags: event.postConversationRequest.ogTags,
     );
 
-    emit(
-      LMChatMultiMediaConversationLoadingState(
-        conversation,
-        event.mediaFiles,
-      ),
-    );
     LMResponse<PostConversationResponse> response =
         await LMChatCore.client.postConversation(
       event.postConversationRequest,
@@ -53,17 +47,35 @@ postMultimediaConversationEventHandler(
 
           try {
             String? url;
+            // TODO: add retry mechanism here
             if (media.mediaFile != null) {
-              final response = await LMChatMediaService.uploadFile(
+              final response = LMChatMediaService.uploadFile(
                 media.mediaFile!.readAsBytesSync(),
                 LMChatLocalPreference.instance.getUser().userUniqueId!,
                 chatroomId: event.postConversationRequest.chatroomId,
                 conversationId: postConversationResponse.conversation!.id,
+              ).asStream();
+
+              emit(
+                LMChatMultiMediaConversationLoadingState(
+                  conversation,
+                  event.mediaFiles,
+                  response,
+                ),
               );
 
-              if (response.success) {
-                url = response.data;
-              }
+              // Transmit the stream progress to the bubble
+              response.first.whenComplete(
+                () => emit(
+                  LMChatMultiMediaConversationLoadedState(
+                    postConversationResponse.conversation!,
+                    event.mediaFiles,
+                  ),
+                ),
+              );
+              // if (response.first.whenComplete(action)) {
+              //   url = response.data;
+              // }
             } else {
               url = media.mediaUrl;
             }

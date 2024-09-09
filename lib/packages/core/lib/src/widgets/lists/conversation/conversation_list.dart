@@ -225,6 +225,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
       },
+      onRetry: () {},
       onMediaTap: () {
         LMChatMediaHandler.instance.addPickedMedia(
             conversationAttachmentsMeta[conversation.id.toString()]);
@@ -289,6 +290,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
       },
+      onRetry: () {},
       onMediaTap: () {
         LMChatMediaHandler.instance.addPickedMedia(
             conversationAttachmentsMeta[conversation.id.toString()]);
@@ -362,10 +364,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                 .map((key, value) {
           return MapEntry(
             key,
-            (value as List<Attachment>?)
-                    ?.map((e) => e.toAttachmentViewData())
-                    .toList() ??
-                [],
+            value.map((e) => e.toAttachmentViewData()).toList(),
           );
         });
         conversationAttachmentsMeta.addAll(getConversationAttachmentData);
@@ -400,14 +399,20 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
 
     if (state is LMChatMultiMediaConversationLoadingState) {
+      // TODO: check for retry
       if (!userMeta.containsKey(user.id)) {
         userMeta[user.id] = user;
       }
       conversationAttachmentsMeta[state.postConversation.temporaryId!] =
           state.mediaFiles.map((e) => e.toAttachmentViewData()).toList();
 
-      addLocalConversationToPagedList(
-          state.postConversation.toConversationViewData());
+      List<LMChatConversationViewData> conversationList =
+          pagedListController.itemList ?? [];
+
+      conversationList.insert(
+          0, state.postConversation.toConversationViewData());
+
+      rebuildConversationList.value = !rebuildConversationList.value;
     }
     if (state is LMChatMultiMediaConversationPostedState) {
       addConversationToPagedList(
