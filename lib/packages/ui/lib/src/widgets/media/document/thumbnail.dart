@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/media/document/tile.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/shimmers/document_shimmer.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -71,12 +70,8 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
           return InkWell(
             onTap: () async {
               if (widget.media.mediaUrl != null) {
-                debugPrint(widget.media.mediaUrl);
                 Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
                 launchUrl(fileUrl, mode: LaunchMode.externalApplication);
-              } else {
-                // OpenFilex.open(file!.path);
-                debugPrint(file!.path);
               }
             },
             child: Stack(
@@ -102,7 +97,9 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LMChatDocumentShimmer();
+          return LMChatDocumentShimmer(
+            style: style?.shimmerStyle,
+          );
         } else {
           return const SizedBox.shrink();
         }
@@ -176,6 +173,9 @@ class LMChatDocumentThumbnailStyle {
   /// The style for the overlay document thumbnail style
   final LMChatDocumentTileStyle? overlayStyle;
 
+  /// The style for the shimmer widget shown
+  final LMChatDocumentShimmerStyle? shimmerStyle;
+
   /// Constructor for LMChatDocumentThumbnailStyle.
   LMChatDocumentThumbnailStyle({
     this.height,
@@ -185,5 +185,6 @@ class LMChatDocumentThumbnailStyle {
     this.padding,
     this.backgroundColor,
     this.overlayStyle,
+    this.shimmerStyle,
   });
 }

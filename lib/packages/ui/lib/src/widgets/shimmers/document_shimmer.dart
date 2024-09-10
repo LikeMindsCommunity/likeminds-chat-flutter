@@ -3,31 +3,39 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// {@template lm_chat_document_shimmer}
-/// A shhimmer loading widget that is shown while document tile is loading
+/// A shimmer loading widget that is shown while document tile is loading
 /// {@endtemplate}
 class LMChatDocumentShimmer extends StatelessWidget {
+  /// The style for the document shimmer.
+  final LMChatDocumentShimmerStyle? style;
+
   ///{@macro lm_chat_document_shimmer}
-  const LMChatDocumentShimmer({super.key});
+  const LMChatDocumentShimmer({super.key, this.style});
 
   @override
   Widget build(BuildContext context) {
+    final style = this.style ?? LMChatDocumentShimmerStyle.basic();
     return Container(
-      height: 78,
-      width: 60.w,
-      margin: const EdgeInsets.only(bottom: 10),
+      height: style.height,
+      width: style.width,
+      margin: style.margin,
       decoration: BoxDecoration(
-          border: Border.all(color: LMChatDefaultTheme.greyColor, width: 1),
-          borderRadius: BorderRadius.circular(kBorderRadiusMedium)),
-      padding: const EdgeInsets.all(kPaddingLarge),
+        border: Border.all(
+          color: style.borderColor ?? LMChatDefaultTheme.greyColor,
+          width: style.borderWidth ?? 1,
+        ),
+        borderRadius: style.borderRadius,
+      ),
+      padding: style.padding,
       child: Shimmer.fromColors(
-        baseColor: Colors.black26,
-        highlightColor: Colors.black12,
+        baseColor: style.baseColor ?? Colors.black26,
+        highlightColor: style.highlightColor ?? Colors.black12,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              height: 10.w,
-              width: 10.w,
+              height: style.iconSize,
+              width: style.iconSize,
               color: LMChatTheme.theme.container,
             ),
             kHorizontalPaddingLarge,
@@ -36,8 +44,8 @@ class LMChatDocumentShimmer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 8,
-                  width: 30.w,
+                  height: style.titleHeight,
+                  width: style.titleWidth,
                   color: LMChatTheme.theme.container,
                 ),
                 kVerticalPaddingMedium,
@@ -45,8 +53,8 @@ class LMChatDocumentShimmer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      height: 6,
-                      width: 10.w,
+                      height: style.subtitleHeight,
+                      width: style.subtitleWidth,
                       color: LMChatTheme.theme.container,
                     ),
                     kHorizontalPaddingXSmall,
@@ -59,8 +67,8 @@ class LMChatDocumentShimmer extends StatelessWidget {
                     ),
                     kHorizontalPaddingXSmall,
                     Container(
-                      height: 6,
-                      width: 10.w,
+                      height: style.subtitleHeight,
+                      width: style.subtitleWidth,
                       color: LMChatTheme.theme.container,
                     ),
                   ],
@@ -70,6 +78,124 @@ class LMChatDocumentShimmer extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Defines the style properties for the LMChatDocumentShimmer widget.
+class LMChatDocumentShimmerStyle {
+  /// Creates an LMChatDocumentShimmerStyle instance.
+  const LMChatDocumentShimmerStyle({
+    this.height,
+    this.width,
+    this.margin,
+    this.borderRadius,
+    this.borderColor,
+    this.borderWidth,
+    this.padding,
+    this.baseColor,
+    this.highlightColor,
+    this.iconSize,
+    this.titleHeight,
+    this.titleWidth,
+    this.subtitleHeight,
+    this.subtitleWidth,
+  });
+
+  /// The height of the shimmer container.
+  final double? height;
+
+  /// The width of the shimmer container.
+  final double? width;
+
+  /// The margin around the shimmer container.
+  final EdgeInsetsGeometry? margin;
+
+  /// The border radius of the shimmer container.
+  final BorderRadius? borderRadius;
+
+  /// The border color of the shimmer container.
+  final Color? borderColor;
+
+  /// The border width of the shimmer container.
+  final double? borderWidth;
+
+  /// The padding inside the shimmer container.
+  final EdgeInsetsGeometry? padding;
+
+  /// The base color for the shimmer effect.
+  final Color? baseColor;
+
+  /// The highlight color for the shimmer effect.
+  final Color? highlightColor;
+
+  /// The size of the icon placeholder.
+  final double? iconSize;
+
+  /// The height of the title placeholder.
+  final double? titleHeight;
+
+  /// The width of the title placeholder.
+  final double? titleWidth;
+
+  /// The height of the subtitle placeholder.
+  final double? subtitleHeight;
+
+  /// The width of the subtitle placeholder.
+  final double? subtitleWidth;
+
+  /// Creates a basic LMChatDocumentShimmerStyle with default values.
+  factory LMChatDocumentShimmerStyle.basic() {
+    return LMChatDocumentShimmerStyle(
+      height: 78,
+      width: 60.w,
+      margin: const EdgeInsets.only(bottom: 10),
+      borderRadius: BorderRadius.circular(kBorderRadiusMedium),
+      borderColor: LMChatDefaultTheme.greyColor,
+      borderWidth: 1,
+      padding: const EdgeInsets.all(kPaddingLarge),
+      baseColor: Colors.black26,
+      highlightColor: Colors.black12,
+      iconSize: 10.w,
+      titleHeight: 8,
+      titleWidth: 30.w,
+      subtitleHeight: 6,
+      subtitleWidth: 10.w,
+    );
+  }
+
+  /// Creates a copy of this LMChatDocumentShimmerStyle but with the given fields replaced with the new values.
+  LMChatDocumentShimmerStyle copyWith({
+    double? height,
+    double? width,
+    EdgeInsetsGeometry? margin,
+    BorderRadius? borderRadius,
+    Color? borderColor,
+    double? borderWidth,
+    EdgeInsetsGeometry? padding,
+    Color? baseColor,
+    Color? highlightColor,
+    double? iconSize,
+    double? titleHeight,
+    double? titleWidth,
+    double? subtitleHeight,
+    double? subtitleWidth,
+  }) {
+    return LMChatDocumentShimmerStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      margin: margin ?? this.margin,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      padding: padding ?? this.padding,
+      baseColor: baseColor ?? this.baseColor,
+      highlightColor: highlightColor ?? this.highlightColor,
+      iconSize: iconSize ?? this.iconSize,
+      titleHeight: titleHeight ?? this.titleHeight,
+      titleWidth: titleWidth ?? this.titleWidth,
+      subtitleHeight: subtitleHeight ?? this.subtitleHeight,
+      subtitleWidth: subtitleWidth ?? this.subtitleWidth,
     );
   }
 }
