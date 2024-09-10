@@ -110,8 +110,16 @@ class LMChatMediaForwardingBuilderDelegate {
   /// Builds the LMChatImage widget of the list
   Widget video(
     BuildContext context,
-    dynamic video,
+    LMChatVideo video,
   ) {
     return video;
+  }
+
+  /// Builds the LMChatDocumentPreview widget of the list
+  Widget document(
+    BuildContext context,
+    LMChatDocumentPreview document,
+  ) {
+    return document;
   }
 }

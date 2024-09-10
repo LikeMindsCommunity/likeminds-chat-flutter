@@ -184,7 +184,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
-      attachments: conversationAttachmentsMeta[conversation.id.toString()],
+      attachments:
+          conversationAttachmentsMeta[conversation.temporaryId.toString()] ??
+              conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -242,7 +244,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
-      attachments: conversationAttachmentsMeta[conversation.id.toString()],
+      attachments:
+          conversationAttachmentsMeta[conversation.temporaryId.toString()] ??
+              conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},

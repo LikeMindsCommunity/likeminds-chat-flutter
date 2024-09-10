@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:pdf_render/pdf_render_widgets.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -189,6 +190,37 @@ Widget getChatItemAttachmentTile(
   }
 }
 
+Widget getDocumentThumbnail(File document, {Size? size}) {
+  return PdfDocumentLoader.openFile(
+    document.path,
+    onError: (error) {},
+    pageNumber: 1,
+    pageBuilder: (context, textureBuilder, pageSize) {
+      return textureBuilder(
+        size: size,
+      );
+    },
+  );
+}
+
+Widget getDocumentDetails(LMChatMediaModel document) {
+  return SizedBox(
+    width: 80.w,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '·'} ${getFileSizeString(bytes: document.size!)} ● PDF',
+          style: TextStyle(
+            color: LMChatTheme.theme.onContainer,
+          ),
+        )
+      ],
+    ),
+  );
+}
+
 Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
   String? thumbnailPath = await VideoThumbnail.thumbnailFile(
     video: media.mediaFile!.path,
@@ -274,9 +306,13 @@ Widget mediaShimmer({bool? isPP}) {
 }
 
 String getFileSizeString({required int bytes, int decimals = 0}) {
-  const suffixes = ["B", "KB", "MB", "GB", "TB"];
-  var i = (log(bytes) / log(1000)).floor();
-  return "${((bytes / pow(1000, i)).toStringAsFixed(decimals))} ${suffixes[i]}";
+  if (bytes > 0) {
+    const suffixes = ["B", "KB", "MB", "GB", "TB"];
+    var i = (log(bytes) / log(1000)).floor();
+    return "${((bytes / pow(1000, i)).toStringAsFixed(decimals))} ${suffixes[i]}";
+  } else {
+    return "0";
+  }
 }
 
 // Returns file size in double in MBs

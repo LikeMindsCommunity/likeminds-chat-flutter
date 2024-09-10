@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/media/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -240,9 +241,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             _isSelected = false;
             widget.onTap?.call(_isSelected, this);
           } else {
-            if (widget.attachments != null) {
-              widget.onMediaTap?.call();
-            }
             if (widget.isSelectableOnTap?.call() ?? false) {
               _isSelected = !_isSelected;
               widget.onTap?.call(_isSelected, this);
@@ -326,12 +324,22 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
-                          LMChatBubbleMedia(
-                            conversation: conversation,
-                            attachments: widget.attachments ?? [],
-                            count: conversation.attachmentCount ?? 0,
-                            attachmentUploaded:
-                                conversation.attachmentsUploaded ?? false,
+                          AbsorbPointer(
+                            absorbing: _isSelected,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (widget.attachments != null) {
+                                  widget.onMediaTap?.call();
+                                }
+                              },
+                              child: LMChatBubbleMedia(
+                                conversation: conversation,
+                                attachments: widget.attachments ?? [],
+                                count: conversation.attachmentCount ?? 0,
+                                attachmentUploaded:
+                                    conversation.attachmentsUploaded ?? false,
+                              ),
+                            ),
                           ),
                           conversation.deletedByUserId != null
                               ? widget.deletedText ??

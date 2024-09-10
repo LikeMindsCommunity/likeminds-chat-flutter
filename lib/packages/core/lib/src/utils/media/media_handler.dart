@@ -312,7 +312,8 @@ class LMChatMediaHandler {
       );
       if (pickedFiles != null) {
         for (var pickedFile in pickedFiles.files) {
-          if (getFileSizeInDouble(pickedFile.size) > 100) {
+          final size = getFileSizeInDouble(pickedFile.size);
+          if (size > 100) {
             return LMResponse(
                 success: false,
                 errorMessage: 'File size should be smaller than 100MB');

@@ -17,8 +17,10 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 /// To configure the page, use [LMChatMediaForwardingScreenConfig]
 /// {@endtemplate}
 class LMChatMediaForwardingScreen extends StatefulWidget {
+  /// Required chatrooom ID for th chatroom media is being sent to
   final int chatroomId;
 
+  ///{@macro lm_chat_media_forwarding_screen}
   const LMChatMediaForwardingScreen({
     super.key,
     required this.chatroomId,
@@ -51,11 +53,6 @@ class _LMChatMediaForwardingScreenState
   void didUpdateWidget(covariant LMChatMediaForwardingScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     mediaList = LMChatMediaHandler.instance.pickedMedia;
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
   }
 
   @override
@@ -172,7 +169,14 @@ class _LMChatMediaForwardingScreenState
         backgroundColor: Colors.transparent,
       ),
       onTap: () async {
-        await LMChatMediaHandler.instance.pickImages();
+        if (mediaList.first.mediaType == LMChatMediaType.image) {
+          await LMChatMediaHandler.instance.pickImages();
+        } else if (mediaList.first.mediaType == LMChatMediaType.video) {
+          await LMChatMediaHandler.instance.pickVideos();
+        } else if (mediaList.first.mediaType == LMChatMediaType.document) {
+          await LMChatMediaHandler.instance.pickDocuments();
+        }
+
         mediaList = LMChatMediaHandler.instance.pickedMedia;
         rebuildCurr.value = !rebuildCurr.value;
       },
@@ -209,7 +213,7 @@ class _LMChatMediaForwardingScreenState
         },
         icon: const LMChatIcon(
           type: LMChatIconType.icon,
-          icon: Icons.cancel_outlined,
+          icon: Icons.arrow_back,
         ),
       ),
       title: LMChatText(
@@ -257,9 +261,7 @@ class _LMChatMediaForwardingScreenState
         mediaList.first.mediaType == LMChatMediaType.video) {
       return Column(
         children: [
-          SizedBox(
-            height: 2.h,
-          ),
+          SizedBox(height: 2.h),
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
             child: Center(
@@ -284,7 +286,14 @@ class _LMChatMediaForwardingScreenState
         ],
       );
     } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return Container();
+      return Column(
+        children: [
+          SizedBox(height: 2.h),
+          _screenBuilder.document(context, _defDocument(mediaList)),
+          const Spacer(),
+          _defPreviewBar()
+        ],
+      );
     }
     return const SizedBox();
   }
@@ -343,7 +352,9 @@ class _LMChatMediaForwardingScreenState
           height: 15.w,
           child: mediaList[index].mediaType == LMChatMediaType.image
               ? _defImageThumbnail(index)
-              : _defVideoThumbnail(index),
+              : mediaList[index].mediaType == LMChatMediaType.video
+                  ? _defVideoThumbnail(index)
+                  : _defDocumentThumbnail(index),
         ),
       ),
     );
@@ -358,14 +369,25 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  ClipRRect _defImageThumbnail(int index) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8.0),
-      child: LMChatImage(
-        imageFile: mediaList[index].mediaFile!,
-        style: const LMChatImageStyle(
-          boxFit: BoxFit.cover,
-        ),
+  LMChatImage _defImageThumbnail(int index) {
+    return LMChatImage(
+      imageFile: mediaList[index].mediaFile!,
+      style: const LMChatImageStyle(
+        boxFit: BoxFit.cover,
+      ),
+    );
+  }
+
+  LMChatDocumentPreview _defDocument(List<LMChatMediaModel> mediaList) {
+    return LMChatDocumentPreview(mediaList: mediaList);
+  }
+
+  LMChatDocumentThumbnail _defDocumentThumbnail(int index) {
+    return LMChatDocumentThumbnail(
+      media: mediaList[index],
+      style: LMChatDocumentThumbnailStyle(
+        height: 15.w,
+        width: 15.w,
       ),
     );
   }

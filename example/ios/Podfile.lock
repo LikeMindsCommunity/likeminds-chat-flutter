@@ -1,9 +1,4 @@
 PODS:
-  - AWSCognito (2.19.1):
-    - AWSCore (= 2.19.1)
-  - AWSCore (2.19.1)
-  - AWSS3 (2.19.1):
-    - AWSCore (= 2.19.1)
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -146,11 +141,15 @@ PODS:
     - nanopb/encode (= 2.30910.0)
   - nanopb/decode (2.30910.0)
   - nanopb/encode (2.30910.0)
+  - open_filex (0.0.2):
+    - Flutter
   - package_info_plus (0.4.5):
     - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - pdf_render (0.0.1):
+    - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
@@ -162,20 +161,12 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - simple_s3 (0.0.1):
-    - AWSCognito
-    - AWSCore
-    - AWSS3
-    - Flutter
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
   - SwiftyGif (5.4.5)
   - url_launcher_ios (0.0.1):
     - Flutter
-  - video_player_avfoundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - video_thumbnail (0.0.1):
     - Flutter
     - libwebp
@@ -196,24 +187,21 @@ DEPENDENCIES:
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
+  - open_filex (from `.symlinks/plugins/open_filex/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - pdf_render (from `.symlinks/plugins/pdf_render/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - simple_s3 (from `.symlinks/plugins/simple_s3/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
   - video_thumbnail (from `.symlinks/plugins/video_thumbnail/ios`)
   - volume_controller (from `.symlinks/plugins/volume_controller/ios`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
 
 SPEC REPOS:
   trunk:
-    - AWSCognito
-    - AWSCore
-    - AWSS3
     - DKImagePickerController
     - DKPhotoGallery
     - Firebase
@@ -256,24 +244,24 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/media_kit_native_event_loop/ios"
   media_kit_video:
     :path: ".symlinks/plugins/media_kit_video/ios"
+  open_filex:
+    :path: ".symlinks/plugins/open_filex/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  pdf_render:
+    :path: ".symlinks/plugins/pdf_render/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   screen_brightness_ios:
     :path: ".symlinks/plugins/screen_brightness_ios/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
-  simple_s3:
-    :path: ".symlinks/plugins/simple_s3/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/darwin"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
-  video_player_avfoundation:
-    :path: ".symlinks/plugins/video_player_avfoundation/darwin"
   video_thumbnail:
     :path: ".symlinks/plugins/video_thumbnail/ios"
   volume_controller:
@@ -282,9 +270,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/wakelock_plus/ios"
 
 SPEC CHECKSUMS:
-  AWSCognito: f50de600804941d083af37a7568905f31a774727
-  AWSCore: 55c154ae27efc5c98bdc30a0eeea5a35d10a2ab5
-  AWSS3: 2272253b098d07803af8dd20ce6ce7302bcffb47
   connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
@@ -311,18 +296,18 @@ SPEC CHECKSUMS:
   media_kit_native_event_loop: e6b2ab20cf0746eb1c33be961fcf79667304fa2a
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
+  open_filex: 6e26e659846ec990262224a12ef1c528bb4edbe4
   package_info_plus: 115f4ad11e0698c8c1c5d8a689390df880f47e85
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  pdf_render: 0b4e1a615aab83ce88b26c57753049424908a755
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
   SDWebImage: 066c47b573f408f18caa467d71deace7c0f8280d
   shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
-  simple_s3: dc1e236435ab824abf10e6147110fe86ab32c51c
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   url_launcher_ios: bbd758c6e7f9fd7b5b1d4cde34d2b95fcce5e812
-  video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
   video_thumbnail: c4e2a3c539e247d4de13cd545344fd2d26ffafd1
   volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
   wakelock_plus: 78ec7c5b202cab7761af8e2b2b3d0671be6c4ae1
