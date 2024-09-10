@@ -20,7 +20,7 @@ class LMChatDocumentTile extends StatefulWidget {
   final Widget? subtitle;
 
   /// The icon to display for the document.
-  final LMChatIcon? documentIcon;
+  final Widget? documentIcon;
 
   /// The style for the document tile.
   final LMChatDocumentTileStyle? style;
@@ -89,7 +89,6 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
                 if (widget.media.mediaFile != null) {
                   OpenFilex.open(widget.media.mediaFile!.path);
                 } else {
-                  debugPrint(widget.media.mediaUrl);
                   Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
                   launchUrl(fileUrl, mode: LaunchMode.externalApplication);
                 }
@@ -139,7 +138,7 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
               ),
             );
           } else {
-            return const LMChatDocumentShimmer();
+            return LMChatDocumentShimmer(style: style.shimmerStyle);
           }
         });
   }
@@ -289,6 +288,9 @@ class LMChatDocumentTileStyle {
   /// The style for the subtitle text in the document tile.
   final LMChatTextStyle? subtitleStyle;
 
+  /// The style class for the shimmer shown while loading
+  final LMChatDocumentShimmerStyle? shimmerStyle;
+
   /// Constructor for LMChatDocumentTileStyle.
   LMChatDocumentTileStyle({
     this.height,
@@ -305,5 +307,6 @@ class LMChatDocumentTileStyle {
     this.textColor,
     this.titleStyle,
     this.subtitleStyle,
+    this.shimmerStyle,
   });
 }
