@@ -24,7 +24,6 @@ dependencies:
   firebase_database: ^11.0.3
   extended_text_field: ^15.0.0
   flutter_keyboard_visibility: ^6.0.0
-  simple_s3: ^0.3.2
   path: ^1.9.0
   firebase_messaging: ^15.0.3
   overlay_support: ^2.1.0
@@ -40,6 +39,9 @@ dependencies:
   custom_pop_up_menu: ^1.2.4
   bloc: ^8.1.4
   meta: ^1.11.0
+  http: ^1.2.2
+  amazon_cognito_identity_dart_2: ^3.6.5
+  giphy_get: ^3.5.6
 
 
 dev_dependencies:
@@ -48,7 +50,7 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
-  assets: 
+  assets:
     - assets/
     - assets/images/
     - assets/icons/

@@ -1,5 +1,7 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/og_tag/og_tag_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// [ConversationViewDataConvertor] is an extension on [Conversation] class.
@@ -10,6 +12,9 @@ extension ConversationViewDataConvertor on Conversation {
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
           ..answer(answer)
+          ..attachmentCount(attachmentCount)
+          ..attachments(
+              attachments?.map((e) => e.toAttachmentViewData()).toList())
           ..attachmentsUploaded(attachmentsUploaded)
           ..chatroomId(chatroomId)
           ..communityId(communityId)
@@ -65,6 +70,8 @@ extension ConversationConvertor on LMChatConversationViewData {
     return Conversation(
       answer: answer,
       attachmentsUploaded: attachmentsUploaded,
+      attachmentCount: attachmentCount,
+      attachments: attachments?.map((e) => e.toAttachment()).toList(),
       chatroomId: chatroomId,
       communityId: communityId,
       createdAt: createdAt,

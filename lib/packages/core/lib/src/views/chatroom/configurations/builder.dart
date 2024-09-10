@@ -2,7 +2,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
+import 'package:likeminds_chat_flutter_core/src/core/configurations/widget_source.dart';
+import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 

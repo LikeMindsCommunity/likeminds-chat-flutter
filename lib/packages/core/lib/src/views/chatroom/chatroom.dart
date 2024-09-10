@@ -92,8 +92,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     super.didUpdateWidget(old);
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
-    _chatroomBloc = LMChatroomBloc.instance
-      ..add(LMChatFetchChatroomEvent(chatroomId: widget.chatroomId));
+    _chatroomBloc = LMChatroomBloc.instance;
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
@@ -110,10 +109,15 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
     _chatroomBloc.close();
     _convActionBloc.close();
     _chatroomActionBloc.close();
-    super.dispose();
+    super.deactivate();
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/media/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -29,6 +30,9 @@ class LMChatBubble extends StatefulWidget {
   /// The user of the conversation.
   final LMChatUserViewData conversationUser;
 
+  /// The list of attachments for this chat bubble
+  final List<LMChatAttachmentViewData>? attachments;
+
   /// is the message sent by the current user.
   final bool? isSent;
 
@@ -55,6 +59,9 @@ class LMChatBubble extends StatefulWidget {
 
   /// The function to call when the bubble is tapped.
   final Function(bool isSelected, State<LMChatBubble> state)? onTap;
+
+  /// The function to call when the bubble media is tapped.
+  final void Function()? onMediaTap;
 
   /// The function to call when the bubble is long pressed.
   final Function(bool isSelected, State<LMChatBubble> state)? onLongPress;
@@ -91,6 +98,7 @@ class LMChatBubble extends StatefulWidget {
     required this.currentUser,
     required this.conversationUser,
     required this.onTagTap,
+    this.attachments,
     this.style,
     this.contentBuilder,
     this.onReply,
@@ -100,6 +108,7 @@ class LMChatBubble extends StatefulWidget {
     this.deletedText,
     this.isSelected = false,
     this.onTap,
+    this.onMediaTap,
     this.onLongPress,
     this.isSelectableOnTap,
     this.headerBuilder,
@@ -332,6 +341,23 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
+                          AbsorbPointer(
+                            absorbing: _isSelected,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (widget.attachments != null) {
+                                  widget.onMediaTap?.call();
+                                }
+                              },
+                              child: LMChatBubbleMedia(
+                                conversation: conversation,
+                                attachments: widget.attachments ?? [],
+                                count: conversation.attachmentCount ?? 0,
+                                attachmentUploaded:
+                                    conversation.attachmentsUploaded ?? false,
+                              ),
+                            ),
+                          ),
                           conversation.deletedByUserId != null
                               ? widget.deletedText ??
                                   widget.deletedTextBuilder?.call(
@@ -350,7 +376,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                     conversation: conversation,
                                     onTagTap: widget.onTagTap,
                                   ),
-                          const LMChatBubbleMedia(),
                           if (conversation.deletedByUserId == null &&
                               inStyle.showFooter == true)
                             Padding(

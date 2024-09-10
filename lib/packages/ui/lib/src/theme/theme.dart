@@ -5,10 +5,12 @@ class LMChatTheme {
   static LMChatTheme? _instance;
   static LMChatTheme get instance => _instance ??= LMChatTheme._();
   static LMChatThemeData get theme => instance.themeData;
+  static TextTheme get text => instance.textTheme;
 
   LMChatTheme._();
 
   late final LMChatThemeData themeData;
+  late final TextTheme textTheme;
 
   void initialise({
     LMChatThemeData? theme,
@@ -27,6 +29,7 @@ class LMChatThemeData {
   final LMChatBottomSheetStyle bottomSheetStyle;
   final LMChatSnackBarStyle snackBarTheme;
   final LMChatImageStyle imageStyle;
+  final LMChatVideoStyle videoStyle;
   final LMChatTileStyle chatTileStyle;
   final LMChatAppBarStyle appBarStyle;
 
@@ -80,6 +83,7 @@ class LMChatThemeData {
     required this.chatTileStyle,
     required this.stateBubbleStyle,
     required this.appBarStyle,
+    required this.videoStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -121,6 +125,7 @@ class LMChatThemeData {
     LMChatBottomSheetStyle? bottomSheetStyle,
     LMChatSnackBarStyle? snackBarTheme,
     LMChatImageStyle? imageStyle,
+    LMChatVideoStyle? videoStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
@@ -161,11 +166,13 @@ class LMChatThemeData {
             backgroundColor: primaryColor ?? LMChatDefaultTheme.primaryColor,
           ),
       imageStyle: imageStyle ?? LMChatImageStyle.basic(),
+      videoStyle: videoStyle ?? LMChatVideoStyle.basic(),
       replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
       chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
-      stateBubbleStyle: stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
+      stateBubbleStyle:
+          stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
       appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
     );
   }
@@ -194,6 +201,7 @@ class LMChatThemeData {
     LMChatBottomSheetStyle? bottomSheetStyle,
     LMChatSnackBarStyle? snackBarTheme,
     LMChatImageStyle? imageStyle,
+    LMChatVideoStyle? videoStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
@@ -225,6 +233,7 @@ class LMChatThemeData {
       bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
       snackBarTheme: snackBarTheme ?? this.snackBarTheme,
       imageStyle: imageStyle ?? this.imageStyle,
+      videoStyle: videoStyle ?? this.videoStyle,
       replyStyle: replyStyle ?? this.replyStyle,
       bubbleStyle: bubbleStyle ?? this.bubbleStyle,
       contentStyle: contentStyle ?? this.contentStyle,

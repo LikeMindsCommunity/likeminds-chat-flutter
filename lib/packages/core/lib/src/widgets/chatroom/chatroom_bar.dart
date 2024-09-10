@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/media_handler.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 
 /// {@template lm_chatroom_bar}
 /// A widget to display the chatroom bar.
@@ -35,40 +35,52 @@ class LMChatroomBar extends StatefulWidget {
 }
 
 class _LMChatroomBarState extends State<LMChatroomBar> {
-  final LMChatConversationActionBloc chatActionBloc =
-      LMChatConversationActionBloc.instance;
-  final LMChatConversationBloc conversationBloc =
-      LMChatConversationBloc.instance;
-  final FilePicker filePicker = FilePicker.platform;
   LMChatConversationViewData? replyToConversation;
-  List<LMChatMedia>? replyConversationAttachments;
+  List<LMChatMediaModel>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
+
+  // Flutter and other dependecies needed
   final CustomPopupMenuController _popupMenuController =
       CustomPopupMenuController();
   final TextEditingController _textEditingController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
+  // Instances of BLoCs required
+  LMChatConversationActionBloc chatActionBloc =
+      LMChatConversationActionBloc.instance;
+  LMChatConversationBloc conversationBloc = LMChatConversationBloc.instance;
+
+  // Instance of current user and member state
   final LMChatUserViewData currentUser =
       LMChatLocalPreference.instance.getUser().toUserViewData();
   final MemberStateResponse? getMemberState =
       LMChatLocalPreference.instance.getMemberRights();
-
-  List<LMChatTagViewData> tags = [];
-  String? result;
-  LMChatRoomViewData? chatroom;
-  String _textFieldValue = '';
-  String previewLink = '';
-  LMChatMediaModel? linkModel;
-  // if set to false link preview should not be displayed
-  bool showLinkPreview = true;
-  // if a message contains a link, this should be set to true
-  bool isActiveLink = false;
-  // debounce timer for link preview
-  Timer? _debounce;
-  // flag to check if a message is sent before the link preview is fetched
-  bool _isSentBeforeLinkFetched = false;
-
   final LMChatThemeData _themeData = LMChatTheme.instance.themeData;
   final _screenBuilder = LMChatCore.config.chatRoomConfig.builder;
+
+  String? result;
+
+  String previewLink = '';
+
+  LMChatRoomViewData? chatroom;
+  List<LMChatTagViewData> tags = [];
+  LMChatMediaModel? linkModel;
+  String _textFieldValue = '';
+  // if set to false link preview should not be displayed
+
+  bool showLinkPreview = true;
+
+  // if a message contains a link, this should be set to true
+
+  bool isActiveLink = false;
+
+  // debounce timer for link preview
+
+  Timer? _debounce;
+
+  // flag to check if a message is sent before the link preview is fetched
+
+  bool _isSentBeforeLinkFetched = false;
 
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
@@ -76,6 +88,38 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     } else {
       return "";
     }
+  }
+
+  void _onTextChanged(String message) {
+    _textFieldValue = message;
+
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+
+    if (!showLinkPreview ||
+        replyToConversation != null ||
+        editConversation != null) {
+      return;
+    }
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      chatActionBloc.add(LMChatConversationTextChangeEvent(
+        text: message,
+        previousLink: previewLink,
+      ));
+    });
+  }
+
+  void _setupReplyText() {
+    _textEditingController.value = TextEditingValue(
+      text: _textFieldValue,
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          offset: _textEditingController.text.length - 1,
+        ),
+      ),
+    );
   }
 
   @override
@@ -93,80 +137,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     super.dispose();
   }
 
-  void _onTextChanged(String message) {
-    _textFieldValue = message;
-    if (_debounce?.isActive ?? false) {
-      _debounce?.cancel();
-    }
-    if (!showLinkPreview ||
-        replyToConversation != null ||
-        editConversation != null) {
-      return;
-    }
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      chatActionBloc.add(LMChatConversationTextChangeEvent(
-        text: message,
-        previousLink: previewLink,
-      ));
-    });
-  }
-
-  bool _isRespondingAllowed() {
-    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
-      return false;
-    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
-      return false;
-    } else if (chatroom!.chatRequestState == 2) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  String _getChatBarHintText() {
-    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
-      return 'Only Community Managers can respond here';
-    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
-      return 'The community managers have restricted you from responding here';
-    } else if (chatroom!.chatRequestState == 2) {
-      return "You can not respond to a rejected connection.";
-    } else {
-      return "Type your response";
-    }
-  }
-
-  void _setupEditText() {
-    String? convertedMsgText =
-        LMChatTaggingHelper.convertRouteToTag(editConversation?.answer);
-    if (editConversation == null) {
-      _textEditingController.clear();
-      return;
-    }
-    _textEditingController.value = TextEditingValue(
-      text: convertedMsgText ?? '',
-      selection: TextSelection.fromPosition(
-        TextPosition(
-          offset: _textEditingController.text.length - 1,
-        ),
-      ),
-    );
-    _textFieldValue = convertedMsgText ?? '';
-    _focusNode.requestFocus();
-    tags = LMChatTaggingHelper.addUserTagsIfMatched(
-        editConversation?.answer ?? '');
-  }
-
-  void _setupReplyText() {
-    _textEditingController.value = TextEditingValue(
-      text: _textFieldValue,
-      selection: TextSelection.fromPosition(
-        TextPosition(
-          offset: _textEditingController.text.length - 1,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<LMChatConversationActionBloc,
@@ -174,30 +144,34 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       bloc: chatActionBloc,
       listener: _blocListener,
       builder: (context, state) {
-        return Container(
-          width: double.infinity,
-          padding: EdgeInsets.only(
-            left: 2.w,
-            right: 2.w,
-            top: 1.5.h,
-            bottom: 1.5.h,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _isRespondingAllowed()
-                  ? _defTextField(context)
-                  : _defDisabledTextField(context),
-              if (_isRespondingAllowed())
-                _screenBuilder.sendButton(
-                  context,
-                  _textEditingController,
-                  _onSend,
-                  _defSendButton(context),
-                ),
-            ],
-          ),
+        return Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(
+                left: 2.w,
+                right: 2.w,
+                top: 1.5.h,
+                bottom: 1.5.h,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _isRespondingAllowed()
+                      ? _defTextField(context)
+                      : _defDisabledTextField(context),
+                  if (_isRespondingAllowed())
+                    _screenBuilder.sendButton(
+                      context,
+                      _textEditingController,
+                      _onSend,
+                      _defSendButton(context),
+                    ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );
@@ -229,7 +203,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         return;
       }
       linkModel = LMChatMediaModel(
-        mediaType: LMMediaType.link,
+        mediaType: LMChatMediaType.link,
         ogTags: state.ogTags,
         link: state.link,
       );
@@ -243,153 +217,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     }
   }
 
-  Widget _defDisabledTextField(BuildContext context) {
-    return Container(
-      width: 90.w,
-      constraints: BoxConstraints(
-        minHeight: 4.h,
-        maxHeight: 24.h,
-      ),
-      decoration: BoxDecoration(
-        color: _themeData.container,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: kPaddingSmall,
-          vertical: kPaddingSmall,
-        ),
-        child: LMChatTextField(
-          isDown: false,
-          enabled: false,
-          isSecret: widget.chatroom.isSecret ?? false,
-          chatroomId: widget.chatroom.id,
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
-          onTagSelected: (tag) {},
-          controller: _textEditingController,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            enabled: false,
-            hintMaxLines: 1,
-            hintStyle:
-                Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
-            hintText: _getChatBarHintText(),
-          ),
-          focusNode: FocusNode(),
-        ),
-      ),
-    );
-  }
-
-  Widget _defTextField(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (editConversation != null)
-          _screenBuilder.editTextTextFieldHeader(
-            context,
-            _textEditingController,
-            _defEditConversationWidget(),
-          ),
-        if (replyToConversation != null)
-          _screenBuilder.replyTextFieldHeader(
-            context,
-            _textEditingController,
-            _defReplyConversationWidget(),
-          ),
-        if (isActiveLink &&
-            replyToConversation == null &&
-            editConversation == null &&
-            !_isSentBeforeLinkFetched)
-          _screenBuilder.linkPreviewBar(
-            context,
-            _defLinkPreview(linkModel!.ogTags!),
-          ),
-        Container(
-          width: 80.w,
-          constraints: BoxConstraints(
-            minHeight: 5.2.h,
-            maxHeight: 24.h,
-          ),
-          decoration: BoxDecoration(
-            color: _themeData.container,
-            borderRadius: editConversation == null &&
-                    replyToConversation == null &&
-                    !isActiveLink
-                ? BorderRadius.circular(24)
-                : const BorderRadius.vertical(
-                    bottom: Radius.circular(24),
-                  ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 2,
-            ),
-            child: _screenBuilder.chatroomTextField(
-              context,
-              _textEditingController,
-              _defInnerTextField(context),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  LMChatTextField _defInnerTextField(BuildContext context) {
-    return LMChatTextField(
-      key: const ObjectKey('chatTextField'),
-      isDown: false,
-      enabled: false,
-      scrollPhysics: const AlwaysScrollableScrollPhysics(),
-      isSecret: widget.chatroom.isSecret ?? false,
-      chatroomId: widget.chatroom.id,
-      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
-      onTagSelected: (tag) {
-        tags.add(tag);
-        LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
-          'community_id': widget.chatroom.id,
-          'chatroom_name': widget.chatroom.title,
-          'tagged_user_id': tag.id,
-          'tagged_user_name': tag.name,
-        });
-      },
-      onChange: _onTextChanged,
-      controller: _textEditingController,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        enabled: true,
-        hintMaxLines: 1,
-        hintStyle: const TextStyle(fontSize: 14),
-        hintText: _getChatBarHintText(),
-      ),
-      focusNode: _focusNode,
-    );
-  }
-
-  LMChatButton _defSendButton(BuildContext context) {
-    return LMChatButton(
-      onTap: _onSend,
-      style: LMChatButtonStyle(
-        backgroundColor: _themeData.primaryColor,
-        borderRadius: 100,
-        height: 48,
-        width: 48,
-      ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.send,
-        style: LMChatIconStyle(
-          size: 24,
-          boxSize: 24,
-          boxPadding: const EdgeInsets.only(left: 2),
-          color: _themeData.container,
-        ),
-      ),
-    );
-  }
-
+  // Handler functions of the LMChatroomBar
   void _onSend() {
     if (_textEditingController.text.trim().isEmpty) {
       toast("Text can't be empty");
@@ -432,9 +260,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                     ..shareLink(linkModel!.link!))
                   .build(),
               [
-                LMChatMedia(
+                LMChatMediaModel(
                   mediaType: LMChatMediaType.link,
-                  ogTags: linkModel!.ogTags?.toOGTag(),
+                  ogTags: linkModel!.ogTags,
                 ),
               ],
             ),
@@ -446,6 +274,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
         } else {
           String? extractedLink;
+
           if (showLinkPreview) {
             extractedLink =
                 LMChatTaggingHelper.getFirstValidLinkFromString(result!);
@@ -498,6 +327,447 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       editConversation = null;
       replyToConversation = null;
     }
+  }
+
+  bool _isRespondingAllowed() {
+    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
+      return false;
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
+      return false;
+    } else if (chatroom!.chatRequestState == 2) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  String _getChatBarHintText() {
+    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
+      return 'Only Community Managers can respond here';
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
+      return 'The community managers have restricted you from responding here';
+    } else if (chatroom!.chatRequestState == 2) {
+      return "You can not respond to a rejected connection.";
+    } else {
+      return "Type your response";
+    }
+  }
+
+  void _setupEditText() {
+    String? convertedMsgText =
+        LMChatTaggingHelper.convertRouteToTag(editConversation?.answer);
+    if (editConversation == null) {
+      return;
+    }
+    _textEditingController.value = TextEditingValue(
+      text: convertedMsgText ?? '',
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          offset: _textEditingController.text.length - 1,
+        ),
+      ),
+    );
+    _focusNode.requestFocus();
+    tags = LMChatTaggingHelper.addUserTagsIfMatched(
+        editConversation?.answer ?? '');
+  }
+
+  Widget _defTextField(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (editConversation != null)
+          _screenBuilder.editTextTextFieldHeader(
+            context,
+            _textEditingController,
+            _defEditConversationWidget(),
+          ),
+        if (replyToConversation != null)
+          _screenBuilder.replyTextFieldHeader(
+            context,
+            _textEditingController,
+            _defReplyConversationWidget(),
+          ),
+        if (isActiveLink &&
+            replyToConversation == null &&
+            editConversation == null &&
+            !_isSentBeforeLinkFetched)
+          _screenBuilder.linkPreviewBar(
+            context,
+            _defLinkPreview(linkModel!.ogTags!),
+          ),
+        Container(
+          width: 80.w,
+          constraints: BoxConstraints(
+            minHeight: 5.2.h,
+            maxHeight: 24.h,
+          ),
+          decoration: BoxDecoration(
+            color: _themeData.container,
+            borderRadius:
+                editConversation == null && replyToConversation == null
+                    ? BorderRadius.circular(24)
+                    : const BorderRadius.vertical(
+                        bottom: Radius.circular(24),
+                      ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 2,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: _screenBuilder.chatroomTextField(
+                    context,
+                    _textEditingController,
+                    _defInnerTextField(context),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                _defAttachmentButton(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Widget functions for the default widgets of LMChatroomBar
+  Widget _defDisabledTextField(BuildContext context) {
+    return Container(
+      width: 90.w,
+      constraints: BoxConstraints(
+        minHeight: 4.h,
+        maxHeight: 24.h,
+      ),
+      decoration: BoxDecoration(
+        color: _themeData.container,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kPaddingSmall,
+          vertical: kPaddingSmall,
+        ),
+        child: LMChatTextField(
+          isDown: false,
+          enabled: false,
+          isSecret: widget.chatroom.isSecret ?? false,
+          chatroomId: widget.chatroom.id,
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+          onTagSelected: (tag) {},
+          onChange: (value) {},
+          controller: _textEditingController,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            enabled: false,
+            hintMaxLines: 1,
+            hintStyle:
+                Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+            hintText: _getChatBarHintText(),
+          ),
+          focusNode: FocusNode(),
+        ),
+      ),
+    );
+  }
+
+  LMChatTextField _defInnerTextField(BuildContext context) {
+    return LMChatTextField(
+      key: const ObjectKey('chatTextField'),
+      isDown: false,
+      enabled: false,
+      scrollPhysics: const AlwaysScrollableScrollPhysics(),
+      isSecret: widget.chatroom.isSecret ?? false,
+      chatroomId: widget.chatroom.id,
+      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+      onTagSelected: (tag) {
+        tags.add(tag);
+        LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
+          'community_id': widget.chatroom.id,
+          'chatroom_name': widget.chatroom.title,
+          'tagged_user_id': tag.id,
+          'tagged_user_name': tag.name,
+        });
+      },
+      onChange: (value) {},
+      controller: _textEditingController,
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        enabled: true,
+        hintMaxLines: 1,
+        hintStyle: const TextStyle(fontSize: 14),
+        hintText: _getChatBarHintText(),
+      ),
+      focusNode: _focusNode,
+    );
+  }
+
+  LMChatButton _defSendButton(BuildContext context) {
+    return LMChatButton(
+      onTap: _onSend,
+      style: LMChatButtonStyle(
+        backgroundColor: _themeData.primaryColor,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 12,
+        ),
+        borderRadius: 100,
+        height: 6.h,
+        width: 6.h,
+      ),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.send,
+        style: LMChatIconStyle(
+          size: 28,
+          boxSize: 36,
+          boxPadding: const EdgeInsets.only(left: 2),
+          color: _themeData.container,
+        ),
+      ),
+    );
+  }
+
+  Widget _defAttachmentButton() {
+    return _isRespondingAllowed()
+        ? CustomPopupMenu(
+            controller: _popupMenuController,
+            enablePassEvent: false,
+            arrowColor: Colors.white,
+            showArrow: false,
+            menuBuilder: () => _defAttachmentMenu(),
+            pressType: PressType.singleClick,
+            child: _defAttachmentIcon(),
+          )
+        : const SizedBox();
+  }
+
+  Container _defAttachmentMenu() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 1.h),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: 100.w,
+          color: LMChatTheme.theme.container,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: 2.h,
+              horizontal: 5.w,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        LMChatButton(
+                          onTap: () async {
+                            final res =
+                                await LMChatMediaHandler.instance.pickImages();
+                            if (res.data != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LMChatMediaForwardingScreen(
+                                    chatroomId: widget.chatroom.id,
+                                  ),
+                                ),
+                              );
+                              _popupMenuController.hideMenu();
+                            }
+                          },
+                          icon: LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.camera_alt_outlined,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.container,
+                              size: 32,
+                            ),
+                          ),
+                          style: LMChatButtonStyle(
+                            height: 48,
+                            width: 48,
+                            borderRadius: 24,
+                            backgroundColor: LMChatTheme.theme.secondaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        LMChatText(
+                          'Camera',
+                          style: LMChatTextStyle(
+                            textStyle: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        LMChatButton(
+                          onTap: () async {
+                            final res =
+                                await LMChatMediaHandler.instance.pickMedia();
+                            if (res.data != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LMChatMediaForwardingScreen(
+                                    chatroomId: widget.chatroom.id,
+                                  ),
+                                ),
+                              );
+                              _popupMenuController.hideMenu();
+                            }
+                          },
+                          icon: LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.photo_outlined,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.container,
+                              size: 32,
+                            ),
+                          ),
+                          style: LMChatButtonStyle(
+                            height: 48,
+                            width: 48,
+                            borderRadius: 24,
+                            backgroundColor: LMChatTheme.theme.secondaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        LMChatText(
+                          'Gallery',
+                          style: LMChatTextStyle(
+                            textStyle: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        LMChatButton(
+                          onTap: () async {
+                            final res = await LMChatMediaHandler.instance
+                                .pickDocuments();
+                            if (res.data != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LMChatMediaForwardingScreen(
+                                    chatroomId: widget.chatroom.id,
+                                  ),
+                                ),
+                              );
+                              _popupMenuController.hideMenu();
+                            }
+                          },
+                          icon: LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.insert_drive_file_outlined,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.container,
+                              size: 32,
+                            ),
+                          ),
+                          style: LMChatButtonStyle(
+                            height: 48,
+                            width: 48,
+                            borderRadius: 24,
+                            backgroundColor: LMChatTheme.theme.secondaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        LMChatText(
+                          'Documents',
+                          style: LMChatTextStyle(
+                            textStyle: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        LMChatButton(
+                          onTap: () async {
+                            _popupMenuController.hideMenu();
+                            final res = await LMChatMediaHandler.instance
+                                .pickGIF(context);
+                            if (res.data != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LMChatMediaForwardingScreen(
+                                    chatroomId: widget.chatroom.id,
+                                  ),
+                                ),
+                              );
+                              _popupMenuController.hideMenu();
+                            }
+                          },
+                          icon: LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.gif_box_outlined,
+                            style: LMChatIconStyle(
+                              color: LMChatTheme.theme.container,
+                              size: 32,
+                            ),
+                          ),
+                          style: LMChatButtonStyle(
+                            height: 48,
+                            width: 48,
+                            borderRadius: 24,
+                            backgroundColor: LMChatTheme.theme.secondaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        LMChatText(
+                          'GIF',
+                          style: LMChatTextStyle(
+                            textStyle: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  LMChatIcon _defAttachmentIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.attachment,
+      style: LMChatIconStyle(
+        size: 24,
+        boxSize: 48,
+        boxPadding: const EdgeInsets.only(
+          bottom: 6,
+          left: 6,
+        ),
+        color: LMChatTheme.theme.inActiveColor,
+      ),
+    );
   }
 
   LMChatBarHeader _defReplyConversationWidget() {

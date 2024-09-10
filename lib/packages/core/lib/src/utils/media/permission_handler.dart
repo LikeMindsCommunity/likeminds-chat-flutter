@@ -71,33 +71,6 @@ Future<bool> handlePermissions(int mediaType) async {
       }
     }
   } else {
-    // Map<Permission, PermissionStatus> statues = await [
-    //   Permission.camera,
-    //   Permission.storage,
-    //   Permission.photos
-    // ].request();
-    // PermissionStatus? statusCamera = statues[Permission.camera];
-    // PermissionStatus? statusStorage = statues[Permission.storage];
-    // PermissionStatus? statusPhotos = statues[Permission.photos];
-    // bool isGranted = statusCamera == PermissionStatus.granted &&
-    //     statusStorage == PermissionStatus.granted &&
-    //     statusPhotos == PermissionStatus.granted;
-    // if (isGranted) {
-    //   return true;
-    // }
-    // bool isPermanentlyDenied =
-    //     statusCamera == PermissionStatus.permanentlyDenied ||
-    //         statusStorage == PermissionStatus.permanentlyDenied ||
-    //         statusPhotos == PermissionStatus.permanentlyDenied;
-    // if (isPermanentlyDenied) {
-    //   toast(
-    //     'Permissions denied, change app settings',
-    //     duration: Toast.LENGTH_LONG,
-    //   );
-    //   openAppSettings();
-    //   return false;
-    // }
-
     return true;
   }
   return true;
