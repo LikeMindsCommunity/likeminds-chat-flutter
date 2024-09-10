@@ -24,6 +24,7 @@ export 'shimmers/skeleton_chat_box.dart';
 export 'media/image.dart';
 export 'media/video.dart';
 export 'media/document/document.dart';
+export 'media/gif.dart';
 
 export 'conversation/chat_bubble.dart';
 

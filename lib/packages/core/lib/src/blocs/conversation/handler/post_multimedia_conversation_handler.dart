@@ -53,15 +53,19 @@ postMultimediaConversationEventHandler(
 
           try {
             String? url;
-            final response = await LMChatMediaService.uploadFile(
-              media.mediaFile!.readAsBytesSync(),
-              LMChatLocalPreference.instance.getUser().userUniqueId!,
-              chatroomId: event.postConversationRequest.chatroomId,
-              conversationId: postConversationResponse.conversation!.id,
-            );
+            if (media.mediaFile != null) {
+              final response = await LMChatMediaService.uploadFile(
+                media.mediaFile!.readAsBytesSync(),
+                LMChatLocalPreference.instance.getUser().userUniqueId!,
+                chatroomId: event.postConversationRequest.chatroomId,
+                conversationId: postConversationResponse.conversation!.id,
+              );
 
-            if (response.success) {
-              url = response.data;
+              if (response.success) {
+                url = response.data;
+              }
+            } else {
+              url = media.mediaUrl;
             }
 
             String? thumbnailUrl;

@@ -47,7 +47,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   late ValueNotifier<bool> rebuildAppBar;
 
   Map<String, Conversation> conversationMeta = <String, Conversation>{};
-  Map<String, dynamic> conversationAttachmentsMeta = <String, dynamic>{};
+  Map<String, List<LMChatAttachmentViewData>> conversationAttachmentsMeta =
+      <String, List<LMChatAttachmentViewData>>{};
   Map<int, User?> userMeta = <int, User?>{};
   List<int> _selectedIds = [];
 
@@ -184,9 +185,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
-      attachments:
-          conversationAttachmentsMeta[conversation.temporaryId.toString()] ??
-              conversationAttachmentsMeta[conversation.id.toString()],
+      attachments: conversationAttachmentsMeta[conversation.id.toString()] ??
+          conversationAttachmentsMeta[conversation.temporaryId.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -244,9 +244,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
-      attachments:
-          conversationAttachmentsMeta[conversation.temporaryId.toString()] ??
-              conversationAttachmentsMeta[conversation.id.toString()],
+      attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -406,7 +404,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         userMeta[user.id] = user;
       }
       conversationAttachmentsMeta[state.postConversation.temporaryId!] =
-          state.mediaFiles;
+          state.mediaFiles.map((e) => e.toAttachmentViewData()).toList();
 
       addLocalConversationToPagedList(
           state.postConversation.toConversationViewData());

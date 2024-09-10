@@ -291,7 +291,20 @@ class _LMChatMediaForwardingScreenState
           SizedBox(height: 2.h),
           _screenBuilder.document(context, _defDocument(mediaList)),
           const Spacer(),
-          _defPreviewBar()
+          _defPreviewBar(),
+        ],
+      );
+    } else if (mediaList.first.mediaType == LMChatMediaType.gif) {
+      return Column(
+        children: [
+          SizedBox(height: 5.h),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
+            child: Center(
+              child: LMChatGIF(media: mediaList.first),
+            ),
+          ),
+          const Spacer(),
         ],
       );
     }

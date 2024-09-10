@@ -46,6 +46,9 @@ class LMChatBubbleMedia extends StatelessWidget {
         }
       } else if (conversation.ogTags != null) {
         mediaWidget = const SizedBox.shrink();
+      } else if (attachments.first.type ==
+          mapMediaTypeToString(LMChatMediaType.gif)) {
+        mediaWidget = LMChatGIF(media: attachments.first.toMediaModel());
       } else {
         mediaWidget = null;
       }
