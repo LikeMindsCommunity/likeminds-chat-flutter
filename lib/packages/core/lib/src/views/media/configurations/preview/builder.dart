@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// {@template lm_chat_media_preview_builder_delegate}
@@ -114,29 +113,5 @@ class LMChatMediaPreviewBuilderDelegate {
     dynamic video,
   ) {
     return video;
-  }
-
-  /// Builds the LMChatDocumentPreview widget of the screen
-  Widget document(
-    BuildContext context,
-    LMChatDocumentPreview document,
-  ) {
-    return document;
-  }
-
-  /// Builds the LMChatGIF widget of the screen
-  Widget gif(
-    BuildContext context,
-    LMChatGIF gif,
-  ) {
-    return gif;
-  }
-
-  /// Builds the LMChatBarHeader reply widget of the keyboard on screen
-  Widget replyWidget(
-    BuildContext context,
-    LMChatBarHeader reply,
-  ) {
-    return reply;
   }
 }
