@@ -9,26 +9,6 @@ import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment
 import 'package:likeminds_chat_flutter_core/src/utils/credentials/credentials.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-const List<String> videoExtentions = [
-  'mp4',
-  'mov',
-  'wmv',
-  'avi',
-  'mkv',
-  'flv',
-];
-
-const List<String> photoExtentions = [
-  'jpg',
-  'jpeg',
-  'png',
-];
-
-const List<String> mediaExtentions = [
-  ...photoExtentions,
-  ...videoExtentions,
-];
-
 /// A class to manage all media picking, and accessing
 ///
 /// Gives access to functions that handles media picking natively
