@@ -25,7 +25,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     // If conversation has media but not uploaded yet
     // show local files
     Widget? mediaWidget;
-    if (attachmentUploaded && count > 0) {
+    if (count > 0 && conversation.deletedByUserId == null) {
       if (attachments.first.type ==
               mapMediaTypeToString(LMChatMediaType.image) ||
           attachments.first.type ==
@@ -66,6 +66,9 @@ class LMChatBubbleMedia extends StatelessWidget {
   }
 
   Widget _defaultMediaWidget(BuildContext context) {
+    if (attachments.first.attachmentFile != null) {
+      return getImageFileMessage(context, attachments);
+    }
     return getImageMessage(context, attachments);
   }
 }
