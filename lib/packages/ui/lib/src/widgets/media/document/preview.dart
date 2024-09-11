@@ -19,6 +19,17 @@ class LMChatDocumentPreview extends StatefulWidget {
     this.style,
   }) : super(key: key);
 
+  /// Creates a copy of this [LMChatDocumentPreview] but with the given fields replaced with the new values.
+  LMChatDocumentPreview copyWith({
+    List<LMChatMediaModel>? mediaList,
+    LMChatDocumentPreviewStyle? style,
+  }) {
+    return LMChatDocumentPreview(
+      mediaList: mediaList ?? this.mediaList,
+      style: style ?? this.style,
+    );
+  }
+
   @override
   State<LMChatDocumentPreview> createState() => _LMChatDocumentPreviewState();
 }

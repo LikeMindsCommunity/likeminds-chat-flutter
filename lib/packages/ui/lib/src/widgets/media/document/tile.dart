@@ -35,6 +35,23 @@ class LMChatDocumentTile extends StatefulWidget {
     this.documentIcon,
   });
 
+  /// Creates a copy of this widget with the given parameters replaced.
+  LMChatDocumentTile copyWith({
+    LMChatMediaModel? media,
+    Widget? title,
+    Widget? subtitle,
+    Widget? documentIcon,
+    LMChatDocumentTileStyle? style,
+  }) {
+    return LMChatDocumentTile(
+      media: media ?? this.media,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      documentIcon: documentIcon ?? this.documentIcon,
+      style: style ?? this.style,
+    );
+  }
+
   @override
   State<LMChatDocumentTile> createState() => _LMChatDocumentTileState();
 }

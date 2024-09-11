@@ -14,8 +14,27 @@ class LMChatGIF extends StatefulWidget {
     this.duration,
     this.overlay,
     this.style,
+    this.autoplay,
   }) : assert((duration == null) || (fps == null),
             'Either duration or fps must be provided, but not both.');
+
+  LMChatGIF copyWith({
+    LMChatMediaModel? media,
+    int? fps,
+    Duration? duration,
+    Widget? overlay,
+    LMChatGIFStyle? style,
+    bool? autoplay,
+  }) {
+    return LMChatGIF(
+      media: media ?? this.media,
+      fps: fps ?? this.fps,
+      duration: duration ?? this.duration,
+      overlay: overlay ?? this.overlay,
+      style: style ?? this.style,
+      autoplay: autoplay ?? this.autoplay,
+    );
+  }
 
   /// The media model containing the GIF data.
   final LMChatMediaModel media;
@@ -31,6 +50,9 @@ class LMChatGIF extends StatefulWidget {
 
   /// The style configuration for the GIF widget.
   final LMChatGIFStyle? style;
+
+  /// The bool to control whether GIF autoplays or not
+  final bool? autoplay;
 
   @override
   State<LMChatGIF> createState() => _LMChatGIFState();
@@ -107,14 +129,12 @@ class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
               Gif(
                 image: imageProvider,
                 controller: _controller,
-                autostart: Autostart.no,
+                autostart:
+                    widget.autoplay ?? false ? Autostart.loop : Autostart.no,
                 duration: widget.duration,
                 fps: widget.fps,
                 fit: style.fit ?? BoxFit.cover,
-                placeholder: (context) => Image(
-                  image: imageProvider,
-                  fit: style.fit ?? BoxFit.cover,
-                ),
+                placeholder: (context) => mediaShimmer(),
                 onFetchCompleted: () {
                   // Do nothing on fetch complete to keep the first frame
                 },

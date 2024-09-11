@@ -31,6 +31,21 @@ class LMChatDocumentThumbnail extends StatefulWidget {
     this.overlay,
   });
 
+  /// Creates a copy of this widget with the given parameters replaced.
+  LMChatDocumentThumbnail copyWith({
+    LMChatMediaModel? media,
+    LMChatDocumentTile? overlay,
+    LMChatDocumentThumbnailStyle? style,
+    bool? showOverlay,
+  }) {
+    return LMChatDocumentThumbnail(
+      media: media ?? this.media,
+      overlay: overlay ?? this.overlay,
+      style: style ?? this.style,
+      showOverlay: showOverlay ?? this.showOverlay,
+    );
+  }
+
   @override
   State<LMChatDocumentThumbnail> createState() =>
       _LMChatDocumentThumbnailState();
