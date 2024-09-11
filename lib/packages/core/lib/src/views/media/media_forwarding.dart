@@ -94,7 +94,7 @@ class _LMChatMediaForwardingScreenState
         Expanded(
           child: _buildMainPreview(),
         ),
-        _buildPreviewBar(),
+        if (mediaList.length > 1) _buildPreviewBar(),
       ],
     );
   }
@@ -130,7 +130,10 @@ class _LMChatMediaForwardingScreenState
           ),
         ),
       ),
-      padding: EdgeInsets.symmetric(vertical: 2.h),
+      padding: EdgeInsets.symmetric(
+        vertical: 2.h,
+        horizontal: 2.w,
+      ),
       child: SizedBox(
         height: 15.w,
         child: _defPreviewList(),
@@ -219,10 +222,11 @@ class _LMChatMediaForwardingScreenState
                   ),
                 ),
               ),
-              _screenBuilder.attachmentButton(
-                context,
-                _defAttachmentButton(),
-              )
+              if (mediaList.first.mediaType != LMChatMediaType.gif)
+                _screenBuilder.attachmentButton(
+                  context,
+                  _defAttachmentButton(),
+                )
             ],
           ),
         ),
@@ -402,7 +406,12 @@ class _LMChatMediaForwardingScreenState
   }
 
   LMChatDocumentPreview _defDocument(List<LMChatMediaModel> mediaList) {
-    return LMChatDocumentPreview(mediaList: mediaList);
+    return LMChatDocumentPreview(
+      mediaList: mediaList,
+      style: LMChatDocumentPreviewStyle(
+        maxHeight: 50.h,
+      ),
+    );
   }
 
   LMChatDocumentThumbnail _defDocumentThumbnail(int index) {
