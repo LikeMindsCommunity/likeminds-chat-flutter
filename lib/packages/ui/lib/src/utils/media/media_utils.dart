@@ -694,8 +694,8 @@ Widget getImageFileMessage(
                 ),
                 Positioned(
                   child: Container(
-                    height: 72,
-                    width: 72,
+                    height: 26.w,
+                    width: 26.w,
                     alignment: Alignment.center,
                     color: LMChatDefaultTheme.blackColor.withOpacity(0.5),
                     child: const LMChatText(
