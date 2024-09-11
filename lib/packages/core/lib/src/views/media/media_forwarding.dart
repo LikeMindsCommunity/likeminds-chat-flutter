@@ -195,7 +195,7 @@ class _LMChatMediaForwardingScreenState
                 : BorderRadius.circular(24),
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Padding(
@@ -446,7 +446,7 @@ class _LMChatMediaForwardingScreenState
               future: getVideoThumbnail(mediaList[index]),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return mediaShimmer();
+                  return const LMChatMediaShimmerWidget();
                 } else if (snapshot.data != null) {
                   return Image.file(
                     snapshot.data!,
