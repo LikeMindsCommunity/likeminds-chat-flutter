@@ -134,7 +134,9 @@ class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
                 duration: widget.duration,
                 fps: widget.fps,
                 fit: style.fit ?? BoxFit.cover,
-                placeholder: (context) => mediaShimmer(),
+                placeholder: (context) => LMChatMediaShimmerWidget(
+                  width: style.width,
+                ),
                 onFetchCompleted: () {
                   // Do nothing on fetch complete to keep the first frame
                 },

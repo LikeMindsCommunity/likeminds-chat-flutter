@@ -124,7 +124,7 @@ class _LMImageState extends State<LMChatImage> {
                   },
                   progressIndicatorBuilder: (context, url, progress) =>
                       style!.shimmerWidget ??
-                      mediaShimmer(
+                      LMChatMediaShimmerWidget(
                         height: style!.height,
                         width: style!.width,
                       ),

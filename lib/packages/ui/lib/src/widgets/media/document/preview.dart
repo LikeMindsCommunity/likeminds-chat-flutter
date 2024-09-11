@@ -79,6 +79,7 @@ class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
                   color: style.backgroundColor,
                   borderRadius: style.borderRadius,
                 ),
+                clipBehavior: Clip.hardEdge,
                 padding: style.padding,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
