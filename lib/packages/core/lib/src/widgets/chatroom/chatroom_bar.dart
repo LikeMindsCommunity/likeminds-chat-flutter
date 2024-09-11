@@ -534,16 +534,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             final res =
                                 await LMChatMediaHandler.instance.pickImages();
                             if (res.data != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LMChatMediaForwardingScreen(
-                                    chatroomId: widget.chatroom.id,
-                                  ),
-                                ),
-                              );
-                              _popupMenuController.hideMenu();
+                              _navigateToForwarding();
                             }
                           },
                           icon: LMChatIcon(
@@ -577,16 +568,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             final res =
                                 await LMChatMediaHandler.instance.pickMedia();
                             if (res.data != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LMChatMediaForwardingScreen(
-                                    chatroomId: widget.chatroom.id,
-                                  ),
-                                ),
-                              );
-                              _popupMenuController.hideMenu();
+                              _navigateToForwarding();
                             }
                           },
                           icon: LMChatIcon(
@@ -626,16 +608,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             final res = await LMChatMediaHandler.instance
                                 .pickDocuments();
                             if (res.data != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LMChatMediaForwardingScreen(
-                                    chatroomId: widget.chatroom.id,
-                                  ),
-                                ),
-                              );
-                              _popupMenuController.hideMenu();
+                              _navigateToForwarding();
                             }
                           },
                           icon: LMChatIcon(
@@ -670,16 +643,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             final res = await LMChatMediaHandler.instance
                                 .pickGIF(context);
                             if (res.data != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LMChatMediaForwardingScreen(
-                                    chatroomId: widget.chatroom.id,
-                                  ),
-                                ),
-                              );
-                              _popupMenuController.hideMenu();
+                              _navigateToForwarding();
                             }
                           },
                           icon: LMChatIcon(
@@ -714,6 +678,31 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         ),
       ),
     );
+  }
+
+  void _navigateToForwarding() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LMChatMediaForwardingScreen(
+          chatroomId: widget.chatroom.id,
+          replyConversation: replyToConversation,
+        ),
+      ),
+    );
+
+    _popupMenuController.hideMenu();
+
+    // Clear replying or editing state after returning from the forwarding screen
+    if (result == true) {
+      if (replyToConversation != null) {
+        chatActionBloc.add(LMChatReplyRemoveEvent());
+      }
+      if (editConversation != null) {
+        chatActionBloc.add(LMChatEditRemoveEvent());
+        _textEditingController.clear();
+      }
+    }
   }
 
   LMChatIcon _defAttachmentIcon() {
