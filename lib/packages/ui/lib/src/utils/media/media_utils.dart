@@ -299,8 +299,8 @@ Widget mediaShimmer({bool? isPP}) {
         ? const CircleAvatar(backgroundColor: Colors.white)
         : Container(
             color: Colors.white,
-            width: 180,
-            height: 180,
+            width: 55.w,
+            height: 55.w,
           ),
   );
 }
