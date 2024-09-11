@@ -12,6 +12,8 @@ _textChangeEventHandler(LMChatConversationTextChangeEvent event, emit) async {
         link: link,
       ));
     }
+  } else if (previousLink.isNotEmpty) {
+    emit(LMChatLinkRemovedState());
   }
 }
 

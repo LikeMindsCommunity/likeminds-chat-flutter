@@ -404,12 +404,13 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
           decoration: BoxDecoration(
             color: _themeData.container,
-            borderRadius:
-                editConversation == null && replyToConversation == null
-                    ? BorderRadius.circular(24)
-                    : const BorderRadius.vertical(
-                        bottom: Radius.circular(24),
-                      ),
+            borderRadius: editConversation == null &&
+                    replyToConversation == null &&
+                    !isActiveLink
+                ? BorderRadius.circular(24)
+                : const BorderRadius.vertical(
+                    bottom: Radius.circular(24),
+                  ),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -494,7 +495,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           'tagged_user_name': tag.name,
         });
       },
-      onChange: (value) {},
+      onChange: _onTextChanged,
       controller: _textEditingController,
       decoration: InputDecoration(
         border: InputBorder.none,
