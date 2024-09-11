@@ -278,16 +278,16 @@ class LMChatMediaHandler {
                   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
             );
           }
+          attachedMedia.add(
+            LMChatMediaModel(
+              mediaType: LMChatMediaType.video,
+              mediaFile: File(file.path!),
+              meta: {
+                'file_name': file.name,
+              },
+            ),
+          );
         }
-        attachedMedia.add(
-          LMChatMediaModel(
-            mediaType: LMChatMediaType.video,
-            mediaFile: File(file.path!),
-            meta: {
-              'file_name': file.name,
-            },
-          ),
-        );
       }
 
       addPickedMedia(attachedMedia);
