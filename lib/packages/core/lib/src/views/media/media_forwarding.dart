@@ -20,10 +20,16 @@ class LMChatMediaForwardingScreen extends StatefulWidget {
   /// Required chatrooom ID for th chatroom media is being sent to
   final int chatroomId;
 
+  final LMChatConversationViewData? replyConversation;
+
+  final String? textFieldText;
+
   ///{@macro lm_chat_media_forwarding_screen}
   const LMChatMediaForwardingScreen({
     super.key,
     required this.chatroomId,
+    this.replyConversation,
+    this.textFieldText,
   });
 
   @override
@@ -36,6 +42,8 @@ class _LMChatMediaForwardingScreenState
   int currPosition = 0;
   List<LMChatMediaModel> mediaList = [];
   LMChatConversationBloc? conversationBloc;
+  LMChatConversationViewData? replyConversation;
+  String? textFieldText;
 
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
   final TextEditingController _textEditingController = TextEditingController();
@@ -46,12 +54,16 @@ class _LMChatMediaForwardingScreenState
   @override
   void initState() {
     super.initState();
+    replyConversation = widget.replyConversation;
+    textFieldText = widget.textFieldText;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
   }
 
   @override
   void didUpdateWidget(covariant LMChatMediaForwardingScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    replyConversation = widget.replyConversation;
+    textFieldText = widget.textFieldText;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
   }
 
@@ -108,49 +120,63 @@ class _LMChatMediaForwardingScreenState
   }
 
   Widget _defTextField() {
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: 8.w,
-        maxHeight: 24.h,
-      ),
-      decoration: BoxDecoration(
-        color: LMChatTheme.theme.container,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: kPaddingSmall,
-                vertical: 1.w,
-              ),
-              child: LMChatTextField(
-                isDown: false,
-                chatroomId: widget.chatroomId,
-                style: Theme.of(context).textTheme.bodyMedium!,
-                onChange: (value) {
-                  // print(value);
-                },
-                onTagSelected: (tag) {},
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintMaxLines: 1,
-                  hintStyle: Theme.of(context).textTheme.bodyMedium,
-                  hintText: "Type something..",
-                ),
-                controller: _textEditingController,
-                focusNode: FocusNode(),
-              ),
-            ),
-          ),
-          _screenBuilder.attachmentButton(
+    return Column(
+      children: [
+        if (replyConversation != null)
+          _screenBuilder.replyWidget(
             context,
-            _defAttachmentButton(),
-          )
-        ],
-      ),
+            _defReplyConversationWidget(),
+          ),
+        Container(
+          constraints: BoxConstraints(
+            minHeight: 8.w,
+            maxHeight: 24.h,
+          ),
+          decoration: BoxDecoration(
+            color: LMChatTheme.theme.container,
+            borderRadius: replyConversation != null
+                ? const BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  )
+                : BorderRadius.circular(24),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: kPaddingSmall,
+                    vertical: 1.w,
+                  ),
+                  child: LMChatTextField(
+                    isDown: false,
+                    chatroomId: widget.chatroomId,
+                    style: Theme.of(context).textTheme.bodyMedium!,
+                    onChange: (value) {
+                      // print(value);
+                    },
+                    onTagSelected: (tag) {},
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintMaxLines: 1,
+                      hintStyle: Theme.of(context).textTheme.bodyMedium,
+                      hintText: "Type something..",
+                    ),
+                    controller: _textEditingController,
+                    focusNode: FocusNode(),
+                  ),
+                ),
+              ),
+              _screenBuilder.attachmentButton(
+                context,
+                _defAttachmentButton(),
+              )
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -169,10 +195,9 @@ class _LMChatMediaForwardingScreenState
         backgroundColor: Colors.transparent,
       ),
       onTap: () async {
-        if (mediaList.first.mediaType == LMChatMediaType.image) {
-          await LMChatMediaHandler.instance.pickImages();
-        } else if (mediaList.first.mediaType == LMChatMediaType.video) {
-          await LMChatMediaHandler.instance.pickVideos();
+        if ((mediaList.first.mediaType == LMChatMediaType.image) ||
+            (mediaList.first.mediaType == LMChatMediaType.video)) {
+          await LMChatMediaHandler.instance.pickMedia();
         } else if (mediaList.first.mediaType == LMChatMediaType.document) {
           await LMChatMediaHandler.instance.pickDocuments();
         }
@@ -183,10 +208,17 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
+  /// Sends a post with the selected media to the server.
+  ///
+  /// This function is called when the user taps the send button.
+  /// It sends a [LMChatPostMultiMediaConversationEvent] event to the
+  /// [LMChatConversationBloc] with the selected media and the chatroom id.
+  /// It also pops the current route.
   void _onSend() {
     LMChatConversationBloc.instance.add(
       LMChatPostMultiMediaConversationEvent(
         (PostConversationRequestBuilder()
+              ..replyId(replyConversation?.id)
               ..attachmentCount(mediaList.length)
               ..chatroomId(widget.chatroomId)
               ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
@@ -196,7 +228,7 @@ class _LMChatMediaForwardingScreenState
         LMChatMediaHandler.instance.pickedMedia,
       ),
     );
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   LMChatAppBar _defAppBar() {
@@ -263,7 +295,11 @@ class _LMChatMediaForwardingScreenState
         children: [
           SizedBox(height: 2.h),
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
+            constraints: BoxConstraints(
+              maxWidth: 100.w,
+              maxHeight: 60.h,
+              minHeight: mediaList.first.height?.toDouble() ?? 25.h,
+            ),
             child: Center(
               child: mediaList[currPosition].mediaType == LMChatMediaType.image
                   ? _screenBuilder.image(
@@ -281,7 +317,6 @@ class _LMChatMediaForwardingScreenState
                     ),
             ),
           ),
-          const Spacer(),
           _defPreviewBar()
         ],
       );
@@ -290,7 +325,6 @@ class _LMChatMediaForwardingScreenState
         children: [
           SizedBox(height: 2.h),
           _screenBuilder.document(context, _defDocument(mediaList)),
-          const Spacer(),
           _defPreviewBar(),
         ],
       );
@@ -301,15 +335,22 @@ class _LMChatMediaForwardingScreenState
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
             child: Center(
-              child: LMChatGIF(media: mediaList.first),
+              child: _defaultGIF(),
             ),
           ),
-          const Spacer(),
         ],
       );
     }
     return const SizedBox();
   }
+
+  LMChatGIF _defaultGIF() => LMChatGIF(
+        media: mediaList.first,
+        autoplay: true,
+        style: LMChatGIFStyle(
+          width: 100.w,
+        ),
+      );
 
   Container _defPreviewBar() {
     return Container(
@@ -444,5 +485,28 @@ class _LMChatMediaForwardingScreenState
               },
             ),
           );
+  }
+
+  LMChatBarHeader _defReplyConversationWidget() {
+    String userText = replyConversation?.member?.name ?? '';
+    final currentUser = LMChatLocalPreference.instance.getUser();
+    if (replyConversation?.memberId == currentUser.id) {
+      userText = 'You';
+    }
+    return LMChatBarHeader(
+      style: LMChatBarHeaderStyle.basic(),
+      titleText: userText,
+      onCanceled: () {
+        setState(() {
+          replyConversation = null;
+        });
+      },
+      subtitle: LMChatText(
+        LMChatTaggingHelper.convertRouteToTag(replyConversation?.answer) ?? "",
+        style: LMChatTextStyle(
+          textStyle: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
+    );
   }
 }

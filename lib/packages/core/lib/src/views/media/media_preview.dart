@@ -60,17 +60,11 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     return _screenBuilder.scaffold(
       backgroundColor: LMChatTheme.theme.scaffold,
       appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
-      body: Column(
-        children: [
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: rebuildCurr,
-              builder: (context, _, __) {
-                return getMediaPreview();
-              },
-            ),
-          ),
-        ],
+      body: ValueListenableBuilder(
+        valueListenable: rebuildCurr,
+        builder: (context, _, __) {
+          return getMediaPreview();
+        },
       ),
     );
   }
@@ -219,21 +213,21 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
 
   LMChatImage _defImage() {
     return LMChatImage(
-      imageUrl: mediaList[currPosition].mediaUrl!,
+      imageUrl: mediaList[currPosition].mediaUrl,
+      imageFile: mediaList[currPosition].mediaFile,
       style: const LMChatImageStyle(
         boxFit: BoxFit.cover,
       ),
     );
   }
 
-  ClipRRect _defImageThumbnail(int index) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8.0),
-      child: LMChatImage(
-        imageUrl: mediaList[index].thumbnailUrl ?? mediaList[index].mediaUrl,
-        style: const LMChatImageStyle(
-          boxFit: BoxFit.cover,
-        ),
+  LMChatImage _defImageThumbnail(int index) {
+    return LMChatImage(
+      imageUrl: mediaList[index].thumbnailUrl ?? mediaList[index].mediaUrl,
+      imageFile: mediaList[index].thumbnailFile ?? mediaList[index].mediaFile,
+      style: LMChatImageStyle(
+        boxFit: BoxFit.cover,
+        borderRadius: BorderRadius.circular(8.0),
       ),
     );
   }
@@ -246,11 +240,17 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   Widget _defVideoThumbnail(int index) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
-      child: LMChatImage(
-        imageUrl: mediaList[index].thumbnailUrl!,
-        style: const LMChatImageStyle(
-          boxFit: BoxFit.cover,
-        ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          LMChatImage(
+            imageUrl: mediaList[index].thumbnailUrl,
+            imageFile: mediaList[index].thumbnailFile,
+            style: const LMChatImageStyle(
+              boxFit: BoxFit.fill,
+            ),
+          ),
+        ],
       ),
     );
   }
