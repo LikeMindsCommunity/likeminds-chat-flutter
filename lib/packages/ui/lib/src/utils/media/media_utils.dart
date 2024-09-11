@@ -289,7 +289,11 @@ Widget mediaErrorWidget({bool isPP = false}) {
   );
 }
 
-Widget mediaShimmer({bool? isPP}) {
+Widget mediaShimmer({
+  bool? isPP,
+  double? height,
+  double? width,
+}) {
   return Shimmer.fromColors(
     baseColor: Colors.grey.shade100,
     highlightColor: Colors.grey.shade200,
@@ -299,8 +303,8 @@ Widget mediaShimmer({bool? isPP}) {
         ? const CircleAvatar(backgroundColor: Colors.white)
         : Container(
             color: Colors.white,
-            width: 55.w,
-            height: 55.w,
+            width: height ?? 55.w,
+            height: width ?? 55.w,
           ),
   );
 }
