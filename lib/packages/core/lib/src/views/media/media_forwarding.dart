@@ -78,12 +78,62 @@ class _LMChatMediaForwardingScreenState
             child: ValueListenableBuilder(
               valueListenable: rebuildCurr,
               builder: (context, _, __) {
-                return getMediaPreview();
+                return _buildMediaPreview();
               },
             ),
           ),
           _defChatBar(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMediaPreview() {
+    return Column(
+      children: [
+        Expanded(
+          child: _buildMainPreview(),
+        ),
+        _buildPreviewBar(),
+      ],
+    );
+  }
+
+  Widget _buildMainPreview() {
+    // Move the main preview logic here
+    if (mediaList.first.mediaType == LMChatMediaType.image ||
+        mediaList.first.mediaType == LMChatMediaType.video) {
+      return Center(
+        child: mediaList[currPosition].mediaType == LMChatMediaType.image
+            ? _screenBuilder.image(context, _defImage())
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                child: _screenBuilder.video(context, _defVideo()),
+              ),
+      );
+    } else if (mediaList.first.mediaType == LMChatMediaType.document) {
+      return _screenBuilder.document(context, _defDocument(mediaList));
+    } else if (mediaList.first.mediaType == LMChatMediaType.gif) {
+      return Center(child: _defaultGIF());
+    }
+    return const SizedBox();
+  }
+
+  Widget _buildPreviewBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: LMChatTheme.theme.container,
+        border: Border(
+          top: BorderSide(
+            color: LMChatTheme.theme.disabledColor,
+            width: 0.1,
+          ),
+        ),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 2.h),
+      child: SizedBox(
+        height: 15.w,
+        child: _defPreviewList(),
       ),
     );
   }
@@ -225,9 +275,10 @@ class _LMChatMediaForwardingScreenState
               ..text(_textEditingController.text)
               ..hasFiles(true))
             .build(),
-        LMChatMediaHandler.instance.pickedMedia,
+        LMChatMediaHandler.instance.pickedMedia.copy(),
       ),
     );
+    LMChatMediaHandler.instance.clearPickedMedia();
     Navigator.pop(context, true);
   }
 
@@ -288,62 +339,6 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  Widget getMediaPreview() {
-    if (mediaList.first.mediaType == LMChatMediaType.image ||
-        mediaList.first.mediaType == LMChatMediaType.video) {
-      return Column(
-        children: [
-          SizedBox(height: 2.h),
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: 100.w,
-              maxHeight: 60.h,
-              minHeight: mediaList.first.height?.toDouble() ?? 25.h,
-            ),
-            child: Center(
-              child: mediaList[currPosition].mediaType == LMChatMediaType.image
-                  ? _screenBuilder.image(
-                      context,
-                      _defImage(),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                      ),
-                      child: _screenBuilder.video(
-                        context,
-                        _defVideo(),
-                      ),
-                    ),
-            ),
-          ),
-          _defPreviewBar()
-        ],
-      );
-    } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return Column(
-        children: [
-          SizedBox(height: 2.h),
-          _screenBuilder.document(context, _defDocument(mediaList)),
-          _defPreviewBar(),
-        ],
-      );
-    } else if (mediaList.first.mediaType == LMChatMediaType.gif) {
-      return Column(
-        children: [
-          SizedBox(height: 5.h),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
-            child: Center(
-              child: _defaultGIF(),
-            ),
-          ),
-        ],
-      );
-    }
-    return const SizedBox();
-  }
-
   LMChatGIF _defaultGIF() => LMChatGIF(
         media: mediaList.first,
         autoplay: true,
@@ -351,32 +346,6 @@ class _LMChatMediaForwardingScreenState
           width: 100.w,
         ),
       );
-
-  Container _defPreviewBar() {
-    return Container(
-      decoration: BoxDecoration(
-          color: LMChatTheme.theme.container,
-          border: Border(
-            top: BorderSide(
-              color: LMChatTheme.theme.disabledColor,
-              width: 0.1,
-            ),
-          )),
-      padding: EdgeInsets.only(
-        left: 5.0,
-        right: 5.0,
-        top: 2.h,
-        bottom: 2.h,
-      ),
-      child: SizedBox(
-        height: 15.w,
-        width: 100.w,
-        child: Center(
-          child: _defPreviewList(),
-        ),
-      ),
-    );
-  }
 
   ListView _defPreviewList() {
     return ListView.builder(
