@@ -2,6 +2,10 @@ import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwa
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/setting.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/style.dart';
 
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/setting.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/style.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/builder.dart';
+
 /// {@template lm_chat_media_forwarding_config}
 /// [LMChatMediaForwardingConfig] is a class which is used to configure the chat media_forwarding
 /// screen. It is used to customize the chat media_forwarding screen.

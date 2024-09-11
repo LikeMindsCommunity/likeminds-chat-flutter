@@ -681,6 +681,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   void _navigateToForwarding() async {
+    _popupMenuController.hideMenu();
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -690,8 +691,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         ),
       ),
     );
-
-    _popupMenuController.hideMenu();
 
     // Clear replying or editing state after returning from the forwarding screen
     if (result == true) {
