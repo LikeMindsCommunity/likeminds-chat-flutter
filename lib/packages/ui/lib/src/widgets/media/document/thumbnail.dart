@@ -82,33 +82,36 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
-          return InkWell(
-            onTap: () async {
-              if (widget.media.mediaUrl != null) {
-                Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                launchUrl(fileUrl, mode: LaunchMode.externalApplication);
-              }
-            },
-            child: Stack(
-              children: [
-                SizedBox(
-                  child: documentFile!,
-                ),
-                widget.showOverlay
-                    ? widget.overlay ??
-                        Positioned(
-                          bottom: 0,
-                          child: LMChatDocumentTile(
-                            media: widget.media,
-                            style: style?.overlayStyle ??
-                                LMChatDocumentTileStyle(
-                                  padding: EdgeInsets.zero,
-                                  width: 54.w,
-                                ),
-                          ),
-                        )
-                    : const SizedBox.shrink(),
-              ],
+          return AbsorbPointer(
+            absorbing: widget.media.mediaUrl == null,
+            child: InkWell(
+              onTap: () async {
+                if (widget.media.mediaUrl != null) {
+                  Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
+                  launchUrl(fileUrl, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Stack(
+                children: [
+                  SizedBox(
+                    child: documentFile!,
+                  ),
+                  widget.showOverlay
+                      ? widget.overlay ??
+                          Positioned(
+                            bottom: 0,
+                            child: LMChatDocumentTile(
+                              media: widget.media,
+                              style: style?.overlayStyle ??
+                                  LMChatDocumentTileStyle(
+                                    padding: EdgeInsets.zero,
+                                    width: 54.w,
+                                  ),
+                            ),
+                          )
+                      : const SizedBox.shrink(),
+                ],
+              ),
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
