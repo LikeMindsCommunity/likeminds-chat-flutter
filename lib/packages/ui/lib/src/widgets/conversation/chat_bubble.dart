@@ -302,7 +302,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   conversationUser: widget.conversationUser,
                                 ),
                           if (conversation.replyConversationObject != null &&
-                              conversation.deletedByUserId == null)
+                              conversation.deletedByUserId == null) ...[
                             LMChatBubbleReply(
                               replyToConversation:
                                   conversation.replyConversationObject!,
@@ -324,6 +324,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 4),
+                          ],
                           AbsorbPointer(
                             absorbing: _isSelected,
                             child: GestureDetector(
