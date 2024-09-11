@@ -73,11 +73,7 @@ class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
       builder: (context, _, __) {
         return Column(
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: style.maxWidth ?? 100.w,
-                maxHeight: style.maxHeight ?? 60.h,
-              ),
+            Expanded(
               child: Container(
                 decoration: BoxDecoration(
                   color: style.backgroundColor,
