@@ -185,8 +185,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
-      attachments: conversationAttachmentsMeta[conversation.id.toString()] ??
-          conversationAttachmentsMeta[conversation.temporaryId.toString()],
+      attachments:
+          conversationAttachmentsMeta[conversation.temporaryId.toString()] ??
+              conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -400,16 +401,23 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
 
     if (state is LMChatMultiMediaConversationLoadingState) {
+      LMChatConversationViewData conv =
+          state.postConversation.toConversationViewData();
+
       if (!userMeta.containsKey(user.id)) {
         userMeta[user.id] = user;
       }
-      conversationAttachmentsMeta[state.postConversation.temporaryId!] =
+      conversationAttachmentsMeta[conv.temporaryId!] =
           state.mediaFiles.map((e) => e.toAttachmentViewData()).toList();
 
-      addLocalConversationToPagedList(
-          state.postConversation.toConversationViewData());
+      addLocalConversationToPagedList(conv);
     }
     if (state is LMChatMultiMediaConversationPostedState) {
+      final conv = state.postConversationResponse.conversation;
+
+      conversationAttachmentsMeta[conv!.id.toString()] =
+          state.putMediaResponse.map((e) => e.toAttachmentViewData()).toList();
+
       addConversationToPagedList(
         state.postConversationResponse.conversation!.toConversationViewData(),
       );
