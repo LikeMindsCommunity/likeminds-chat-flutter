@@ -30,6 +30,8 @@ class LMChatThemeData {
   final LMChatSnackBarStyle snackBarTheme;
   final LMChatImageStyle imageStyle;
   final LMChatVideoStyle videoStyle;
+  final LMChatDocumentStyle documentStyle;
+  final LMChatGIFStyle gifStyle;
   final LMChatTileStyle chatTileStyle;
   final LMChatAppBarStyle appBarStyle;
 
@@ -77,13 +79,15 @@ class LMChatThemeData {
     required this.bottomSheetStyle,
     required this.snackBarTheme,
     required this.imageStyle,
+    required this.videoStyle,
+    required this.documentStyle,
+    required this.gifStyle,
     required this.bubbleStyle,
     required this.replyStyle,
     required this.contentStyle,
     required this.chatTileStyle,
     required this.stateBubbleStyle,
     required this.appBarStyle,
-    required this.videoStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -126,6 +130,8 @@ class LMChatThemeData {
     LMChatSnackBarStyle? snackBarTheme,
     LMChatImageStyle? imageStyle,
     LMChatVideoStyle? videoStyle,
+    LMChatDocumentStyle? documentStyle,
+    LMChatGIFStyle? gifStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
@@ -167,6 +173,8 @@ class LMChatThemeData {
           ),
       imageStyle: imageStyle ?? LMChatImageStyle.basic(),
       videoStyle: videoStyle ?? LMChatVideoStyle.basic(),
+      documentStyle: documentStyle ?? LMChatDocumentStyle.basic(),
+      gifStyle: gifStyle ?? LMChatGIFStyle.basic(),
       replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
       bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
       contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
@@ -202,6 +210,8 @@ class LMChatThemeData {
     LMChatSnackBarStyle? snackBarTheme,
     LMChatImageStyle? imageStyle,
     LMChatVideoStyle? videoStyle,
+    LMChatDocumentStyle? documentStyle,
+    LMChatGIFStyle? gifStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
@@ -234,6 +244,8 @@ class LMChatThemeData {
       snackBarTheme: snackBarTheme ?? this.snackBarTheme,
       imageStyle: imageStyle ?? this.imageStyle,
       videoStyle: videoStyle ?? this.videoStyle,
+      documentStyle: documentStyle ?? this.documentStyle,
+      gifStyle: gifStyle ?? this.gifStyle,
       replyStyle: replyStyle ?? this.replyStyle,
       bubbleStyle: bubbleStyle ?? this.bubbleStyle,
       contentStyle: contentStyle ?? this.contentStyle,

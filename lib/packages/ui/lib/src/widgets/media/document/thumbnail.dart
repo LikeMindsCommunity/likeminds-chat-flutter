@@ -187,4 +187,41 @@ class LMChatDocumentThumbnailStyle {
     this.overlayStyle,
     this.shimmerStyle,
   });
+
+  /// Creates a copy of the current style with the given parameters.
+  LMChatDocumentThumbnailStyle copyWith({
+    double? height,
+    double? width,
+    Border? border,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    Color? backgroundColor,
+    LMChatDocumentTileStyle? overlayStyle,
+    LMChatDocumentShimmerStyle? shimmerStyle,
+  }) {
+    return LMChatDocumentThumbnailStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      overlayStyle: overlayStyle ?? this.overlayStyle,
+      shimmerStyle: shimmerStyle ?? this.shimmerStyle,
+    );
+  }
+
+  /// A factory constructor that returns a basic instance of [LMChatDocumentThumbnailStyle].
+  factory LMChatDocumentThumbnailStyle.basic() {
+    return LMChatDocumentThumbnailStyle(
+      height: 100.0,
+      width: 100.0,
+      border: Border.all(color: Colors.grey),
+      borderRadius: BorderRadius.circular(8.0),
+      padding: const EdgeInsets.all(8.0),
+      backgroundColor: Colors.white,
+      overlayStyle: LMChatDocumentTileStyle.basic(),
+      shimmerStyle: LMChatDocumentShimmerStyle.basic(),
+    );
+  }
 }

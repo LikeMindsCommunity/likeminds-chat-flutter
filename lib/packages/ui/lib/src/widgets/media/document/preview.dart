@@ -275,8 +275,6 @@ class LMChatDocumentPreviewStyle {
   /// Creates a basic LMChatDocumentPreviewStyle with default values.
   factory LMChatDocumentPreviewStyle.basic() {
     return LMChatDocumentPreviewStyle(
-      maxWidth: 100.w,
-      maxHeight: 60.h,
       backgroundColor: Colors.white,
       borderRadius: BorderRadius.circular(8),
       padding: const EdgeInsets.all(16),
@@ -345,13 +343,6 @@ class LMChatDocumentTilePreviewStyle {
       backgroundColor: Colors.white,
       borderRadius: BorderRadius.circular(8),
       padding: const EdgeInsets.all(8),
-      moreButtonStyle: LMChatTextStyle(
-        textStyle: TextStyle(
-          color: LMChatTheme.theme.secondaryColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 
