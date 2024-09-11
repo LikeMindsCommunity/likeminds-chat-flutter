@@ -4,10 +4,8 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:pdf_render/pdf_render_widgets.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:likeminds_chat_flutter_ui/src/widgets/media/error.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 const List<String> videoExtentions = [
@@ -30,8 +28,8 @@ const List<String> mediaExtentions = [
   ...videoExtentions,
 ];
 
-Widget getChatItemAttachmentTile(
-    List<LMChatAttachmentViewData> mediaFiles, Conversation conversation) {
+Widget getChatItemAttachmentTile(List<LMChatAttachmentViewData> mediaFiles,
+    LMChatConversationViewData conversation) {
   String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
           withTilde: false) ??
       '';
@@ -190,37 +188,6 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-Widget getDocumentThumbnail(File document, {Size? size}) {
-  return PdfDocumentLoader.openFile(
-    document.path,
-    onError: (error) {},
-    pageNumber: 1,
-    pageBuilder: (context, textureBuilder, pageSize) {
-      return textureBuilder(
-        size: size,
-      );
-    },
-  );
-}
-
-Widget getDocumentDetails(LMChatMediaModel document) {
-  return SizedBox(
-    width: 80.w,
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          '${document.pageCount ?? ''} ${document.pageCount == null ? '' : (document.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${document.pageCount == null ? '' : '·'} ${getFileSizeString(bytes: document.size!)} ● PDF',
-          style: TextStyle(
-            color: LMChatTheme.theme.onContainer,
-          ),
-        )
-      ],
-    ),
-  );
-}
-
 Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
   String? thumbnailPath = await VideoThumbnail.thumbnailFile(
     video: media.mediaFile!.path,
@@ -241,72 +208,6 @@ Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
   media.thumbnailFile ??= thumbnailFile;
 
   return thumbnailFile;
-}
-
-LMChatMediaType getMediaTypeFromExtention(String extention) {
-  if (videoExtentions.contains(extention)) {
-    return LMChatMediaType.video;
-  } else {
-    return LMChatMediaType.image;
-  }
-}
-
-Widget mediaErrorWidget({bool isPP = false}) {
-  return Container(
-    color:
-        isPP ? LMChatTheme.theme.primaryColor : LMChatDefaultTheme.whiteColor,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        LMChatIcon(
-          type: LMChatIconType.icon,
-          icon: Icons.error_outline,
-          style: LMChatIconStyle(
-            size: 10,
-            color: isPP
-                ? LMChatDefaultTheme.whiteColor
-                : LMChatDefaultTheme.blackColor,
-          ),
-        ),
-        isPP ? const SizedBox() : const SizedBox(height: 12),
-        isPP
-            ? const SizedBox()
-            : LMChatText(
-                "An error occurred fetching media",
-                style: LMChatTextStyle(
-                  textAlign: TextAlign.center,
-                  textStyle: TextStyle(
-                    fontSize: 8,
-                    color: isPP
-                        ? LMChatDefaultTheme.whiteColor
-                        : LMChatDefaultTheme.blackColor,
-                  ),
-                ),
-              )
-      ],
-    ),
-  );
-}
-
-Widget mediaShimmer({
-  bool? isPP,
-  double? height,
-  double? width,
-}) {
-  return Shimmer.fromColors(
-    baseColor: Colors.grey.shade100,
-    highlightColor: Colors.grey.shade200,
-    period: const Duration(seconds: 2),
-    direction: ShimmerDirection.ltr,
-    child: isPP != null && isPP
-        ? const CircleAvatar(backgroundColor: Colors.white)
-        : Container(
-            color: Colors.white,
-            width: height ?? 55.w,
-            height: width ?? 55.w,
-          ),
-  );
 }
 
 String getFileSizeString({required int bytes, int decimals = 0}) {
@@ -349,9 +250,10 @@ Widget getChatBubbleImage(
             fit: BoxFit.cover,
             height: height,
             width: width,
-            errorWidget: (context, url, error) => mediaErrorWidget(),
+            errorWidget: (context, url, error) =>
+                const LMChatMediaErrorWidget(),
             progressIndicatorBuilder: (context, url, progress) =>
-                mediaShimmer(),
+                const LMChatMediaShimmerWidget(),
           ),
           mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
                   mediaFile.thumbnailUrl != null
@@ -411,7 +313,7 @@ Widget getChatBubbleImage(
 Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
     {double? width, double? height}) {
   if (mediaFile.attachmentFile == null && mediaFile.thumbnailFile == null) {
-    return mediaErrorWidget();
+    return const LMChatMediaErrorWidget();
   }
   return Container(
     height: height,
@@ -427,7 +329,8 @@ Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
               ? mediaFile.attachmentFile!
               : mediaFile.thumbnailFile!,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => mediaErrorWidget(),
+          errorBuilder: (context, error, stackTrace) =>
+              const LMChatMediaErrorWidget(),
           height: height,
           width: width,
         ),
