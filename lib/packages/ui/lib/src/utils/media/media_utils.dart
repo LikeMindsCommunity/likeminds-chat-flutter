@@ -28,7 +28,22 @@ const List<String> mediaExtentions = [
   ...videoExtentions,
 ];
 
-Widget getChatItemAttachmentTile(List<LMChatAttachmentViewData> mediaFiles,
+/// Builds a widget to display the attachment tiles for a chat item.
+///
+/// This function takes a list of media files and a conversation object,
+/// and returns a widget that shows the appropriate UI for the attachments.
+/// If there are no media files and no answer text, an empty SizedBox is returned.
+/// If there are no media files but there is answer text, it displays the answer text.
+/// If there are media files, it determines the type of media and displays
+/// the corresponding icon and text based on the media type.
+///
+/// [mediaFiles] - A list of media files associated with the chat item.
+/// [conversation] - The conversation data that may contain answer text.
+///
+/// Returns a [Widget] that represents the attachment tile.
+Widget getChatItemAttachmentTile(
+    String message,
+    List<LMChatAttachmentViewData> mediaFiles,
     LMChatConversationViewData conversation) {
   String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
           withTilde: false) ??
@@ -61,9 +76,12 @@ Widget getChatItemAttachmentTile(List<LMChatAttachmentViewData> mediaFiles,
     } else {
       int videoCount = 0;
       int imageCount = 0;
+      int gifCount = 0; // Added for GIF count
       for (LMChatAttachmentViewData media in mediaFiles) {
         if (mapStringToMediaType(media.type!) == LMChatMediaType.video) {
           videoCount++;
+        } else if (mapStringToMediaType(media.type!) == LMChatMediaType.gif) {
+          gifCount++; // Count GIFs
         } else {
           imageCount++;
         }
@@ -128,24 +146,28 @@ Widget getChatItemAttachmentTile(List<LMChatAttachmentViewData> mediaFiles,
             )
           ],
         );
-      } else if (videoCount == 0) {
+      } else if (videoCount == 0 && gifCount == 0) {
         iconData = Icons.image;
         if (conversation.answer.isEmpty) {
           text = mediaFiles.length > 1 ? "Images" : "Image";
         } else {
           text = answerText;
         }
-      } else if (imageCount == 0) {
+      } else if (imageCount == 0 && gifCount == 0) {
         iconData = Icons.video_camera_back;
         if (conversation.answer.isEmpty) {
           text = mediaFiles.length > 1 ? "Videos" : "Video";
         } else {
           text = answerText;
         }
+      } else if (gifCount > 0) {
+        iconData = Icons.image; // Assuming you have an icon for GIFs
+        text = gifCount > 1 ? "GIFs" : "GIF"; // Set text for GIFs
       }
     }
     return Row(
       children: <Widget>[
+        LMChatText(message),
         mediaFiles.length > 1
             ? LMChatText(
                 '${mediaFiles.length}',
@@ -359,6 +381,7 @@ Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
 Widget getImageMessage(
   BuildContext context,
   List<LMChatAttachmentViewData>? conversationAttachments,
+  LMChatImageBuilder? imageBuilder,
 ) {
   if (conversationAttachments == null || conversationAttachments.isEmpty) {
     return const SizedBox();
@@ -542,7 +565,10 @@ Widget getImageMessage(
 }
 
 Widget getImageFileMessage(
-    BuildContext context, List<LMChatAttachmentViewData> mediaFiles) {
+  BuildContext context,
+  List<LMChatAttachmentViewData> mediaFiles,
+  LMChatImageBuilder? imageBuilder,
+) {
   if (mediaFiles.length == 1) {
     return GestureDetector(
       child: getFileImageTile(

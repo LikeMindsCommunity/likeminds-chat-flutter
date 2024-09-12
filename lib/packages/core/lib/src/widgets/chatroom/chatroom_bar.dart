@@ -703,6 +703,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         builder: (context) => LMChatMediaForwardingScreen(
           chatroomId: widget.chatroom.id,
           replyConversation: replyToConversation,
+          textFieldText: _textEditingController.text,
         ),
       ),
     );

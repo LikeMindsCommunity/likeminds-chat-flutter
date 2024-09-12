@@ -57,6 +57,7 @@ class _LMChatMediaForwardingScreenState
     super.initState();
     replyConversation = widget.replyConversation;
     textFieldText = widget.textFieldText;
+    if (textFieldText != null) _textEditingController.text = textFieldText!;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
   }
 
@@ -65,6 +66,7 @@ class _LMChatMediaForwardingScreenState
     super.didUpdateWidget(oldWidget);
     replyConversation = widget.replyConversation;
     textFieldText = widget.textFieldText;
+    if (textFieldText != null) _textEditingController.text = textFieldText!;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
   }
 
