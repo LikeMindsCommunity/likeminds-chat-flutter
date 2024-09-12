@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
@@ -361,30 +362,68 @@ class _LMChatMediaForwardingScreenState
           currPosition = index;
           rebuildCurr.value = !rebuildCurr.value;
         },
-        child: Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 3.0,
-          ),
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              border: currPosition == index
-                  ? Border.all(
-                      color: LMChatTheme.theme.secondaryColor,
-                      width: 2.0,
-                      strokeAlign: BorderSide.strokeAlignOutside,
-                    )
-                  : null),
-          width: 15.w,
-          height: 15.w,
-          child: mediaList[index].mediaType == LMChatMediaType.image
-              ? _defImageThumbnail(index)
-              : mediaList[index].mediaType == LMChatMediaType.video
-                  ? _defVideoThumbnail(index)
-                  : _defDocumentThumbnail(index),
+        child: Stack(
+          // Use Stack to overlay the remove button
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 3.0),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: currPosition == index
+                      ? Border.all(
+                          color: LMChatTheme.theme.secondaryColor,
+                          width: 2.0,
+                          strokeAlign: BorderSide.strokeAlignOutside,
+                        )
+                      : null),
+              width: 15.w,
+              height: 15.w,
+              child: mediaList[index].mediaType == LMChatMediaType.image
+                  ? _defImageThumbnail(index)
+                  : mediaList[index].mediaType == LMChatMediaType.video
+                      ? _defVideoThumbnail(index)
+                      : _defDocumentThumbnail(index),
+            ),
+            Visibility(
+              visible: currPosition == index,
+              child: Positioned(
+                // Position the remove button
+                top: 2,
+                right: 4,
+                child: InkWell(
+                  onTap: () => _removeMedia(index),
+                  child: LMChatIcon(
+                    type: LMChatIconType.icon,
+                    icon: CupertinoIcons.xmark,
+                    style: LMChatIconStyle(
+                      color: LMChatTheme.theme.onContainer,
+                      boxPadding: const EdgeInsets.all(4),
+                      size: 12,
+                      boxSize: 18,
+                      boxBorderRadius: 12,
+                      backgroundColor: LMChatTheme.theme.container,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  void _removeMedia(int index) {
+    setState(() {
+      mediaList.removeAt(index);
+      if (currPosition >= mediaList.length) {
+        currPosition =
+            mediaList.length - 1; // Adjust current position if needed
+      }
+      rebuildCurr.value = !rebuildCurr.value; // Trigger rebuild
+    });
   }
 
   LMChatImage _defImage() {
