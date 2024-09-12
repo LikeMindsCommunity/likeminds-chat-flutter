@@ -24,14 +24,18 @@ class LMChatJoinButton extends StatelessWidget {
                   ? showDialog(
                       context: context,
                       builder: (context) => LMChatDialog(
-                        title: const Text("Leave chatroom"),
-                        content: Text(
+                        title: const LMChatText("Leave chatroom"),
+                        content: LMChatText(
                           chatroom.isSecret != null && chatroom.isSecret!
                               ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
                               : 'Are you sure you want to leave this group?',
                         ),
-                        // actionText: 'Confirm',
-                        // onActionPressed: onTap,
+                        style: LMChatDialogStyle(
+                          backgroundColor: LMChatTheme.theme.container,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                         actions: [
                           LMChatText(
                             'Cancel',
