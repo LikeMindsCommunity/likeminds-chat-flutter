@@ -44,7 +44,7 @@ class LMChatUserTile extends LMChatTile {
               size: 48,
               fallbackTextStyle: LMChatTextStyle(
                 textStyle: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: _chatTheme.onPrimary,
                 ),
