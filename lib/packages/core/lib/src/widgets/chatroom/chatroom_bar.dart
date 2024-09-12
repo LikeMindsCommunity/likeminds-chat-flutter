@@ -474,10 +474,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       onTap: _onSend,
       style: LMChatButtonStyle(
         backgroundColor: _themeData.primaryColor,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 12,
-        ),
         borderRadius: 100,
         height: 6.h,
         width: 6.h,
@@ -487,7 +483,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         icon: Icons.send,
         style: LMChatIconStyle(
           size: 28,
-          boxSize: 36,
+          boxSize: 28,
           boxPadding: const EdgeInsets.only(left: 2),
           color: _themeData.container,
         ),
@@ -616,7 +612,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             icon: Icons.insert_drive_file_outlined,
                             style: LMChatIconStyle(
                               color: LMChatTheme.theme.container,
-                              size: 32,
+                              size: 30,
+                              boxSize: 48,
+                              boxPadding: EdgeInsets.zero,
                             ),
                           ),
                           style: LMChatButtonStyle(
