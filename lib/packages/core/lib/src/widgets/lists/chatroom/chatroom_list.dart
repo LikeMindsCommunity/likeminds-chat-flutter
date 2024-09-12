@@ -338,7 +338,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
+          Flexible(
             child: LMChatText(
               chatroom.header,
               style: const LMChatTextStyle(
