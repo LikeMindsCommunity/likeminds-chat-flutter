@@ -102,6 +102,7 @@ class LMChatBarHeader extends StatelessWidget {
                 Container(
                   width: 1.w,
                   color: LMChatTheme.instance.themeData.primaryColor,
+                  padding: const EdgeInsets.all(4),
                 ),
                 kHorizontalPaddingMedium,
                 Column(
@@ -113,7 +114,11 @@ class LMChatBarHeader extends StatelessWidget {
                         ) ??
                         _defTitleBuilder(themeData),
                     kVerticalPaddingSmall,
-                    SizedBox(width: 55.w, child: subtitle),
+                    SizedBox(
+                      width: 55.w,
+                      height: 3.h,
+                      child: subtitle,
+                    ),
                   ],
                 ),
               ],
