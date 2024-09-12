@@ -36,7 +36,7 @@ class LMChatroomBar extends StatefulWidget {
 
 class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatConversationViewData? replyToConversation;
-  List<LMChatMediaModel>? replyConversationAttachments;
+  List<LMChatAttachmentViewData>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
 
   // Flutter and other dependecies needed
@@ -99,6 +99,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           _setupEditText();
         } else if (state is LMChatReplyConversationState) {
           replyToConversation = state.conversation;
+          replyConversationAttachments = state.attachments;
           _focusNode.requestFocus();
         } else if (state is LMChatReplyRemoveState) {
           replyToConversation = null;
@@ -737,6 +738,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   LMChatBarHeader _defReplyConversationWidget() {
+    String message = getGIFText(replyToConversation!);
     String userText = replyToConversation?.member?.name ?? '';
     if (replyToConversation?.memberId == currentUser.id) {
       userText = 'You';
@@ -747,13 +749,24 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       onCanceled: () {
         chatActionBloc.add(LMChatReplyRemoveEvent());
       },
-      subtitle: LMChatText(
-        LMChatTaggingHelper.convertRouteToTag(replyToConversation?.answer) ??
-            "",
-        style: LMChatTextStyle(
-          textStyle: Theme.of(context).textTheme.bodySmall,
-        ),
-      ),
+      subtitle: ((replyToConversation?.attachmentsUploaded ?? false) &&
+              replyToConversation?.deletedByUserId == null)
+          ? getChatItemAttachmentTile(
+              message, replyConversationAttachments ?? [], replyToConversation!)
+          : LMChatText(
+              replyToConversation!.state != 0
+                  ? LMChatTaggingHelper.extractStateMessage(message)
+                  : message,
+              style: LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
     );
   }
 

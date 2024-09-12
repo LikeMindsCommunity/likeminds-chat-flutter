@@ -197,6 +197,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             chatroomId: widget.chatroomId,
             conversationId: conversation.id,
             replyConversation: conversation,
+            attachments: conversationAttachmentsMeta[
+                    conversation.temporaryId.toString()] ??
+                conversationAttachmentsMeta[conversation.id.toString()],
           ),
         );
       },
@@ -255,6 +258,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             chatroomId: widget.chatroomId,
             conversationId: conversation.id,
             replyConversation: conversation,
+            attachments:
+                conversationAttachmentsMeta[conversation.id.toString()],
           ),
         );
       },

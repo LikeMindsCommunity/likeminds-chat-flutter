@@ -29,7 +29,7 @@ class LMChatBarHeader extends StatelessWidget {
   final String? titleText;
 
   /// The subtitle of the chat bar header.
-  final LMChatText? subtitle;
+  final Widget? subtitle;
 
   /// The trailing icon of the chat bar header.
   final LMChatIcon? trailing;

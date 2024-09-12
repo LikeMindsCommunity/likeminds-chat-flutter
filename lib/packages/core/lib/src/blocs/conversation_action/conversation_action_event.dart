@@ -86,11 +86,14 @@ class LMChatReplyConversationEvent extends LMChatConversationActionEvent {
   /// [LMChatConversationViewData] replyConversation is the conversation to be replied.
   final LMChatConversationViewData replyConversation;
 
+  final List<LMChatAttachmentViewData>? attachments;
+
   /// {@macro lm_chat_reply_conversation_event}
   LMChatReplyConversationEvent({
     required this.conversationId,
     required this.chatroomId,
     required this.replyConversation,
+    required this.attachments,
   });
 
   @override

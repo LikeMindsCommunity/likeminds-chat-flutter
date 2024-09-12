@@ -344,8 +344,7 @@ class LMChatMediaHandler {
         randomID: "lm-gif", // Optional - An ID/proxy for a specific user.
         tabColor:
             LMChatTheme.theme.primaryColor, // Optional- default accent color.
-        debounceTimeInMilliseconds:
-            350, // Optional- time to pause between search keystrokes
+        debounceTimeInMilliseconds: 350,
       );
 
       if (gif == null) {

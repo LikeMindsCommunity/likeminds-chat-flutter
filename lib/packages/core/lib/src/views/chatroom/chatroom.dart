@@ -393,6 +393,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     conversationId: conversationViewData.id,
                     chatroomId: widget.chatroomId,
                     replyConversation: conversationViewData,
+                    attachments: conversationViewData.attachments,
                   ),
                 );
                 _selectedIds.clear();

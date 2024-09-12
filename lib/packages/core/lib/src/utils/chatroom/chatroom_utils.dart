@@ -52,14 +52,14 @@ String getHomeChatroomPreviewMessage(
       ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
           conversation.answer,
         ) : LMChatTaggingHelper.convertRouteToTag(
-          _getGIFText(conversation),
+          getGIFText(conversation),
           withTilde: false,
         )}'
       : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
 
-String _getGIFText(LMChatConversationViewData conversation) {
+String getGIFText(LMChatConversationViewData conversation) {
   String gifText = conversation.answer;
   const String gifMessageIndicator =
       "* This is a gif message. Please update your app *";
