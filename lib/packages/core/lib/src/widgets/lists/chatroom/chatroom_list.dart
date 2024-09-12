@@ -361,20 +361,24 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             ),
         ],
       ),
-      subtitle: LMChatText(
-        chatroom.lastConversation!.state != 0
-            ? LMChatTaggingHelper.extractStateMessage(message)
-            : message,
-        style: LMChatTextStyle(
-          maxLines: 1,
-          textStyle: TextStyle(
-            fontSize: 14,
-            color: LMChatTheme.theme.onContainer,
-            fontWeight: FontWeight.w400,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
+      subtitle: ((chatroom.lastConversation?.attachmentsUploaded ?? false) &&
+              chatroom.lastConversation?.deletedByUserId == null)
+          ? getChatItemAttachmentTile(
+              message, chatroom.attachments, chatroom.lastConversation!)
+          : LMChatText(
+              chatroom.lastConversation!.state != 0
+                  ? LMChatTaggingHelper.extractStateMessage(message)
+                  : message,
+              style: LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
       trailing: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
