@@ -115,38 +115,25 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   }
 
   Widget getMediaPreview() {
-    if (mediaList.first.mediaType == LMChatMediaType.image ||
-        mediaList.first.mediaType == LMChatMediaType.video) {
-      return Column(
-        children: [
-          SizedBox(
-            height: 2.h,
-          ),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 70.h),
-            child: Center(
-              child: mediaList[currPosition].mediaType == LMChatMediaType.image
-                  ? _screenBuilder.image(
-                      context,
-                      _defImage(),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                      ),
-                      child: _screenBuilder.video(
-                        context,
-                        _defVideo(),
-                      ),
-                    ),
-            ),
-          ),
-          const Spacer(),
-          _defPreviewBar()
-        ],
-      );
-    } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return LMChatDocumentPreview(mediaList: mediaList);
+    // Updated to handle single attachment preview
+    if (mediaList.isNotEmpty) {
+      if (mediaList.first.mediaType == LMChatMediaType.image ||
+          mediaList.first.mediaType == LMChatMediaType.video) {
+        return Center(
+          child: mediaList[currPosition].mediaType == LMChatMediaType.image
+              ? _screenBuilder.image(
+                  context,
+                  _defImage(),
+                )
+              : Padding(
+                  padding: EdgeInsets.symmetric(vertical: 2.h),
+                  child: _screenBuilder.video(
+                    context,
+                    _defVideo(),
+                  ),
+                ),
+        );
+      }
     }
     return const SizedBox();
   }
@@ -169,10 +156,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       ),
       child: SizedBox(
         height: 15.w,
-        width: 100.w,
-        child: Center(
-          child: _defPreviewList(),
-        ),
+        child: _defPreviewList(),
       ),
     );
   }
