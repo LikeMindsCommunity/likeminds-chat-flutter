@@ -527,8 +527,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                       children: [
                         LMChatButton(
                           onTap: () async {
-                            final res =
-                                await LMChatMediaHandler.instance.pickImages();
+                            final res = await LMChatMediaHandler.instance
+                                .pickSingleImage();
                             if (res.data != null) {
                               _navigateToForwarding();
                             }
@@ -538,7 +538,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             icon: Icons.camera_alt_outlined,
                             style: LMChatIconStyle(
                               color: LMChatTheme.theme.container,
-                              size: 32,
+                              size: 30,
+                              boxSize: 48,
+                              boxPadding: EdgeInsets.zero,
                             ),
                           ),
                           style: LMChatButtonStyle(
@@ -572,7 +574,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             icon: Icons.photo_outlined,
                             style: LMChatIconStyle(
                               color: LMChatTheme.theme.container,
-                              size: 32,
+                              size: 30,
+                              boxSize: 48,
+                              boxPadding: EdgeInsets.zero,
                             ),
                           ),
                           style: LMChatButtonStyle(
@@ -649,7 +653,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                             icon: Icons.gif_box_outlined,
                             style: LMChatIconStyle(
                               color: LMChatTheme.theme.container,
-                              size: 32,
+                              size: 30,
+                              boxSize: 48,
+                              boxPadding: EdgeInsets.zero,
                             ),
                           ),
                           style: LMChatButtonStyle(
@@ -724,7 +730,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       userText = 'You';
     }
     return LMChatBarHeader(
-      style: LMChatBarHeaderStyle.basic(),
+      style: LMChatBarHeaderStyle.basic().copyWith(height: 8.h),
       titleText: userText,
       onCanceled: () {
         chatActionBloc.add(LMChatReplyRemoveEvent());
