@@ -166,11 +166,11 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       },
       style: LMChatTileStyle.basic().copyWith(
         margin: EdgeInsets.only(
-          top: 3.h,
-          bottom: 1.h,
+          top: 2.h,
+          bottom: 2.h,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
-        height: 4.h,
+        padding: EdgeInsets.symmetric(horizontal: 6.w),
+        height: 4.5.h,
       ),
       leading: LMChatIcon(
         type: LMChatIconType.svg,
@@ -227,8 +227,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
     return LMChatChip(
       style: LMChatChipStyle.basic().copyWith(
         backgroundColor: LMChatTheme.theme.primaryColor,
-        padding: EdgeInsets.symmetric(
-          horizontal: 2.w,
+        padding: EdgeInsets.zero,
+        labelPadding: EdgeInsets.only(
+          left: 2.w,
+          right: 2.w,
         ),
         side: BorderSide.none,
       ),
@@ -240,6 +242,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           textStyle: TextStyle(
             color: LMChatTheme.theme.onPrimary,
             fontWeight: FontWeight.w500,
+            fontSize: 14,
           ),
         ),
       ),
