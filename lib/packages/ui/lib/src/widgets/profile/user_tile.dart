@@ -35,7 +35,7 @@ class LMChatUserTile extends LMChatTile {
           LMChatTileStyle(
             backgroundColor: _chatTheme.container,
             gap: 4,
-            // margin: 12,
+            margin: const EdgeInsets.only(bottom: 2),
           ),
       leading: leading ??
           LMChatProfilePicture(
@@ -44,7 +44,7 @@ class LMChatUserTile extends LMChatTile {
               size: 48,
               fallbackTextStyle: LMChatTextStyle(
                 textStyle: TextStyle(
-                  fontSize: 18,
+                  fontSize: 24,
                   fontWeight: FontWeight.w600,
                   color: _chatTheme.onPrimary,
                 ),
@@ -59,7 +59,7 @@ class LMChatUserTile extends LMChatTile {
             userViewData.name,
             style: const LMChatTextStyle(
               textStyle: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w400,
               ),
             ),
