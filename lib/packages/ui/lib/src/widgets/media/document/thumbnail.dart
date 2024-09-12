@@ -76,6 +76,13 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
   }
 
   @override
+  void didUpdateWidget(LMChatDocumentThumbnail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    style = widget.style;
+    loadedFile = loadFile();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: loadedFile,

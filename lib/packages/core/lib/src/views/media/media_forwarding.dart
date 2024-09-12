@@ -115,7 +115,7 @@ class _LMChatMediaForwardingScreenState
               ),
       );
     } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return _screenBuilder.document(context, _defDocument(mediaList));
+      return _screenBuilder.document(context, _defDocument());
     } else if (mediaList.first.mediaType == LMChatMediaType.gif) {
       return Center(child: _defaultGIF());
     }
@@ -446,9 +446,9 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  LMChatDocumentPreview _defDocument(List<LMChatMediaModel> mediaList) {
+  LMChatDocumentPreview _defDocument() {
     return LMChatDocumentPreview(
-      mediaList: mediaList,
+      media: mediaList[currPosition],
       style: LMChatDocumentPreviewStyle(
         maxHeight: 50.h,
       ),
