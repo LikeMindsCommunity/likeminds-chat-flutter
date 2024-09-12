@@ -51,7 +51,10 @@ LMChatRoomViewData parseLastConversation(
       .toConversationViewData();
   //Create a new instance with member object copied
   LMChatConversationViewData updated = lastConversation.copyWith(
-      member: response.userMeta![lastConversation.memberId]!.toUserViewData());
+      member: response.userMeta != null &&
+              response.userMeta![lastConversation.memberId] != null
+          ? response.userMeta![lastConversation.memberId]!.toUserViewData()
+          : null);
   //Return a copy of passed chatroom with lastConversation updated
   return chatroom.copyWith(lastConversation: updated);
 }
@@ -60,7 +63,8 @@ LMChatRoomViewData parseLastConversation(
 LMChatRoomViewData parseAttachments(
     GetHomeFeedResponse response, LMChatRoomViewData chatroom) {
   // Assuming response.conversationAttachmentsMeta is a map of attachment data
-  final attachmentData = response.conversationAttachmentsMeta;
+  final Map<String, List<Attachment>>? attachmentData =
+      response.conversationAttachmentsMeta;
 
   // Check if the attachment data exists
   if (attachmentData != null) {
@@ -73,7 +77,7 @@ LMChatRoomViewData parseAttachments(
       List<LMChatAttachmentViewData> attachments = [];
 
       // Iterate through each entry in the attachment data for the specific conversation
-      for (var item in attachmentData[lastConversationId]!) {
+      for (Attachment item in attachmentData[lastConversationId]!) {
         // Convert each attachment entry to LMChatAttachmentViewData
         LMChatAttachmentViewData attachment = item.toAttachmentViewData();
         attachments.add(attachment);
