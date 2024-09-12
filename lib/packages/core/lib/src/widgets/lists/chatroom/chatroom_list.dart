@@ -338,14 +338,16 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          LMChatText(
-            chatroom.header,
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+          Expanded(
+            child: LMChatText(
+              chatroom.header,
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
