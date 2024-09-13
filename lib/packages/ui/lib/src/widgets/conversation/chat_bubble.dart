@@ -85,6 +85,13 @@ class LMChatBubble extends StatefulWidget {
   final Widget Function(BuildContext context, LMChatText text)?
       deletedTextBuilder;
 
+  /// The media builder.
+  final Widget Function(
+    BuildContext context,
+    List<LMChatAttachmentViewData>? attachments,
+    LMChatBubbleMedia media,
+  )? mediaBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -109,6 +116,7 @@ class LMChatBubble extends StatefulWidget {
     this.headerBuilder,
     this.footerBuilder,
     this.deletedTextBuilder,
+    this.mediaBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -134,6 +142,11 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(BuildContext context, LMChatBubbleFooter footer)?
         footerBuilder,
     Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
+    Widget Function(
+      BuildContext context,
+      List<LMChatAttachmentViewData>? attachments,
+      LMChatBubbleMedia media,
+    )? mediaBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -153,6 +166,7 @@ class LMChatBubble extends StatefulWidget {
       headerBuilder: headerBuilder ?? this.headerBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
+      mediaBuilder: mediaBuilder ?? this.mediaBuilder,
     );
   }
 
@@ -302,7 +316,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   conversationUser: widget.conversationUser,
                                 ),
                           if (conversation.replyConversationObject != null &&
-                              conversation.deletedByUserId == null)
+                              conversation.deletedByUserId == null) ...[
                             LMChatBubbleReply(
                               replyToConversation:
                                   conversation.replyConversationObject!,
@@ -324,6 +338,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 4),
+                          ],
                           AbsorbPointer(
                             absorbing: _isSelected,
                             child: GestureDetector(
@@ -351,21 +367,34 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               : widget.contentBuilder?.call(
                                     context,
                                     LMChatBubbleContent(
-                                      conversation: conversation,
+                                      conversation:
+                                          widget.attachments?.first.type ==
+                                                  "gif"
+                                              ? conversation.copyWith(
+                                                  answer: _getGIFText())
+                                              : conversation,
                                       onTagTap: widget.onTagTap,
                                     ),
                                   ) ??
                                   LMChatBubbleContent(
-                                    conversation: conversation,
+                                    conversation:
+                                        widget.attachments?.first.type == "gif"
+                                            ? conversation.copyWith(
+                                                answer: _getGIFText())
+                                            : conversation,
                                     onTagTap: widget.onTagTap,
                                   ),
                           if (conversation.deletedByUserId == null &&
                               inStyle.showFooter == true)
                             Padding(
                               padding: const EdgeInsets.only(top: 4.0),
-                              child: LMChatBubbleFooter(
-                                conversation: conversation,
-                              ),
+                              child: widget.footerBuilder?.call(
+                                      context,
+                                      LMChatBubbleFooter(
+                                          conversation: conversation)) ??
+                                  LMChatBubbleFooter(
+                                    conversation: conversation,
+                                  ),
                             ),
                         ],
                       ),
@@ -405,6 +434,20 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             ? 'You deleted this message'
             : "This message was deleted"
         : "This message was deleted by a community manager";
+  }
+
+  String _getGIFText() {
+    String gifText = conversation.answer;
+    const String gifMessageIndicator =
+        "* This is a gif message. Please update your app *";
+
+    if (gifText.endsWith(gifMessageIndicator)) {
+      gifText = gifText
+          .substring(0, gifText.length - gifMessageIndicator.length)
+          .trim();
+    }
+
+    return gifText;
   }
 }
 

@@ -86,11 +86,14 @@ class LMChatReplyConversationState extends LMChatConversationActionState {
   /// The conversation
   final LMChatConversationViewData conversation;
 
+  final List<LMChatAttachmentViewData>? attachments;
+
   /// [LMChatReplyConversationState] constructor
   LMChatReplyConversationState({
     required this.chatroomId,
     required this.conversationId,
     required this.conversation,
+    this.attachments,
   });
 
   @override

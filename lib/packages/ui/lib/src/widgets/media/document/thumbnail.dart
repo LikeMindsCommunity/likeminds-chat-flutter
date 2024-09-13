@@ -31,6 +31,21 @@ class LMChatDocumentThumbnail extends StatefulWidget {
     this.overlay,
   });
 
+  /// Creates a copy of this widget with the given parameters replaced.
+  LMChatDocumentThumbnail copyWith({
+    LMChatMediaModel? media,
+    LMChatDocumentTile? overlay,
+    LMChatDocumentThumbnailStyle? style,
+    bool? showOverlay,
+  }) {
+    return LMChatDocumentThumbnail(
+      media: media ?? this.media,
+      overlay: overlay ?? this.overlay,
+      style: style ?? this.style,
+      showOverlay: showOverlay ?? this.showOverlay,
+    );
+  }
+
   @override
   State<LMChatDocumentThumbnail> createState() =>
       _LMChatDocumentThumbnailState();
@@ -61,39 +76,49 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
   }
 
   @override
+  void didUpdateWidget(LMChatDocumentThumbnail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    style = widget.style;
+    loadedFile = loadFile();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: loadedFile,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
-          return InkWell(
-            onTap: () async {
-              if (widget.media.mediaUrl != null) {
-                Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                launchUrl(fileUrl, mode: LaunchMode.externalApplication);
-              }
-            },
-            child: Stack(
-              children: [
-                SizedBox(
-                  child: documentFile!,
-                ),
-                widget.showOverlay
-                    ? widget.overlay ??
-                        Positioned(
-                          bottom: 0,
-                          child: LMChatDocumentTile(
-                            media: widget.media,
-                            style: style?.overlayStyle ??
-                                LMChatDocumentTileStyle(
-                                  padding: EdgeInsets.zero,
-                                  width: 54.w,
-                                ),
-                          ),
-                        )
-                    : const SizedBox.shrink(),
-              ],
+          return AbsorbPointer(
+            absorbing: widget.media.mediaUrl == null,
+            child: InkWell(
+              onTap: () async {
+                if (widget.media.mediaUrl != null) {
+                  Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
+                  launchUrl(fileUrl, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Stack(
+                children: [
+                  SizedBox(
+                    child: documentFile!,
+                  ),
+                  widget.showOverlay
+                      ? widget.overlay ??
+                          Positioned(
+                            bottom: 0,
+                            child: LMChatDocumentTile(
+                              media: widget.media,
+                              style: style?.overlayStyle ??
+                                  LMChatDocumentTileStyle(
+                                    padding: EdgeInsets.zero,
+                                    width: 54.w,
+                                  ),
+                            ),
+                          )
+                      : const SizedBox.shrink(),
+                ],
+              ),
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
@@ -187,4 +212,41 @@ class LMChatDocumentThumbnailStyle {
     this.overlayStyle,
     this.shimmerStyle,
   });
+
+  /// Creates a copy of the current style with the given parameters.
+  LMChatDocumentThumbnailStyle copyWith({
+    double? height,
+    double? width,
+    Border? border,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    Color? backgroundColor,
+    LMChatDocumentTileStyle? overlayStyle,
+    LMChatDocumentShimmerStyle? shimmerStyle,
+  }) {
+    return LMChatDocumentThumbnailStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      overlayStyle: overlayStyle ?? this.overlayStyle,
+      shimmerStyle: shimmerStyle ?? this.shimmerStyle,
+    );
+  }
+
+  /// A factory constructor that returns a basic instance of [LMChatDocumentThumbnailStyle].
+  factory LMChatDocumentThumbnailStyle.basic() {
+    return LMChatDocumentThumbnailStyle(
+      height: 100.0,
+      width: 100.0,
+      border: Border.all(color: Colors.grey),
+      borderRadius: BorderRadius.circular(8.0),
+      padding: const EdgeInsets.all(8.0),
+      backgroundColor: Colors.white,
+      overlayStyle: LMChatDocumentTileStyle.basic(),
+      shimmerStyle: LMChatDocumentShimmerStyle.basic(),
+    );
+  }
 }

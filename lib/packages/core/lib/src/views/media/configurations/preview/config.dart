@@ -2,6 +2,10 @@ import 'package:likeminds_chat_flutter_core/src/views/media/configurations/previ
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/setting.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/style.dart';
 
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/builder.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/setting.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/style.dart';
+
 /// {@template lm_chat_media_preview_config}
 /// [LMChatMediaPreviewConfig] is a class which is used to configure the chat media_preview
 /// screen. It is used to customize the chat media_preview screen.

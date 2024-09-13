@@ -19,6 +19,18 @@ class LMChatVideo extends StatefulWidget {
     this.muteButton,
   });
 
+  LMChatVideo copyWith({
+    LMChatMediaModel? media,
+    LMChatVideoStyle? style,
+    LMChatButtonBuilder? muteButton,
+  }) {
+    return LMChatVideo(
+      media: media ?? this.media,
+      style: style ?? this.style,
+      muteButton: muteButton ?? this.muteButton,
+    );
+  }
+
   @override
   State<LMChatVideo> createState() => _LMChatVideoState();
 }

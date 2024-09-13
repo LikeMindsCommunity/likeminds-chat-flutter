@@ -30,8 +30,12 @@ class LMChatJoinButton extends StatelessWidget {
                               ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
                               : 'Are you sure you want to leave this group?',
                         ),
-                        // actionText: 'Confirm',
-                        // onActionPressed: onTap,
+                        style: LMChatDialogStyle(
+                          backgroundColor: LMChatTheme.theme.container,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                         actions: [
                           LMChatText(
                             'Cancel',
@@ -44,7 +48,7 @@ class LMChatJoinButton extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 fontSize: 16,
                                 color: Colors.black87,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -59,7 +63,7 @@ class LMChatJoinButton extends StatelessWidget {
                               textStyle: TextStyle(
                                 overflow: TextOverflow.ellipsis,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),

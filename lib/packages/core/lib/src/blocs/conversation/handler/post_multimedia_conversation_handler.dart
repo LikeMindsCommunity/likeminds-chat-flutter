@@ -6,6 +6,7 @@ postMultimediaConversationEventHandler(
   Emitter<LMChatConversationState> emit,
 ) async {
   // final mediaService = LMChatMediaService.instance;
+  final List<LMChatMediaModel> mediaList = event.mediaFiles.copy();
   try {
     DateTime dateTime = DateTime.now();
     User user = LMChatLocalPreference.instance.getUser();
@@ -28,13 +29,11 @@ postMultimediaConversationEventHandler(
     emit(
       LMChatMultiMediaConversationLoadingState(
         conversation,
-        event.mediaFiles,
+        mediaList,
       ),
     );
     LMResponse<PostConversationResponse> response =
-        await LMChatCore.client.postConversation(
-      event.postConversationRequest,
-    );
+        await LMChatCore.client.postConversation(event.postConversationRequest);
 
     if (response.success) {
       PostConversationResponse postConversationResponse = response.data!;
@@ -43,7 +42,7 @@ postMultimediaConversationEventHandler(
         emit(
           LMChatMultiMediaConversationPostedState(
             postConversationResponse,
-            event.mediaFiles,
+            mediaList,
           ),
         );
       } else {
@@ -123,7 +122,7 @@ postMultimediaConversationEventHandler(
         emit(
           LMChatMultiMediaConversationPostedState(
             postConversationResponse,
-            event.mediaFiles,
+            mediaList,
           ),
         );
 

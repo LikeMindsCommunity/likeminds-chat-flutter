@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
@@ -20,10 +21,16 @@ class LMChatMediaForwardingScreen extends StatefulWidget {
   /// Required chatrooom ID for th chatroom media is being sent to
   final int chatroomId;
 
+  final LMChatConversationViewData? replyConversation;
+
+  final String? textFieldText;
+
   ///{@macro lm_chat_media_forwarding_screen}
   const LMChatMediaForwardingScreen({
     super.key,
     required this.chatroomId,
+    this.replyConversation,
+    this.textFieldText,
   });
 
   @override
@@ -36,6 +43,8 @@ class _LMChatMediaForwardingScreenState
   int currPosition = 0;
   List<LMChatMediaModel> mediaList = [];
   LMChatConversationBloc? conversationBloc;
+  LMChatConversationViewData? replyConversation;
+  String? textFieldText;
 
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
   final TextEditingController _textEditingController = TextEditingController();
@@ -46,12 +55,18 @@ class _LMChatMediaForwardingScreenState
   @override
   void initState() {
     super.initState();
+    replyConversation = widget.replyConversation;
+    textFieldText = widget.textFieldText;
+    if (textFieldText != null) _textEditingController.text = textFieldText!;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
   }
 
   @override
   void didUpdateWidget(covariant LMChatMediaForwardingScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    replyConversation = widget.replyConversation;
+    textFieldText = widget.textFieldText;
+    if (textFieldText != null) _textEditingController.text = textFieldText!;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
   }
 
@@ -66,12 +81,65 @@ class _LMChatMediaForwardingScreenState
             child: ValueListenableBuilder(
               valueListenable: rebuildCurr,
               builder: (context, _, __) {
-                return getMediaPreview();
+                return _buildMediaPreview();
               },
             ),
           ),
           _defChatBar(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMediaPreview() {
+    return Column(
+      children: [
+        Expanded(
+          child: _buildMainPreview(),
+        ),
+        if (mediaList.length > 1) _buildPreviewBar(),
+      ],
+    );
+  }
+
+  Widget _buildMainPreview() {
+    // Move the main preview logic here
+    if (mediaList.first.mediaType == LMChatMediaType.image ||
+        mediaList.first.mediaType == LMChatMediaType.video) {
+      return Center(
+        child: mediaList[currPosition].mediaType == LMChatMediaType.image
+            ? _screenBuilder.image(context, _defImage())
+            : Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                child: _screenBuilder.video(context, _defVideo()),
+              ),
+      );
+    } else if (mediaList.first.mediaType == LMChatMediaType.document) {
+      return _screenBuilder.document(context, _defDocument());
+    } else if (mediaList.first.mediaType == LMChatMediaType.gif) {
+      return Center(child: _defaultGIF());
+    }
+    return const SizedBox();
+  }
+
+  Widget _buildPreviewBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: LMChatTheme.theme.container,
+        border: Border(
+          top: BorderSide(
+            color: LMChatTheme.theme.disabledColor,
+            width: 0.1,
+          ),
+        ),
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: 2.h,
+        horizontal: 2.w,
+      ),
+      child: SizedBox(
+        height: 15.w,
+        child: _defPreviewList(),
       ),
     );
   }
@@ -108,49 +176,64 @@ class _LMChatMediaForwardingScreenState
   }
 
   Widget _defTextField() {
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: 8.w,
-        maxHeight: 24.h,
-      ),
-      decoration: BoxDecoration(
-        color: LMChatTheme.theme.container,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: kPaddingSmall,
-                vertical: 1.w,
-              ),
-              child: LMChatTextField(
-                isDown: false,
-                chatroomId: widget.chatroomId,
-                style: Theme.of(context).textTheme.bodyMedium!,
-                onChange: (value) {
-                  // print(value);
-                },
-                onTagSelected: (tag) {},
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintMaxLines: 1,
-                  hintStyle: Theme.of(context).textTheme.bodyMedium,
-                  hintText: "Type something..",
-                ),
-                controller: _textEditingController,
-                focusNode: FocusNode(),
-              ),
-            ),
-          ),
-          _screenBuilder.attachmentButton(
+    return Column(
+      children: [
+        if (replyConversation != null)
+          _screenBuilder.replyWidget(
             context,
-            _defAttachmentButton(),
-          )
-        ],
-      ),
+            _defReplyConversationWidget(),
+          ),
+        Container(
+          constraints: BoxConstraints(
+            minHeight: 8.w,
+            maxHeight: 24.h,
+          ),
+          decoration: BoxDecoration(
+            color: LMChatTheme.theme.container,
+            borderRadius: replyConversation != null
+                ? const BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  )
+                : BorderRadius.circular(24),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: kPaddingSmall,
+                    vertical: 1.w,
+                  ),
+                  child: LMChatTextField(
+                    isDown: false,
+                    chatroomId: widget.chatroomId,
+                    style: Theme.of(context).textTheme.bodyMedium!,
+                    onChange: (value) {
+                      // print(value);
+                    },
+                    onTagSelected: (tag) {},
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintMaxLines: 1,
+                      hintStyle: Theme.of(context).textTheme.bodyMedium,
+                      hintText: "Type something..",
+                    ),
+                    controller: _textEditingController,
+                    focusNode: FocusNode(),
+                  ),
+                ),
+              ),
+              if (mediaList.first.mediaType != LMChatMediaType.gif)
+                _screenBuilder.attachmentButton(
+                  context,
+                  _defAttachmentButton(),
+                )
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -169,10 +252,9 @@ class _LMChatMediaForwardingScreenState
         backgroundColor: Colors.transparent,
       ),
       onTap: () async {
-        if (mediaList.first.mediaType == LMChatMediaType.image) {
-          await LMChatMediaHandler.instance.pickImages();
-        } else if (mediaList.first.mediaType == LMChatMediaType.video) {
-          await LMChatMediaHandler.instance.pickVideos();
+        if ((mediaList.first.mediaType == LMChatMediaType.image) ||
+            (mediaList.first.mediaType == LMChatMediaType.video)) {
+          await LMChatMediaHandler.instance.pickMedia();
         } else if (mediaList.first.mediaType == LMChatMediaType.document) {
           await LMChatMediaHandler.instance.pickDocuments();
         }
@@ -183,20 +265,28 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
+  /// Sends a post with the selected media to the server.
+  ///
+  /// This function is called when the user taps the send button.
+  /// It sends a [LMChatPostMultiMediaConversationEvent] event to the
+  /// [LMChatConversationBloc] with the selected media and the chatroom id.
+  /// It also pops the current route.
   void _onSend() {
     LMChatConversationBloc.instance.add(
       LMChatPostMultiMediaConversationEvent(
         (PostConversationRequestBuilder()
+              ..replyId(replyConversation?.id)
               ..attachmentCount(mediaList.length)
               ..chatroomId(widget.chatroomId)
               ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
               ..text(_textEditingController.text)
               ..hasFiles(true))
             .build(),
-        LMChatMediaHandler.instance.pickedMedia,
+        LMChatMediaHandler.instance.pickedMedia.copy(),
       ),
     );
-    Navigator.pop(context);
+    LMChatMediaHandler.instance.clearPickedMedia();
+    Navigator.pop(context, true);
   }
 
   LMChatAppBar _defAppBar() {
@@ -256,86 +346,13 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  Widget getMediaPreview() {
-    if (mediaList.first.mediaType == LMChatMediaType.image ||
-        mediaList.first.mediaType == LMChatMediaType.video) {
-      return Column(
-        children: [
-          SizedBox(height: 2.h),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
-            child: Center(
-              child: mediaList[currPosition].mediaType == LMChatMediaType.image
-                  ? _screenBuilder.image(
-                      context,
-                      _defImage(),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 2.h,
-                      ),
-                      child: _screenBuilder.video(
-                        context,
-                        _defVideo(),
-                      ),
-                    ),
-            ),
-          ),
-          const Spacer(),
-          _defPreviewBar()
-        ],
-      );
-    } else if (mediaList.first.mediaType == LMChatMediaType.document) {
-      return Column(
-        children: [
-          SizedBox(height: 2.h),
-          _screenBuilder.document(context, _defDocument(mediaList)),
-          const Spacer(),
-          _defPreviewBar(),
-        ],
-      );
-    } else if (mediaList.first.mediaType == LMChatMediaType.gif) {
-      return Column(
-        children: [
-          SizedBox(height: 5.h),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 100.w, maxHeight: 60.h),
-            child: Center(
-              child: LMChatGIF(media: mediaList.first),
-            ),
-          ),
-          const Spacer(),
-        ],
-      );
-    }
-    return const SizedBox();
-  }
-
-  Container _defPreviewBar() {
-    return Container(
-      decoration: BoxDecoration(
-          color: LMChatTheme.theme.container,
-          border: Border(
-            top: BorderSide(
-              color: LMChatTheme.theme.disabledColor,
-              width: 0.1,
-            ),
-          )),
-      padding: EdgeInsets.only(
-        left: 5.0,
-        right: 5.0,
-        top: 2.h,
-        bottom: 2.h,
-      ),
-      child: SizedBox(
-        height: 15.w,
-        width: 100.w,
-        child: Center(
-          child: _defPreviewList(),
+  LMChatGIF _defaultGIF() => LMChatGIF(
+        media: mediaList.first,
+        autoplay: true,
+        style: LMChatGIFStyle(
+          width: 100.w,
         ),
-      ),
-    );
-  }
+      );
 
   ListView _defPreviewList() {
     return ListView.builder(
@@ -347,30 +364,68 @@ class _LMChatMediaForwardingScreenState
           currPosition = index;
           rebuildCurr.value = !rebuildCurr.value;
         },
-        child: Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 3.0,
-          ),
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              border: currPosition == index
-                  ? Border.all(
-                      color: LMChatTheme.theme.secondaryColor,
-                      width: 2.0,
-                      strokeAlign: BorderSide.strokeAlignOutside,
-                    )
-                  : null),
-          width: 15.w,
-          height: 15.w,
-          child: mediaList[index].mediaType == LMChatMediaType.image
-              ? _defImageThumbnail(index)
-              : mediaList[index].mediaType == LMChatMediaType.video
-                  ? _defVideoThumbnail(index)
-                  : _defDocumentThumbnail(index),
+        child: Stack(
+          // Use Stack to overlay the remove button
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 3.0),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: currPosition == index
+                      ? Border.all(
+                          color: LMChatTheme.theme.secondaryColor,
+                          width: 2.0,
+                          strokeAlign: BorderSide.strokeAlignOutside,
+                        )
+                      : null),
+              width: 15.w,
+              height: 15.w,
+              child: mediaList[index].mediaType == LMChatMediaType.image
+                  ? _defImageThumbnail(index)
+                  : mediaList[index].mediaType == LMChatMediaType.video
+                      ? _defVideoThumbnail(index)
+                      : _defDocumentThumbnail(index),
+            ),
+            Visibility(
+              visible: currPosition == index,
+              child: Positioned(
+                // Position the remove button
+                top: 2,
+                right: 4,
+                child: InkWell(
+                  onTap: () => _removeMedia(index),
+                  child: LMChatIcon(
+                    type: LMChatIconType.icon,
+                    icon: CupertinoIcons.xmark,
+                    style: LMChatIconStyle(
+                      color: LMChatTheme.theme.onContainer,
+                      boxPadding: const EdgeInsets.all(4),
+                      size: 12,
+                      boxSize: 18,
+                      boxBorderRadius: 12,
+                      backgroundColor: LMChatTheme.theme.container,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  void _removeMedia(int index) {
+    setState(() {
+      mediaList.removeAt(index);
+      if (currPosition >= mediaList.length) {
+        currPosition =
+            mediaList.length - 1; // Adjust current position if needed
+      }
+      rebuildCurr.value = !rebuildCurr.value; // Trigger rebuild
+    });
   }
 
   LMChatImage _defImage() {
@@ -391,8 +446,13 @@ class _LMChatMediaForwardingScreenState
     );
   }
 
-  LMChatDocumentPreview _defDocument(List<LMChatMediaModel> mediaList) {
-    return LMChatDocumentPreview(mediaList: mediaList);
+  LMChatDocumentPreview _defDocument() {
+    return LMChatDocumentPreview(
+      media: mediaList[currPosition],
+      style: LMChatDocumentPreviewStyle(
+        maxHeight: 50.h,
+      ),
+    );
   }
 
   LMChatDocumentThumbnail _defDocumentThumbnail(int index) {
@@ -427,7 +487,7 @@ class _LMChatMediaForwardingScreenState
               future: getVideoThumbnail(mediaList[index]),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return mediaShimmer();
+                  return const LMChatMediaShimmerWidget();
                 } else if (snapshot.data != null) {
                   return Image.file(
                     snapshot.data!,
@@ -444,5 +504,28 @@ class _LMChatMediaForwardingScreenState
               },
             ),
           );
+  }
+
+  LMChatBarHeader _defReplyConversationWidget() {
+    String userText = replyConversation?.member?.name ?? '';
+    final currentUser = LMChatLocalPreference.instance.getUser();
+    if (replyConversation?.memberId == currentUser.id) {
+      userText = 'You';
+    }
+    return LMChatBarHeader(
+      style: LMChatBarHeaderStyle.basic(),
+      titleText: userText,
+      onCanceled: () {
+        setState(() {
+          replyConversation = null;
+        });
+      },
+      subtitle: LMChatText(
+        LMChatTaggingHelper.convertRouteToTag(replyConversation?.answer) ?? "",
+        style: LMChatTextStyle(
+          textStyle: Theme.of(context).textTheme.bodySmall,
+        ),
+      ),
+    );
   }
 }

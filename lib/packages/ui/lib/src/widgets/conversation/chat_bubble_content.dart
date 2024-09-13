@@ -28,7 +28,7 @@ class LMChatBubbleContent extends StatelessWidget {
               expandText: "see more",
               enableSelection: inStyle.enableSelection ?? false,
               animation: inStyle.animation ?? true,
-              maxLines: inStyle.visibleLines ?? 4,
+              maxLines: inStyle.visibleLines ?? 6,
               mentionStyle: inStyle.tagStyle,
               linkStyle: inStyle.linkStyle ??
                   TextStyle(

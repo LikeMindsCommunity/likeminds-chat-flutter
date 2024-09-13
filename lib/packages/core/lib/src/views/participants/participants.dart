@@ -82,10 +82,18 @@ class _LMChatroomParticipantsPageState
         child: Column(
           children: [
             Expanded(
-              child: BlocListener(
+              child:
+                  BlocConsumer<LMChatParticipantsBloc, LMChatParticipantsState>(
                 bloc: participantsBloc,
                 listener: _updatePaginationState,
-                child: _buildParticipantsList(),
+                builder: (context, state) {
+                  if (state is LMChatParticipantsLoadingState) {
+                    return LMChatLoader(
+                      style: LMChatTheme.theme.loaderStyle,
+                    );
+                  }
+                  return _buildParticipantsList();
+                },
               ),
             ),
           ],
