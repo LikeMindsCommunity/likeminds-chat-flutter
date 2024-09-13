@@ -51,7 +51,7 @@ class LMChatConversationViewData {
   final int? replyConversation;
   final LMChatConversationViewData? replyConversationObject;
   final List<LMChatReactionViewData>? conversationReactions;
-  final LMChatPollInfoViewData? poll;
+  final LMChatPollViewData? poll;
 
   LMChatConversationViewData._({
     this.allowAddOption,
@@ -152,7 +152,7 @@ class LMChatConversationViewData {
     int? replyConversation,
     LMChatConversationViewData? replyConversationObject,
     List<LMChatReactionViewData>? conversationReactions,
-    LMChatPollInfoViewData? poll,
+    LMChatPollViewData? poll,
   }) {
     return LMChatConversationViewData._(
       allowAddOption: allowAddOption ?? this.allowAddOption,
@@ -258,7 +258,7 @@ class LMChatConversationViewDataBuilder {
   int? _replyConversation;
   LMChatConversationViewData? _replyConversationObject;
   List<LMChatReactionViewData>? _conversationReactions;
-  LMChatPollInfoViewData? _poll;
+  LMChatPollViewData? _poll;
 
   void allowAddOption(bool? allowAddOption) {
     _allowAddOption = allowAddOption;
@@ -446,7 +446,7 @@ class LMChatConversationViewDataBuilder {
     _conversationReactions = conversationReactions;
   }
 
-  void poll(LMChatPollInfoViewData? poll) {
+  void poll(LMChatPollViewData? poll) {
     _poll = poll;
   }
 

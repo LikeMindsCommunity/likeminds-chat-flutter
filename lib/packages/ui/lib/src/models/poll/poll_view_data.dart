@@ -1,24 +1,50 @@
-import 'package:likeminds_chat_flutter_ui/src/models/attachment/poll_view_data.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 
-
-/// `LMChatPollInfoViewData` is a model class that holds the data for the poll info view.
+/// {@template lm_chat_poll_view_data}
+/// `LMChatPollViewData` is a model class that holds the data for the poll info view.
 /// This class is used to display the poll information in the chat screen.
-class LMChatPollInfoViewData {
+/// {@endtemplate}
+class LMChatPollViewData {
+  /// Indicates if the poll is anonymous.
   final bool? isAnonymous;
+
+  /// Allows adding new options to the poll.
   final bool? allowAddOption;
+
+  /// Type of the poll.
   final int? pollType;
+
+  /// Text description of the poll type.
   final String? pollTypeText;
+
+  /// Text description of the submit type.
   final String? submitTypeText;
+
+  /// Expiry time of the poll.
   final int? expiryTime;
+
+  /// Number of selections allowed in multiple select polls.
   final int? multipleSelectNum;
+
+  /// State of multiple select options.
   final int? multipleSelectState;
-  final List<LMChatPollViewData>? pollViewDataList;
+
+  /// List of poll options.
+  final List<LMChatPollOptionViewData>? pollOptions;
+
+  /// Text of the poll answer.
   final String? pollAnswerText;
+
+  /// Indicates if the poll has been submitted.
   final bool? isPollSubmitted;
+
+  /// Indicates if the poll results should be shown.
   final bool? toShowResult;
+
+  /// ID of the conversation associated with the poll.
   final int? conversationId;
 
-  LMChatPollInfoViewData._({
+  LMChatPollViewData._({
     required this.isAnonymous,
     required this.allowAddOption,
     required this.pollType,
@@ -27,7 +53,7 @@ class LMChatPollInfoViewData {
     required this.expiryTime,
     required this.multipleSelectNum,
     required this.multipleSelectState,
-    required this.pollViewDataList,
+    required this.pollOptions,
     required this.pollAnswerText,
     required this.isPollSubmitted,
     required this.toShowResult,
@@ -36,7 +62,7 @@ class LMChatPollInfoViewData {
 
   /// copyWith method is used to create a new instance of `LMChatPollInfoViewData` with the updated values.
   /// If the new values are not provided, the old values are used.
-  LMChatPollInfoViewData copyWith({
+  LMChatPollViewData copyWith({
     bool? isAnonymous,
     bool? allowAddOption,
     int? pollType,
@@ -45,13 +71,13 @@ class LMChatPollInfoViewData {
     int? expiryTime,
     int? multipleSelectNum,
     int? multipleSelectState,
-    List<LMChatPollViewData>? pollViewDataList,
+    List<LMChatPollOptionViewData>? pollOptions,
     String? pollAnswerText,
     bool? isPollSubmitted,
     bool? toShowResult,
     int? conversationId,
   }) {
-    return LMChatPollInfoViewData._(
+    return LMChatPollViewData._(
       isAnonymous: isAnonymous ?? this.isAnonymous,
       allowAddOption: allowAddOption ?? this.allowAddOption,
       pollType: pollType ?? this.pollType,
@@ -60,7 +86,7 @@ class LMChatPollInfoViewData {
       expiryTime: expiryTime ?? this.expiryTime,
       multipleSelectNum: multipleSelectNum ?? this.multipleSelectNum,
       multipleSelectState: multipleSelectState ?? this.multipleSelectState,
-      pollViewDataList: pollViewDataList ?? this.pollViewDataList,
+      pollOptions: pollOptions ?? this.pollOptions,
       pollAnswerText: pollAnswerText ?? this.pollAnswerText,
       isPollSubmitted: isPollSubmitted ?? this.isPollSubmitted,
       toShowResult: toShowResult ?? this.toShowResult,
@@ -69,9 +95,11 @@ class LMChatPollInfoViewData {
   }
 }
 
-/// `LMChatPollInfoViewDataBuilder` is a builder class that is used to build the `LMChatPollInfoViewData` object.
+/// {@template lm_chat_poll_view_data_builder}
+/// `LMChatPollViewDataBuilder` is a builder class that is used to build the `LMChatPollInfoViewData` object.
 /// This class is used to set the values for the `LMChatPollInfoViewData` object.
-class LMChatPollInfoViewDataBuilder {
+/// {@endtemplate}
+class LMChatPollViewDataBuilder {
   bool? _isAnonymous;
   bool? _allowAddOption;
   int? _pollType;
@@ -80,66 +108,80 @@ class LMChatPollInfoViewDataBuilder {
   int? _expiryTime;
   int? _multipleSelectNum;
   int? _multipleSelectState;
-  List<LMChatPollViewData>? _pollViewDataList;
+  List<LMChatPollOptionViewData>? _pollOptions;
   String? _pollAnswerText;
   bool? _isPollSubmitted;
   bool? _toShowResult;
   int? _conversationId;
 
+  /// isAnonymous method is used to set the value for the isAnonymous field.
   void isAnonymous(bool? isAnonymous) {
     _isAnonymous = isAnonymous;
   }
 
+  /// allowAddOption method is used to set the value for the allowAddOption field.
   void allowAddOption(bool? allowAddOption) {
     _allowAddOption = allowAddOption;
   }
 
+  /// pollType method is used to set the value for the pollType field.
   void pollType(int? pollType) {
     _pollType = pollType;
   }
 
+  /// pollTypeText method is used to set the value for the pollTypeText field.
   void pollTypeText(String? pollTypeText) {
     _pollTypeText = pollTypeText;
   }
 
+  /// submitTypeText method is used to set the value for the submitTypeText field.
   void submitTypeText(String? submitTypeText) {
     _submitTypeText = submitTypeText;
   }
 
+  /// expiryTime method is used to set the value for the expiryTime field.
   void expiryTime(int? expiryTime) {
     _expiryTime = expiryTime;
   }
 
+  /// multipleSelectNum method is used to set the value for the multipleSelectNum field.
   void multipleSelectNum(int? multipleSelectNum) {
     _multipleSelectNum = multipleSelectNum;
   }
 
+  /// multipleSelectState method is used to set the value for the multipleSelectState field.
   void multipleSelectState(int? multipleSelectState) {
     _multipleSelectState = multipleSelectState;
   }
 
-  void pollViewDataList(List<LMChatPollViewData>? pollViewDataList) {
-    _pollViewDataList = pollViewDataList;
+  /// pollOptions method is used to set the value for the pollOptions field.
+  void pollOptions(List<LMChatPollOptionViewData>? pollOptions) {
+    _pollOptions = pollOptions;
   }
 
+  /// pollAnswerText method is used to set the value for the pollAnswerText field.
   void pollAnswerText(String? pollAnswerText) {
     _pollAnswerText = pollAnswerText;
   }
 
+  /// isPollSubmitted method is used to set the value for the isPollSubmitted field.
   void isPollSubmitted(bool? isPollSubmitted) {
     _isPollSubmitted = isPollSubmitted;
   }
 
+  /// toShowResult method is used to set the value for the toShowResult field.
   void toShowResult(bool? toShowResult) {
     _toShowResult = toShowResult;
   }
 
+  /// conversationId method is used to set the value for the conversationId field.
   void conversationId(int? conversationId) {
     _conversationId = conversationId;
   }
 
-  LMChatPollInfoViewData build() {
-    return LMChatPollInfoViewData._(
+  /// build method is used to create a new instance of `LMChatPollInfoViewData` with the provided values.
+  LMChatPollViewData build() {
+    return LMChatPollViewData._(
       isAnonymous: _isAnonymous,
       allowAddOption: _allowAddOption,
       pollType: _pollType,
@@ -148,7 +190,7 @@ class LMChatPollInfoViewDataBuilder {
       expiryTime: _expiryTime,
       multipleSelectNum: _multipleSelectNum,
       multipleSelectState: _multipleSelectState,
-      pollViewDataList: _pollViewDataList,
+      pollOptions: _pollOptions,
       pollAnswerText: _pollAnswerText,
       isPollSubmitted: _isPollSubmitted,
       toShowResult: _toShowResult,
@@ -156,4 +198,3 @@ class LMChatPollInfoViewDataBuilder {
     );
   }
 }
-
