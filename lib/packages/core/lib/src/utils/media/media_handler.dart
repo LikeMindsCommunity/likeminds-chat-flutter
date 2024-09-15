@@ -160,6 +160,7 @@ class LMChatMediaHandler {
           'file_name': image.name,
         });
 
+    addPickedMedia(mediaFile);
     return LMResponse(success: true, data: mediaFile);
   }
 
