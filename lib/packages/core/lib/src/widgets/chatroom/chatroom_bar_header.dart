@@ -116,7 +116,7 @@ class LMChatBarHeader extends StatelessWidget {
                     kVerticalPaddingSmall,
                     SizedBox(
                       width: 55.w,
-                      height: 3.h,
+                      height: 2.h,
                       child: subtitle,
                     ),
                   ],
