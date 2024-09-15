@@ -718,6 +718,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         chatActionBloc.add(LMChatEditRemoveEvent());
         _textEditingController.clear();
       }
+      _textEditingController.clear();
     }
   }
 
