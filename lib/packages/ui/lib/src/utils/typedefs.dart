@@ -144,3 +144,108 @@ typedef LMChatUserTileBuilder = Widget Function(
   LMChatUserViewData user,
   LMChatUserTile oldUserTile,
 );
+
+/// {@template lm_chat_image_widget_builder}
+/// The image widget builder function for the chat screen.
+/// This function is called to build the image widget for the chat screen.
+/// The [LMChatImageBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The image attachment.
+/// - [LMChatImage] oldWidget: The old image widget.
+/// The function returns an [Widget].
+/// {@endtemplate}
+typedef LMChatImageBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatImage oldWidget,
+);
+
+/// {@template lm_chat_video_widget_builder}
+/// The video widget builder function for the chat screen.
+/// This function is called to build the video widget for the chat screen.
+/// The [LMChatVideoBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The video attachment.
+/// - [LMChatVideo] oldWidget: The old video widget.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatVideoBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatVideo oldWidget,
+);
+
+/// {@template lm_chat_gif_widget_builder}
+/// The gif widget builder function for the chat screen.
+/// This function is called to build the gif widget for the chat screen.
+/// The [LMChatGIFBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The video attachment.
+/// - [LMChatGIF] oldWidget: The old video widget.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatGIFBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatGIF oldWidget,
+);
+
+/// {@template lm_chat_document_widget_builder}
+/// The document widget builder function for the chat screen.
+/// This function is called to build the document widget for the chat screen.
+/// The [LMChatDocumentTilePreviewBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The document attachment.
+/// - [LMChatDocumentTilePreview] oldWidget: The old document widget.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatDocumentTilePreviewBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatDocumentTilePreview oldWidget,
+);
+
+/// {@template lm_chat_document_widget_builder}
+/// The document widget builder function for the chat screen.
+/// This function is called to build the document widget for the chat screen.
+/// The [LMChatDocumentPreviewBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The document attachment.
+/// - [LMChatDocumentPreview] oldWidget: The old document widget.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatDocumentPreviewBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatDocumentPreview oldWidget,
+);
+
+/// {@template lm_chat_document_thumbnail_widget_builder}
+/// The document thumbnail widget builder function for the chat screen.
+/// This function is called to build the document thumbnail widget for the chat screen.
+/// The [LMChatDocumentThumbnailBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The document attachment.
+/// - [LMChatDocumentThumbnail] oldWidget: The old document thumbnail widget.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatDocumentThumbnailBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatDocumentThumbnail oldWidget,
+);
+
+/// {@template lm_chat_document_tile_widget_builder}
+/// The document tile widget builder function for the chat screen.
+/// This function is called to build the document tile widget for the chat screen.
+/// The [LMChatDocumentTileBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The document attachment.
+/// - [LMChatDocumentTile] oldWidget: The old document tile widget.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatDocumentTileBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatDocumentTile oldWidget,
+);
