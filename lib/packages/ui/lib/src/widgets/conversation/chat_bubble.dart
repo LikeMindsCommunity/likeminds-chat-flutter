@@ -207,6 +207,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   @override
   Widget build(BuildContext context) {
+    double finalWidth = calculateFinalWidth();
+
     final inStyle = widget.style ?? LMChatTheme.theme.bubbleStyle;
     return Swipeable(
       dismissThresholds: const {SwipeDirection.startToEnd: 0.0},
@@ -389,11 +391,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                             Padding(
                               padding: const EdgeInsets.only(top: 4.0),
                               child: widget.footerBuilder?.call(
-                                      context,
-                                      LMChatBubbleFooter(
-                                          conversation: conversation)) ??
+                                    context,
+                                    LMChatBubbleFooter(
+                                        conversation: conversation,
+                                        textWidth: finalWidth),
+                                  ) ??
                                   LMChatBubbleFooter(
                                     conversation: conversation,
+                                    textWidth: finalWidth,
                                   ),
                             ),
                         ],
@@ -449,26 +454,94 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
     return gifText;
   }
+
+  double calculateFinalWidth() {
+    // Measure the text width
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: widget.conversation.answer
+            .split('\n')
+            .first, // Only take the first line
+        style: const TextStyle(fontSize: 14), // Use the appropriate style
+      ),
+      maxLines: 1, // Limit to one line
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    double textWidth = textPainter.width;
+
+    // Measure the header width if a header is present
+    final headerPainter = TextPainter(
+      text: TextSpan(
+        text: conversationUser.name,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ), // Use the appropriate style
+      ),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    );
+    headerPainter.layout();
+    double headerWidth =
+        conversation.memberId == currentUser.id ? 0 : headerPainter.width;
+
+    // Determine the width to use
+    if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
+        conversation.replyId != null) {
+      return 60.w; // Full width if media or reply is present
+    }
+    return textWidth > headerWidth ? textWidth : headerWidth;
+  }
 }
 
+/// {@template lm_chat_bubble_style}
+/// Style configuration for the chat bubble.
+/// {@endtemplate}
 class LMChatBubbleStyle {
+  /// The width of the chat bubble.
   final double? width;
+
+  /// The height of the chat bubble.
   final double? height;
+
+  /// The width of the border.
   final double? borderWidth;
+
+  /// The radius of the border.
   final double? borderRadiusNum;
+
+  /// The border radius.
   final BorderRadius? borderRadius;
 
+  /// The color of the border.
   final Color? borderColor;
+
+  /// The background color of the chat bubble.
   final Color? backgroundColor;
+
+  /// The color of the sent message.
   final Color? sentColor;
+
+  /// The color when the chat bubble is selected.
   final Color? selectedColor;
 
+  /// Whether to show action buttons.
   final bool? showActions;
+
+  /// Whether to show the header.
   final bool? showHeader;
+
+  /// Whether to show the footer.
   final bool? showFooter;
+
+  /// Whether to show the sides.
   final bool? showSides;
+
+  /// Whether to show the avatar.
   final bool? showAvatar;
 
+  /// {@macro lm_chat_bubble_style}
   LMChatBubbleStyle({
     this.backgroundColor,
     this.borderColor,
@@ -486,6 +559,7 @@ class LMChatBubbleStyle {
     this.showSides,
   });
 
+  /// Creates a copy of the current style with optional new values.
   LMChatBubbleStyle copyWith({
     double? width,
     double? height,
@@ -520,6 +594,7 @@ class LMChatBubbleStyle {
     );
   }
 
+  /// Creates a basic style with default values.
   factory LMChatBubbleStyle.basic() {
     return LMChatBubbleStyle(
       backgroundColor: LMChatDefaultTheme.container,
