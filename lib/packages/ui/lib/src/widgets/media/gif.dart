@@ -67,6 +67,7 @@ class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = GifController(vsync: this);
+    _isPlaying = widget.autoplay ?? false;
     _initializeImageProvider();
   }
 
