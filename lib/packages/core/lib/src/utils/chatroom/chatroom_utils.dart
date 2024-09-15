@@ -29,12 +29,14 @@ String getDMChatroomPreviewMessage(
           ? 'You: '
           : '';
   String message = conversation.deletedByUserId == null
-      ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-          conversation.answer,
-        ) : LMChatTaggingHelper.convertRouteToTag(
-          conversation.answer,
-          withTilde: false,
-        )}'
+      ? conversation.attachmentCount == 0
+          ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+              conversation.answer,
+            ) : LMChatTaggingHelper.convertRouteToTag(
+              conversation.answer,
+              withTilde: false,
+            )}'
+          : personLabel
       : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
@@ -49,12 +51,14 @@ String getHomeChatroomPreviewMessage(
       ? 'You: '
       : '${conversation.member!.name.split(' ').first}: ';
   String message = conversation.deletedByUserId == null
-      ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-          conversation.answer,
-        ) : LMChatTaggingHelper.convertRouteToTag(
-          getGIFText(conversation),
-          withTilde: false,
-        )}'
+      ? conversation.attachmentCount == 0
+          ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+              conversation.answer,
+            ) : LMChatTaggingHelper.convertRouteToTag(
+              conversation.answer,
+              withTilde: false,
+            )}'
+          : personLabel
       : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
