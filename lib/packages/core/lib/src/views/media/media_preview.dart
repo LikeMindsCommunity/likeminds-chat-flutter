@@ -58,6 +58,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
+      onPopInvoked: (p0) {
+        LMChatMediaHandler.instance.clearPickedMedia();
+      },
       backgroundColor: LMChatTheme.theme.scaffold,
       appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
       body: ValueListenableBuilder(
