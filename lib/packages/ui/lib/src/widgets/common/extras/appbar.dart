@@ -16,6 +16,8 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.banner,
     this.backButtonCallback,
     this.bottom,
+    this.titleBuilder,
+    this.subtitleBuilder,
   });
 
   /// The widget to display as the leading element.
@@ -41,6 +43,12 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// The style configuration for the AppBar.
   final LMChatAppBarStyle? style;
+
+  /// The builder for the title where you want to modify it
+  final Widget Function(Widget)? titleBuilder;
+
+  /// The builder for the subtitle where you want to modify it
+  final Widget Function(Widget)? subtitleBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -119,12 +127,18 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                             constraints: BoxConstraints(
                               minWidth: 80.w,
                             ),
-                            child: title ?? const SizedBox.shrink(),
+                            child: titleBuilder
+                                    ?.call(title ?? const SizedBox.shrink()) ??
+                                title ??
+                                const SizedBox.shrink(),
                           ),
                           subtitle != null
                               ? const SizedBox(height: 1)
                               : const SizedBox.shrink(),
-                          subtitle ?? const SizedBox.shrink(),
+                          subtitleBuilder
+                                  ?.call(subtitle ?? const SizedBox.shrink()) ??
+                              subtitle ??
+                              const SizedBox.shrink(),
                         ],
                       ),
                     ),
