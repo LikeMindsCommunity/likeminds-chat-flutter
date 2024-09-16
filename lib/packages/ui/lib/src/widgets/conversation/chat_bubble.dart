@@ -85,6 +85,9 @@ class LMChatBubble extends StatefulWidget {
   final Widget Function(BuildContext context, LMChatText text)?
       deletedTextBuilder;
 
+  /// bool to check whether a message is a DM message
+  final bool? isDM;
+
   /// The media builder.
   final Widget Function(
     BuildContext context,
@@ -109,6 +112,7 @@ class LMChatBubble extends StatefulWidget {
     this.isSent,
     this.deletedText,
     this.isSelected = false,
+    this.isDM,
     this.onTap,
     this.onMediaTap,
     this.onLongPress,
@@ -389,7 +393,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           if (conversation.deletedByUserId == null &&
                               inStyle.showFooter == true)
                             Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
+                              padding: const EdgeInsets.only(top: 2.0),
                               child: widget.footerBuilder?.call(
                                     context,
                                     LMChatBubbleFooter(
@@ -470,28 +474,33 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     textPainter.layout();
     double textWidth = textPainter.width;
 
-    // Measure the header width if a header is present
-    final headerPainter = TextPainter(
-      text: TextSpan(
-        text: conversationUser.name,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ), // Use the appropriate style
-      ),
-      maxLines: 1,
-      textDirection: TextDirection.ltr,
-    );
-    headerPainter.layout();
-    double headerWidth =
-        conversation.memberId == currentUser.id ? 0 : headerPainter.width;
-
     // Determine the width to use
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
         conversation.replyId != null) {
       return 60.w; // Full width if media or reply is present
     }
-    return textWidth > headerWidth ? textWidth : headerWidth;
+
+    if (widget.isDM == true) {
+      return textWidth; // Only consider text width for DM
+    } else {
+      // Measure the header width if a header is present and not a DM
+      final headerPainter = TextPainter(
+        text: TextSpan(
+          text: conversationUser.name,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ), // Use the appropriate style
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      );
+      headerPainter.layout();
+      double headerWidth =
+          conversation.memberId == currentUser.id ? 0 : headerPainter.width;
+
+      return textWidth > headerWidth ? textWidth : headerWidth;
+    }
   }
 }
 
