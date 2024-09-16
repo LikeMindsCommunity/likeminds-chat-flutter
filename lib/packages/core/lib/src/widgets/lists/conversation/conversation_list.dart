@@ -88,8 +88,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
   @override
   void dispose() {
-    _convActionBloc.close();
-    _conversationBloc.close();
     super.dispose();
   }
 
@@ -429,6 +427,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId) {
+        conversationAttachmentsMeta.addAll(state.attachments ?? {});
         addConversationToPagedList(
           state.conversationViewData,
         );

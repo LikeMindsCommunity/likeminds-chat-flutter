@@ -137,12 +137,13 @@ class LMChatMediaHandler {
       );
     }
 
-    final Uint8List uint8List = await File(image.path).readAsBytes();
-    int intBytes = uint8List.fold(
-        0, (previousValue, element) => (previousValue << 8) | element);
-    ui.Image imageFile = await decodeImageFromList(uint8List);
-    double fileSize = getFileSizeInDouble(intBytes);
-    if (fileSize > sizeLimit) {
+    final File imageFile = File(image.path);
+    final int fileSizeInBytes = await imageFile.length();
+    final ui.Image decodedImage =
+        await decodeImageFromList(await imageFile.readAsBytes());
+    final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+
+    if (fileSizeInMB > sizeLimit) {
       return LMResponse(
         success: false,
         errorMessage:
@@ -152,14 +153,15 @@ class LMChatMediaHandler {
 
     LMChatMediaModel mediaFile = LMChatMediaModel(
         mediaType: LMChatMediaType.image,
-        height: imageFile.height,
-        width: imageFile.width,
+        height: decodedImage.height,
+        width: decodedImage.width,
         mediaFile: File(image.path),
-        size: intBytes,
+        size: fileSizeInBytes ~/ 1024,
         meta: {
           'file_name': image.name,
         });
 
+    addPickedMedia(mediaFile);
     return LMResponse(success: true, data: mediaFile);
   }
 
@@ -313,9 +315,10 @@ class LMChatMediaHandler {
                 size: pickedFile.size,
                 meta: {
                   'file_name': pickedFile.name,
+                  'size': pickedFile.size,
                 });
 
-            pickedMedia.add(documentFile);
+            addPickedMedia(documentFile);
           }
         }
 

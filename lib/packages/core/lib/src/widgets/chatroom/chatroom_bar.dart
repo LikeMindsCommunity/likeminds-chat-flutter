@@ -534,6 +534,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   .pickSingleImage();
                               if (res.data != null) {
                                 _navigateToForwarding();
+                              } else if (res.errorMessage != null) {
+                                toast(res.errorMessage!);
                               }
                             },
                             icon: LMChatIcon(
@@ -573,6 +575,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   await LMChatMediaHandler.instance.pickMedia();
                               if (res.data != null) {
                                 _navigateToForwarding();
+                              } else if (res.errorMessage != null) {
+                                toast(res.errorMessage!);
                               }
                             },
                             icon: LMChatIcon(
@@ -618,6 +622,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   .pickDocuments();
                               if (res.data != null) {
                                 _navigateToForwarding();
+                              } else if (res.errorMessage != null) {
+                                toast(res.errorMessage!);
                               }
                             },
                             icon: LMChatIcon(
@@ -657,6 +663,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                   .pickGIF(context);
                               if (res.data != null) {
                                 _navigateToForwarding();
+                              } else if (res.errorMessage != null) {
+                                toast(res.errorMessage!);
                               }
                             },
                             icon: LMChatIcon(
@@ -718,6 +726,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         chatActionBloc.add(LMChatEditRemoveEvent());
         _textEditingController.clear();
       }
+      _textEditingController.clear();
     }
   }
 

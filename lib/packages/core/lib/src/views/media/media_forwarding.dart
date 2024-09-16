@@ -73,6 +73,9 @@ class _LMChatMediaForwardingScreenState
   @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
+      onPopInvoked: (p0) {
+        LMChatMediaHandler.instance.clearPickedMedia();
+      },
       backgroundColor: LMChatTheme.theme.scaffold,
       appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
       body: Column(
@@ -225,7 +228,8 @@ class _LMChatMediaForwardingScreenState
                   ),
                 ),
               ),
-              if (mediaList.first.mediaType != LMChatMediaType.gif)
+              if (mediaList.isNotEmpty &&
+                  mediaList.first.mediaType != LMChatMediaType.gif)
                 _screenBuilder.attachmentButton(
                   context,
                   _defAttachmentButton(),

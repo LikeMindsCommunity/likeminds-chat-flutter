@@ -406,6 +406,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId) {
+        conversationAttachmentsMeta.addAll(state.attachments ?? {});
         addConversationToPagedList(
           state.conversationViewData,
         );
