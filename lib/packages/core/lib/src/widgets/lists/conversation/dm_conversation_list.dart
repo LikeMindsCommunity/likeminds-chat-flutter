@@ -212,6 +212,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         );
       },
       isSent: true,
+      isDM: true,
       isSelected: _selectedIds.contains(conversation.id),
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       onLongPress: (value, state) {
@@ -258,6 +259,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         );
       },
       isSent: false,
+      isDM: true,
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       isSelected: _selectedIds.contains(conversation.id),
       onLongPress: (value, state) {
