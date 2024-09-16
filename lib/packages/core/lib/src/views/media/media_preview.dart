@@ -62,7 +62,12 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         LMChatMediaHandler.instance.clearPickedMedia();
       },
       backgroundColor: LMChatTheme.theme.scaffold,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _defAppBar(),
+        LMChatMediaHandler.instance.pickedMedia.length,
+        currPosition,
+      ),
       body: ValueListenableBuilder(
         valueListenable: rebuildCurr,
         builder: (context, _, __) {
@@ -122,19 +127,33 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     if (mediaList.isNotEmpty) {
       if (mediaList.first.mediaType == LMChatMediaType.image ||
           mediaList.first.mediaType == LMChatMediaType.video) {
-        return Center(
-          child: mediaList[currPosition].mediaType == LMChatMediaType.image
-              ? _screenBuilder.image(
-                  context,
-                  _defImage(),
-                )
-              : Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2.h),
-                  child: _screenBuilder.video(
-                    context,
-                    _defVideo(),
-                  ),
-                ),
+        return Column(
+          children: [
+            const Spacer(),
+            Center(
+              child: mediaList[currPosition].mediaType == LMChatMediaType.image
+                  ? _screenBuilder.image(
+                      context,
+                      _defImage(),
+                      mediaList[currPosition],
+                    )
+                  : Padding(
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
+                      child: _screenBuilder.video(
+                        context,
+                        _defVideo(),
+                        mediaList[currPosition],
+                      ),
+                    ),
+            ),
+            const Spacer(),
+            _screenBuilder.mediaPreviewBuilder(
+              context,
+              LMChatMediaHandler.instance.pickedMedia.copy(),
+              currPosition,
+              _defPreviewBar(),
+            ),
+          ],
         );
       }
     }
@@ -215,6 +234,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       style: LMChatImageStyle(
         boxFit: BoxFit.cover,
         borderRadius: BorderRadius.circular(8.0),
+        width: 100.w,
       ),
     );
   }

@@ -81,8 +81,20 @@ class LMChatMediaForwardingBuilderDelegate {
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
     LMChatAppBar appBar,
+    int mediaLength,
+    int index,
   ) {
     return appBar;
+  }
+
+  /// Builds the app bar.
+  Widget mediaPreviewBuilder(
+    BuildContext context,
+    List<LMChatMediaModel> media,
+    int index,
+    Widget currentPreview,
+  ) {
+    return currentPreview;
   }
 
   /// Builds the chatroom bar send button
