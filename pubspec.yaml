@@ -1,10 +1,10 @@
 name: likeminds_chat_flutter
 description: The monorepo for LikeMinds Chat SDK Flutter, giving access to all our packages
-version: 0.6.1
+version: 0.7.0
 homepage: "https:likeminds.community"
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: ">=3.1.0 <4.0.0"
   flutter: ">=3.10.0"
 
 dependencies:
@@ -16,5 +16,3 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   melos: ^3.4.0
-
-flutter:
