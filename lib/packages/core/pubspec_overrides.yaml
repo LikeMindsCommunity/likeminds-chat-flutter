@@ -2,6 +2,6 @@
 dependency_overrides:
   js: ^0.7.1
   likeminds_chat_fl:
-    path: ../../../../LikeMinds-Flutter-GroupChat-SDK/
+    path: ../../../../likeminds-chat-flutter-data
   likeminds_chat_flutter_ui:
     path: ../ui

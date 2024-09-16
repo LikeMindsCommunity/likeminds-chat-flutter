@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
+import 'package:likeminds_chat_flutter_sample/custom/custom_chat_bubble.dart';
+import 'package:likeminds_chat_flutter_sample/custom/custom_chat_media_forwarding.dart';
+import 'package:likeminds_chat_flutter_sample/custom/custom_widget.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
 
 /// Flutter flavour/environment manager v0.0.1
@@ -39,6 +42,14 @@ void main() async {
       ConversationState.memberLeftSecretChatroom,
       ConversationState.memberAddedToChatroom,
     ],
+    config: LMChatConfig(
+      chatRoomConfig: LMChatroomConfig(builder: LMChatroomBuilder()),
+      mediaForwardingConfig:
+          LMChatMediaForwardingConfig(builder: CustomChatMediaForwarding()),
+      mediaPreviewConfig: LMChatMediaPreviewConfig(
+        builder: CustomWidget(),
+      ),
+    ),
   );
   runApp(const LMChatSampleApp());
 }

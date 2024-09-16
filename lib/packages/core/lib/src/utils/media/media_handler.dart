@@ -342,7 +342,7 @@ class LMChatMediaHandler {
     try {
       GiphyGif? gif = await GiphyGet.getGif(
         context: context, //Required
-        apiKey: GIPHY_API_KEY, //Required.
+        apiKey: "uFWgh5Fl9H3tBmogUqcbDj1EfnQPcMUX", //Required.
         lang: GiphyLanguage.english, //Optional - Language for query.
         randomID: "lm-gif", // Optional - An ID/proxy for a specific user.
         tabColor:
