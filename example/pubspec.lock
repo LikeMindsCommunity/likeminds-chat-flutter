@@ -787,21 +787,21 @@ packages:
       path: "../../LikeMinds-Flutter-GroupChat-SDK"
       relative: true
     source: path
-    version: "1.7.1"
+    version: "1.7.2"
   likeminds_chat_flutter_core:
     dependency: "direct main"
     description:
       path: "../lib/packages/core"
       relative: true
     source: path
-    version: "0.6.1"
+    version: "0.7.0"
   likeminds_chat_flutter_ui:
     dependency: "direct overridden"
     description:
       path: "../lib/packages/ui"
       relative: true
     source: path
-    version: "0.6.1"
+    version: "0.7.0"
   lints:
     dependency: transitive
     description:
