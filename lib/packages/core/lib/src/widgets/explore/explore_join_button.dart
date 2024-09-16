@@ -24,47 +24,60 @@ class LMChatJoinButton extends StatelessWidget {
                   ? showDialog(
                       context: context,
                       builder: (context) => LMChatDialog(
-                        title: const Text("Leave chatroom"),
-                        content: Text(
-                          chatroom.isSecret != null && chatroom.isSecret!
-                              ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
-                              : 'Are you sure you want to leave this group?',
-                        ),
                         style: LMChatDialogStyle(
                           backgroundColor: LMChatTheme.theme.container,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        actions: [
-                          LMChatText(
-                            'Cancel',
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            style: const LMChatTextStyle(
-                              maxLines: 1,
-                              textStyle: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontSize: 16,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        title: LMChatText(
+                          "Leave Chatroom?",
+                          style: LMChatTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: LMChatTheme.theme.onContainer,
                             ),
                           ),
-                          LMChatText(
-                            'Confirm',
-                            onTap: () {
-                              onTap();
-                              Navigator.pop(context);
-                            },
-                            style: const LMChatTextStyle(
-                              maxLines: 1,
-                              textStyle: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                        ),
+                        content: LMChatText(
+                          chatroom.isSecret != null && chatroom.isSecret!
+                              ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
+                              : 'Are you sure you want to leave this group?',
+                          style: const LMChatTextStyle(),
+                        ),
+                        actions: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 2.0),
+                            child: LMChatText(
+                              "CANCEL",
+                              style: LMChatTextStyle(
+                                textStyle: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: LMChatTheme.theme.onContainer,
+                                ),
                               ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: LMChatText(
+                              "CONFIRM",
+                              style: LMChatTextStyle(
+                                textStyle: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: LMChatTheme.theme.primaryColor,
+                                ),
+                              ),
+                              onTap: () {
+                                onTap();
+                                Navigator.pop(context);
+                              },
                             ),
                           ),
                         ],
