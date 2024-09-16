@@ -315,9 +315,10 @@ class LMChatMediaHandler {
                 size: pickedFile.size,
                 meta: {
                   'file_name': pickedFile.name,
+                  'size': pickedFile.size,
                 });
 
-            pickedMedia.add(documentFile);
+            addPickedMedia(documentFile);
           }
         }
 
