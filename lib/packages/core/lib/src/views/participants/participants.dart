@@ -94,7 +94,8 @@ class _LMChatroomParticipantsPageState
                   return true;
                 },
                 builder: (context, state) {
-                  if (state is LMChatParticipantsLoadingState) {
+                  if (state is LMChatParticipantsLoadingState ||
+                      state is LMChatParticipantsSearchingState) {
                     return LMChatLoader(
                       style: LMChatTheme.theme.loaderStyle,
                     );

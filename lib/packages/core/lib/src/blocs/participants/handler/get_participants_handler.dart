@@ -4,7 +4,11 @@ part of "../participants_bloc.dart";
 // It fetches the participants of a chat room.
 void _getParticipantsEventHandler(LMChatGetParticipantsEvent event,
     Emitter<LMChatParticipantsState> emit) async {
-  emit(const LMChatParticipantsLoadingState());
+  if (event.search != null) {
+    emit(const LMChatParticipantsSearchingState()); // Emit searching state
+  } else {
+    emit(const LMChatParticipantsLoadingState());
+  }
   try {
     // create get participants request
     final GetParticipantsRequest getParticipantsRequest =
@@ -41,14 +45,15 @@ void _getParticipantsEventHandler(LMChatGetParticipantsEvent event,
     } else {
       emit(
         LMChatParticipantsErrorState(
-         errorMessage:  response.errorMessage ?? "Error in fetching participants",
+          errorMessage:
+              response.errorMessage ?? "Error in fetching participants",
         ),
       );
     }
   } catch (e) {
     emit(
       LMChatParticipantsErrorState(
-       errorMessage:  e.toString(),
+        errorMessage: e.toString(),
       ),
     );
   }
