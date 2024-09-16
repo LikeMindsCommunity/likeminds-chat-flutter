@@ -23,6 +23,8 @@ import 'package:overlay_support/overlay_support.dart';
 /// It has a chatroom list, chatroom bar, and chatroom menu.
 ///  {@endtemplate}
 class LMChatroomScreen extends StatefulWidget {
+  static const routeName = '/chatroom';
+
   /// [chatroomId] is the id of the chatroom.
   final int chatroomId;
 
@@ -89,7 +91,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void didUpdateWidget(LMChatroomScreen old) {
-    super.didUpdateWidget(old);
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
     _chatroomBloc = LMChatroomBloc.instance;
@@ -99,30 +100,36 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     scrollController.addListener(() {
       _showScrollToBottomButton();
     });
+    super.didUpdateWidget(old);
   }
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
+    _chatroomBloc = LMChatroomBloc.instance;
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
+    _conversationBloc = LMChatConversationBloc.instance;
+    _convActionBloc = LMChatConversationActionBloc.instance;
     ScreenSize.init(context);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    super.dispose();
-  }
-
-  @override
-  void deactivate() {
     _chatroomBloc.close();
     _convActionBloc.close();
+    _conversationBloc.close();
     _chatroomActionBloc.close();
-    super.deactivate();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
+      onPopInvoked: (p) {
+        _chatroomActionBloc.add(MarkReadChatroomEvent(
+          chatroomId: chatroom.id,
+        ));
+      },
       backgroundColor: LMChatTheme.theme.backgroundColor,
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildFloatingButton,
