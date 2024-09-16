@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/credentials/credentials.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/credentials/giphy.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// A class to manage all media picking, and accessing
@@ -342,7 +343,7 @@ class LMChatMediaHandler {
     try {
       GiphyGif? gif = await GiphyGet.getGif(
         context: context, //Required
-        apiKey: GIPHY_API_KEY, //Required.
+        apiKey: LMChatGiphyCredentials.apiKey, //Required.
         lang: GiphyLanguage.english, //Optional - Language for query.
         randomID: "lm-gif", // Optional - An ID/proxy for a specific user.
         tabColor:
