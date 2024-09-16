@@ -48,6 +48,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   late ValueNotifier<bool> rebuildAppBar;
 
   Map<String, Conversation> conversationMeta = <String, Conversation>{};
+  Map<String, List<LMChatAttachmentViewData>> conversationAttachmentsMeta =
+      <String, List<LMChatAttachmentViewData>>{};
   Map<int, User?> userMeta = <int, User?>{};
   List<int> _selectedIds = [];
 
@@ -191,6 +193,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
+      attachments:
+          conversationAttachmentsMeta[conversation.temporaryId.toString()] ??
+              conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -200,10 +205,14 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             chatroomId: widget.chatroomId,
             conversationId: conversation.id,
             replyConversation: conversation,
+            attachments: conversationAttachmentsMeta[
+                    conversation.temporaryId.toString()] ??
+                conversationAttachmentsMeta[conversation.id.toString()],
           ),
         );
       },
       isSent: true,
+      isDM: true,
       isSelected: _selectedIds.contains(conversation.id),
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       onLongPress: (value, state) {
@@ -234,6 +243,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
+      attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
@@ -243,10 +253,13 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             chatroomId: widget.chatroomId,
             conversationId: conversation.id,
             replyConversation: conversation,
+            attachments:
+                conversationAttachmentsMeta[conversation.id.toString()],
           ),
         );
       },
       isSent: false,
+      isDM: true,
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       isSelected: _selectedIds.contains(conversation.id),
       onLongPress: (value, state) {
@@ -322,6 +335,23 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         conversationMeta
             .addAll(state.getConversationResponse.conversationMeta!);
       }
+      if (state.getConversationResponse.conversationAttachmentsMeta != null &&
+          state.getConversationResponse.conversationAttachmentsMeta!
+              .isNotEmpty) {
+        Map<String, List<LMChatAttachmentViewData>>
+            getConversationAttachmentData = state
+                .getConversationResponse.conversationAttachmentsMeta!
+                .map((key, value) {
+          return MapEntry(
+            key,
+            (value as List<Attachment>?)
+                    ?.map((e) => e.toAttachmentViewData())
+                    .toList() ??
+                [],
+          );
+        });
+        conversationAttachmentsMeta.addAll(getConversationAttachmentData);
+      }
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
@@ -346,13 +376,39 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         state.conversationViewData,
       );
     } else if (state is LMChatLocalConversationState) {
-      addLocalConversationToPagedList(
-          state.conversationViewData.toConversation());
+      addLocalConversationToPagedList(state.conversationViewData);
     } else if (state is LMChatConversationErrorState) {
       toast(state.message);
     }
+    if (state is LMChatMultiMediaConversationLoadingState) {
+      LMChatConversationViewData conv =
+          state.postConversation.toConversationViewData();
+
+      conv = conv.copyWith(
+          replyConversationObject: conversationMeta[conv.replyId.toString()]
+              ?.toConversationViewData());
+
+      if (!userMeta.containsKey(user.id)) {
+        userMeta[user.id] = user;
+      }
+      conversationAttachmentsMeta[conv.temporaryId!] =
+          state.mediaFiles.map((e) => e.toAttachmentViewData()).toList();
+
+      addLocalConversationToPagedList(conv);
+    }
+    if (state is LMChatMultiMediaConversationPostedState) {
+      final conv = state.postConversationResponse.conversation;
+
+      conversationAttachmentsMeta[conv!.id.toString()] =
+          state.putMediaResponse.map((e) => e.toAttachmentViewData()).toList();
+
+      addConversationToPagedList(
+        state.postConversationResponse.conversation!.toConversationViewData(),
+      );
+    }
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId) {
+        conversationAttachmentsMeta.addAll(state.attachments ?? {});
         addConversationToPagedList(
           state.conversationViewData,
         );
@@ -361,9 +417,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
   }
 
-  // This function adds local conversation to the paging controller
-  // and rebuilds the list to reflect UI changes
-  void addLocalConversationToPagedList(Conversation conversation) {
+  void addLocalConversationToPagedList(
+      LMChatConversationViewData conversation) {
+    LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
@@ -376,8 +432,11 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
               (conversation.replyId ?? conversation.replyConversation));
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
+
+      result =
+          conversation.copyWith(replyConversationObject: replyConversation);
     }
-    conversationList.insert(0, conversation.toConversationViewData());
+    conversationList.insert(0, result ?? conversation);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
     }
@@ -390,13 +449,15 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   }
 
   void addConversationToPagedList(LMChatConversationViewData conversation) {
+    LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
     int index = conversationList.indexWhere(
         (element) => element.temporaryId == conversation.temporaryId);
     if (pagedListController.itemList != null &&
-        conversation.replyId != null &&
+        (conversation.replyId != null ||
+            conversation.replyConversation != null) &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
       LMChatConversationViewData? replyConversation =
           pagedListController.itemList!.firstWhere((element) =>
@@ -404,6 +465,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
               (conversation.replyId ?? conversation.replyConversation));
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
+
+      result =
+          conversation.copyWith(replyConversationObject: replyConversation);
     }
     if (index != -1) {
       conversationList[index] = conversation;
@@ -429,7 +493,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           ).toConversationViewData(),
         );
       }
-      conversationList.insert(0, conversation);
+      conversationList.insert(0, result ?? conversation);
       if (conversationList.length >= 500) {
         conversationList.removeLast();
       }

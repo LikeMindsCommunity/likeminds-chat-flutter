@@ -41,9 +41,27 @@ updateConversationsEventHandler(
             .data!.conversationMeta![realTimeConversation.replyId.toString()];
         realTimeConversation.replyConversationObject = replyConversationObject;
       }
+
+      Map<String, List<LMChatAttachmentViewData>> attachments = {};
+      if (conversationResponse.conversationAttachmentsMeta != null &&
+          conversationResponse.conversationAttachmentsMeta!.isNotEmpty) {
+        Map<String, List<LMChatAttachmentViewData>>
+            getConversationAttachmentData =
+            conversationResponse.conversationAttachmentsMeta!.map((key, value) {
+          return MapEntry(
+              key,
+              (value as List<Attachment>?)
+                      ?.map((e) => e.toAttachmentViewData())
+                      .toList() ??
+                  []);
+        });
+        attachments.addAll(getConversationAttachmentData);
+      }
+
       emit(
         LMChatConversationUpdatedState(
           conversationViewData: realTimeConversation.toConversationViewData(),
+          attachments: attachments,
         ),
       );
       lastConversationId = event.conversationId;

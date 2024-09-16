@@ -29,12 +29,14 @@ String getDMChatroomPreviewMessage(
           ? 'You: '
           : '';
   String message = conversation.deletedByUserId == null
-      ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-          conversation.answer,
-        ) : LMChatTaggingHelper.convertRouteToTag(
-          conversation.answer,
-          withTilde: false,
-        )}'
+      ? conversation.attachmentCount == 0
+          ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+              conversation.answer,
+            ) : LMChatTaggingHelper.convertRouteToTag(
+              conversation.answer,
+              withTilde: false,
+            )}'
+          : personLabel
       : getDeletedText(conversation, user.toUserViewData());
   return message;
 }
@@ -49,14 +51,30 @@ String getHomeChatroomPreviewMessage(
       ? 'You: '
       : '${conversation.member!.name.split(' ').first}: ';
   String message = conversation.deletedByUserId == null
-      ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
-          conversation.answer,
-        ) : LMChatTaggingHelper.convertRouteToTag(
-          conversation.answer,
-          withTilde: false,
-        )}'
+      ? conversation.attachmentCount == 0
+          ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
+              conversation.answer,
+            ) : LMChatTaggingHelper.convertRouteToTag(
+              conversation.answer,
+              withTilde: false,
+            )}'
+          : personLabel
       : getDeletedText(conversation, user.toUserViewData());
   return message;
+}
+
+String getGIFText(LMChatConversationViewData conversation) {
+  String gifText = conversation.answer;
+  const String gifMessageIndicator =
+      "* This is a gif message. Please update your app *";
+
+  if (gifText.endsWith(gifMessageIndicator)) {
+    gifText = gifText
+        .substring(0, gifText.length - gifMessageIndicator.length)
+        .trim();
+  }
+
+  return gifText;
 }
 
 String getTime(String time) {

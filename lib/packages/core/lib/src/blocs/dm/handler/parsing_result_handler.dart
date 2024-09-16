@@ -15,6 +15,7 @@ List<LMChatRoomViewData> parseDMHomeFeedToChatrooms(
       LMChatRoomViewData chatroomViewData = chatroom.toChatRoomViewData();
       chatroomViewData = parseDMLastConversation(response, chatroomViewData);
       chatroomViewData = parseDMChatroomUsers(response, chatroomViewData);
+      chatroomViewData = parseDMAttachments(response, chatroomViewData);
       return chatroomViewData;
     },
   ).toList();
@@ -52,9 +53,43 @@ LMChatRoomViewData parseDMLastConversation(
       .toConversationViewData();
   //Create a new instance with member object copied
   LMChatConversationViewData updated = lastConversation.copyWith(
-      member: response
-          .userMeta![lastConversation.memberId]!
-          .toUserViewData());
+      member: response.userMeta != null &&
+              response.userMeta![lastConversation.memberId] != null
+          ? response.userMeta![lastConversation.memberId]!.toUserViewData()
+          : null);
   //Return a copy of passed chatroom with lastConversation updated
   return chatroom.copyWith(lastConversation: updated);
+}
+
+/// Function to parse attachments from the response object
+LMChatRoomViewData parseDMAttachments(
+    GetHomeFeedResponse response, LMChatRoomViewData chatroom) {
+  // Assuming response.conversationAttachmentsMeta is a map of attachment data
+  final Map<String, List<Attachment>>? attachmentData =
+      response.conversationAttachmentsMeta;
+
+  // Check if the attachment data exists
+  if (attachmentData != null) {
+    // Retrieve the last conversation ID from the chatroom
+    String lastConversationId = chatroom.lastConversationId.toString();
+
+    // Check if there are attachments for the last conversation ID
+    if (attachmentData.containsKey(lastConversationId)) {
+      // Create a list to hold the parsed attachments
+      List<LMChatAttachmentViewData> attachments = [];
+
+      // Iterate through each entry in the attachment data for the specific conversation
+      for (Attachment item in attachmentData[lastConversationId]!) {
+        // Convert each attachment entry to LMChatAttachmentViewData
+        LMChatAttachmentViewData attachment = item.toAttachmentViewData();
+        attachments.add(attachment);
+      }
+
+      // Return a copy of the chatroom with the attachments updated
+      return chatroom.copyWith(attachments: attachments);
+    }
+  }
+
+  // If no attachments are found, return the chatroom unchanged
+  return chatroom;
 }

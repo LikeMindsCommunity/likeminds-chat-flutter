@@ -23,6 +23,8 @@ import 'package:overlay_support/overlay_support.dart';
 /// It has a chatroom list, chatroom bar, and chatroom menu.
 ///  {@endtemplate}
 class LMChatroomScreen extends StatefulWidget {
+  static const routeName = '/chatroom';
+
   /// [chatroomId] is the id of the chatroom.
   final int chatroomId;
 
@@ -92,8 +94,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     super.didUpdateWidget(old);
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
-    _chatroomBloc = LMChatroomBloc.instance
-      ..add(LMChatFetchChatroomEvent(chatroomId: widget.chatroomId));
+    _chatroomBloc = LMChatroomBloc.instance;
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
@@ -104,14 +105,19 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
+    _chatroomBloc = LMChatroomBloc.instance;
+    _chatroomActionBloc = LMChatroomActionBloc.instance;
+    _conversationBloc = LMChatConversationBloc.instance;
+    _convActionBloc = LMChatConversationActionBloc.instance;
     ScreenSize.init(context);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     _chatroomBloc.close();
     _convActionBloc.close();
+    _conversationBloc.close();
     _chatroomActionBloc.close();
     super.dispose();
   }
@@ -119,6 +125,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
+      onPopInvoked: (p) {
+        _chatroomActionBloc.add(MarkReadChatroomEvent(
+          chatroomId: chatroom.id,
+        ));
+      },
       backgroundColor: LMChatTheme.theme.backgroundColor,
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildFloatingButton,
@@ -389,6 +400,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     conversationId: conversationViewData.id,
                     chatroomId: widget.chatroomId,
                     replyConversation: conversationViewData,
+                    attachments: conversationViewData.attachments,
                   ),
                 );
                 _selectedIds.clear();

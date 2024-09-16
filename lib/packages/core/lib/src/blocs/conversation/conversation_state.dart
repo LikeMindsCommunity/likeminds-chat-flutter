@@ -47,14 +47,18 @@ class LMChatConversationUpdatedState extends LMChatConversationState {
   /// The updated conversation data.
   final LMChatConversationViewData conversationViewData;
 
+  final Map<String, List<LMChatAttachmentViewData>> attachments;
+
   /// Creates and returns a new instance of [LMChatConversationUpdatedState]
   LMChatConversationUpdatedState({
     required this.conversationViewData,
+    required this.attachments,
   });
 
   @override
   List<Object> get props => [
         conversationViewData,
+        attachments,
       ];
 }
 
@@ -92,7 +96,7 @@ class LMChatMultiMediaConversationLoadingState extends LMChatConversationState {
   final Conversation postConversation;
 
   /// The list of media files associated with the conversation.
-  final List<LMChatMedia> mediaFiles;
+  final List<LMChatMediaModel> mediaFiles;
 
   /// Creates and returns a new instance of [LMChatMultiMediaConversationLoadingState]
   LMChatMultiMediaConversationLoadingState(
@@ -110,7 +114,7 @@ class LMChatMultiMediaConversationPostedState extends LMChatConversationState {
   final PostConversationResponse postConversationResponse;
 
   /// The response received after putting (uploading) the media files.
-  final List<LMChatMedia> putMediaResponse;
+  final List<LMChatMediaModel> putMediaResponse;
 
   /// Creates and returns a new instance of [LMChatMultiMediaConversationPostedState]
   LMChatMultiMediaConversationPostedState(

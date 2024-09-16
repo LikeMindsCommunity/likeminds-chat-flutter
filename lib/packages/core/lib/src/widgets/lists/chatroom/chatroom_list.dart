@@ -166,11 +166,11 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       },
       style: LMChatTileStyle.basic().copyWith(
         margin: EdgeInsets.only(
-          top: 3.h,
-          bottom: 1.h,
+          top: 2.h,
+          bottom: 2.h,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
-        height: 4.h,
+        padding: EdgeInsets.symmetric(horizontal: 6.w),
+        height: 4.5.h,
       ),
       leading: LMChatIcon(
         type: LMChatIconType.svg,
@@ -227,8 +227,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
     return LMChatChip(
       style: LMChatChipStyle.basic().copyWith(
         backgroundColor: LMChatTheme.theme.primaryColor,
-        padding: EdgeInsets.symmetric(
-          horizontal: 2.w,
+        padding: EdgeInsets.zero,
+        labelPadding: EdgeInsets.only(
+          left: 2.w,
+          right: 2.w,
         ),
         side: BorderSide.none,
       ),
@@ -240,6 +242,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           textStyle: TextStyle(
             color: LMChatTheme.theme.onPrimary,
             fontWeight: FontWeight.w500,
+            fontSize: 14,
           ),
         ),
       ),
@@ -338,14 +341,16 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          LMChatText(
-            chatroom.header,
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+          Flexible(
+            child: LMChatText(
+              chatroom.header,
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
@@ -356,20 +361,24 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             ),
         ],
       ),
-      subtitle: LMChatText(
-        chatroom.lastConversation!.state != 0
-            ? LMChatTaggingHelper.extractStateMessage(message)
-            : message,
-        style: LMChatTextStyle(
-          maxLines: 1,
-          textStyle: TextStyle(
-            fontSize: 14,
-            color: LMChatTheme.theme.onContainer,
-            fontWeight: FontWeight.w400,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ),
+      subtitle: ((chatroom.lastConversation?.attachmentsUploaded ?? false) &&
+              chatroom.lastConversation?.deletedByUserId == null)
+          ? getChatItemAttachmentTile(
+              message, chatroom.attachments, chatroom.lastConversation!)
+          : LMChatText(
+              chatroom.lastConversation!.state != 0
+                  ? LMChatTaggingHelper.extractStateMessage(message)
+                  : message,
+              style: LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
       trailing: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

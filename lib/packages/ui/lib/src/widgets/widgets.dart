@@ -20,8 +20,14 @@ export 'profile/user_tile.dart';
 
 export 'shimmers/chatroom_skeleton.dart';
 export 'shimmers/skeleton_chat_box.dart';
+export 'shimmers/document_shimmer.dart';
+export 'shimmers/media_shimmer.dart';
 
 export 'media/image.dart';
+export 'media/video.dart';
+export 'media/document/document.dart';
+export 'media/gif.dart';
+export 'media/error.dart';
 
 export 'conversation/chat_bubble.dart';
 

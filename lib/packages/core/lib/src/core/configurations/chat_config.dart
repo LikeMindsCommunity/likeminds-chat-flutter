@@ -3,6 +3,8 @@ import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
 
@@ -12,6 +14,8 @@ export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/con
 export 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
 
 /// {@template lm_chat_config}
 /// Configuration class for the Likeminds Chat SDK.
@@ -32,6 +36,12 @@ class LMChatConfig {
   /// {@macro lm_chat_report_config}
   final LMChatReportConfig reportConfig;
 
+  /// {@macro lm_chat_media_forwarding_config}
+  final LMChatMediaForwardingConfig mediaForwardingConfig;
+
+  /// {@macro lm_chat_media_preview_config}
+  final LMChatMediaPreviewConfig mediaPreviewConfig;
+
   /// {@macro lm_widget_builder_delegate}
   final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
@@ -45,6 +55,8 @@ class LMChatConfig {
     this.homeConfig = const LMChatHomeConfig(),
     this.participantConfig = const LMChatParticipantConfig(),
     this.reportConfig = const LMChatReportConfig(),
+    this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),
+    this.mediaPreviewConfig = const LMChatMediaPreviewConfig(),
     this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });
