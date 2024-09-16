@@ -110,10 +110,10 @@ class _LMImageState extends State<LMChatImage> {
       clipBehavior: Clip.hardEdge,
       child: CachedNetworkImage(
         cacheKey: widget.imageUrl!,
-        height: style!.height,
-        width: style!.width,
+        height: style?.height,
+        width: style?.width,
         imageUrl: widget.imageUrl!,
-        fit: style!.boxFit ?? BoxFit.contain,
+        fit: style?.boxFit ?? BoxFit.contain,
         fadeInDuration: const Duration(milliseconds: 100),
         errorWidget: (context, url, error) {
           // Log the error for debugging
