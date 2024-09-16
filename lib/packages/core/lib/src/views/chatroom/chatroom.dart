@@ -91,6 +91,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void didUpdateWidget(LMChatroomScreen old) {
+    super.didUpdateWidget(old);
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
     _chatroomBloc = LMChatroomBloc.instance;
@@ -100,7 +101,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     scrollController.addListener(() {
       _showScrollToBottomButton();
     });
-    super.didUpdateWidget(old);
   }
 
   @override
