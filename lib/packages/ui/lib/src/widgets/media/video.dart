@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -11,12 +12,14 @@ class LMChatVideo extends StatefulWidget {
   final LMChatMediaModel media;
   final LMChatVideoStyle? style;
   final LMChatButtonBuilder? muteButton;
+  final LMChatButtonBuilder? playButton;
 
   const LMChatVideo({
     super.key,
     required this.media,
     this.style,
     this.muteButton,
+    this.playButton,
   });
 
   LMChatVideo copyWith({
@@ -107,7 +110,8 @@ class _LMChatVideoState extends State<LMChatVideo> {
     final chatTheme = LMChatTheme.theme;
     style = widget.style ?? chatTheme.videoStyle;
     return Container(
-      width: 100.w,
+      height: style?.height,
+      width: style?.width ?? 100.w,
       color: LMChatTheme.theme.onPrimary,
       child: AspectRatio(
         // aspectRatio:
@@ -118,7 +122,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
             bottomButtonBar: [
               const MaterialPositionIndicator(),
               const Spacer(),
-              widget.muteButton ?? _defMuteButton(),
+              widget.muteButton?.call(_defMuteButton()) ?? _defMuteButton(),
             ],
             bottomButtonBarMargin: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -142,7 +146,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
             bottomButtonBar: [
               const MaterialPositionIndicator(),
               const Spacer(),
-              widget.muteButton ?? _defMuteButton(),
+              widget.muteButton?.call(_defMuteButton()) ?? _defMuteButton(),
               const SizedBox(width: 4),
               const MaterialFullscreenButton(),
             ],

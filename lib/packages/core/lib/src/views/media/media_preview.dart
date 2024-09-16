@@ -74,6 +74,19 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           return getMediaPreview();
         },
       ),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: rebuildCurr,
+        builder: (context, _, __) {
+          return (mediaList.isNotEmpty)
+              ? _screenBuilder.mediaPreviewBuilder(
+                  context,
+                  LMChatMediaHandler.instance.pickedMedia.copy(),
+                  currPosition,
+                  _defPreviewBar(),
+                )
+              : const SizedBox.shrink();
+        },
+      ),
     );
   }
 
@@ -127,34 +140,21 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     if (mediaList.isNotEmpty) {
       if (mediaList.first.mediaType == LMChatMediaType.image ||
           mediaList.first.mediaType == LMChatMediaType.video) {
-        return Column(
-          children: [
-            const Spacer(),
-            Center(
-              child: mediaList[currPosition].mediaType == LMChatMediaType.image
-                  ? _screenBuilder.image(
-                      context,
-                      _defImage(),
-                      mediaList[currPosition],
-                    )
-                  : Padding(
-                      padding: EdgeInsets.symmetric(vertical: 2.h),
-                      child: _screenBuilder.video(
-                        context,
-                        _defVideo(),
-                        mediaList[currPosition],
-                      ),
-                    ),
-            ),
-            const Spacer(),
-            if (mediaList.isNotEmpty)
-              _screenBuilder.mediaPreviewBuilder(
-                context,
-                LMChatMediaHandler.instance.pickedMedia.copy(),
-                currPosition,
-                _defPreviewBar(),
-              ),
-          ],
+        return Center(
+          child: mediaList[currPosition].mediaType == LMChatMediaType.image
+              ? _screenBuilder.image(
+                  context,
+                  _defImage(),
+                  mediaList[currPosition],
+                )
+              : Padding(
+                  padding: EdgeInsets.symmetric(vertical: 2.h),
+                  child: _screenBuilder.video(
+                    context,
+                    _defVideo(),
+                    mediaList[currPosition],
+                  ),
+                ),
         );
       }
     }

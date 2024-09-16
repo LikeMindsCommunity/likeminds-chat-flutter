@@ -27,7 +27,7 @@ typedef LMChatErrorHandler = Function(String, StackTrace);
 /// - [LMChatButton] olButton: The old button.
 /// The function returns a [LMChatButton] widget.
 /// {@endtemplate}
-typedef LMChatButtonBuilder = LMChatButton Function(LMChatButton olButton);
+typedef LMChatButtonBuilder = Widget Function(LMChatButton olButton);
 
 /// {@template lm_chat_home_app_bar_builder}
 /// The app bar builder function for the chat home screen.
