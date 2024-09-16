@@ -492,8 +492,9 @@ class _LMChatMediaForwardingScreenState
             borderRadius: BorderRadius.circular(8.0),
             child: LMChatImage(
               imageFile: mediaList[index].thumbnailFile!,
-              style: const LMChatImageStyle(
+              style: LMChatImageStyle(
                 boxFit: BoxFit.cover,
+                width: 15.w,
               ),
             ),
           )
