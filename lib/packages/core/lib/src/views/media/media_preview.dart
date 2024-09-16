@@ -62,11 +62,29 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         LMChatMediaHandler.instance.clearPickedMedia();
       },
       backgroundColor: LMChatTheme.theme.scaffold,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _defAppBar(),
+        LMChatMediaHandler.instance.pickedMedia.length,
+        currPosition,
+      ),
       body: ValueListenableBuilder(
         valueListenable: rebuildCurr,
         builder: (context, _, __) {
           return getMediaPreview();
+        },
+      ),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: rebuildCurr,
+        builder: (context, _, __) {
+          return (mediaList.isNotEmpty)
+              ? _screenBuilder.mediaPreviewBuilder(
+                  context,
+                  LMChatMediaHandler.instance.pickedMedia.copy(),
+                  currPosition,
+                  _defPreviewBar(),
+                )
+              : const SizedBox.shrink();
         },
       ),
     );
@@ -127,12 +145,14 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
               ? _screenBuilder.image(
                   context,
                   _defImage(),
+                  mediaList[currPosition],
                 )
               : Padding(
                   padding: EdgeInsets.symmetric(vertical: 2.h),
                   child: _screenBuilder.video(
                     context,
                     _defVideo(),
+                    mediaList[currPosition],
                   ),
                 ),
         );
@@ -215,6 +235,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       style: LMChatImageStyle(
         boxFit: BoxFit.cover,
         borderRadius: BorderRadius.circular(8.0),
+        width: 100.w,
       ),
     );
   }

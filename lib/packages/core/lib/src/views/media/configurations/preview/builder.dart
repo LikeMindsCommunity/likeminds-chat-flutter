@@ -80,31 +80,27 @@ class LMChatMediaPreviewBuilderDelegate {
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
     LMChatAppBar appBar,
+    int mediaLength,
+    int index,
   ) {
     return appBar;
   }
 
-  /// Builds the chatroom bar send button
-  Widget sendButton(
+  /// Builds the app bar.
+  Widget mediaPreviewBuilder(
     BuildContext context,
-    VoidCallback onSend,
-    LMChatButton sendButton,
+    List<LMChatMediaModel> media,
+    int index,
+    Widget currentPreview,
   ) {
-    return sendButton;
-  }
-
-  /// Build the chatroom bar attachment button
-  Widget attachmentButton(
-    BuildContext context,
-    LMChatButton attachmentButton,
-  ) {
-    return attachmentButton;
+    return currentPreview;
   }
 
   /// Builds the LMChatImage widget of the list
   Widget image(
     BuildContext context,
     LMChatImage image,
+    LMChatMediaModel media,
   ) {
     return image;
   }
@@ -112,7 +108,8 @@ class LMChatMediaPreviewBuilderDelegate {
   /// Builds the LMChatImage widget of the list
   Widget video(
     BuildContext context,
-    dynamic video,
+    LMChatVideo video,
+    LMChatMediaModel media,
   ) {
     return video;
   }

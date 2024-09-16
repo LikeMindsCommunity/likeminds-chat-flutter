@@ -17,3 +17,8 @@
 - Added Support for block member
 - Support for targetSDK v34 out of the box
 - Updating dependencies to support Flutter `v3.22.0`
+
+## 0.7.0
+
+- Added multimedia support
+- Added multimedia utils and handler functions

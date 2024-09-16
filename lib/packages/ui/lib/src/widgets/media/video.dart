@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
@@ -7,9 +6,15 @@ import 'package:media_kit_video/media_kit_video.dart';
 // import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
 //     as media_kit_video_controls;
 
+/// A widget that displays a video in a chat interface.
 class LMChatVideo extends StatefulWidget {
+  /// The media model containing video information.
   final LMChatMediaModel media;
+
+  /// The style configuration for the video.
   final LMChatVideoStyle? style;
+
+  /// A builder for the mute button.
   final LMChatButtonBuilder? muteButton;
 
   const LMChatVideo({
@@ -19,6 +24,7 @@ class LMChatVideo extends StatefulWidget {
     this.muteButton,
   });
 
+  /// Creates a copy of the current LMChatVideo with optional new values.
   LMChatVideo copyWith({
     LMChatMediaModel? media,
     LMChatVideoStyle? style,
@@ -35,15 +41,30 @@ class LMChatVideo extends StatefulWidget {
   State<LMChatVideo> createState() => _LMChatVideoState();
 }
 
+/// State for the LMChatVideo widget.
 class _LMChatVideoState extends State<LMChatVideo> {
+  /// The video controller for managing video playback.
   VideoController? _controller;
+
+  /// The player instance for video playback.
   Player? _player;
+
+  /// Future for initializing the controller.
   Future<void>? init;
 
+  /// Notifier to track mute state.
   ValueNotifier<bool>? isMuted;
+
+  /// Notifier to track play/pause state.
+  ValueNotifier<bool>? isPlaying;
+
+  /// Notifier to trigger video rebuilds.
   ValueNotifier<bool> rebuildVideo = ValueNotifier(false);
+
+  /// The video controller instance.
   VideoController? controller;
 
+  /// The style configuration for the video.
   LMChatVideoStyle? style;
 
   @override
@@ -51,6 +72,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
     super.initState();
     init = _initController();
     isMuted = ValueNotifier(false);
+    isPlaying = ValueNotifier(false);
   }
 
   @override
@@ -71,6 +93,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
     super.dispose();
   }
 
+  /// Initializes the video controller based on the media source.
   Future<void> _initController() async {
     _player ??= Player(
       configuration: PlayerConfiguration(
@@ -107,18 +130,33 @@ class _LMChatVideoState extends State<LMChatVideo> {
     final chatTheme = LMChatTheme.theme;
     style = widget.style ?? chatTheme.videoStyle;
     return Container(
-      width: 100.w,
-      color: LMChatTheme.theme.onPrimary,
+      height: style?.height,
+      width: style?.width ?? 100.w,
+      decoration: BoxDecoration(
+        color: style?.backgroundColor ?? chatTheme.onPrimary,
+        border: Border.all(
+          color: style?.borderColor ?? Colors.transparent,
+          width: style?.borderWidth ?? 0,
+        ),
+        borderRadius: style?.borderRadius ?? BorderRadius.circular(8.0),
+      ),
       child: AspectRatio(
         // aspectRatio:
         aspectRatio: (style?.width ?? widget.media.width?.toDouble() ?? 100.w) /
             (style?.height ?? widget.media.height?.toDouble() ?? 56.h),
         child: MaterialVideoControlsTheme(
+          fullscreen: const MaterialVideoControlsThemeData(),
           normal: MaterialVideoControlsThemeData(
             bottomButtonBar: [
               const MaterialPositionIndicator(),
               const Spacer(),
-              widget.muteButton ?? _defMuteButton(),
+              ValueListenableBuilder(
+                valueListenable: isMuted!,
+                builder: (context, state, _) {
+                  return widget.muteButton?.call(_defMuteButton(state)) ??
+                      _defMuteButton(state);
+                },
+              ),
             ],
             bottomButtonBarMargin: const EdgeInsets.symmetric(
               horizontal: 12,
@@ -132,23 +170,6 @@ class _LMChatVideoState extends State<LMChatVideo> {
                 style?.seekBarColor ?? chatTheme.secondaryColor,
             seekBarThumbColor: style?.seekBarColor ?? chatTheme.secondaryColor,
           ),
-          fullscreen: MaterialVideoControlsThemeData(
-            seekBarMargin: const EdgeInsets.symmetric(
-              horizontal: 4,
-              vertical: 8,
-            ),
-            seekBarPositionColor: style?.seekBarColor ?? chatTheme.primaryColor,
-            seekBarThumbColor: style?.seekBarColor ?? chatTheme.primaryColor,
-            bottomButtonBar: [
-              const MaterialPositionIndicator(),
-              const Spacer(),
-              widget.muteButton ?? _defMuteButton(),
-              const SizedBox(width: 4),
-              const MaterialFullscreenButton(),
-            ],
-            bottomButtonBarMargin: const EdgeInsets.symmetric(horizontal: 8),
-            controlsHoverDuration: const Duration(seconds: 3),
-          ),
           child: Video(
             fit: style?.boxFit ?? BoxFit.contain,
             aspectRatio: style?.aspectRatio,
@@ -159,55 +180,98 @@ class _LMChatVideoState extends State<LMChatVideo> {
     );
   }
 
-  _defMuteButton() {
-    return ValueListenableBuilder(
-      valueListenable: isMuted!,
-      builder: (context, state, _) {
-        return IconButton(
-          onPressed: () {
-            state ? _player!.setVolume(100) : _player!.setVolume(0);
-            isMuted!.value = !isMuted!.value;
-          },
-          icon: LMChatIcon(
-            type: LMChatIconType.icon,
-            style: const LMChatIconStyle(
-              color: Colors.white,
-            ),
-            icon: state ? Icons.volume_off : Icons.volume_up,
-          ),
-        );
+  /// Defines the mute button for the video.
+  LMChatButton _defMuteButton(bool state) {
+    return LMChatButton(
+      onTap: () {
+        state ? _player!.setVolume(100) : _player!.setVolume(0);
+        isMuted!.value = !isMuted!.value;
       },
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        style: LMChatIconStyle(
+          color: LMChatTheme.theme.container,
+        ),
+        icon: state ? Icons.volume_off : Icons.volume_up,
+      ),
     );
   }
 }
 
+/// Configuration for the LMChatVideo widget's style.
 class LMChatVideoStyle {
   // Video structure variables
+  /// The height of the video.
   final double? height;
+
+  /// The width of the video.
   final double? width;
-  final double? aspectRatio; // defaults to 16/9
-  final BorderRadius? borderRadius; // defaults to 0
+
+  /// The aspect ratio of the video (defaults to 16/9).
+  final double? aspectRatio;
+
+  /// The border radius of the video (defaults to 0).
+  final BorderRadius? borderRadius;
+
+  /// The border color of the video.
   final Color? borderColor;
+
+  /// The background color of the video.
+  final Color? backgroundColor;
+
+  /// The border width of the video.
   final double? borderWidth;
-  final BoxFit? boxFit; // defaults to BoxFit.cover
+
+  /// The box fit of the video (defaults to BoxFit.cover).
+  final BoxFit? boxFit;
+
+  /// Padding around the video.
   final EdgeInsets? padding;
+
+  /// Margin around the video.
   final EdgeInsets? margin;
 
   // Video styling variables
+  /// The color of the seek bar.
   final Color? seekBarColor;
+
+  /// The color of the seek bar buffer.
   final Color? seekBarBufferColor;
+
+  /// The text style for the progress text.
   final TextStyle? progressTextStyle;
+
+  /// The widget displayed while loading the video.
   final Widget? loaderWidget;
+
+  /// The widget displayed on error.
   final Widget? errorWidget;
+
+  /// The widget displayed while shimmering.
   final Widget? shimmerWidget;
+
+  /// The button for playing the video.
   final LMChatButton? playButton;
+
+  /// The button for pausing the video.
   final LMChatButton? pauseButton;
+
+  /// The button for muting the video.
   final LMChatButton? muteButton;
   // Video functionality control variables
+  /// Whether to show video controls.
   final bool? showControls;
+
+  /// Whether the video should autoplay.
   final bool? autoPlay;
+
+  /// Whether the video should loop.
   final bool? looping;
+
+  /// Whether to allow full screen mode.
   final bool? allowFullScreen;
+
+  /// Whether to allow muting.
   final bool? allowMuting;
 
   const LMChatVideoStyle({
@@ -216,6 +280,7 @@ class LMChatVideoStyle {
     this.aspectRatio,
     this.borderRadius,
     this.borderColor,
+    this.backgroundColor,
     this.borderWidth,
     this.boxFit,
     this.seekBarColor,
@@ -236,6 +301,7 @@ class LMChatVideoStyle {
     this.margin,
   });
 
+  /// Creates a copy of the current LMChatVideoStyle with optional new values.
   LMChatVideoStyle copyWith({
     double? height,
     double? width,
@@ -288,6 +354,7 @@ class LMChatVideoStyle {
     );
   }
 
+  /// Creates a basic LMChatVideoStyle with a loader widget.
   factory LMChatVideoStyle.basic({Color? primaryColor}) =>
       const LMChatVideoStyle(
         loaderWidget: LMChatLoader(),

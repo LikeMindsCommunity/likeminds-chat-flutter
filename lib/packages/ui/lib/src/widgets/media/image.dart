@@ -67,84 +67,113 @@ class _LMImageState extends State<LMChatImage> {
   LMChatImageStyle? style;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     style = widget.style ?? LMChatTheme.theme.imageStyle;
+  }
+
+  @override
+  void didUpdateWidget(covariant LMChatImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    style = widget.style ?? LMChatTheme.theme.imageStyle;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AbsorbPointer(
-      absorbing: true,
+      absorbing: widget.onTap == null,
       child: GestureDetector(
         onTap: () => widget.onTap?.call(),
-        child: widget.imageUrl != null
-            ? Container(
-                padding: style?.padding,
-                margin: style?.margin,
-                decoration: BoxDecoration(
-                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                  color: style?.backgroundColor,
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: CachedNetworkImage(
-                  cacheKey: widget.imageUrl!,
-                  height: style!.height,
-                  width: style!.width,
-                  imageUrl: widget.imageUrl!,
-                  fit: style!.boxFit ?? BoxFit.contain,
-                  fadeInDuration: const Duration(
-                    milliseconds: 100,
-                  ),
-                  errorWidget: (context, url, error) {
-                    if (widget.onError != null) {
-                      widget.onError!(error.toString(), StackTrace.empty);
-                    }
-                    return style!.errorWidget ??
-                        Container(
-                          color: Colors.grey,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              LMChatIcon(
-                                type: LMChatIconType.icon,
-                                icon: Icons.error_outline,
-                                style: LMChatIconStyle(
-                                  size: 24,
-                                  color: Colors.grey.shade300,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              const LMChatText(
-                                "An error occurred fetching media",
-                                style: LMChatTextStyle(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                  },
-                  progressIndicatorBuilder: (context, url, progress) =>
-                      style!.shimmerWidget ??
-                      LMChatMediaShimmerWidget(
-                        height: style!.height,
-                        width: style!.width,
-                      ),
-                ),
-              )
-            : widget.imageFile != null
-                ? Container(
-                    padding: style?.padding,
-                    margin: style?.margin,
-                    decoration: BoxDecoration(
-                        borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                        color: style?.backgroundColor),
-                    child: Image.file(
-                      widget.imageFile!,
-                      height: style!.height,
-                      width: style!.width,
-                      fit: style!.boxFit ?? BoxFit.contain,
-                    ),
-                  )
-                : const SizedBox(),
+        child: _buildImageWidget(),
+      ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+    if (widget.imageUrl != null) {
+      return _buildNetworkImage();
+    } else if (widget.imageFile != null) {
+      return _buildFileImage();
+    } else {
+      return const SizedBox();
+    }
+  }
+
+  Widget _buildNetworkImage() {
+    return Container(
+      padding: style?.padding,
+      margin: style?.margin,
+      decoration: BoxDecoration(
+        borderRadius: style!.borderRadius ?? BorderRadius.zero,
+        color: style?.backgroundColor,
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: CachedNetworkImage(
+        cacheKey: widget.imageUrl!,
+        height: style?.height,
+        width: style?.width,
+        imageUrl: widget.imageUrl!,
+        fit: style?.boxFit ?? BoxFit.contain,
+        fadeInDuration: const Duration(milliseconds: 100),
+        errorWidget: (context, url, error) {
+          // Log the error for debugging
+          debugPrint('Error loading image: $error');
+          if (widget.onError != null) {
+            widget.onError!(error.toString(), StackTrace.empty);
+          }
+          return style!.errorWidget ?? _defaultErrorWidget();
+        },
+        progressIndicatorBuilder: (context, url, progress) =>
+            style!.shimmerWidget ??
+            LMChatMediaShimmerWidget(
+              height: style!.height,
+              width: style!.width,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildFileImage() {
+    return Container(
+      padding: style?.padding,
+      margin: style?.margin,
+      decoration: BoxDecoration(
+        borderRadius: style!.borderRadius ?? BorderRadius.zero,
+        color: style?.backgroundColor,
+      ),
+      child: Image.file(
+        widget.imageFile!,
+        height: style!.height,
+        width: style!.width,
+        fit: style!.boxFit ?? BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _defaultErrorWidget() {
+    return Container(
+      color: Colors.grey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.error_outline,
+            style: LMChatIconStyle(
+              size: 24,
+              color: Colors.grey.shade300,
+            ),
+          ),
+          const SizedBox(height: 24),
+          const LMChatText(
+            "An error occurred fetching media",
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -192,6 +221,7 @@ class LMChatImageStyle {
   /// Widget to show a shimmer while presenting the image
   final Widget? shimmerWidget;
 
+  ///{@macro lm_chat_image_style}
   const LMChatImageStyle({
     this.height,
     this.width,
@@ -207,6 +237,10 @@ class LMChatImageStyle {
     this.backgroundColor,
   });
 
+  /// Creates a copy of the current style with the given parameters.
+  ///
+  /// All non-null parameters will override the current style's parameters.
+  /// All null parameters will keep the current style's parameter.
   LMChatImageStyle copyWith({
     double? height,
     double? width,
@@ -237,6 +271,9 @@ class LMChatImageStyle {
     );
   }
 
+  /// Creates a basic instance of [LMChatImageStyle].
+  ///
+  /// Optionally takes a [primaryColor] parameter to customize the style.
   factory LMChatImageStyle.basic({Color? primaryColor}) =>
       const LMChatImageStyle();
 }

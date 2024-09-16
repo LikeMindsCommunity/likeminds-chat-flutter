@@ -77,7 +77,12 @@ class _LMChatMediaForwardingScreenState
         LMChatMediaHandler.instance.clearPickedMedia();
       },
       backgroundColor: LMChatTheme.theme.scaffold,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _defAppBar(),
+        LMChatMediaHandler.instance.pickedMedia.length,
+        currPosition,
+      ),
       body: Column(
         children: [
           Expanded(
@@ -100,7 +105,13 @@ class _LMChatMediaForwardingScreenState
         Expanded(
           child: _buildMainPreview(),
         ),
-        if (mediaList.length > 1) _buildPreviewBar(),
+        if (mediaList.length > 1)
+          _screenBuilder.mediaPreviewBuilder(
+            context,
+            LMChatMediaHandler.instance.pickedMedia,
+            currPosition,
+            _buildPreviewBar(),
+          )
       ],
     );
   }
@@ -472,6 +483,7 @@ class _LMChatMediaForwardingScreenState
   LMChatVideo _defVideo() => LMChatVideo(
         media: mediaList[currPosition],
         key: ObjectKey(mediaList[currPosition].hashCode),
+        style: const LMChatVideoStyle(),
       );
 
   Widget _defVideoThumbnail(int index) {
@@ -480,8 +492,9 @@ class _LMChatMediaForwardingScreenState
             borderRadius: BorderRadius.circular(8.0),
             child: LMChatImage(
               imageFile: mediaList[index].thumbnailFile!,
-              style: const LMChatImageStyle(
+              style: LMChatImageStyle(
                 boxFit: BoxFit.cover,
+                width: 15.w,
               ),
             ),
           )
