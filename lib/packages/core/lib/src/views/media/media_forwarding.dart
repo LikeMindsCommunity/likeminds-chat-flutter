@@ -228,7 +228,8 @@ class _LMChatMediaForwardingScreenState
                   ),
                 ),
               ),
-              if (mediaList.first.mediaType != LMChatMediaType.gif)
+              if (mediaList.isNotEmpty &&
+                  mediaList.first.mediaType != LMChatMediaType.gif)
                 _screenBuilder.attachmentButton(
                   context,
                   _defAttachmentButton(),

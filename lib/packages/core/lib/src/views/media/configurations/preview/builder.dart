@@ -71,6 +71,8 @@ class LMChatMediaPreviewBuilderDelegate {
       drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
       endDrawerEnableOpenDragGesture: endDrawerEnableOpenDragGesture,
       restorationId: restorationId,
+      onPopInvoked: onPopInvoked,
+      canPop: canPop,
     );
   }
 

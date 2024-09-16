@@ -79,7 +79,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
   void didUpdateWidget(LMChatDocumentThumbnail oldWidget) {
     super.didUpdateWidget(oldWidget);
     style = widget.style;
-    if (oldWidget.media.hashCode != widget.media.hashCode) {
+    if (oldWidget.media.mediaUrl != widget.media.mediaUrl) {
       loadedFile = loadFile();
     }
   }

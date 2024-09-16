@@ -39,7 +39,7 @@ initFirebase() async {
                 )
               : FirebaseOptions(
                   apiKey: FbCredsDev.fbApiKey,
-                  appId: FbCredsDev.fbAppIdIOS,
+                  appId: FbCredsDev.fbAppIdAN,
                   messagingSenderId: FbCredsDev.fbMessagingSenderId,
                   projectId: FbCredsDev.fbProjectId,
                   databaseURL: FbCredsDev.fbDatabaseUrl,

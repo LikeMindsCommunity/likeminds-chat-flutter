@@ -213,7 +213,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     return Swipeable(
       dismissThresholds: const {SwipeDirection.startToEnd: 0.0},
       movementDuration: const Duration(milliseconds: 50),
-      key: GlobalObjectKey(conversation.id),
+      key: ObjectKey(conversation.id),
       onSwipe: (direction) {
         if (widget.onReply != null &&
             widget.conversation.deletedByUserId == null) {
