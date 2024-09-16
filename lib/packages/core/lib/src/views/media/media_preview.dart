@@ -147,12 +147,13 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
                     ),
             ),
             const Spacer(),
-            _screenBuilder.mediaPreviewBuilder(
-              context,
-              LMChatMediaHandler.instance.pickedMedia.copy(),
-              currPosition,
-              _defPreviewBar(),
-            ),
+            if (mediaList.isNotEmpty)
+              _screenBuilder.mediaPreviewBuilder(
+                context,
+                LMChatMediaHandler.instance.pickedMedia.copy(),
+                currPosition,
+                _defPreviewBar(),
+              ),
           ],
         );
       }
