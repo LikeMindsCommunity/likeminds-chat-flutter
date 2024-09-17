@@ -5,24 +5,24 @@
 enum LMChatPollMultiSelectState {
   /// User can select exactly n options
   exactly(
-    value: 'exactly',
+    value: 0,
     name: 'exactly',
-  ),
-
-  /// User can select at least n options
-  atLeast(
-    value: 'at_least',
-    name: 'at least',
   ),
 
   /// User can select at most n options
   atMax(
-    value: 'at_max',
+    value: 1,
     name: 'at most',
+  ),
+
+  /// User can select at least n options
+  atLeast(
+    value: 2,
+    name: 'at least',
   );
 
   /// Value of the enum
-  final String value;
+  final int value;
 
   /// Display String of the enum
   final String name;
@@ -32,14 +32,14 @@ enum LMChatPollMultiSelectState {
     required this.name,
   });
 
-  factory LMChatPollMultiSelectState.fromValue(String value) {
+  factory LMChatPollMultiSelectState.fromValue(int? value) {
     switch (value) {
-      case 'exactly':
+      case 0:
         return LMChatPollMultiSelectState.exactly;
-      case 'at_least':
-        return LMChatPollMultiSelectState.atLeast;
-      case 'at_max':
+      case 1:
         return LMChatPollMultiSelectState.atMax;
+      case 2:
+        return LMChatPollMultiSelectState.atLeast;
       default:
         return LMChatPollMultiSelectState.exactly;
     }
@@ -53,26 +53,26 @@ enum LMChatPollMultiSelectState {
 enum LMChatPollType {
   /// Instant poll
   instant(
-    value: 'instant',
+    value: 0,
   ),
 
   /// Deferred poll
   deferred(
-    value: 'deferred',
+    value: 1,
   );
 
   /// Value of the enum
-  final String value;
+  final int value;
 
   const LMChatPollType({
     required this.value,
   });
 
-  factory LMChatPollType.fromValue(String value) {
+  factory LMChatPollType.fromValue(int? value) {
     switch (value) {
-      case 'instant':
+      case 0:
         return LMChatPollType.instant;
-      case 'deferred':
+      case 1:
         return LMChatPollType.deferred;
       default:
         return LMChatPollType.instant;

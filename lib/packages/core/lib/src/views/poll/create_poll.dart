@@ -224,6 +224,7 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
             ),
           ]),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _defHeader(),
           Expanded(

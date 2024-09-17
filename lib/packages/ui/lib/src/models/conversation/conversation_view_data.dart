@@ -32,11 +32,11 @@ class LMChatConversationViewData {
   final String? locationLat;
   final String? locationLong;
   final int? multipleSelectNo;
-  final int? multipleSelectState;
+  final LMChatPollMultiSelectState? multipleSelectState;
   final LMChatOGTagsViewData? ogTags;
   final int? onlineLinkEnableBefore;
   final String? pollAnswerText;
-  final int? pollType;
+  final LMChatPollType? pollType;
   final int? replyChatroomId;
   final int? replyId;
   final int? startTime;
@@ -51,7 +51,8 @@ class LMChatConversationViewData {
   final int? replyConversation;
   final LMChatConversationViewData? replyConversationObject;
   final List<LMChatReactionViewData>? conversationReactions;
-  final LMChatPollViewData? poll;
+  final List<LMChatPollOptionViewData>? poll;
+  final bool? isPollSubmitted;
 
   LMChatConversationViewData._({
     this.allowAddOption,
@@ -101,6 +102,7 @@ class LMChatConversationViewData {
     this.replyConversationObject,
     this.conversationReactions,
     this.poll,
+    this.isPollSubmitted,
   });
 
   /// copyWith method is used to create a new instance of `LMChatConversationViewData` with the updated values.
@@ -133,11 +135,11 @@ class LMChatConversationViewData {
     String? locationLat,
     String? locationLong,
     int? multipleSelectNo,
-    int? multipleSelectState,
+    LMChatPollMultiSelectState? multipleSelectState,
     dynamic ogTags,
     int? onlineLinkEnableBefore,
     String? pollAnswerText,
-    int? pollType,
+    LMChatPollType? pollType,
     int? replyChatroomId,
     int? replyId,
     int? startTime,
@@ -152,7 +154,8 @@ class LMChatConversationViewData {
     int? replyConversation,
     LMChatConversationViewData? replyConversationObject,
     List<LMChatReactionViewData>? conversationReactions,
-    LMChatPollViewData? poll,
+    List<LMChatPollOptionViewData>? poll,
+    bool? isPollSubmitted,
   }) {
     return LMChatConversationViewData._(
       allowAddOption: allowAddOption ?? this.allowAddOption,
@@ -205,6 +208,7 @@ class LMChatConversationViewData {
       conversationReactions:
           conversationReactions ?? this.conversationReactions,
       poll: poll ?? this.poll,
+      isPollSubmitted: isPollSubmitted ?? this.isPollSubmitted,
     );
   }
 }
@@ -239,11 +243,11 @@ class LMChatConversationViewDataBuilder {
   String? _locationLat;
   String? _locationLong;
   int? _multipleSelectNo;
-  int? _multipleSelectState;
+  LMChatPollMultiSelectState? _multipleSelectState;
   LMChatOGTagsViewData? _ogTags;
   int? _onlineLinkEnableBefore;
   String? _pollAnswerText;
-  int? _pollType;
+  LMChatPollType? _pollType;
   int? _replyChatroomId;
   int? _replyId;
   int? _startTime;
@@ -258,7 +262,8 @@ class LMChatConversationViewDataBuilder {
   int? _replyConversation;
   LMChatConversationViewData? _replyConversationObject;
   List<LMChatReactionViewData>? _conversationReactions;
-  LMChatPollViewData? _poll;
+  List<LMChatPollOptionViewData>? _poll;
+  bool? _isPollSubmitted;
 
   void allowAddOption(bool? allowAddOption) {
     _allowAddOption = allowAddOption;
@@ -368,7 +373,7 @@ class LMChatConversationViewDataBuilder {
     _multipleSelectNo = multipleSelectNo;
   }
 
-  void multipleSelectState(int? multipleSelectState) {
+  void multipleSelectState(LMChatPollMultiSelectState? multipleSelectState) {
     _multipleSelectState = multipleSelectState;
   }
 
@@ -384,7 +389,7 @@ class LMChatConversationViewDataBuilder {
     _pollAnswerText = pollAnswerText;
   }
 
-  void pollType(int? pollType) {
+  void pollType(LMChatPollType? pollType) {
     _pollType = pollType;
   }
 
@@ -446,8 +451,12 @@ class LMChatConversationViewDataBuilder {
     _conversationReactions = conversationReactions;
   }
 
-  void poll(LMChatPollViewData? poll) {
+  void poll(List<LMChatPollOptionViewData>? poll) {
     _poll = poll;
+  }
+
+  void isPollSubmitted(bool? isPollSubmitted) {
+    _isPollSubmitted = isPollSubmitted;
   }
 
   /// Builds the `LMChatConversationViewData` object using the provided values.
@@ -500,6 +509,7 @@ class LMChatConversationViewDataBuilder {
       replyConversationObject: _replyConversationObject,
       conversationReactions: _conversationReactions,
       poll: _poll,
+      isPollSubmitted: _isPollSubmitted,
     );
   }
 }

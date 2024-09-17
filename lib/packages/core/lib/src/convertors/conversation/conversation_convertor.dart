@@ -35,10 +35,11 @@ extension ConversationViewDataConvertor on Conversation {
           ..locationLat(locationLat)
           ..locationLong(locationLong)
           ..multipleSelectNo(multipleSelectNo)
-          ..multipleSelectState(multipleSelectState)
+          ..multipleSelectState(
+              LMChatPollMultiSelectState.fromValue(multipleSelectState))
           ..onlineLinkEnableBefore(onlineLinkEnableBefore)
           ..pollAnswerText(pollAnswerText)
-          ..pollType(pollType)
+          ..pollType(LMChatPollType.fromValue(pollType))
           ..replyChatroomId(replyChatroomId)
           ..replyId(replyId)
           ..startTime(startTime)
@@ -91,10 +92,10 @@ extension ConversationConvertor on LMChatConversationViewData {
       locationLat: locationLat,
       locationLong: locationLong,
       multipleSelectNo: multipleSelectNo,
-      multipleSelectState: multipleSelectState,
+      multipleSelectState: multipleSelectState?.value,
       onlineLinkEnableBefore: onlineLinkEnableBefore,
       pollAnswerText: pollAnswerText,
-      pollType: pollType,
+      pollType: pollType?.value,
       replyChatroomId: replyChatroomId,
       replyId: replyId,
       startTime: startTime,

@@ -2,7 +2,7 @@
 export 'attachment/attachment_view_data.dart';
 export 'poll/poll_view_data.dart';
 export 'poll/poll_option_view_data.dart';
-export 'poll/poll_view_data.dart';
+export 'poll/poll_enum.dart';
 
 // chatroom models
 export 'chatroom/chatroom_view_data.dart';

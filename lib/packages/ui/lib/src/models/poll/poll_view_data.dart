@@ -1,3 +1,4 @@
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 
 /// {@template lm_chat_poll_view_data}
@@ -12,7 +13,7 @@ class LMChatPollViewData {
   final bool? allowAddOption;
 
   /// Type of the poll.
-  final int? pollType;
+  final LMChatPollType? pollType;
 
   /// Text description of the poll type.
   final String? pollTypeText;
@@ -27,7 +28,7 @@ class LMChatPollViewData {
   final int? multipleSelectNum;
 
   /// State of multiple select options.
-  final int? multipleSelectState;
+  final LMChatPollMultiSelectState? multipleSelectState;
 
   /// List of poll options.
   final List<LMChatPollOptionViewData>? pollOptions;
@@ -65,12 +66,12 @@ class LMChatPollViewData {
   LMChatPollViewData copyWith({
     bool? isAnonymous,
     bool? allowAddOption,
-    int? pollType,
+    LMChatPollType? pollType,
     String? pollTypeText,
     String? submitTypeText,
     int? expiryTime,
     int? multipleSelectNum,
-    int? multipleSelectState,
+    LMChatPollMultiSelectState? multipleSelectState,
     List<LMChatPollOptionViewData>? pollOptions,
     String? pollAnswerText,
     bool? isPollSubmitted,
@@ -102,12 +103,12 @@ class LMChatPollViewData {
 class LMChatPollViewDataBuilder {
   bool? _isAnonymous;
   bool? _allowAddOption;
-  int? _pollType;
+  LMChatPollType? _pollType;
   String? _pollTypeText;
   String? _submitTypeText;
   int? _expiryTime;
   int? _multipleSelectNum;
-  int? _multipleSelectState;
+  LMChatPollMultiSelectState? _multipleSelectState;
   List<LMChatPollOptionViewData>? _pollOptions;
   String? _pollAnswerText;
   bool? _isPollSubmitted;
@@ -125,7 +126,7 @@ class LMChatPollViewDataBuilder {
   }
 
   /// pollType method is used to set the value for the pollType field.
-  void pollType(int? pollType) {
+  void pollType(LMChatPollType? pollType) {
     _pollType = pollType;
   }
 
@@ -150,7 +151,7 @@ class LMChatPollViewDataBuilder {
   }
 
   /// multipleSelectState method is used to set the value for the multipleSelectState field.
-  void multipleSelectState(int? multipleSelectState) {
+  void multipleSelectState(LMChatPollMultiSelectState? multipleSelectState) {
     _multipleSelectState = multipleSelectState;
   }
 

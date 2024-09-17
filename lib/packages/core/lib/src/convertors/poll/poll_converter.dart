@@ -7,12 +7,12 @@ extension PollConvertor on LMChatPollViewData {
     return Poll(
       isAnonymous: isAnonymous,
       allowAddOption: allowAddOption,
-      pollType: pollType,
+      pollType: pollType?.value,
       pollTypeText: pollTypeText,
       submitTypeText: submitTypeText,
       expiryTime: expiryTime,
       multipleSelectNum: multipleSelectNum,
-      multipleSelectState: multipleSelectState,
+      multipleSelectState: multipleSelectState?.value,
       pollOptions: pollOptions?.map((e) => e.toPollOption()).toList(),
       pollAnswerText: pollAnswerText,
       isPollSubmitted: isPollSubmitted,
@@ -27,12 +27,13 @@ extension PollViewDataConvertor on Poll {
     LMChatPollViewDataBuilder builder = LMChatPollViewDataBuilder()
       ..isAnonymous(isAnonymous)
       ..allowAddOption(allowAddOption)
-      ..pollType(pollType)
+      ..pollType(LMChatPollType.fromValue(pollType))
       ..pollTypeText(pollTypeText)
       ..submitTypeText(submitTypeText)
       ..expiryTime(expiryTime)
       ..multipleSelectNum(multipleSelectNum)
-      ..multipleSelectState(multipleSelectState)
+      ..multipleSelectState(
+          LMChatPollMultiSelectState.fromValue(multipleSelectState))
       ..pollOptions(pollOptions?.map((e) => e.toPollOptionViewData()).toList())
       ..pollAnswerText(pollAnswerText)
       ..isPollSubmitted(isPollSubmitted)

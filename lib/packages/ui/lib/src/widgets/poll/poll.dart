@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/poll/poll_enum.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/poll/poll_style.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
 
@@ -16,12 +14,30 @@ class _PollTestScreenState extends State<PollTestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Poll Test'),
+        title: const Text('Poll Test'),
       ),
       body: Center(
-        child: Container(
+        child: SizedBox(
           height: 50.h,
-          child: LMChatPoll(),
+          child: LMChatPoll(
+            pollData: (LMChatConversationViewDataBuilder()
+                  ..answer("This is a poll conversation")
+                  ..createdAt(DateTime.now().toIso8601String())
+                  ..id(1)
+                  ..pollAnswerText("Poll Answer Text")
+                  ..expiryTime(DateTime.now().millisecondsSinceEpoch)
+                  ..multipleSelectState(LMChatPollMultiSelectState.atLeast)
+                  ..multipleSelectNo(2)
+                  ..poll([
+                    (LMChatPollOptionViewDataBuilder()..text("Option 1"))
+                        .build(),
+                    (LMChatPollOptionViewDataBuilder()..text("Option 2"))
+                        .build(),
+                    (LMChatPollOptionViewDataBuilder()..text("Option 3"))
+                        .build(),
+                  ]))
+                .build(),
+          ),
         ),
       ),
     );
@@ -32,7 +48,7 @@ class _PollTestScreenState extends State<PollTestScreen> {
 class LMChatPoll extends StatefulWidget {
   LMChatPoll({
     super.key,
-    this.pollData,
+    required this.pollData,
     this.rebuildPollWidget,
     this.onEditVote,
     this.style = const LMChatPollStyle(),
@@ -64,7 +80,7 @@ class LMChatPoll extends StatefulWidget {
   final ValueNotifier<bool>? rebuildPollWidget;
 
   /// [LMChatPollViewData] to be displayed in the poll
-  final LMChatPollViewData? pollData;
+  final LMChatConversationViewData pollData;
 
   /// Callback when the edit vote button is clicked
   final Function(LMChatPollViewData)? onEditVote;
@@ -144,7 +160,7 @@ class LMChatPoll extends StatefulWidget {
 
   LMChatPoll copyWith({
     ValueNotifier<bool>? rebuildPollWidget,
-    LMChatPollViewData? pollData,
+    LMChatConversationViewData? pollData,
     Function(LMChatPollViewData)? onEditVote,
     LMChatPollStyle? style,
     void Function(LMChatPollViewData)? onOptionSelect,
@@ -175,12 +191,12 @@ class LMChatPoll extends StatefulWidget {
       pollData: pollData ?? this.pollData,
       onEditVote: onEditVote ?? this.onEditVote,
       style: style ?? this.style,
-      // onOptionSelect: onOptionSelect ?? this.onOptionSelect,
+      onOptionSelect: onOptionSelect ?? this.onOptionSelect,
       showSubmitButton: showSubmitButton ?? this.showSubmitButton,
       showAddOptionButton: showAddOptionButton ?? this.showAddOptionButton,
       showEditVoteButton: showEditVoteButton ?? this.showEditVoteButton,
       isVoteEditing: isVoteEditing ?? this.isVoteEditing,
-      // showTick: showTick ?? this.showTick,
+      showTick: showTick ?? this.showTick,
       timeLeft: timeLeft ?? this.timeLeft,
       onAddOptionSubmit: onAddOptionSubmit ?? this.onAddOptionSubmit,
       onVoteClick: onVoteClick ?? this.onVoteClick,
@@ -216,16 +232,14 @@ class _LMChatPollState extends State<LMChatPoll> {
   bool _isVoteEditing = false;
 
   void _setPollData() {
-    // pollQuestion = widget.pollData.pollQuestion ?? '';
-    // pollOptions = widget.pollData.options?.map((e) => e.text).toList() ??
-    //     widget.pollData.pollOptions ??
-    //     [];
-    // expiryTime = DateTime.fromMillisecondsSinceEpoch(
-    //         widget.pollData.expiryTime ?? 0)
-    //     .toString();
-    // multiSelectNo = widget.pollData.multiSelectNo ?? 0;
-    // multiSelectState =
-    //     widget.pollData.multiSelectState ?? LMChatPollMultiSelectState.exactly;
+    pollQuestion = 'This is a poll';
+    pollOptions = widget.pollData.poll?.map((e) => e.text).toList() ?? [];
+    expiryTime =
+        DateTime.fromMillisecondsSinceEpoch(widget.pollData.expiryTime ?? 0)
+            .toString();
+    multiSelectNo = widget.pollData.multipleSelectNo ?? 0;
+    multiSelectState = widget.pollData.multipleSelectState ??
+        LMChatPollMultiSelectState.exactly;
     _isVoteEditing = widget.isVoteEditing;
   }
 
@@ -317,7 +331,7 @@ class _LMChatPollState extends State<LMChatPoll> {
   Row _defSubText() {
     return Row(
       children: [
-        LMChatText("widget.pollData.pollAnswerText ?? ''",
+        LMChatText(widget.pollData?.pollAnswerText ?? '',
             onTap: widget.onSubtextTap,
             style: _lmChatPollStyle.pollAnswerStyle ??
                 LMChatTextStyle(
@@ -585,28 +599,27 @@ class _LMChatPollState extends State<LMChatPoll> {
           },
           child: Stack(
             children: [
-              // if (widget.pollData.toShowResult != null &&
-              //     widget.pollData.toShowResult! &&
-              //     !_isVoteEditing &&
-              //     !_lmChatPollStyle.isComposable)
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: LinearProgressIndicator(
-                    //Here you pass the percentage
-                    value: 60 / 100,
-                    // widget.pollData.options![index].percentage / 100,
-                    color: theme.primaryColor,
-                    // widget.pollData.options![index].isSelected
-                    //     ? _lmChatPollStyle
-                    //         .pollOptionStyle?.pollOptionSelectedColor
-                    //     : _lmChatPollStyle
-                    //         .pollOptionStyle?.pollOptionOtherColor,
-                    backgroundColor: theme.container,
-                    borderRadius: BorderRadius.circular(8),
+              if (widget.pollData.toShowResults != null &&
+                  widget.pollData.toShowResults! &&
+                  !_isVoteEditing &&
+                  !_lmChatPollStyle.isComposable)
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: LinearProgressIndicator(
+                      //Here you pass the percentage
+                      value: 60 / 100,
+                      // widget.pollData.options![index].percentage / 100,
+                      color: widget.pollData.poll?[index].isSelected ?? false
+                          ? _lmChatPollStyle
+                              .pollOptionStyle?.pollOptionSelectedColor
+                          : _lmChatPollStyle
+                              .pollOptionStyle?.pollOptionOtherColor,
+                      backgroundColor: theme.container,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
-              ),
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(vertical: 8),
@@ -692,13 +705,11 @@ class _LMChatPollState extends State<LMChatPoll> {
                     //     (widget.showTick != null &&
                     //         widget.showTick!(widget.pollData.options![index])))
                     Padding(
-                      padding:
-                          // widget.pollData.allowAddOption ??
-                          false
-                              ? const EdgeInsets.only(
-                                  top: 5,
-                                )
-                              : EdgeInsets.zero,
+                      padding: widget.pollData.allowAddOption ?? false
+                          ? const EdgeInsets.only(
+                              top: 5,
+                            )
+                          : EdgeInsets.zero,
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: LMChatIcon(
