@@ -120,6 +120,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         Expanded(
           child: _defaultExploreBlocConsumer(),
         ),
+        SizedBox(height: 2.h),
       ],
     );
   }

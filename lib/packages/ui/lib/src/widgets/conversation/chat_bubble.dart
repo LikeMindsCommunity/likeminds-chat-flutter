@@ -85,6 +85,16 @@ class LMChatBubble extends StatefulWidget {
   final Widget Function(BuildContext context, LMChatText text)?
       deletedTextBuilder;
 
+  /// bool to check whether a message is a DM message
+  final bool? isDM;
+
+  /// The media builder.
+  final Widget Function(
+    BuildContext context,
+    List<LMChatAttachmentViewData>? attachments,
+    LMChatBubbleMedia media,
+  )? mediaBuilder;
+
   /// The Link Preview widget builder.
   final Widget Function(
           LMChatOGTagsViewData ogTags, LMChatLinkPreview oldLinkPreviewWidget)?
@@ -107,6 +117,7 @@ class LMChatBubble extends StatefulWidget {
     this.isSent,
     this.deletedText,
     this.isSelected = false,
+    this.isDM,
     this.onTap,
     this.onMediaTap,
     this.onLongPress,
@@ -114,6 +125,7 @@ class LMChatBubble extends StatefulWidget {
     this.headerBuilder,
     this.footerBuilder,
     this.deletedTextBuilder,
+    this.mediaBuilder,
     this.linkPreviewBuilder,
   });
 
@@ -140,6 +152,11 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(BuildContext context, LMChatBubbleFooter footer)?
         footerBuilder,
     Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
+    Widget Function(
+      BuildContext context,
+      List<LMChatAttachmentViewData>? attachments,
+      LMChatBubbleMedia media,
+    )? mediaBuilder,
     Widget Function(LMChatOGTagsViewData ogTags,
             LMChatLinkPreview oldLinkPreviewWidget)?
         linkPreviewBuilder,
@@ -162,6 +179,7 @@ class LMChatBubble extends StatefulWidget {
       headerBuilder: headerBuilder ?? this.headerBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
+      mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
     );
   }
@@ -203,11 +221,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   @override
   Widget build(BuildContext context) {
+    double finalWidth = calculateFinalWidth();
+
     final inStyle = widget.style ?? LMChatTheme.theme.bubbleStyle;
     return Swipeable(
       dismissThresholds: const {SwipeDirection.startToEnd: 0.0},
       movementDuration: const Duration(milliseconds: 50),
-      key: GlobalObjectKey(conversation.id),
+      key: ObjectKey(conversation.id),
       onSwipe: (direction) {
         if (widget.onReply != null &&
             widget.conversation.deletedByUserId == null) {
@@ -319,7 +339,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ) ??
                                 _defLinkPreviewWidget(conversation.ogTags!),
                           if (conversation.replyConversationObject != null &&
-                              conversation.deletedByUserId == null)
+                              conversation.deletedByUserId == null) ...[
                             LMChatBubbleReply(
                               replyToConversation:
                                   conversation.replyConversationObject!,
@@ -341,6 +361,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 4),
+                          ],
                           AbsorbPointer(
                             absorbing: _isSelected,
                             child: GestureDetector(
@@ -368,21 +390,37 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               : widget.contentBuilder?.call(
                                     context,
                                     LMChatBubbleContent(
-                                      conversation: conversation,
+                                      conversation:
+                                          widget.attachments?.first.type ==
+                                                  "gif"
+                                              ? conversation.copyWith(
+                                                  answer: _getGIFText())
+                                              : conversation,
                                       onTagTap: widget.onTagTap,
                                     ),
                                   ) ??
                                   LMChatBubbleContent(
-                                    conversation: conversation,
+                                    conversation:
+                                        widget.attachments?.first.type == "gif"
+                                            ? conversation.copyWith(
+                                                answer: _getGIFText())
+                                            : conversation,
                                     onTagTap: widget.onTagTap,
                                   ),
                           if (conversation.deletedByUserId == null &&
                               inStyle.showFooter == true)
                             Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child: LMChatBubbleFooter(
-                                conversation: conversation,
-                              ),
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: widget.footerBuilder?.call(
+                                    context,
+                                    LMChatBubbleFooter(
+                                        conversation: conversation,
+                                        textWidth: finalWidth),
+                                  ) ??
+                                  LMChatBubbleFooter(
+                                    conversation: conversation,
+                                    textWidth: finalWidth,
+                                  ),
                             ),
                         ],
                       ),
@@ -434,27 +472,114 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             : "This message was deleted"
         : "This message was deleted by a community manager";
   }
+
+  String _getGIFText() {
+    String gifText = conversation.answer;
+    const String gifMessageIndicator =
+        "* This is a gif message. Please update your app *";
+
+    if (gifText.endsWith(gifMessageIndicator)) {
+      gifText = gifText
+          .substring(0, gifText.length - gifMessageIndicator.length)
+          .trim();
+    }
+
+    return gifText;
+  }
+
+  double calculateFinalWidth() {
+    // Measure the text width
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: widget.conversation.answer
+            .split('\n')
+            .first, // Only take the first line
+        style: const TextStyle(fontSize: 14), // Use the appropriate style
+      ),
+      maxLines: 1, // Limit to one line
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    double textWidth = textPainter.width;
+
+    // Determine the width to use
+    if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
+        conversation.replyId != null) {
+      return 60.w; // Full width if media or reply is present
+    }
+
+    if (widget.isDM == true) {
+      return textWidth; // Only consider text width for DM
+    } else {
+      // Measure the header width if a header is present and not a DM
+      final headerPainter = TextPainter(
+        text: TextSpan(
+          text: conversationUser.name,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ), // Use the appropriate style
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      );
+      headerPainter.layout();
+      double headerWidth =
+          conversation.memberId == currentUser.id ? 0 : headerPainter.width;
+
+      return textWidth > headerWidth ? textWidth : headerWidth;
+    }
+  }
 }
 
+/// {@template lm_chat_bubble_style}
+/// Style configuration for the chat bubble.
+/// {@endtemplate}
 class LMChatBubbleStyle {
+  /// The width of the chat bubble.
   final double? width;
+
+  /// The height of the chat bubble.
   final double? height;
+
+  /// The width of the border.
   final double? borderWidth;
+
+  /// The radius of the border.
   final double? borderRadiusNum;
+
+  /// The border radius.
   final BorderRadius? borderRadius;
 
+  /// The color of the border.
   final Color? borderColor;
+
+  /// The background color of the chat bubble.
   final Color? backgroundColor;
+
+  /// The color of the sent message.
   final Color? sentColor;
+
+  /// The color when the chat bubble is selected.
   final Color? selectedColor;
 
+  /// Whether to show action buttons.
   final bool? showActions;
+
+  /// Whether to show the header.
   final bool? showHeader;
+
+  /// Whether to show the footer.
   final bool? showFooter;
+
+  /// Whether to show the sides.
   final bool? showSides;
+
+  /// Whether to show the avatar.
   final bool? showAvatar;
   final LMChatLinkPreviewStyle? linkPreviewStyle;
 
+  /// {@macro lm_chat_bubble_style}
   LMChatBubbleStyle({
     this.backgroundColor,
     this.borderColor,
@@ -473,6 +598,7 @@ class LMChatBubbleStyle {
     this.linkPreviewStyle,
   });
 
+  /// Creates a copy of the current style with optional new values.
   LMChatBubbleStyle copyWith({
     double? width,
     double? height,
@@ -509,6 +635,7 @@ class LMChatBubbleStyle {
     );
   }
 
+  /// Creates a basic style with default values.
   factory LMChatBubbleStyle.basic() {
     return LMChatBubbleStyle(
       backgroundColor: LMChatDefaultTheme.container,

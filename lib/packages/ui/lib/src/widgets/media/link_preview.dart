@@ -28,7 +28,7 @@ class LMChatLinkPreview extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// The builder function for the image widget in the link preview.
-  final LMChatImageBuilder? imageBuilder;
+  final Widget Function(BuildContext, LMChatImage)? imageBuilder;
 
   /// The builder function for the title widget in the link preview.
   final LMChatTextBuilder? titleBuilder;
@@ -43,7 +43,7 @@ class LMChatLinkPreview extends StatelessWidget {
   LMChatLinkPreview copyWith({
     LMChatOGTagsViewData? ogTags,
     VoidCallback? onTap,
-    LMChatImageBuilder? imageBuilder,
+    Widget Function(BuildContext, LMChatImage)? imageBuilder,
     LMChatTextBuilder? titleBuilder,
     LMChatTextBuilder? subtitleBuilder,
     LMChatLinkPreviewStyle? style,

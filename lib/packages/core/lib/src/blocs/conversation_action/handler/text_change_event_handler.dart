@@ -6,11 +6,15 @@ _textChangeEventHandler(LMChatConversationTextChangeEvent event, emit) async {
   if (text.isNotEmpty) {
     final (ogTags, link) =
         await _extractOgTagFromText(text, previousLink, emit);
+    debugPrint('ogTags: $ogTags');
     if (ogTags != null && link != null) {
       emit(LMChatLinkAttachedState(
         ogTags: ogTags,
         link: link,
       ));
+    } else if (link != null && previousLink == link) {
+      // if the link is the same as the previous link, do nothing
+      return;
     }
   } else if (previousLink.isNotEmpty) {
     emit(LMChatLinkRemovedState());
@@ -25,7 +29,8 @@ Future<(LMChatOGTagsViewData?, String?)> _extractOgTagFromText(
   String link = LMChatTaggingHelper.getFirstValidLinkFromString(text);
   if (link.isNotEmpty) {
     if (previousLink == link) {
-      return (null, null);
+      // if the link is the same as the previous link, do nothing
+      return (null, previousLink);
     }
     DecodeUrlRequest request = (DecodeUrlRequestBuilder()..url(link)).build();
     LMResponse<DecodeUrlResponse> response =
@@ -42,7 +47,9 @@ Future<(LMChatOGTagsViewData?, String?)> _extractOgTagFromText(
     }
   }
   // if no link is found, remove the previous link
-  emit(LMChatLinkRemovedState());
+  if(previousLink.isNotEmpty) {
+    emit(LMChatLinkRemovedState());
+  }
 
   return (null, null);
 }

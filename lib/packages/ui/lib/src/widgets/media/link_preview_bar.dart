@@ -33,7 +33,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// The builder function for the leading widget in the link preview bar.
-  final LMChatImageBuilder? leadingBuilder;
+  final Widget Function(BuildContext, LMChatImage)? leadingBuilder;
 
   /// The builder function for the title widget in the link preview bar.
   final LMChatTextBuilder? titleBuilder;
@@ -56,7 +56,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
     LMChatOGTagsViewData? ogTags,
     VoidCallback? onCanceled,
     VoidCallback? onTap,
-    LMChatImageBuilder? leadingBuilder,
+    Widget Function(BuildContext, LMChatImage)? leadingBuilder,
     LMChatTextBuilder? titleBuilder,
     LMChatTextBuilder? subtitleBuilder,
     LMChatTextBuilder? linkTextBuilder,

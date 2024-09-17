@@ -16,8 +16,8 @@ class LMChatDocumentShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = this.style ?? LMChatDocumentShimmerStyle.basic();
     return Container(
-      height: style.height,
-      width: style.width,
+      height: style.height ?? 80, // Default height
+      width: style.width ?? 60.w, // Default width
       margin: style.margin,
       decoration: BoxDecoration(
         border: Border.all(
@@ -34,8 +34,8 @@ class LMChatDocumentShimmer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
-              height: style.iconSize,
-              width: style.iconSize,
+              height: style.iconSize ?? 40, // Default icon size
+              width: style.iconSize ?? 40, // Default icon size
               color: LMChatTheme.theme.container,
             ),
             kHorizontalPaddingLarge,
@@ -44,8 +44,8 @@ class LMChatDocumentShimmer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: style.titleHeight,
-                  width: style.titleWidth,
+                  height: style.titleHeight ?? 16, // Default title height
+                  width: style.titleWidth ?? 120, // Default title width
                   color: LMChatTheme.theme.container,
                 ),
                 kVerticalPaddingMedium,
@@ -53,8 +53,10 @@ class LMChatDocumentShimmer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      height: style.subtitleHeight,
-                      width: style.subtitleWidth,
+                      height:
+                          style.subtitleHeight ?? 12, // Default subtitle height
+                      width:
+                          style.subtitleWidth ?? 60, // Default subtitle width
                       color: LMChatTheme.theme.container,
                     ),
                     kHorizontalPaddingXSmall,
@@ -147,8 +149,6 @@ class LMChatDocumentShimmerStyle {
   /// Creates a basic LMChatDocumentShimmerStyle with default values.
   factory LMChatDocumentShimmerStyle.basic() {
     return LMChatDocumentShimmerStyle(
-      height: 78,
-      width: 60.w,
       margin: const EdgeInsets.only(bottom: 10),
       borderRadius: BorderRadius.circular(kBorderRadiusMedium),
       borderColor: LMChatDefaultTheme.greyColor,
@@ -156,11 +156,6 @@ class LMChatDocumentShimmerStyle {
       padding: const EdgeInsets.all(kPaddingLarge),
       baseColor: Colors.black26,
       highlightColor: Colors.black12,
-      iconSize: 10.w,
-      titleHeight: 8,
-      titleWidth: 30.w,
-      subtitleHeight: 6,
-      subtitleWidth: 10.w,
     );
   }
 

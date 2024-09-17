@@ -7,7 +7,7 @@ import 'package:path/path.dart';
 /// {@endtemplate}
 class LMChatDocumentPreview extends StatefulWidget {
   /// The list of documents to display.
-  final List<LMChatMediaModel> mediaList;
+  final LMChatMediaModel media;
 
   /// The style for the document preview.
   final LMChatDocumentPreviewStyle? style;
@@ -15,9 +15,20 @@ class LMChatDocumentPreview extends StatefulWidget {
   ///{@macro lm_chat_document_preview}
   const LMChatDocumentPreview({
     Key? key,
-    required this.mediaList,
+    required this.media,
     this.style,
   }) : super(key: key);
+
+  /// Creates a copy of this [LMChatDocumentPreview] but with the given fields replaced with the new values.
+  LMChatDocumentPreview copyWith({
+    LMChatMediaModel? media,
+    LMChatDocumentPreviewStyle? style,
+  }) {
+    return LMChatDocumentPreview(
+      media: media ?? this.media,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   State<LMChatDocumentPreview> createState() => _LMChatDocumentPreviewState();
@@ -26,113 +37,92 @@ class LMChatDocumentPreview extends StatefulWidget {
 /// The state for the DocumentFactory widget.
 class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
   /// The list of documents to display.
-  List<LMChatMediaModel>? mediaList;
-
-  /// A notifier that triggers a rebuild of the widget.
-  ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
+  LMChatMediaModel? media;
 
   /// The result of the document preview.
   String? result;
 
-  /// The current position in the list of documents.
-  int currPosition = 0;
-
-  /// Checks if there are multiple attachments.
-  bool checkIfMultipleAttachments() {
-    return mediaList!.length > 1;
-  }
-
-  @override
-  void dispose() {
-    rebuildCurr.dispose();
-    super.dispose();
-  }
-
   @override
   void initState() {
     super.initState();
-    mediaList = widget.mediaList;
+    media = widget.media;
+  }
+
+  @override
+  void didUpdateWidget(covariant LMChatDocumentPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    media = widget.media;
   }
 
   @override
   Widget build(BuildContext context) {
     final style = widget.style ?? LMChatDocumentPreviewStyle.basic();
-    return ValueListenableBuilder(
-      valueListenable: rebuildCurr,
-      builder: (context, _, __) {
-        return Column(
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: style.maxWidth ?? 100.w,
-                maxHeight: style.maxHeight ?? 60.h,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: style.backgroundColor,
-                  borderRadius: style.borderRadius,
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              color: style.backgroundColor,
+              borderRadius: style.borderRadius,
+            ),
+            clipBehavior: Clip.hardEdge,
+            padding: style.padding,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  child: LMChatDocumentThumbnail(
+                    media: media!,
+                    style: style.thumbnailStyle,
+                  ),
                 ),
-                padding: style.padding,
-                child: Column(
+                kVerticalPaddingXLarge,
+                Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Expanded(
-                      child: LMChatDocumentThumbnail(
-                        media: mediaList![currPosition],
-                        style: style.thumbnailStyle,
-                      ),
-                    ),
-                    kVerticalPaddingXLarge,
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        kVerticalPaddingSmall,
-                        SizedBox(
-                          width: 80.w,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Column(
-                                children: [
-                                  LMChatText(
-                                    basenameWithoutExtension(
-                                        mediaList![currPosition]
-                                            .mediaFile!
-                                            .path),
-                                    style: style.fileNameStyle ??
-                                        const LMChatTextStyle(
-                                          maxLines: 1,
-                                          textAlign: TextAlign.right,
-                                          textStyle: TextStyle(
-                                            fontSize: 14,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                  ),
-                                  LMChatText(
-                                    '${mediaList![currPosition].pageCount ?? ''} ${mediaList![currPosition].pageCount == null ? '' : (mediaList![currPosition].pageCount ?? 0) > 1 ? 'pages' : 'page'} ${mediaList![currPosition].pageCount == null ? '' : '·'} ${getFileSizeString(bytes: mediaList![currPosition].size!)} · PDF',
-                                    style: LMChatTextStyle(
+                    kVerticalPaddingSmall,
+                    SizedBox(
+                      width: 80.w,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Column(
+                            children: [
+                              LMChatText(
+                                basenameWithoutExtension(
+                                    media!.mediaFile!.path),
+                                style: style.fileNameStyle ??
+                                    const LMChatTextStyle(
+                                      maxLines: 1,
+                                      textAlign: TextAlign.right,
                                       textStyle: TextStyle(
-                                        color: LMChatTheme.theme.onContainer,
+                                        fontSize: 14,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
+                              ),
+                              LMChatText(
+                                '${media!.pageCount ?? ''} ${media!.pageCount == null ? '' : (media!.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${media!.pageCount == null ? '' : '·'} ${getFileSizeString(bytes: media!.size!)} · PDF',
+                                style: LMChatTextStyle(
+                                  textStyle: TextStyle(
+                                    color: LMChatTheme.theme.onContainer,
                                   ),
-                                ],
-                              )
+                                ),
+                              ),
                             ],
-                          ),
-                        ),
-                      ],
+                          )
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -275,8 +265,6 @@ class LMChatDocumentPreviewStyle {
   /// Creates a basic LMChatDocumentPreviewStyle with default values.
   factory LMChatDocumentPreviewStyle.basic() {
     return LMChatDocumentPreviewStyle(
-      maxWidth: 100.w,
-      maxHeight: 60.h,
       backgroundColor: Colors.white,
       borderRadius: BorderRadius.circular(8),
       padding: const EdgeInsets.all(16),
@@ -345,13 +333,6 @@ class LMChatDocumentTilePreviewStyle {
       backgroundColor: Colors.white,
       borderRadius: BorderRadius.circular(8),
       padding: const EdgeInsets.all(8),
-      moreButtonStyle: LMChatTextStyle(
-        textStyle: TextStyle(
-          color: LMChatTheme.theme.secondaryColor,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:gif/gif.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
+///{@template lm_chat_gif}
 /// A widget to display and control GIF animations in the LMChat UI.
+/// The [media] parameter is required and contains the GIF data.
+/// {@endtemplate}
 class LMChatGIF extends StatefulWidget {
-  /// Creates an LMChatGIF widget.
-  ///
-  /// The [media] parameter is required and contains the GIF data.
+  /// {@macro lm_chat_gif}
   const LMChatGIF({
     super.key,
     required this.media,
@@ -14,8 +15,30 @@ class LMChatGIF extends StatefulWidget {
     this.duration,
     this.overlay,
     this.style,
+    this.autoplay,
   }) : assert((duration == null) || (fps == null),
             'Either duration or fps must be provided, but not both.');
+
+  /// Creates a copy of this [LMChatGIF] but with the given fields replaced with the new values.
+  ///
+  /// If the new values are null, then the old values are used.
+  LMChatGIF copyWith({
+    LMChatMediaModel? media,
+    int? fps,
+    Duration? duration,
+    Widget? overlay,
+    LMChatGIFStyle? style,
+    bool? autoplay,
+  }) {
+    return LMChatGIF(
+      media: media ?? this.media,
+      fps: fps ?? this.fps,
+      duration: duration ?? this.duration,
+      overlay: overlay ?? this.overlay,
+      style: style ?? this.style,
+      autoplay: autoplay ?? this.autoplay,
+    );
+  }
 
   /// The media model containing the GIF data.
   final LMChatMediaModel media;
@@ -32,6 +55,9 @@ class LMChatGIF extends StatefulWidget {
   /// The style configuration for the GIF widget.
   final LMChatGIFStyle? style;
 
+  /// The bool to control whether GIF autoplays or not
+  final bool? autoplay;
+
   @override
   State<LMChatGIF> createState() => _LMChatGIFState();
 }
@@ -39,20 +65,25 @@ class LMChatGIF extends StatefulWidget {
 class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
   late GifController _controller;
   late ImageProvider<Object> imageProvider;
-  bool _isPlaying = false;
+  bool _isGIFPlaying = false; // Renamed for clarity
 
   @override
   void initState() {
     super.initState();
     _controller = GifController(vsync: this);
+    _isGIFPlaying = widget.autoplay ?? false;
     _initializeImageProvider();
   }
 
   void _initializeImageProvider() {
     if (widget.media.mediaUrl != null) {
       imageProvider = NetworkImage(widget.media.mediaUrl!);
-    } else {
+    } else if (widget.media.mediaFile != null) {
       imageProvider = FileImage(widget.media.mediaFile!);
+    } else {
+      // Handle error case if both are null
+      debugPrint('Error: No media URL or file provided.');
+      return;
     }
   }
 
@@ -62,14 +93,14 @@ class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
     if (widget.media != oldWidget.media) {
       _initializeImageProvider();
       _controller.reset();
-      _isPlaying = false;
+      _isGIFPlaying = false;
     }
   }
 
   @override
   void deactivate() {
     _controller.stop();
-    _isPlaying = false;
+    _isGIFPlaying = false;
     super.deactivate();
   }
 
@@ -81,12 +112,12 @@ class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
 
   void _togglePlayPause() {
     setState(() {
-      if (_isPlaying) {
+      if (_isGIFPlaying) {
         _controller.stop();
       } else {
         _controller.repeat();
       }
-      _isPlaying = !_isPlaying;
+      _isGIFPlaying = !_isGIFPlaying;
     });
   }
 
@@ -107,21 +138,20 @@ class _LMChatGIFState extends State<LMChatGIF> with TickerProviderStateMixin {
               Gif(
                 image: imageProvider,
                 controller: _controller,
-                autostart: Autostart.no,
+                autostart:
+                    widget.autoplay ?? false ? Autostart.loop : Autostart.no,
                 duration: widget.duration,
                 fps: widget.fps,
                 fit: style.fit ?? BoxFit.cover,
-                placeholder: (context) => Image(
-                  image: imageProvider,
-                  fit: style.fit ?? BoxFit.cover,
+                placeholder: (context) => LMChatMediaShimmerWidget(
+                  width: style.width,
                 ),
                 onFetchCompleted: () {
                   // Do nothing on fetch complete to keep the first frame
                 },
               ),
-              AnimatedOpacity(
-                opacity: _isPlaying ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 100),
+              Visibility(
+                visible: !_isGIFPlaying,
                 child: Container(
                   height: style.overlaySize ?? 42,
                   width: style.overlaySize ?? 42,
