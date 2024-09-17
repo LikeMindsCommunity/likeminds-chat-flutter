@@ -35,6 +35,23 @@ class LMChatDocumentTile extends StatefulWidget {
     this.documentIcon,
   });
 
+  /// Creates a copy of this widget with the given parameters replaced.
+  LMChatDocumentTile copyWith({
+    LMChatMediaModel? media,
+    Widget? title,
+    Widget? subtitle,
+    Widget? documentIcon,
+    LMChatDocumentTileStyle? style,
+  }) {
+    return LMChatDocumentTile(
+      media: media ?? this.media,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      documentIcon: documentIcon ?? this.documentIcon,
+      style: style ?? this.style,
+    );
+  }
+
   @override
   State<LMChatDocumentTile> createState() => _LMChatDocumentTileState();
 }
@@ -309,4 +326,61 @@ class LMChatDocumentTileStyle {
     this.subtitleStyle,
     this.shimmerStyle,
   });
+
+  /// Creates a copy of the current style with the given parameters.
+  LMChatDocumentTileStyle copyWith({
+    double? height,
+    double? width,
+    Border? border,
+    BorderRadius? borderRadius,
+    CrossAxisAlignment? crossAxisAlignment,
+    MainAxisAlignment? mainAxisAlignment,
+    MainAxisAlignment? rowMainAxisAlignment,
+    EdgeInsets? padding,
+    Color? backgroundColor,
+    Color? iconColor,
+    LMChatIconStyle? iconStyle,
+    Color? textColor,
+    LMChatTextStyle? titleStyle,
+    LMChatTextStyle? subtitleStyle,
+    LMChatDocumentShimmerStyle? shimmerStyle,
+  }) {
+    return LMChatDocumentTileStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
+      mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
+      rowMainAxisAlignment: rowMainAxisAlignment ?? this.rowMainAxisAlignment,
+      padding: padding ?? this.padding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      iconColor: iconColor ?? this.iconColor,
+      iconStyle: iconStyle ?? this.iconStyle,
+      textColor: textColor ?? this.textColor,
+      titleStyle: titleStyle ?? this.titleStyle,
+      subtitleStyle: subtitleStyle ?? this.subtitleStyle,
+      shimmerStyle: shimmerStyle ?? this.shimmerStyle,
+    );
+  }
+
+  /// A factory constructor that returns a basic instance of [LMChatDocumentTileStyle].
+  factory LMChatDocumentTileStyle.basic() {
+    return LMChatDocumentTileStyle(
+      height: 100.0,
+      width: 100.0,
+      border: Border.all(color: Colors.grey),
+      borderRadius: BorderRadius.circular(8.0),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      rowMainAxisAlignment: MainAxisAlignment.start,
+      padding: const EdgeInsets.all(8.0),
+      backgroundColor: Colors.white,
+      iconColor: Colors.black,
+      textColor: Colors.black,
+      titleStyle: LMChatTextStyle.basic(),
+      subtitleStyle: LMChatTextStyle.basic(),
+      shimmerStyle: LMChatDocumentShimmerStyle.basic(),
+    );
+  }
 }

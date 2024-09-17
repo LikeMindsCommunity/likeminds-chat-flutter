@@ -47,14 +47,18 @@ class LMChatConversationUpdatedState extends LMChatConversationState {
   /// The updated conversation data.
   final LMChatConversationViewData conversationViewData;
 
+  final Map<String, List<LMChatAttachmentViewData>> attachments;
+
   /// Creates and returns a new instance of [LMChatConversationUpdatedState]
   LMChatConversationUpdatedState({
     required this.conversationViewData,
+    required this.attachments,
   });
 
   @override
   List<Object> get props => [
         conversationViewData,
+        attachments,
       ];
 }
 

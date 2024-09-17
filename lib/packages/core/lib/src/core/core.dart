@@ -7,6 +7,9 @@ import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
+export 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+export 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+
 /// {@template lm_chat_core}
 /// The core class of the LikeMinds Chat SDK.
 /// This class is used to initialize the chat, show the chat, and logout the user session.

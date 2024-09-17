@@ -267,90 +267,116 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   void showLeaveDialog() {
     showDialog(
-      context: context,
-      builder: (context) => LMChatDialog(
-        title: const Text("Leave chatroom"),
-        content: Text(
-          widget.chatroom.isSecret != null && widget.chatroom.isSecret!
-              ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
-              : 'Are you sure you want to leave this group?',
-        ),
-        // actionText: 'Confirm',
-        // onActionPressed: onTap,
-        actions: [
-          LMChatText(
-            'Cancel',
-            onTap: () {
-              Navigator.pop(context);
-            },
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
+        context: context,
+        builder: (context) => LMChatDialog(
+              style: LMChatDialogStyle(
+                backgroundColor: LMChatTheme.theme.container,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-          ),
-          LMChatText(
-            'Confirm',
-            onTap: () {
-              leaveChatroom();
-              Navigator.pop(context);
-            },
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+              title: LMChatText(
+                "Leave Chatroom?",
+                style: LMChatTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: LMChatTheme.theme.onContainer,
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
+              content: LMChatText(
+                widget.chatroom.isSecret != null && widget.chatroom.isSecret!
+                    ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
+                    : 'Are you sure you want to leave this group?',
+                style: const LMChatTextStyle(),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 2.0),
+                  child: LMChatText(
+                    "CANCEL",
+                    style: LMChatTextStyle(
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: LMChatTheme.theme.onContainer,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: LMChatText("CONFIRM",
+                      style: LMChatTextStyle(
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: LMChatTheme.theme.primaryColor,
+                        ),
+                      ), onTap: () {
+                    leaveChatroom();
+                    Navigator.pop(context);
+                  }),
+                ),
+              ],
+            ));
   }
 
   void showBlockDialog(ChatroomAction action) {
     showDialog(
       context: context,
       builder: (context) => LMChatDialog(
-        title: const Text("Block direct messaging"),
-        content: const Text(
-          'Are you sure you do not want to receive new messages from this user?',
+        style: LMChatDialogStyle(
+          backgroundColor: LMChatTheme.theme.container,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
-        actions: [
-          LMChatText(
-            'Cancel',
-            onTap: () {
-              Navigator.pop(context);
-            },
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-                color: Colors.black87,
-                fontWeight: FontWeight.w500,
-              ),
+        title: LMChatText(
+          "Block Direct Messaging?",
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: LMChatTheme.theme.onContainer,
             ),
           ),
-          LMChatText(
-            'Confirm',
-            onTap: () {
+        ),
+        content: const LMChatText(
+          'Are you sure you do not want to receive new messages from this user?',
+          style: LMChatTextStyle(),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+            child: LMChatText(
+              "CANCEL",
+              style: LMChatTextStyle(
+                textStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: LMChatTheme.theme.onContainer,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: LMChatText("CONFIRM",
+                style: LMChatTextStyle(
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: LMChatTheme.theme.primaryColor,
+                  ),
+                ), onTap: () {
               blockDM(action);
               Navigator.pop(context);
-            },
-            style: const LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            }),
           ),
         ],
       ),

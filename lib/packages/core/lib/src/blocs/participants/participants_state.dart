@@ -44,11 +44,14 @@ class LMChatParticipantsErrorState extends LMChatParticipantsState {
   final String errorMessage;
 
   /// [LMChatParticipantsErrorState] constructor to create an instance of [LMChatParticipantsErrorState].
-  const LMChatParticipantsErrorState(
-    {
-      required this.errorMessage,
-    }
-  );
+  const LMChatParticipantsErrorState({
+    required this.errorMessage,
+  });
   @override
   List<Object> get props => [errorMessage];
+}
+
+/// New state to indicate searching
+class LMChatParticipantsSearchingState extends LMChatParticipantsState {
+  const LMChatParticipantsSearchingState();
 }

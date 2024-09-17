@@ -1,33 +1,16 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:giphy_get/giphy_get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/credentials/credentials.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/credentials/giphy.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-
-const List<String> videoExtentions = [
-  'mp4',
-  'mov',
-  'wmv',
-  'avi',
-  'mkv',
-  'flv',
-];
-
-const List<String> photoExtentions = [
-  'jpg',
-  'jpeg',
-  'png',
-];
-
-const List<String> mediaExtentions = [
-  ...photoExtentions,
-  ...videoExtentions,
-];
 
 /// A class to manage all media picking, and accessing
 ///
@@ -144,38 +127,43 @@ class LMChatMediaHandler {
   /// Returns an [LMResponse] containing an [LMChatMediaModel] for the selected image
   /// Enforces a size limit of 5MB for the image file
   Future<LMResponse<LMChatMediaModel>> pickSingleImage() async {
-    final FilePickerResult? list = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.image,
-      compressionQuality: 0,
-    );
+    final XFile? image =
+        await ImagePicker().pickImage(source: ImageSource.camera);
     const double sizeLimit = 5;
 
-    if (list != null && list.files.isNotEmpty) {
-      for (PlatformFile image in list.files) {
-        int fileBytes = image.size;
-        double fileSize = getFileSizeInDouble(fileBytes);
-        if (fileSize > sizeLimit) {
-          return LMResponse(
-            success: false,
-            errorMessage:
-                'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-          );
-        }
-      }
-      LMChatMediaModel mediaFile;
-
-      mediaFile = LMChatMediaModel(
-          mediaType: LMChatMediaType.image,
-          mediaFile: File(list.files.first.path!),
-          meta: {
-            'file_name': list.files.first.name,
-          });
-
-      return LMResponse(success: true, data: mediaFile);
-    } else {
-      return LMResponse(success: true);
+    if (image == null) {
+      return LMResponse(
+        success: false,
+        errorMessage: 'No image selected.',
+      );
     }
+
+    final File imageFile = File(image.path);
+    final int fileSizeInBytes = await imageFile.length();
+    final ui.Image decodedImage =
+        await decodeImageFromList(await imageFile.readAsBytes());
+    final double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+
+    if (fileSizeInMB > sizeLimit) {
+      return LMResponse(
+        success: false,
+        errorMessage:
+            'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+      );
+    }
+
+    LMChatMediaModel mediaFile = LMChatMediaModel(
+        mediaType: LMChatMediaType.image,
+        height: decodedImage.height,
+        width: decodedImage.width,
+        mediaFile: File(image.path),
+        size: fileSizeInBytes ~/ 1024,
+        meta: {
+          'file_name': image.name,
+        });
+
+    addPickedMedia(mediaFile);
+    return LMResponse(success: true, data: mediaFile);
   }
 
   /// Picks multiple image files from the device storage
@@ -278,16 +266,16 @@ class LMChatMediaHandler {
                   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
             );
           }
+          attachedMedia.add(
+            LMChatMediaModel(
+              mediaType: LMChatMediaType.video,
+              mediaFile: File(file.path!),
+              meta: {
+                'file_name': file.name,
+              },
+            ),
+          );
         }
-        attachedMedia.add(
-          LMChatMediaModel(
-            mediaType: LMChatMediaType.video,
-            mediaFile: File(file.path!),
-            meta: {
-              'file_name': file.name,
-            },
-          ),
-        );
       }
 
       addPickedMedia(attachedMedia);
@@ -328,9 +316,10 @@ class LMChatMediaHandler {
                 size: pickedFile.size,
                 meta: {
                   'file_name': pickedFile.name,
+                  'size': pickedFile.size,
                 });
 
-            pickedMedia.add(documentFile);
+            addPickedMedia(documentFile);
           }
         }
 
@@ -354,13 +343,12 @@ class LMChatMediaHandler {
     try {
       GiphyGif? gif = await GiphyGet.getGif(
         context: context, //Required
-        apiKey: GIPHY_API_KEY, //Required.
+        apiKey: LMChatGiphyCredentials.apiKey, //Required.
         lang: GiphyLanguage.english, //Optional - Language for query.
         randomID: "lm-gif", // Optional - An ID/proxy for a specific user.
         tabColor:
             LMChatTheme.theme.primaryColor, // Optional- default accent color.
-        debounceTimeInMilliseconds:
-            350, // Optional- time to pause between search keystrokes
+        debounceTimeInMilliseconds: 350,
       );
 
       if (gif == null) {

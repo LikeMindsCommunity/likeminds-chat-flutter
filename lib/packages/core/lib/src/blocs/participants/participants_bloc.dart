@@ -9,13 +9,13 @@ part 'participants_event.dart';
 part 'participants_state.dart';
 part 'handler/get_participants_handler.dart';
 
-
 /// [LMChatParticipantsBloc] is responsible for handling the participants of a chat room.
 /// It extends [Bloc] and uses [LMChatParticipantsEvent] and [LMChatParticipantsState].
 /// It has a singleton instance [instance] which is used to access the bloc.
 class LMChatParticipantsBloc
     extends Bloc<LMChatParticipantsEvent, LMChatParticipantsState> {
   static LMChatParticipantsBloc? _instance;
+
   /// Singleton instance of [LMChatParticipantsBloc]
   static LMChatParticipantsBloc get instance =>
       _instance ??= LMChatParticipantsBloc._();
@@ -23,5 +23,4 @@ class LMChatParticipantsBloc
     // handle get participants event
     on<LMChatGetParticipantsEvent>(_getParticipantsEventHandler);
   }
-
 }

@@ -14,6 +14,8 @@ export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/con
 export 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
 
 /// {@template lm_chat_config}
 /// Configuration class for the Likeminds Chat SDK.
