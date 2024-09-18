@@ -16,28 +16,44 @@ class _PollTestScreenState extends State<PollTestScreen> {
       appBar: AppBar(
         title: const Text('Poll Test'),
       ),
-      body: Center(
-        child: SizedBox(
-          height: 50.h,
-          child: LMChatPoll(
-            pollData: (LMChatConversationViewDataBuilder()
-                  ..answer("This is a poll conversation")
-                  ..createdAt(DateTime.now().toIso8601String())
-                  ..id(1)
-                  ..pollAnswerText("Poll Answer Text")
-                  ..expiryTime(DateTime.now().millisecondsSinceEpoch)
-                  ..multipleSelectState(LMChatPollMultiSelectState.atLeast)
-                  ..multipleSelectNo(2)
-                  ..poll([
-                    (LMChatPollOptionViewDataBuilder()..text("Option 1"))
-                        .build(),
-                    (LMChatPollOptionViewDataBuilder()..text("Option 2"))
-                        .build(),
-                    (LMChatPollOptionViewDataBuilder()..text("Option 3"))
-                        .build(),
-                  ]))
-                .build(),
-          ),
+      body: SingleChildScrollView(
+        child: LMChatPoll(
+          pollData: (LMChatConversationViewDataBuilder()
+                ..answer("This is a poll conversation")
+                ..createdAt(DateTime.now().toIso8601String())
+                ..id(1)
+                ..pollTypeText('Instant poll')
+                ..submitTypeText("Public voting")
+                ..multipleSelectNo(2)
+                ..multipleSelectState(LMChatPollMultiSelectState.atLeast)
+                ..pollAnswerText("Poll Answer Text")
+                ..expiryTime(DateTime.now().millisecondsSinceEpoch)
+                ..multipleSelectState(LMChatPollMultiSelectState.atLeast)
+                ..multipleSelectNo(2)
+                ..allowAddOption(true)
+                ..poll([
+                  (LMChatPollOptionViewDataBuilder()
+                        ..text("Option 0")
+                        ..noVotes(0))
+                      .build(),
+                  (LMChatPollOptionViewDataBuilder()
+                        ..text("Option 1")
+                        ..noVotes(1))
+                      .build(),
+                  (LMChatPollOptionViewDataBuilder()
+                        ..text("Option 2")
+                        ..noVotes(2))
+                      .build(),
+                  (LMChatPollOptionViewDataBuilder()
+                        ..text("Option 3")
+                        ..noVotes(3))
+                      .build(),
+                  (LMChatPollOptionViewDataBuilder()
+                        ..text("Option 4")
+                        ..noVotes(4))
+                      .build(),
+                ]))
+              .build(),
         ),
       ),
     );
@@ -265,11 +281,7 @@ class _LMChatPollState extends State<LMChatPoll> {
         valueListenable: _rebuildPollWidget,
         builder: (context, value, __) {
           return Container(
-            margin: _lmChatPollStyle.margin ??
-                const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 16,
-                ),
+            margin: _lmChatPollStyle.margin ,
             padding: _lmChatPollStyle.padding ?? const EdgeInsets.all(16),
             decoration: _lmChatPollStyle.decoration?.copyWith(
                   color: _lmChatPollStyle.backgroundColor ?? theme.container,
@@ -288,6 +300,71 @@ class _LMChatPollState extends State<LMChatPoll> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    LMChatText(
+                      widget.pollData.pollTypeText ?? '',
+                      style: LMChatTextStyle(
+                        textStyle: TextStyle(
+                          height: 1.33,
+                          fontSize: 14,
+                          color: theme.inActiveColor,
+                        ),
+                      ),
+                    ),
+                    LMChatDefaultTheme.kHorizontalPaddingSmall,
+                    // separator
+                    LMChatText(
+                      '●',
+                      style: LMChatTextStyle(
+                        textStyle: TextStyle(
+                          fontSize: 6,
+                          color: theme.inActiveColor,
+                        ),
+                      ),
+                    ),
+                    LMChatDefaultTheme.kHorizontalPaddingSmall,
+                    LMChatText(
+                      widget.pollData.submitTypeText ?? '',
+                      style: LMChatTextStyle(
+                        textStyle: TextStyle(
+                          height: 1.33,
+                          fontSize: 14,
+                          color: theme.inActiveColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                LMChatDefaultTheme.kVerticalPaddingMedium,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    LMChatIcon(
+                      type: LMChatIconType.icon,
+                      icon: Icons.poll,
+                      style: LMChatIconStyle(
+                        color: theme.primaryColor,
+                        size: 28,
+                      ),
+                    ),
+                    LMChatDefaultTheme.kHorizontalPaddingSmall,
+                    LMChatText(
+                      widget.timeLeft ?? 'Ends in 8 days',
+                      style: LMChatTextStyle(
+                        borderRadius: 100,
+                        backgroundColor: theme.primaryColor,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        textStyle: TextStyle(
+                          height: 1.33,
+                          fontSize: 14,
+                          color: theme.container,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 widget.pollQuestionBuilder?.call(context) ?? _defPollQuestion(),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
                 widget.pollSelectionTextBuilder?.call(context) ??
@@ -296,6 +373,7 @@ class _LMChatPollState extends State<LMChatPoll> {
                 ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
+                    padding: EdgeInsets.zero,
                     itemCount: pollOptions.length,
                     itemBuilder: (context, index) {
                       return widget.pollOptionBuilder?.call(
@@ -304,102 +382,38 @@ class _LMChatPollState extends State<LMChatPoll> {
                           _defPollOption(index);
                     }),
                 //add and option button
-                if (widget.showAddOptionButton)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: widget.addOptionButtonBuilder?.call(context,
-                            _defAddOptionButton(context), _onAddOptionSubmit) ??
-                        _defAddOptionButton(context),
-                  ),
-
-                if (widget.showSubmitButton ||
-                    (_isVoteEditing && (widget.isMultiChoicePoll ?? false)))
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: widget.submitButtonBuilder?.call(
-                          _defSubmitButton(),
-                        ) ??
-                        _defSubmitButton(),
-                  ),
+                if (widget.pollData.allowAddOption ?? false)
+                  widget.addOptionButtonBuilder?.call(context,
+                          _defAddOptionButton(context), _onAddOptionSubmit) ??
+                      _defAddOptionButton(context),
                 widget.subTextBuilder?.call(context) ?? _defSubText(),
+                // if (widget.showSubmitButton ||
+                //     (_isVoteEditing && (widget.isMultiChoicePoll ?? false)))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: widget.submitButtonBuilder?.call(
+                        _defSubmitButton(),
+                      ) ??
+                      _defSubmitButton(),
+                ),
               ],
             ),
           );
         });
   }
 
-  Row _defSubText() {
-    return Row(
-      children: [
-        LMChatText(widget.pollData?.pollAnswerText ?? '',
-            onTap: widget.onSubtextTap,
-            style: _lmChatPollStyle.pollAnswerStyle ??
-                LMChatTextStyle(
-                  textStyle: TextStyle(
-                    height: 1.33,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: theme.primaryColor,
-                  ),
-                )),
-        LMChatDefaultTheme.kHorizontalPaddingSmall,
-        LMChatText(
-          '●',
-          style: LMChatTextStyle(
-            textStyle: TextStyle(
-              fontSize: LMChatDefaultTheme.kFontSmall,
-              color: theme.inActiveColor,
-            ),
-          ),
-        ),
-        LMChatDefaultTheme.kHorizontalPaddingSmall,
-        LMChatText(
-          widget.timeLeft ?? '',
-          style: _lmChatPollStyle.timeStampStyle ??
-              LMChatTextStyle(
-                textStyle: TextStyle(
-                  height: 1.33,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: theme.inActiveColor,
-                ),
+  LMChatText _defSubText() {
+    return LMChatText(widget.pollData.pollAnswerText ?? '',
+        onTap: widget.onSubtextTap,
+        style: _lmChatPollStyle.pollAnswerStyle ??
+            LMChatTextStyle(
+              textStyle: TextStyle(
+                height: 1.33,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: theme.primaryColor,
               ),
-        ),
-        if (widget.showEditVoteButton && !_isVoteEditing)
-          Row(
-            children: [
-              LMChatDefaultTheme.kHorizontalPaddingSmall,
-              LMChatText(
-                '●',
-                style: LMChatTextStyle(
-                  textStyle: TextStyle(
-                    fontSize: LMChatDefaultTheme.kFontSmall,
-                    color: theme.inActiveColor,
-                  ),
-                ),
-              ),
-              LMChatDefaultTheme.kHorizontalPaddingSmall,
-              LMChatText(
-                'Edit Vote',
-                onTap: () {
-                  // widget.onEditVote?.call(widget.pollData);
-                  _isVoteEditing = true;
-                  _rebuildPollWidget.value = !_rebuildPollWidget.value;
-                },
-                style: _lmChatPollStyle.editPollOptionsStyles ??
-                    LMChatTextStyle(
-                      textStyle: TextStyle(
-                        height: 1.33,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-              ),
-            ],
-          ),
-      ],
-    );
+            ));
   }
 
   LMChatButton _defAddOptionButton(BuildContext context) {
@@ -409,6 +423,12 @@ class _LMChatPollState extends State<LMChatPoll> {
         showModalBottomSheet(
           isScrollControlled: true,
           context: context,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+          ),
           builder: (context) => Padding(
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -428,18 +448,30 @@ class _LMChatPollState extends State<LMChatPoll> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: LMChatText(
-                      'Add new poll option',
-                      style: LMChatTextStyle(
-                        textStyle: TextStyle(
-                          height: 1.33,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const LMChatText(
+                        'Add new poll option',
+                        style: LMChatTextStyle(
+                          textStyle: TextStyle(
+                            height: 1.33,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
+                      LMChatButton(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: const LMChatButtonStyle(
+                          backgroundColor: Colors.transparent,
+                          icon: LMChatIcon(
+                              type: LMChatIconType.icon, icon: Icons.close),
+                        ),
+                      ),
+                    ],
                   ),
                   LMChatDefaultTheme.kVerticalPaddingSmall,
                   LMChatText(
@@ -513,12 +545,13 @@ class _LMChatPollState extends State<LMChatPoll> {
         ),
       ),
       style: LMChatButtonStyle(
+        backgroundColor: theme.container,
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         borderRadius: 8,
         border: Border.all(
-          color: theme.inActiveColor,
+          color: theme.primaryColor,
         ),
       ),
     );
@@ -559,20 +592,42 @@ class _LMChatPollState extends State<LMChatPoll> {
   }
 
   Widget _defPollSubtitle() {
-    return widget.pollSelectionText == null
-        ? const SizedBox.shrink()
-        : LMChatText(
-            widget.pollSelectionText!,
-            style: _lmChatPollStyle.pollInfoStyles ??
-                const LMChatTextStyle(
-                  textStyle: TextStyle(
-                    height: 1.33,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                  ),
-                ),
-          );
+    return LMChatText(
+      _getPollSelectionText(widget.pollData.multipleSelectState,
+              widget.pollData.multipleSelectNo) ??
+          '',
+      style: _lmChatPollStyle.pollInfoStyles ??
+          const LMChatTextStyle(
+            textStyle: TextStyle(
+              height: 1.33,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey,
+            ),
+          ),
+    );
+  }
+
+  String? _getPollSelectionText(
+      LMChatPollMultiSelectState? pollMultiSelectState,
+      int? pollMultiSelectNo) {
+    if (pollMultiSelectNo == null || pollMultiSelectState == null) {
+      return null;
+    }
+    switch (pollMultiSelectState) {
+      case LMChatPollMultiSelectState.exactly:
+        if (pollMultiSelectNo == 1) {
+          return null;
+        } else {
+          return "*Select ${pollMultiSelectState.name} $pollMultiSelectNo options.";
+        }
+      case LMChatPollMultiSelectState.atMax:
+        return "*Select ${pollMultiSelectState.name} $pollMultiSelectNo options.";
+      case LMChatPollMultiSelectState.atLeast:
+        return "*Select ${pollMultiSelectState.name} $pollMultiSelectNo options.";
+      default:
+        return null;
+    }
   }
 
   LMChatExpandableText _defPollQuestion() {
@@ -627,23 +682,25 @@ class _LMChatPollState extends State<LMChatPoll> {
                     _lmChatPollStyle.pollOptionStyle?.pollOptionDecoration ??
                         BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          // border: Border.all(
-                          //   color: (!_lmChatPollStyle.isComposable &&
-                          //               widget.pollData.toShowResult != null &&
-                          //               !_isVoteEditing &&
-                          //               widget.pollData.toShowResult! &&
-                          //               widget.pollData.options![index]
-                          //                   .isSelected) ||
-                          //           _isSelectedByUser(
-                          //               widget.pollData.options?[index]) ||
-                          //           (widget.showTick != null &&
-                          //               widget.showTick!(
-                          //                   widget.pollData.options![index]))
-                          //       ? _lmChatPollStyle.pollOptionStyle
-                          //               ?.pollOptionSelectedBorderColor ??
-                          //           theme.primaryColor
-                          //       : theme.inActiveColor,
-                          // ),
+                          border: Border.all(
+                            color: (!_lmChatPollStyle.isComposable &&
+                                    widget.pollData.toShowResults != null &&
+                                    !_isVoteEditing &&
+                                    widget.pollData.toShowResults!
+                                //     &&
+                                //     widget.pollData.poll![index]
+                                //         .isSelected) ||
+                                // _isSelectedByUser(
+                                //     widget.pollData.options?[index]) ||
+                                // (widget.showTick != null &&
+                                //     widget.showTick!(
+                                //         widget.pollData.options![index])
+                                )
+                                ? _lmChatPollStyle.pollOptionStyle
+                                        ?.pollOptionSelectedBorderColor ??
+                                    theme.primaryColor
+                                : theme.inActiveColor,
+                          ),
                         ),
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -655,11 +712,11 @@ class _LMChatPollState extends State<LMChatPoll> {
                         LMChatText(pollOptions[index],
                             style: _lmChatPollStyle
                                     .pollOptionStyle?.pollOptionTextStyle ??
-                                LMChatTextStyle(
+                                const LMChatTextStyle(
                                   maxLines: 1,
                                   textStyle: TextStyle(
                                     overflow: TextOverflow.ellipsis,
-                                    color: theme.primaryColor,
+                                    // color: theme.primaryColor,
                                     // _isSelectedByUser(widget
                                     //             .pollData.options?[index]) ||
                                     //         (widget.showTick != null &&
@@ -674,31 +731,20 @@ class _LMChatPollState extends State<LMChatPoll> {
                                     fontWeight: FontWeight.w400,
                                   ),
                                 )),
-                        // if (widget.pollData.allowAddOption ?? false)
-                        LMChatText("user",
-                            // _defAddedByMember(
-                            //     widget.pollData.options?[index].userViewData),
-                            style: LMChatTextStyle(
-                              maxLines: 1,
-                              textStyle: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                height: 1.25,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: true
-                                    // _isSelectedByUser(
-                                    //             widget.pollData.options?[index]) ||
-                                    //         (widget.showTick != null &&
-                                    //             widget.showTick!(widget
-                                    //                 .pollData.options![index]))
-                                    ? _lmChatPollStyle.pollOptionStyle
-                                            ?.pollOptionSelectedTextColor ??
-                                        theme.primaryColor
-                                    : _lmChatPollStyle.pollOptionStyle
-                                            ?.pollOptionOtherTextColor ??
-                                        theme.inActiveColor,
-                              ),
-                            )),
+                        if (widget.pollData.allowAddOption ?? false)
+                          LMChatText(
+                              _defAddedByMember(
+                                  widget.pollData.poll?[index].member),
+                              style: LMChatTextStyle(
+                                maxLines: 1,
+                                textStyle: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  height: 1.25,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: theme.inActiveColor,
+                                ),
+                              )),
                       ],
                     ),
                     // if (_isSelectedByUser(widget.pollData.options?[index]) ||
@@ -716,8 +762,8 @@ class _LMChatPollState extends State<LMChatPoll> {
                           type: LMChatIconType.icon,
                           icon: Icons.check_circle,
                           style: LMChatIconStyle(
-                            boxSize: 20,
-                            size: 20,
+                            boxSize: 24,
+                            size: 24,
                             color: _lmChatPollStyle.pollOptionStyle
                                     ?.pollOptionSelectedTickColor ??
                                 theme.primaryColor,
@@ -738,8 +784,7 @@ class _LMChatPollState extends State<LMChatPoll> {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: LMChatText(
-            "12",
-            // voteText(widget.pollData.options![index].voteCount),
+            voteText(widget.pollData.poll![index].noVotes ?? 0),
             onTap: () {
               // widget.onVoteClick?.call(widget.pollData.options![index]);
             },
@@ -785,15 +830,25 @@ class _LMChatPollState extends State<LMChatPoll> {
                   height: 1.33,
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
-                  color: theme.container,
+                  color: theme.primaryColor,
                 ),
               ),
         ),
         style: _lmChatPollStyle.submitPollButtonStyle ??
             LMChatButtonStyle(
-              backgroundColor: theme.primaryColor,
-              borderRadius: 8,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              icon: LMChatIcon(
+                type: LMChatIconType.icon,
+                icon: Icons.touch_app_outlined,
+                style: LMChatIconStyle(
+                  color: theme.primaryColor,
+                ),
+              ),
+              backgroundColor: theme.container,
+              borderRadius: 100,
+              border: Border.all(
+                color: theme.primaryColor,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             ));
   }
 }

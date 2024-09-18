@@ -298,7 +298,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     minHeight: 2.h,
                     minWidth:
                         conversation.answer.split('\n').length > 4 ? 40.w : 5.w,
-                    maxWidth: 60.w,
+                    maxWidth: 70.w,
                   ),
                   child: PhysicalShape(
                     clipper: LMChatBubbleClipper(
@@ -338,6 +338,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   _defLinkPreviewWidget(conversation.ogTags!),
                                 ) ??
                                 _defLinkPreviewWidget(conversation.ogTags!),
+                          if(conversation.state == 10)
+                            LMChatPoll(pollData: conversation),
                           if (conversation.replyConversationObject != null &&
                               conversation.deletedByUserId == null) ...[
                             LMChatBubbleReply(

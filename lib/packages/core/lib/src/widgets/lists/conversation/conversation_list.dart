@@ -380,7 +380,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       }
       List<LMChatConversationViewData>? conversationData = state
           .getConversationResponse.conversationData
-          ?.map((e) => e.toConversationViewData())
+          ?.map((e) => e.toConversationViewData(
+            conversationPollsMeta: state.getConversationResponse.conversationPollsMeta,
+          ))
           .toList();
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,

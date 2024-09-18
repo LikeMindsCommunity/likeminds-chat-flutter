@@ -1,5 +1,6 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/poll/poll_option_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/og_tag/og_tag_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -8,7 +9,9 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 /// It converts [Conversation] to [LMChatConversationViewData].
 extension ConversationViewDataConvertor on Conversation {
   /// Converts [Conversation] to [LMChatConversationViewData]
-  LMChatConversationViewData toConversationViewData() {
+  LMChatConversationViewData toConversationViewData({
+     Map<String, List<PollOption>>? conversationPollsMeta,
+  }) {
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
           ..answer(answer)
@@ -53,8 +56,13 @@ extension ConversationViewDataConvertor on Conversation {
           ..member(member?.toUserViewData())
           ..replyConversation(replyConversation)
           ..replyConversationObject(
-              replyConversationObject?.toConversationViewData())
+              replyConversationObject?.toConversationViewData(
+                  conversationPollsMeta: conversationPollsMeta))
           ..ogTags(ogTags?.toLMChatOGTagViewData())
+          ..poll(conversationPollsMeta?[id.toString()]
+                  ?.map((e) => e.toPollOptionViewData())
+                  .toList() ??
+              [])
         // ..conversationReactions(conversationReactions?.map((LMChatReactionViewData reaction) => reaction.toReactionViewData()).toList())
         // ..poll(poll?.toPollViewData())
         ;

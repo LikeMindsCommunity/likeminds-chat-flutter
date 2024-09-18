@@ -17,6 +17,10 @@ void postPollConversationHandler(
             ..memberId(user.id)
             ..header("")
             ..date("${dateTime.day} ${dateTime.month} ${dateTime.year}")
+            ..state(10)
+            ..poll(event.postPollConversationRequest.polls
+                .map((e) => e.toPollOptionViewData())
+                .toList())
             // ..replyId(pollRequest.repliedConversationId?? )
             // ..attachmentCount(event.attachmentCount)
             // ..replyConversationObject(event.repliedTo)
@@ -29,7 +33,6 @@ void postPollConversationHandler(
 
   LMResponse<PostConversationResponse> response = await LMChatCore.client
       .postPollConversation(event.postPollConversationRequest);
-  debugPrint("Poll response: ${response.data}");
   if (response.success && response.data != null) {
     Conversation conversation = response.data!.conversation!;
     conversationViewData = conversation.toConversationViewData();
