@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/services/media_service.dart';
@@ -18,6 +19,7 @@ part 'handler/fetch_conversation_handler.dart';
 part 'handler/update_conversation_handler.dart';
 part 'handler/initialise_conversations_handler.dart';
 part 'handler/local_conversation_handler.dart';
+part 'handler/post_poll_handler.dart';
 
 /// LMChatConversationBloc is the BLoC that manages conversations
 ///
@@ -57,6 +59,8 @@ class LMChatConversationBloc
     on<LMChatUpdateConversationsEvent>(updateConversationsEventHandler);
     // Handle adding of local conversation through handler
     on<LMChatLocalConversationEvent>(localConversationEventHandler);
+    // Handle posting of poll conversation through handler
+    on<LMChatPostPollConversationEvent>(postPollConversationHandler);
   }
 
   @override

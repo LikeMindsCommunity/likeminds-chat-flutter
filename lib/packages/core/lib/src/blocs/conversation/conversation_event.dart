@@ -146,3 +146,14 @@ class LMChatLocalConversationEvent extends LMChatConversationEvent {
         conversation,
       ];
 }
+
+class LMChatPostPollConversationEvent extends LMChatConversationEvent {
+  final PostPollConversationRequest postPollConversationRequest;
+
+  LMChatPostPollConversationEvent({
+    required this.postPollConversationRequest,
+  });
+
+  @override
+  List<Object> get props => [postPollConversationRequest];
+}

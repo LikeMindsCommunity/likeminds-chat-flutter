@@ -643,12 +643,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 2.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
                     Expanded(
                       child: Column(
                         children: [
@@ -690,6 +684,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
                     Expanded(
                       child: Column(
                         children: [
@@ -731,6 +731,52 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          LMChatButton(
+                            onTap: () async {
+                              _popupMenuController.hideMenu();
+                              // show bottom sheet to create a poll
+                              showBottomSheet(
+                                  context: context,
+                                  constraints: BoxConstraints(
+                                    maxHeight: 60.h,
+                                  ),
+                                  builder: (context) {
+                                    return LMChatCreatePoll(
+                                      chatroomId: widget.chatroom.id,
+                                    );
+                                  });
+                            },
+                            icon: LMChatIcon(
+                              type: LMChatIconType.icon,
+                              icon: Icons.poll_outlined,
+                              style: LMChatIconStyle(
+                                color: LMChatTheme.theme.container,
+                                size: 30,
+                                boxSize: 48,
+                                boxPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                            style: LMChatButtonStyle(
+                              height: 48,
+                              width: 48,
+                              borderRadius: 24,
+                              backgroundColor: LMChatTheme.theme.secondaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          LMChatText(
+                            'Poll',
+                            style: LMChatTextStyle(
+                              textStyle: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
                   ],
                 ),
               ],

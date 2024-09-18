@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMChatCreatePoll extends StatefulWidget {
   const LMChatCreatePoll({
     super.key,
-    // this.attachmentMeta,
+    required this.chatroomId,
+    this.repliedConversationId,
     this.appBarBuilder,
     this.pollQuestionStyle,
     this.optionStyle,
@@ -16,8 +16,8 @@ class LMChatCreatePoll extends StatefulWidget {
     this.addOptionButtonBuilder,
   });
 
-  // /// [LMAttachmentMetaViewData] to prefill the poll data
-  // final LMChatAttachmentMetaViewData? attachmentMeta;
+  final int chatroomId;
+  final String? repliedConversationId;
 
   /// [LMChatPostAppBarBuilder] Builder for app bar
   final LMChatAppBarBuilder? appBarBuilder;
@@ -177,36 +177,6 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
     }
 
     return true;
-  }
-
-  void loadInitialData() {
-    // if (widget.attachmentMeta != null) {
-    //   LMAttachmentMetaViewData attachmentMeta = widget.attachmentMeta!;
-    //   _questionController.text = attachmentMeta.pollQuestion ?? '';
-    //   options = attachmentMeta.pollOptions ?? [];
-    //   _expiryDateBuilder.value = attachmentMeta.expiryTime != null
-    //       ? DateTime.fromMillisecondsSinceEpoch(attachmentMeta.expiryTime!)
-    //       : null;
-    //   _multiSelectStateBuilder.value =
-    //       attachmentMeta.multiSelectState ?? LMChatPollMultiSelectState.exactly;
-    //   _multiSelectNoBuilder.value = attachmentMeta.multiSelectNo ?? 1;
-    //   _pollTypeBuilder.value =
-    //       attachmentMeta.pollType == LMChatPollType.deferred;
-    //   _isAnonymousBuilder.value = attachmentMeta.isAnonymous ?? false;
-    //   _allowAddOptionBuilder.value = attachmentMeta.allowAddOption ?? false;
-    // }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadInitialData();
-  }
-
-  @override
-  void didUpdateWidget(oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    loadInitialData();
   }
 
   @override
@@ -819,25 +789,36 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
     );
   }
 
-  onPollSubmit() {
+  void onPollSubmit() {
     if (validatePoll()) {
-      // LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-      //     LMAttachmentMetaViewDataBuilder()
-      //       ..pollQuestion(_questionController.text)
-      //       ..expiryTime(_expiryDateBuilder.value?.millisecondsSinceEpoch)
-      //       ..pollOptions(options)
-      //       ..multiSelectState(_multiSelectStateBuilder.value)
-      //       ..pollType(_pollTypeBuilder.value
-      //           ? LMChatPollType.deferred
-      //           : LMChatPollType.instant)
-      //       ..multiSelectNo(_multiSelectNoBuilder.value)
-      //       ..isAnonymous(_isAnonymousBuilder.value)
-      //       ..allowAddOption(_allowAddOptionBuilder.value);
+      // create poll
+      String pollQuestion = _questionController.text.trim();
+      final pollOptions =
+          options.map((option) => PollOption(text: option)).toList();
 
-      debugPrint('Poll submitted');
-      // LMChatComposeBloc.instance.add(LMChatComposeAddPollEvent(
-      //   attachmentMetaViewData: attachmentMetaViewDataBuilder.build(),
-      // ));
+      final PostPollConversationRequestBuilder requestBuilder =
+          PostPollConversationRequestBuilder()
+            ..chatroomId(widget.chatroomId)
+            ..text(pollQuestion)
+            ..state(10)
+            ..polls(pollOptions)
+            ..pollType(_pollTypeBuilder.value ? 1 : 0)
+            ..multipleSelectState(_multiSelectStateBuilder.value.index)
+            ..multipleSelectNo(_multiSelectNoBuilder.value)
+            ..isAnonymous(_isAnonymousBuilder.value)
+            ..allowAddOption(_allowAddOptionBuilder.value)
+            ..expiryTime(_expiryDateBuilder.value!.millisecondsSinceEpoch)
+            ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString());
+      if (widget.repliedConversationId != null) {
+        requestBuilder.repliedConversationId(widget.repliedConversationId!);
+      }
+
+      LMChatConversationBloc.instance.add(
+        LMChatPostPollConversationEvent(
+          postPollConversationRequest: requestBuilder.build(),
+        ),
+      );
+
       Navigator.pop(context);
     }
   }
