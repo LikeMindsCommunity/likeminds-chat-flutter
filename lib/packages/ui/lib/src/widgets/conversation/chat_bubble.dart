@@ -95,6 +95,9 @@ class LMChatBubble extends StatefulWidget {
     LMChatBubbleMedia media,
   )? mediaBuilder;
 
+  /// The function to call when a reaction is made.
+  final Function(String reaction)? onReaction;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -121,6 +124,7 @@ class LMChatBubble extends StatefulWidget {
     this.footerBuilder,
     this.deletedTextBuilder,
     this.mediaBuilder,
+    this.onReaction,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -151,6 +155,7 @@ class LMChatBubble extends StatefulWidget {
       List<LMChatAttachmentViewData>? attachments,
       LMChatBubbleMedia media,
     )? mediaBuilder,
+    Function(String reaction)? onReaction,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -171,6 +176,7 @@ class LMChatBubble extends StatefulWidget {
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
+      onReaction: onReaction ?? this.onReaction,
     );
   }
 
@@ -501,6 +507,32 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
       return textWidth > headerWidth ? textWidth : headerWidth;
     }
+  }
+
+  Widget _buildReactionBar() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _reactionButton('👍', 'like'),
+        _reactionButton('❤️', 'love'),
+        _reactionButton('😂', 'laugh'),
+        _reactionButton('😮', 'surprise'),
+        _reactionButton('😢', 'sad'),
+        _reactionButton('😡', 'angry'),
+      ],
+    );
+  }
+
+  Widget _reactionButton(String emoji, String reaction) {
+    return GestureDetector(
+      onTap: () {
+        widget.onReaction?.call(reaction);
+      },
+      child: Text(
+        emoji,
+        style: const TextStyle(fontSize: 24), // Adjust size as needed
+      ),
+    );
   }
 }
 
