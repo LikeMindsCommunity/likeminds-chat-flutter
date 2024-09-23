@@ -8,7 +8,7 @@ export 'constants/constants.dart';
 export 'helpers/tagging_helper.dart';
 export 'helpers/text_helper.dart';
 
-export 'media_provider/media_provider.dart';
+export 'conversation/conversation_utils.dart';
 
 export 'media/media_utils.dart';
 
