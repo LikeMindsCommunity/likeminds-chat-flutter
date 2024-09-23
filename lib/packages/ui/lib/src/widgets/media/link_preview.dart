@@ -72,6 +72,7 @@ class LMChatLinkPreview extends StatelessWidget {
         },
         child: Container(
           width: style?.width ?? double.infinity,
+          height: style?.height,
           decoration: style?.decoration ??
               const BoxDecoration(
                 color: Color(0x1a9b9b9b),
@@ -79,14 +80,18 @@ class LMChatLinkPreview extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (ogTags.imageUrl != null && ogTags.imageUrl!.isNotEmpty)
+              if ((ogTags.imageUrl != null && ogTags.imageUrl!.isNotEmpty) ||
+                  imageBuilder != null)
                 AbsorbPointer(
                   child:
                       imageBuilder?.call(context, _defImage()) ?? _defImage(),
                 ),
-              if (ogTags.title != null && ogTags.title!.isNotEmpty)
+              if ((ogTags.title != null && ogTags.title!.isNotEmpty) ||
+                  titleBuilder != null)
                 titleBuilder?.call(context, _defTitle()) ?? _defTitle(),
-              if (ogTags.description != null && ogTags.description!.isNotEmpty)
+              if ((ogTags.description != null &&
+                      ogTags.description!.isNotEmpty) ||
+                  subtitleBuilder != null)
                 subtitleBuilder?.call(context, _defSubTitle()) ??
                     _defSubTitle(),
             ],
