@@ -2,64 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
 
-class PollTestScreen extends StatefulWidget {
-  const PollTestScreen({super.key});
-
-  @override
-  State<PollTestScreen> createState() => _PollTestScreenState();
-}
-
-class _PollTestScreenState extends State<PollTestScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Poll Test'),
-      ),
-      body: SingleChildScrollView(
-        child: LMChatPoll(
-          pollData: (LMChatConversationViewDataBuilder()
-                ..answer("This is a poll conversation")
-                ..createdAt(DateTime.now().toIso8601String())
-                ..id(1)
-                ..pollTypeText('Instant poll')
-                ..submitTypeText("Public voting")
-                ..multipleSelectNo(2)
-                ..multipleSelectState(LMChatPollMultiSelectState.atLeast)
-                ..pollAnswerText("Poll Answer Text")
-                ..expiryTime(DateTime.now().millisecondsSinceEpoch)
-                ..multipleSelectState(LMChatPollMultiSelectState.atLeast)
-                ..multipleSelectNo(2)
-                ..allowAddOption(true)
-                ..poll([
-                  (LMChatPollOptionViewDataBuilder()
-                        ..text("Option 0")
-                        ..noVotes(0))
-                      .build(),
-                  (LMChatPollOptionViewDataBuilder()
-                        ..text("Option 1")
-                        ..noVotes(1))
-                      .build(),
-                  (LMChatPollOptionViewDataBuilder()
-                        ..text("Option 2")
-                        ..noVotes(2))
-                      .build(),
-                  (LMChatPollOptionViewDataBuilder()
-                        ..text("Option 3")
-                        ..noVotes(3))
-                      .build(),
-                  (LMChatPollOptionViewDataBuilder()
-                        ..text("Option 4")
-                        ..noVotes(4))
-                      .build(),
-                ]))
-              .build(),
-        ),
-      ),
-    );
-  }
-}
-
 // ignore: must_be_immutable
 class LMChatPoll extends StatefulWidget {
   LMChatPoll({
@@ -67,7 +9,7 @@ class LMChatPoll extends StatefulWidget {
     required this.pollData,
     this.rebuildPollWidget,
     this.onEditVote,
-    this.style = const LMChatPollStyle(),
+    this.style,
     this.onOptionSelect,
     this.showSubmitButton = false,
     this.showAddOptionButton = false,
@@ -102,7 +44,7 @@ class LMChatPoll extends StatefulWidget {
   final Function(LMChatPollViewData)? onEditVote;
 
   /// [LMChatPollStyle] Style for the poll
-  final LMChatPollStyle style;
+  final LMChatPollStyle? style;
 
   /// Callback when an option is selected
   final void Function(LMChatPollViewData)? onOptionSelect;
@@ -248,7 +190,7 @@ class _LMChatPollState extends State<LMChatPoll> {
   bool _isVoteEditing = false;
 
   void _setPollData() {
-    pollQuestion = 'This is a poll';
+    pollQuestion = widget.pollData.answer;
     pollOptions = widget.pollData.poll?.map((e) => e.text).toList() ?? [];
     expiryTime =
         DateTime.fromMillisecondsSinceEpoch(widget.pollData.expiryTime ?? 0)
@@ -262,7 +204,10 @@ class _LMChatPollState extends State<LMChatPoll> {
   @override
   void initState() {
     super.initState();
-    _lmChatPollStyle = widget.style;
+    _lmChatPollStyle = widget.style ??
+        LMChatPollStyle.basic(
+          primaryColor: theme.primaryColor,
+        );
     _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
     _setPollData();
   }
@@ -270,7 +215,10 @@ class _LMChatPollState extends State<LMChatPoll> {
   @override
   void didUpdateWidget(covariant LMChatPoll oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _lmChatPollStyle = widget.style;
+    _lmChatPollStyle = widget.style ??
+        LMChatPollStyle.basic(
+          primaryColor: theme.primaryColor,
+        );
     _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
     _setPollData();
   }
@@ -281,7 +229,7 @@ class _LMChatPollState extends State<LMChatPoll> {
         valueListenable: _rebuildPollWidget,
         builder: (context, value, __) {
           return Container(
-            margin: _lmChatPollStyle.margin ,
+            margin: _lmChatPollStyle.margin,
             padding: _lmChatPollStyle.padding ?? const EdgeInsets.all(16),
             decoration: _lmChatPollStyle.decoration?.copyWith(
                   color: _lmChatPollStyle.backgroundColor ?? theme.container,
@@ -350,7 +298,8 @@ class _LMChatPollState extends State<LMChatPoll> {
                     ),
                     LMChatDefaultTheme.kHorizontalPaddingSmall,
                     LMChatText(
-                      widget.timeLeft ?? 'Ends in 8 days',
+                      widget.timeLeft ??
+                          _getTimeLeftInPoll(widget.pollData.expiryTime),
                       style: LMChatTextStyle(
                         borderRadius: 100,
                         backgroundColor: theme.primaryColor,
@@ -402,18 +351,44 @@ class _LMChatPollState extends State<LMChatPoll> {
         });
   }
 
+  String _getTimeLeftInPoll(int? expiryTime) {
+    if (expiryTime == null) {
+      return "";
+    }
+    DateTime expiryTimeInDateTime =
+        DateTime.fromMillisecondsSinceEpoch(expiryTime);
+    DateTime now = DateTime.now();
+    Duration difference = expiryTimeInDateTime.difference(now);
+    if (difference.isNegative) {
+      return "Poll Ended";
+    }
+    if (difference.inDays > 1) {
+      return "Ends in ${difference.inDays} days";
+    } else if (difference.inDays > 0) {
+      return "Ends in ${difference.inDays} day";
+    } else if (difference.inHours > 0) {
+      return "Ends in  ${difference.inHours} hours";
+    } else if (difference.inMinutes > 0) {
+      return "Ends in  ${difference.inMinutes} minutes";
+    } else {
+      return "Just Now";
+    }
+  }
+
   LMChatText _defSubText() {
-    return LMChatText(widget.pollData.pollAnswerText ?? '',
-        onTap: widget.onSubtextTap,
-        style: _lmChatPollStyle.pollAnswerStyle ??
-            LMChatTextStyle(
-              textStyle: TextStyle(
-                height: 1.33,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: theme.primaryColor,
-              ),
-            ));
+    return LMChatText(
+      widget.pollData.pollAnswerText ?? '',
+      onTap: widget.onSubtextTap,
+      style: _lmChatPollStyle.pollAnswerStyle ??
+          LMChatTextStyle(
+            textStyle: TextStyle(
+              height: 1.33,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: theme.primaryColor,
+            ),
+          ),
+    );
   }
 
   LMChatButton _defAddOptionButton(BuildContext context) {
@@ -433,6 +408,7 @@ class _LMChatPollState extends State<LMChatPoll> {
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Container(
+              color: theme.container,
               padding: const EdgeInsets.all(16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -662,9 +638,8 @@ class _LMChatPollState extends State<LMChatPoll> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: LinearProgressIndicator(
-                      //Here you pass the percentage
-                      value: 60 / 100,
-                      // widget.pollData.options![index].percentage / 100,
+                      value:
+                          (widget.pollData.poll![index].percentage ?? 0) / 100,
                       color: widget.pollData.poll?[index].isSelected ?? false
                           ? _lmChatPollStyle
                               .pollOptionStyle?.pollOptionSelectedColor

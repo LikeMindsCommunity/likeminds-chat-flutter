@@ -737,17 +737,27 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                           LMChatButton(
                             onTap: () async {
                               _popupMenuController.hideMenu();
+                              // unfocus the text field
+                              _focusNode.unfocus();
                               // show bottom sheet to create a poll
-                              showBottomSheet(
-                                  context: context,
-                                  constraints: BoxConstraints(
-                                    maxHeight: 60.h,
-                                  ),
-                                  builder: (context) {
-                                    return LMChatCreatePoll(
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                useSafeArea: true,
+                                builder: (context) {
+                                  return DraggableScrollableSheet(
+                                    expand: false,
+                                    initialChildSize: 0.9,
+                                    minChildSize: 0.5,
+                                    snap: true,
+                                    builder: (_, controller) =>
+                                        LMChatCreatePoll(
                                       chatroomId: widget.chatroom.id,
-                                    );
-                                  });
+                                      scrollController: controller,
+                                    ),
+                                  );
+                                },
+                              );
                             },
                             icon: LMChatIcon(
                               type: LMChatIconType.icon,

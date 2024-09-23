@@ -14,6 +14,7 @@ extension ConversationViewDataConvertor on Conversation {
   }) {
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
+        ..allowAddOption(allowAddOption)
           ..answer(answer)
           ..attachmentCount(attachmentCount)
           ..attachments(
@@ -77,6 +78,7 @@ extension ConversationConvertor on LMChatConversationViewData {
   /// Converts [LMChatConversationViewData] to [Conversation]
   Conversation toConversation() {
     return Conversation(
+      allowAddOption: allowAddOption,
       answer: answer,
       attachmentsUploaded: attachmentsUploaded,
       attachmentCount: attachmentCount,

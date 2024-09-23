@@ -14,6 +14,7 @@ class LMChatCreatePoll extends StatefulWidget {
     this.advancedButtonBuilder,
     this.postButtonBuilder,
     this.addOptionButtonBuilder,
+    this.scrollController,
   });
 
   final int chatroomId;
@@ -36,6 +37,8 @@ class LMChatCreatePoll extends StatefulWidget {
 
   /// [LMChatButtonBuilder] Builder for add option button
   final LMChatButtonBuilder? addOptionButtonBuilder;
+
+  final ScrollController? scrollController;
 
   @override
   State<LMChatCreatePoll> createState() => _LMChatCreatePollState();
@@ -181,7 +184,6 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
 
   @override
   Widget build(BuildContext context) {
-    screenSize = MediaQuery.sizeOf(context);
     return Container(
       decoration: BoxDecoration(
           color: theme.backgroundColor,
@@ -199,6 +201,8 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
           _defHeader(),
           Expanded(
             child: SingleChildScrollView(
+              controller: widget.scrollController,
+              physics: const ClampingScrollPhysics(),
               child: Column(
                 children: [
                   Container(

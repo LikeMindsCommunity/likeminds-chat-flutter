@@ -26,7 +26,7 @@ class LMChatPollResultScreen extends StatefulWidget {
   final int conversationId;
   final String? pollTitle;
   final List<LMChatPollOptionViewData> pollOptions;
-  final String? selectedOptionId;
+  final int? selectedOptionId;
   // Builder for empty feed view
   final LMChatContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
