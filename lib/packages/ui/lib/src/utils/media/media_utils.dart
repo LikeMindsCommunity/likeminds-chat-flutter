@@ -48,6 +48,31 @@ Widget getChatItemAttachmentTile(
   String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
           withTilde: false) ??
       '';
+  if (conversation.ogTags != null) {
+    return  Row(
+      children: [
+        LMChatText(
+          message,
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
+        const LMChatIcon(
+          type: LMChatIconType.icon,
+          icon: Icons.link,
+          style: LMChatIconStyle(
+            color: LMChatDefaultTheme.greyColor,
+            size: 16,
+          ),
+        ),
+      ],
+    );
+  }
   if (mediaFiles.isEmpty && conversation.answer.isEmpty) {
     return const SizedBox();
   } else if (mediaFiles.isEmpty) {

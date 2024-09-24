@@ -95,6 +95,11 @@ class LMChatBubble extends StatefulWidget {
     LMChatBubbleMedia media,
   )? mediaBuilder;
 
+  /// The Link Preview widget builder.
+  final Widget Function(
+          LMChatOGTagsViewData ogTags, LMChatLinkPreview oldLinkPreviewWidget)?
+      linkPreviewBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -121,6 +126,7 @@ class LMChatBubble extends StatefulWidget {
     this.footerBuilder,
     this.deletedTextBuilder,
     this.mediaBuilder,
+    this.linkPreviewBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -151,6 +157,9 @@ class LMChatBubble extends StatefulWidget {
       List<LMChatAttachmentViewData>? attachments,
       LMChatBubbleMedia media,
     )? mediaBuilder,
+    Widget Function(LMChatOGTagsViewData ogTags,
+            LMChatLinkPreview oldLinkPreviewWidget)?
+        linkPreviewBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -171,6 +180,7 @@ class LMChatBubble extends StatefulWidget {
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
+      linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
     );
   }
 
@@ -185,7 +195,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   late LMChatUserViewData conversationUser;
   bool _isSelected = false;
   bool _isDeleted = false;
-  final LMChatThemeData theme = LMChatTheme.theme;
+  final LMChatThemeData _themeData = LMChatTheme.theme;
 
   @override
   void initState() {
@@ -294,7 +304,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                     clipper: LMChatBubbleClipper(
                       isSent: isSent,
                     ),
-                    color: inStyle.backgroundColor ?? theme.container,
+                    color: inStyle.backgroundColor ?? _themeData.container,
                     child: Padding(
                       padding: isSent
                           ? EdgeInsets.only(
@@ -321,6 +331,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 LMChatBubbleHeader(
                                   conversationUser: widget.conversationUser,
                                 ),
+                          // link preview widget
+                          if (conversation.ogTags != null)
+                            widget.linkPreviewBuilder?.call(
+                                  conversation.ogTags!,
+                                  _defLinkPreviewWidget(conversation.ogTags!),
+                                ) ??
+                                _defLinkPreviewWidget(conversation.ogTags!),
                           if (conversation.replyConversationObject != null &&
                               conversation.deletedByUserId == null) ...[
                             LMChatBubbleReply(
@@ -337,7 +354,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   maxLines: 1,
                                   textStyle: TextStyle(
                                     overflow: TextOverflow.ellipsis,
-                                    color: theme.primaryColor,
+                                    color: _themeData.primaryColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -420,6 +437,17 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     );
   }
 
+  LMChatLinkPreview _defLinkPreviewWidget(LMChatOGTagsViewData ogTags) {
+    return LMChatLinkPreview(
+      ogTags: ogTags,
+      style: widget.style?.linkPreviewStyle ??
+          LMChatLinkPreviewStyle.basic(
+            inactiveColor: _themeData.inActiveColor,
+            containerColor: _themeData.onContainer,
+          ),
+    );
+  }
+
   LMChatText _defDeletedWidget() {
     return LMChatText(
       _getDeletedText(),
@@ -476,7 +504,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
     // Determine the width to use
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
-        conversation.replyId != null) {
+        conversation.replyId != null ||
+        conversation.replyConversationObject != null ||
+        conversation.ogTags != null) {
       return 60.w; // Full width if media or reply is present
     }
 
@@ -549,6 +579,7 @@ class LMChatBubbleStyle {
 
   /// Whether to show the avatar.
   final bool? showAvatar;
+  final LMChatLinkPreviewStyle? linkPreviewStyle;
 
   /// {@macro lm_chat_bubble_style}
   LMChatBubbleStyle({
@@ -566,6 +597,7 @@ class LMChatBubbleStyle {
     this.showFooter,
     this.showHeader,
     this.showSides,
+    this.linkPreviewStyle,
   });
 
   /// Creates a copy of the current style with optional new values.
@@ -584,6 +616,7 @@ class LMChatBubbleStyle {
     bool? showAvatar,
     bool? showHeader,
     bool? showFooter,
+    LMChatLinkPreviewStyle? linkPreviewStyle,
   }) {
     return LMChatBubbleStyle(
       width: width ?? this.width,
@@ -600,6 +633,7 @@ class LMChatBubbleStyle {
       showFooter: showFooter ?? this.showFooter,
       showHeader: showHeader ?? this.showHeader,
       showSides: showSides ?? this.showSides,
+      linkPreviewStyle: linkPreviewStyle ?? this.linkPreviewStyle,
     );
   }
 

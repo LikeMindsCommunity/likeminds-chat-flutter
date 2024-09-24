@@ -28,6 +28,8 @@ export 'media/video.dart';
 export 'media/document/document.dart';
 export 'media/gif.dart';
 export 'media/error.dart';
+export 'media/link_preview_bar.dart';
+export 'media/link_preview.dart';
 
 export 'conversation/chat_bubble.dart';
 

@@ -145,7 +145,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               ),
               itemBuilder: (context, item, index) {
                 if (item.isTimeStamp != null && item.isTimeStamp! ||
-                    item.state != 0 && item.state != null) {
+                    item.state != 0 && item.state != 10 && item.state != null) {
                   final stateMessage =
                       LMChatTaggingHelper.extractStateMessage(item.answer);
                   return _screenBuilder.stateBubbleBuilder(

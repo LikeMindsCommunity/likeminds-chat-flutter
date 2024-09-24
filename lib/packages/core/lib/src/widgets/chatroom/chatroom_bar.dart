@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/media/media_handler.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
@@ -59,16 +56,57 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   final _screenBuilder = LMChatCore.config.chatRoomConfig.builder;
 
   String? result;
-  Timer? _debounce;
+
   String previewLink = '';
-  bool isActiveLink = true;
-  bool showLinkPreview = true;
-  LMChatMediaModel? linkModel;
+
   LMChatRoomViewData? chatroom;
   List<LMChatTagViewData> tags = [];
+  LMChatMediaModel? linkModel;
+  String _textFieldValue = '';
+  // if set to false link preview should not be displayed
 
-  ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
-  ValueNotifier<bool> rebuildChatBar = ValueNotifier(false);
+  bool showLinkPreview = true;
+
+  // if a message contains a link, this should be set to true
+
+  bool isActiveLink = false;
+
+  // debounce timer for link preview
+
+  Timer? _debounce;
+
+  // flag to check if a message is sent before the link preview is fetched
+
+  bool _isSentBeforeLinkFetched = false;
+
+  String getText() {
+    if (_textEditingController.text.isNotEmpty) {
+      return _textEditingController.text;
+    } else {
+      return "";
+    }
+  }
+
+  void _onTextChanged(String message) {
+    _textFieldValue = message;
+
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+
+    if (!showLinkPreview ||
+        replyToConversation != null ||
+        editConversation != null) {
+      return;
+    }
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      chatActionBloc.add(LMChatConversationTextChangeEvent(
+        text: message,
+        previousLink: previewLink,
+      ));
+    });
+  }
 
   @override
   void initState() {
@@ -90,34 +128,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return BlocConsumer<LMChatConversationActionBloc,
         LMChatConversationActionState>(
       bloc: chatActionBloc,
-      listener: (context, state) {
-        if (state is LMChatEditConversationState) {
-          editConversation = state.editConversation;
-          _setupEditText();
-        } else if (state is LMChatEditRemoveState) {
-          editConversation = null;
-          _setupEditText();
-        } else if (state is LMChatReplyConversationState) {
-          replyToConversation = state.conversation;
-          replyConversationAttachments = state.attachments;
-          _focusNode.requestFocus();
-        } else if (state is LMChatReplyRemoveState) {
-          replyToConversation = null;
-          _focusNode.requestFocus();
-        } else if (state is LMChatRefreshBarState) {
-          chatroom = state.chatroom;
-          rebuildChatBar.value = !rebuildChatBar.value;
-        }
-      },
+      listener: _blocListener,
       builder: (context, state) {
         return Column(
           children: [
-            ValueListenableBuilder(
-              valueListenable: rebuildLinkPreview,
-              builder: ((context, value, child) {
-                return Container(color: Colors.red);
-              }),
-            ),
             Container(
               width: double.infinity,
               padding: EdgeInsets.only(
@@ -149,12 +163,54 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
+  void _blocListener(context, state) {
+    if (state is LMChatEditConversationState) {
+      replyToConversation = null;
+      editConversation = state.editConversation;
+      _setupEditText();
+    } else if (state is LMChatEditRemoveState) {
+      editConversation = null;
+      _setupEditText();
+    } else if (state is LMChatReplyConversationState) {
+      editConversation = null;
+      _setupEditText();
+      replyToConversation = state.conversation;
+      replyConversationAttachments = state.attachments;
+      _focusNode.requestFocus();
+    } else if (state is LMChatReplyRemoveState) {
+      replyToConversation = null;
+      _focusNode.requestFocus();
+    } else if (state is LMChatRefreshBarState) {
+      chatroom = state.chatroom;
+    } else if (state is LMChatLinkAttachedState) {
+      // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
+      debugPrint('Link attached state');
+      if (_isSentBeforeLinkFetched) {
+        _isSentBeforeLinkFetched = false;
+        return;
+      }
+      linkModel = LMChatMediaModel(
+        mediaType: LMChatMediaType.link,
+        ogTags: state.ogTags,
+        link: state.link,
+      );
+      previewLink = state.link;
+      isActiveLink = true;
+    } else if (state is LMChatLinkRemovedState) {
+      linkModel = null;
+      previewLink = '';
+      isActiveLink = false;
+      showLinkPreview = !state.isPermanentlyRemoved;
+    }
+  }
+
   // Handler functions of the LMChatroomBar
   void _onSend() {
     if (_textEditingController.text.trim().isEmpty) {
       toast("Text can't be empty");
       return;
     } else {
+      _isSentBeforeLinkFetched = true;
       final string = _textEditingController.text;
 
       tags = LMChatTaggingHelper.matchTags(string, tags);
@@ -173,13 +229,17 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                 editConversation!.replyConversationObject?.toConversation()));
         linkModel = null;
         isActiveLink = false;
-        rebuildLinkPreview.value = !rebuildLinkPreview.value;
         if (!showLinkPreview) {
           showLinkPreview = true;
         }
         widget.scrollToBottom();
       } else {
-        if (isActiveLink && showLinkPreview && linkModel != null) {
+        if (isActiveLink && linkModel != null) {
+          final extractedLink =
+              LMChatTaggingHelper.getFirstValidLinkFromString(result!);
+          if (extractedLink.isEmpty) {
+            return;
+          }
           conversationBloc.add(
             LMChatPostMultiMediaConversationEvent(
               (PostConversationRequestBuilder()
@@ -189,7 +249,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                     ..text(result!)
                     ..replyId(replyToConversation?.id)
                     ..ogTags(linkModel!.ogTags!.toOGTag())
-                    ..shareLink(linkModel!.mediaUrl!))
+                    ..shareLink(linkModel!.link!))
                   .build(),
               [
                 LMChatMediaModel(
@@ -199,17 +259,17 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               ],
             ),
           );
-          linkModel = null;
-          isActiveLink = false;
-          rebuildLinkPreview.value = !rebuildLinkPreview.value;
           if (!showLinkPreview) {
             showLinkPreview = true;
           }
           widget.scrollToBottom();
+          chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
         } else {
-          bool isLinkPresent = false;
-          if (showLinkPreview && previewLink.isNotEmpty) {
-            isLinkPresent = true;
+          String? extractedLink;
+
+          if (showLinkPreview) {
+            extractedLink =
+                LMChatTaggingHelper.getFirstValidLinkFromString(result!);
           }
           conversationBloc.add(
             LMChatPostConversationEvent(
@@ -217,17 +277,15 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               chatroomId: widget.chatroom.id,
               replyId: replyToConversation?.id,
               repliedTo: replyToConversation,
-              shareLink: isLinkPresent ? previewLink : null,
+              shareLink: extractedLink,
             ),
           );
         }
-        linkModel = null;
-        isActiveLink = false;
-        rebuildLinkPreview.value = !rebuildLinkPreview.value;
         if (!showLinkPreview) {
           showLinkPreview = true;
         }
         widget.scrollToBottom();
+        chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
         if (replyToConversation != null) {
           LMAnalytics.get().track(
             AnalyticsKeys.messageReply,
@@ -260,43 +318,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       }
       editConversation = null;
       replyToConversation = null;
-    }
-  }
-
-  Future<void> handleTextLinks(String text) async {
-    String link = LMChatTaggingHelper.getFirstValidLinkFromString(text);
-    if (link.isNotEmpty) {
-      previewLink = link;
-      showLinkPreview = true;
-      DecodeUrlRequest request =
-          (DecodeUrlRequestBuilder()..url(previewLink)).build();
-      LMResponse<DecodeUrlResponse> response =
-          await LMChatCore.client.decodeUrl(request);
-      if (response.success == true) {
-        OgTags? responseTags = response.data!.ogTags;
-        linkModel = LMChatMediaModel(
-          mediaType: LMChatMediaType.link,
-          mediaUrl: previewLink,
-          ogTags: responseTags?.toLMChatOGTagViewData(),
-        );
-        LMAnalytics.get().track(
-          AnalyticsKeys.attachmentsUploaded,
-          {
-            'link': previewLink,
-          },
-        );
-        showLinkPreview = true;
-        rebuildLinkPreview.value = !rebuildLinkPreview.value;
-      } else {
-        linkModel = null;
-        if (isActiveLink) {
-          rebuildLinkPreview.value = !rebuildLinkPreview.value;
-        }
-      }
-    } else if (link.isEmpty) {
-      showLinkPreview = false;
-      linkModel = null;
-      rebuildLinkPreview.value = !rebuildLinkPreview.value;
     }
   }
 
@@ -359,6 +380,14 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
             _textEditingController,
             _defReplyConversationWidget(),
           ),
+        if (isActiveLink &&
+            replyToConversation == null &&
+            editConversation == null &&
+            !_isSentBeforeLinkFetched)
+          _screenBuilder.linkPreviewBar(
+            context,
+            _defLinkPreview(linkModel!.ogTags!),
+          ),
         Container(
           width: 80.w,
           constraints: BoxConstraints(
@@ -367,12 +396,13 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
           decoration: BoxDecoration(
             color: _themeData.container,
-            borderRadius:
-                editConversation == null && replyToConversation == null
-                    ? BorderRadius.circular(24)
-                    : const BorderRadius.vertical(
-                        bottom: Radius.circular(24),
-                      ),
+            borderRadius: editConversation == null &&
+                    replyToConversation == null &&
+                    !isActiveLink
+                ? BorderRadius.circular(24)
+                : const BorderRadius.vertical(
+                    bottom: Radius.circular(24),
+                  ),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -457,7 +487,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           'tagged_user_name': tag.name,
         });
       },
-      onChange: (value) {},
+      onChange: _onTextChanged,
       controller: _textEditingController,
       decoration: InputDecoration(
         border: InputBorder.none,
@@ -726,6 +756,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         chatActionBloc.add(LMChatEditRemoveEvent());
         _textEditingController.clear();
       }
+      if(linkModel != null) {
+        chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
+      }
       _textEditingController.clear();
     }
   }
@@ -799,6 +832,23 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           textStyle: Theme.of(context).textTheme.bodySmall,
         ),
       ),
+    );
+  }
+
+  LMChatLinkPreviewBar _defLinkPreview(LMChatOGTagsViewData ogTags) {
+    return LMChatLinkPreviewBar(
+      ogTags: ogTags,
+      style: LMChatLinkPreviewBarStyle.basic(
+        inActiveColor: _themeData.inActiveColor,
+        containerColor: _themeData.onContainer,
+      ),
+      onCanceled: () {
+        chatActionBloc.add(
+          LMChatLinkPreviewRemovedEvent(
+            isPermanentlyRemoved: true,
+          ),
+        );
+      },
     );
   }
 }
