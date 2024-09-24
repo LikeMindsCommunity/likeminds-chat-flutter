@@ -504,7 +504,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
     // Determine the width to use
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
-        conversation.replyId != null) {
+        conversation.replyId != null ||
+        conversation.replyConversationObject != null ||
+        conversation.ogTags != null) {
       return 60.w; // Full width if media or reply is present
     }
 

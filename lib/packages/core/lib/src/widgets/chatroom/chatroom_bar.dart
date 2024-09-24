@@ -108,17 +108,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     });
   }
 
-  void _setupReplyText() {
-    _textEditingController.value = TextEditingValue(
-      text: _textFieldValue,
-      selection: TextSelection.fromPosition(
-        TextPosition(
-          offset: _textEditingController.text.length - 1,
-        ),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -187,7 +176,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       _setupEditText();
       replyToConversation = state.conversation;
       replyConversationAttachments = state.attachments;
-      _setupReplyText();
       _focusNode.requestFocus();
     } else if (state is LMChatReplyRemoveState) {
       replyToConversation = null;
@@ -247,6 +235,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         widget.scrollToBottom();
       } else {
         if (isActiveLink && linkModel != null) {
+          final extractedLink =
+              LMChatTaggingHelper.getFirstValidLinkFromString(result!);
+          if (extractedLink.isEmpty) {
+            return;
+          }
           conversationBloc.add(
             LMChatPostMultiMediaConversationEvent(
               (PostConversationRequestBuilder()
@@ -762,6 +755,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       if (editConversation != null) {
         chatActionBloc.add(LMChatEditRemoveEvent());
         _textEditingController.clear();
+      }
+      if(linkModel != null) {
+        chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
       }
       _textEditingController.clear();
     }
