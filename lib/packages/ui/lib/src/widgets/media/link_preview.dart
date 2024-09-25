@@ -259,8 +259,8 @@ class LMChatLinkPreviewStyle {
         color: containerColor?.withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
       ),
-      margin: const EdgeInsets.symmetric(
-        vertical: 8,
+      margin: const EdgeInsets.only(
+        bottom: 8,
       ),
       padding: const EdgeInsets.only(
         bottom: 6,
