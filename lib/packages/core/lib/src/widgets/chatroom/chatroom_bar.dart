@@ -184,10 +184,15 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       chatroom = state.chatroom;
     } else if (state is LMChatLinkAttachedState) {
       // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
-      debugPrint('Link attached state');
       if (_isSentBeforeLinkFetched) {
         _isSentBeforeLinkFetched = false;
-        return;
+        bool isCurrentTextHasLink =
+            LMChatTaggingHelper.getFirstValidLinkFromString(
+                    _textEditingController.text)
+                .isNotEmpty;
+        if (!isCurrentTextHasLink) {
+          return;
+        }
       }
       linkModel = LMChatMediaModel(
         mediaType: LMChatMediaType.link,
@@ -346,11 +351,16 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   void _setupEditText() {
-    String? convertedMsgText =
-        LMChatTaggingHelper.convertRouteToTag(editConversation?.answer);
+    // if the edit conversation is null, return
     if (editConversation == null) {
       return;
     }
+    // remove GIF message in the text
+    String message = getGIFText(editConversation!);
+
+    // Check for user tags in the message
+    String? convertedMsgText = LMChatTaggingHelper.convertRouteToTag(message);
+    // set the text in the text field
     _textEditingController.value = TextEditingValue(
       text: convertedMsgText ?? '',
       selection: TextSelection.fromPosition(
@@ -756,7 +766,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         chatActionBloc.add(LMChatEditRemoveEvent());
         _textEditingController.clear();
       }
-      if(linkModel != null) {
+      if (linkModel != null) {
         chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
       }
       _textEditingController.clear();

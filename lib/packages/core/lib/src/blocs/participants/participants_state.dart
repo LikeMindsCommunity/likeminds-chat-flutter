@@ -52,6 +52,6 @@ class LMChatParticipantsErrorState extends LMChatParticipantsState {
 }
 
 /// New state to indicate searching
-class LMChatParticipantsSearchingState extends LMChatParticipantsState {
-  const LMChatParticipantsSearchingState();
+class LMChatParticipantsPaginationLoadingState extends LMChatParticipantsState {
+  const LMChatParticipantsPaginationLoadingState();
 }
