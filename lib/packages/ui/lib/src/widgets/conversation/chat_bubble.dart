@@ -306,7 +306,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   minHeight: 2.h,
                   minWidth:
                       conversation.answer.split('\n').length > 4 ? 40.w : 5.w,
-                  maxWidth: 60.w,
+                  maxWidth: (widget.attachments != null &&
+                          widget.attachments!.isNotEmpty)
+                      ? 60.w
+                      : 65.w,
                 ),
                 child: PhysicalShape(
                   clipper: LMChatBubbleClipper(
@@ -507,14 +510,17 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();
-    double textWidth = textPainter.width;
+    double textWidth = textPainter.width + 1;
 
     // Determine the width to use
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
         conversation.replyId != null ||
-        conversation.replyConversationObject != null ||
-        conversation.ogTags != null) {
-      return 60.w; // Full width if media or reply is present
+        conversation.replyConversationObject != null) {
+      return 54.w; // Full width if media or reply is present
+    }
+
+    if (conversation.ogTags != null) {
+      return double.infinity; // Full width if link preview is present
     }
 
     if (widget.isDM == true) {
