@@ -4,8 +4,9 @@ part of "../participants_bloc.dart";
 // It fetches the participants of a chat room.
 void _getParticipantsEventHandler(LMChatGetParticipantsEvent event,
     Emitter<LMChatParticipantsState> emit) async {
-  if (event.search != null) {
-    emit(const LMChatParticipantsSearchingState()); // Emit searching state
+  if (event.page > 1) {
+    emit(
+        const LMChatParticipantsPaginationLoadingState()); // Emit searching state
   } else {
     emit(const LMChatParticipantsLoadingState());
   }

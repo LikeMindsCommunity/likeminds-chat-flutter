@@ -72,6 +72,9 @@ class LMChatLinkPreview extends StatelessWidget {
         },
         child: Container(
           width: style?.width ?? double.infinity,
+          height: style?.height,
+          margin: style?.margin,
+          padding: style?.padding,
           decoration: style?.decoration ??
               const BoxDecoration(
                 color: Color(0x1a9b9b9b),
@@ -79,14 +82,18 @@ class LMChatLinkPreview extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (ogTags.imageUrl != null && ogTags.imageUrl!.isNotEmpty)
+              if ((ogTags.imageUrl != null && ogTags.imageUrl!.isNotEmpty) ||
+                  imageBuilder != null)
                 AbsorbPointer(
                   child:
                       imageBuilder?.call(context, _defImage()) ?? _defImage(),
                 ),
-              if (ogTags.title != null && ogTags.title!.isNotEmpty)
+              if ((ogTags.title != null && ogTags.title!.isNotEmpty) ||
+                  titleBuilder != null)
                 titleBuilder?.call(context, _defTitle()) ?? _defTitle(),
-              if (ogTags.description != null && ogTags.description!.isNotEmpty)
+              if ((ogTags.description != null &&
+                      ogTags.description!.isNotEmpty) ||
+                  subtitleBuilder != null)
                 subtitleBuilder?.call(context, _defSubTitle()) ??
                     _defSubTitle(),
             ],
@@ -102,7 +109,7 @@ class LMChatLinkPreview extends StatelessWidget {
       style: style?.subtitleStyle ??
           const LMChatTextStyle(
             padding: EdgeInsets.only(
-              top: 4,
+              top: 2,
               bottom: 16,
               left: 8,
               right: 8,
@@ -125,7 +132,7 @@ class LMChatLinkPreview extends StatelessWidget {
           const LMChatTextStyle(
             padding: EdgeInsets.only(
               top: 8,
-              bottom: 4,
+              bottom: 2,
               left: 8,
               right: 8,
             ),
@@ -252,6 +259,12 @@ class LMChatLinkPreviewStyle {
         color: containerColor?.withOpacity(0.05),
         borderRadius: BorderRadius.circular(8),
       ),
+      margin: const EdgeInsets.only(
+        bottom: 8,
+      ),
+      padding: const EdgeInsets.only(
+        bottom: 6,
+      ),
       innerPadding: const EdgeInsets.only(
         top: 8,
         bottom: 8,
@@ -274,7 +287,7 @@ class LMChatLinkPreviewStyle {
       titleStyle: const LMChatTextStyle(
         padding: EdgeInsets.only(
           top: 8,
-          bottom: 4,
+          bottom: 2,
           left: 8,
           right: 8,
         ),
@@ -287,8 +300,8 @@ class LMChatLinkPreviewStyle {
       ),
       subtitleStyle: LMChatTextStyle(
         padding: const EdgeInsets.only(
-          top: 4,
-          bottom: 16,
+          top: 2,
+          bottom: 8,
           left: 8,
           right: 8,
         ),

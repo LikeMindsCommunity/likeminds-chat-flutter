@@ -87,15 +87,13 @@ class _LMChatroomParticipantsPageState
                 bloc: participantsBloc,
                 listener: _updatePaginationState,
                 buildWhen: (previous, current) {
-                  if (previous is LMChatParticipantsLoadedState &&
-                      current is LMChatParticipantsLoadingState) {
+                  if (current is LMChatParticipantsPaginationLoadingState) {
                     return false;
                   }
                   return true;
                 },
                 builder: (context, state) {
-                  if (state is LMChatParticipantsLoadingState ||
-                      state is LMChatParticipantsSearchingState) {
+                  if (state is LMChatParticipantsLoadingState) {
                     return LMChatLoader(
                       style: LMChatTheme.theme.loaderStyle,
                     );
