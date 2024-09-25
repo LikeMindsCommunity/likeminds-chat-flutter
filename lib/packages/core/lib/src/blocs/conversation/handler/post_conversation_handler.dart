@@ -28,16 +28,20 @@ postConversationEventHandler(
 
     emit(LMChatLocalConversationState(conversationViewData));
 
-    final PostConversationRequest postConversationRequest =
-        (PostConversationRequestBuilder()
-              ..chatroomId(event.chatroomId)
-              ..text(event.text)
-              ..replyId(event.replyId)
-              ..temporaryId(tempId))
-            .build();
+    final PostConversationRequestBuilder postConversationRequest =
+        PostConversationRequestBuilder()
+          ..chatroomId(event.chatroomId)
+          ..text(event.text)
+          ..replyId(event.replyId)
+          ..temporaryId(tempId);
+    if (event.replyId == null &&
+        event.shareLink != null &&
+        event.shareLink!.isNotEmpty) {
+      postConversationRequest.shareLink(event.shareLink!);
+    }
     LMResponse<PostConversationResponse> response =
         await LMChatCore.client.postConversation(
-      postConversationRequest,
+      postConversationRequest.build(),
     );
 
     if (response.success && response.data != null) {

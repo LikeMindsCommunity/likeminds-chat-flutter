@@ -153,3 +153,46 @@ class LMChatRefreshBarState extends LMChatConversationActionState {
   @override
   List<Object> get props => [chatroom];
 }
+
+/// {@templete lm_chat_link_attached_state} 
+/// It is the state when a link is attached to the conversation.
+/// [ogTags] - The Open Graph tags of the link
+/// [link] - The link
+/// {@endtemplate}
+class LMChatLinkAttachedState extends LMChatConversationActionState {
+  /// The Open Graph tags of the link
+  final LMChatOGTagsViewData ogTags;
+  /// The link
+  final String link;
+
+/// {@macro lm_chat_link_attached_state}
+  LMChatLinkAttachedState({
+    required this.ogTags,
+    required this.link,
+  });
+
+  @override
+  List<Object> get props => [
+        ogTags,
+        link,
+      ];
+}
+
+/// {@template lm_chat_link_removed_state}
+/// It is the state when a link is removed from the conversation.
+/// [isPermanentlyRemoved] - If the link is permanently removed
+/// {@endtemplate}
+class LMChatLinkRemovedState extends LMChatConversationActionState {
+  /// If the link is permanently removed
+  final bool isPermanentlyRemoved;
+
+/// {@macro lm_chat_link_removed_state}
+  LMChatLinkRemovedState({
+    this.isPermanentlyRemoved = false,
+  });
+
+  @override
+  List<Object> get props => [
+        isPermanentlyRemoved,
+      ];
+}

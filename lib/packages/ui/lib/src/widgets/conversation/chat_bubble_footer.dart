@@ -105,7 +105,7 @@ class LMChatBubbleFooter extends StatelessWidget {
         textDirection: TextDirection.ltr,
       );
       editedTextPainter.layout();
-      edited = editedTextPainter.width;
+      edited = editedTextPainter.width + 2;
     }
 
     result = timestamp + (edited ?? 0);

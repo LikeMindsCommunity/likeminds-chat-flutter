@@ -211,6 +211,14 @@ class LMChatroomBuilderDelegate {
     return chatBarHeader;
   }
 
+  /// Builds the link preview bar.
+  Widget linkPreviewBar(
+    BuildContext context,
+    LMChatLinkPreviewBar oldLinkPreviewBar,
+  ) {
+    return oldLinkPreviewBar;
+  }
+
   /// Builds the chatroom menu.
   Widget sendButton(
     BuildContext context,

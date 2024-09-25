@@ -77,6 +77,9 @@ class LMChatMediaModel {
   /// Additional metadata related to the media
   Map<String, dynamic>? meta;
 
+  /// The link associated with the media
+  String? link;
+
   ///{@macro lm_chat_media_model}
   LMChatMediaModel({
     this.mediaFile,
@@ -91,6 +94,7 @@ class LMChatMediaModel {
     this.duration,
     this.ogTags,
     this.meta,
+    this.link,
   });
 
   /// copyWith method is used to create a new instance of `LMChatMediaModel` with the updated values.
@@ -108,6 +112,7 @@ class LMChatMediaModel {
     double? duration,
     LMChatOGTagsViewData? ogTags,
     Map<String, dynamic>? meta,
+    String? link,
   }) {
     return LMChatMediaModel(
       mediaFile: mediaFile ?? this.mediaFile,
@@ -122,6 +127,7 @@ class LMChatMediaModel {
       duration: duration ?? this.duration,
       ogTags: ogTags ?? this.ogTags,
       meta: meta ?? this.meta,
+      link: link ?? this.link,
     );
   }
 }
