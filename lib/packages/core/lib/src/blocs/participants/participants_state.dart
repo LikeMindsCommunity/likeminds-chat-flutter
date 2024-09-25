@@ -51,7 +51,7 @@ class LMChatParticipantsErrorState extends LMChatParticipantsState {
   List<Object> get props => [errorMessage];
 }
 
-/// New state to indicate searching
+/// [LMChatParticipantsPaginationLoadingState] is the state when the participants are being loaded for pagination.
 class LMChatParticipantsPaginationLoadingState extends LMChatParticipantsState {
   const LMChatParticipantsPaginationLoadingState();
 }
