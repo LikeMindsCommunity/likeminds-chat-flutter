@@ -22,3 +22,7 @@
 
 - Added multimedia support
 - Added multimedia utils and handler functions
+
+## 0.7.5
+
+- Added support for Link Preview

@@ -1,10 +1,10 @@
 ## 0.5.0
 
-Initial release of the LikeMinds Chat SDK monorepo
+- Initial release of the LikeMinds Chat SDK monorepo
 
 ## 0.5.1
 
-Fixed a bug in Core package
+- Fixed a bug in Core package
 
 ## 0.6.0
 
@@ -22,3 +22,7 @@ Fixed a bug in Core package
 
 - Added multimedia support
 - Added multimedia utils and handler functions
+
+## 0.7.5
+
+- Added support for Link Preview
