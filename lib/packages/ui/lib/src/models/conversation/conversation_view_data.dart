@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 
 /// `LMChatConversationViewData` is a model class that holds the data for the conversation view.
 /// This class is used to display the conversation information in the chat screen.
@@ -32,7 +33,7 @@ class LMChatConversationViewData {
   final String? locationLong;
   final int? multipleSelectNo;
   final int? multipleSelectState;
-  final dynamic ogTags;
+  final LMChatOGTagsViewData? ogTags;
   final int? onlineLinkEnableBefore;
   final String? pollAnswerText;
   final int? pollType;
@@ -239,7 +240,7 @@ class LMChatConversationViewDataBuilder {
   String? _locationLong;
   int? _multipleSelectNo;
   int? _multipleSelectState;
-  dynamic _ogTags;
+  LMChatOGTagsViewData? _ogTags;
   int? _onlineLinkEnableBefore;
   String? _pollAnswerText;
   int? _pollType;
@@ -371,7 +372,7 @@ class LMChatConversationViewDataBuilder {
     _multipleSelectState = multipleSelectState;
   }
 
-  void ogTags(dynamic ogTags) {
+  void ogTags(LMChatOGTagsViewData? ogTags) {
     _ogTags = ogTags;
   }
 

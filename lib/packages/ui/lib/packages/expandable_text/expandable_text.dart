@@ -436,7 +436,6 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
             ..onTap = () async {
               if (!isTag) {
                 final checkLink = extractLinkAndEmailFromString(link ?? '');
-                debugPrint('checkLink: $checkLink');
                 if (checkLink is UrlElement) {
                   if (Uri.parse(checkLink.url).isAbsolute) {
                     launchUrl(

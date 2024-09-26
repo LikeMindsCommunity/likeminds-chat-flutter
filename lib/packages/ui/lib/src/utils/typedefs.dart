@@ -25,7 +25,7 @@ typedef LMChatErrorHandler = Function(String, StackTrace);
 /// This function is called to build the button for the chat.
 /// The [LMChatButtonBuilder] function takes one parameter:
 /// - [LMChatButton] olButton: The old button.
-/// The function returns a [LMChatButton] widget.
+/// The function returns a [Widget] widget.
 /// {@endtemplate}
 typedef LMChatButtonBuilder = Widget Function(LMChatButton olButton);
 
@@ -248,4 +248,17 @@ typedef LMChatDocumentTileBuilder = Widget Function(
   BuildContext context,
   LMChatAttachmentViewData attachment,
   LMChatDocumentTile oldWidget,
+);
+
+/// {@template lm_chat_text_builder}
+/// The text builder function for the chat screen.
+/// This function is called to build the text for the chat screen.
+/// The [LMChatTextBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatText] text: The text.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatTextBuilder = Widget Function(
+  BuildContext,
+  LMChatText,
 );
