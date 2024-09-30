@@ -6,6 +6,7 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
+import 'package:likeminds_chat_flutter_core/src/views/poll/poll_handler.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -181,6 +182,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
+    ValueNotifier<bool> rebuildPoll = ValueNotifier(false);
     return LMChatBubble(
       conversation: conversation,
       attachments:
@@ -188,6 +190,47 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
+      poll: LMChatPoll(
+        rebuildPollWidget: rebuildPoll,
+        pollData: conversation,
+        onOptionSelect: (option) {
+          submitVote(
+            context,
+            conversation,
+            [option],
+            {},
+            conversation.copyWith(),
+            rebuildPoll,
+          );
+        },
+        onAddOptionSubmit: (optionText) async {
+          await addOption(
+            context,
+            conversation,
+            optionText,
+            user.toUserViewData(),
+            rebuildPoll,
+            LMChatWidgetSource.chatroom,
+          );
+          //TODO: find the way to update only poll options
+          rebuildConversationList.value = !rebuildConversationList.value;
+        },
+        onVoteClick: (option) {
+          onVoteTextTap(
+            context,
+            conversation,
+            LMChatWidgetSource.chatroom,
+            option: option,
+          );
+        },
+        onAnswerTextTap: () {
+          onVoteTextTap(
+            context,
+            conversation,
+            LMChatWidgetSource.chatroom,
+          );
+        },
+      ),
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -378,12 +421,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
-      List<LMChatConversationViewData>? conversationData = state
-          .getConversationResponse.conversationData
-          ?.map((e) => e.toConversationViewData(
-            conversationPollsMeta: state.getConversationResponse.conversationPollsMeta,
-          ))
-          .toList();
+      List<LMChatConversationViewData>? conversationData =
+          state.getConversationResponse.conversationData
+              ?.map((e) => e.toConversationViewData(
+                    conversationPollsMeta:
+                        state.getConversationResponse.conversationPollsMeta,
+                    userMeta: state.getConversationResponse.userMeta,
+                  ))
+              .toList();
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,
           LMChatLocalPreference.instance.getCommunityData()!.id);

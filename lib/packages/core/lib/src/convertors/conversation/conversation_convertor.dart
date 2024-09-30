@@ -10,11 +10,12 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 extension ConversationViewDataConvertor on Conversation {
   /// Converts [Conversation] to [LMChatConversationViewData]
   LMChatConversationViewData toConversationViewData({
-     Map<String, List<PollOption>>? conversationPollsMeta,
+    Map<String, List<PollOption>>? conversationPollsMeta,
+    Map<int, User>? userMeta,
   }) {
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
-        ..allowAddOption(allowAddOption)
+          ..allowAddOption(allowAddOption)
           ..answer(answer)
           ..attachmentCount(attachmentCount)
           ..attachments(
@@ -58,16 +59,20 @@ extension ConversationViewDataConvertor on Conversation {
           ..replyConversation(replyConversation)
           ..replyConversationObject(
               replyConversationObject?.toConversationViewData(
-                  conversationPollsMeta: conversationPollsMeta))
+                  conversationPollsMeta: conversationPollsMeta,
+                  userMeta: userMeta))
           ..ogTags(ogTags?.toLMChatOGTagViewData())
-          ..poll(conversationPollsMeta?[id.toString()]
-                  ?.map((e) => e.toPollOptionViewData())
-                  .toList() ??
-              [])
         // ..conversationReactions(conversationReactions?.map((LMChatReactionViewData reaction) => reaction.toReactionViewData()).toList())
         // ..poll(poll?.toPollViewData())
         ;
-
+    final polls = conversationPollsMeta?[id.toString()];
+    if (polls != null) {
+      polls.sort((a, b) => a.id!.compareTo(b.id!));
+    }
+    if (polls != null) {
+      conversationBuilder
+          .poll(polls.map((e) => e.toPollOptionViewData()).toList());
+    }
     return conversationBuilder.build();
   }
 }
