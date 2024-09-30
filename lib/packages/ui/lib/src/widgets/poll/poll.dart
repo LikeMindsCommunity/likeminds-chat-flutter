@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_chat_flutter_ui/src/utils/constants/assets.dart';
 
 // ignore: must_be_immutable
 class LMChatPoll extends StatefulWidget {
@@ -11,17 +12,11 @@ class LMChatPoll extends StatefulWidget {
     this.onEditVote,
     this.style,
     this.onOptionSelect,
-    this.showSubmitButton = false,
-    this.showAddOptionButton = false,
-    this.showEditVoteButton = false,
     this.isVoteEditing = false,
-    this.showTick,
-    this.timeLeft,
     this.onAddOptionSubmit,
     this.onVoteClick,
-    this.selectedOption = const [],
     this.onSubmit,
-    this.onSubtextTap,
+    this.onAnswerTextTap,
     this.pollQuestionBuilder,
     this.pollOptionBuilder,
     this.pollSelectionTextBuilder,
@@ -31,7 +26,6 @@ class LMChatPoll extends StatefulWidget {
     this.subTextBuilder,
     this.pollActionBuilder,
     this.onSameOptionAdded,
-    this.isMultiChoicePoll,
   });
 
   /// [ValueNotifier] to rebuild the poll widget
@@ -47,40 +41,22 @@ class LMChatPoll extends StatefulWidget {
   final LMChatPollStyle? style;
 
   /// Callback when an option is selected
-  final void Function(LMChatPollViewData)? onOptionSelect;
-
-  /// [bool] to show the submit button
-  final bool showSubmitButton;
-
-  /// [bool] to show edit vote button
-  final bool showEditVoteButton;
-
-  /// [bool] to show the add option button
-  final bool showAddOptionButton;
+  final void Function(LMChatPollOptionViewData)? onOptionSelect;
 
   /// [bool] to show is poll votes are being edited
   bool isVoteEditing;
-
-  /// [bool Function(LMPollOptionViewData optionViewData)] to show the tick
-  final bool Function(LMChatPollViewData optionViewData)? showTick;
-
-  /// [String] time left for the poll to end
-  final String? timeLeft;
 
   /// Callback when the add option is submitted
   final void Function(String option)? onAddOptionSubmit;
 
   /// Callback when the vote is clicked
-  final Function(LMChatPollViewData)? onVoteClick;
-
-  /// [List<String>] selected options
-  List<String> selectedOption;
+  final Function(LMChatPollOptionViewData)? onVoteClick;
 
   /// Callback when the submit button is clicked
   final Function(List<String> selectedOption)? onSubmit;
 
   /// Callback when the subtext is clicked
-  final VoidCallback? onSubtextTap;
+  final VoidCallback? onAnswerTextTap;
 
   /// [Widget Function(BuildContext)] Builder for the poll question
   final Widget Function(BuildContext)? pollQuestionBuilder;
@@ -110,70 +86,8 @@ class LMChatPoll extends StatefulWidget {
   /// [VoidCallback] error callback to be called when same option is added
   final VoidCallback? onSameOptionAdded;
 
-  /// [bool] to show if the poll is multi choice
-  final bool? isMultiChoicePoll;
-
   @override
   State<LMChatPoll> createState() => _LMChatPollState();
-
-  LMChatPoll copyWith({
-    ValueNotifier<bool>? rebuildPollWidget,
-    LMChatConversationViewData? pollData,
-    Function(LMChatPollViewData)? onEditVote,
-    LMChatPollStyle? style,
-    void Function(LMChatPollViewData)? onOptionSelect,
-    bool? showSubmitButton,
-    bool? showAddOptionButton,
-    bool? showEditVoteButton,
-    bool? isVoteEditing,
-    bool Function(LMChatPollViewData)? showTick,
-    String? timeLeft,
-    void Function(String option)? onAddOptionSubmit,
-    Function(LMChatPollViewData)? onVoteClick,
-    List<String>? selectedOption,
-    Function(List<String> selectedOption)? onSubmit,
-    VoidCallback? onSubtextTap,
-    Widget Function(BuildContext)? pollQuestionBuilder,
-    Widget Function(BuildContext)? pollOptionBuilder,
-    Widget Function(BuildContext)? pollSelectionTextBuilder,
-    String? pollSelectionText,
-    Widget Function(BuildContext, LMChatButton, Function(String))?
-        addOptionButtonBuilder,
-    LMChatButtonBuilder? submitButtonBuilder,
-    Widget Function(BuildContext)? subTextBuilder,
-    VoidCallback? onSameOptionAdded,
-    bool? isMultiChoicePoll,
-  }) {
-    return LMChatPoll(
-      rebuildPollWidget: rebuildPollWidget ?? this.rebuildPollWidget,
-      pollData: pollData ?? this.pollData,
-      onEditVote: onEditVote ?? this.onEditVote,
-      style: style ?? this.style,
-      onOptionSelect: onOptionSelect ?? this.onOptionSelect,
-      showSubmitButton: showSubmitButton ?? this.showSubmitButton,
-      showAddOptionButton: showAddOptionButton ?? this.showAddOptionButton,
-      showEditVoteButton: showEditVoteButton ?? this.showEditVoteButton,
-      isVoteEditing: isVoteEditing ?? this.isVoteEditing,
-      showTick: showTick ?? this.showTick,
-      timeLeft: timeLeft ?? this.timeLeft,
-      onAddOptionSubmit: onAddOptionSubmit ?? this.onAddOptionSubmit,
-      onVoteClick: onVoteClick ?? this.onVoteClick,
-      selectedOption: selectedOption ?? this.selectedOption,
-      onSubmit: onSubmit ?? this.onSubmit,
-      onSubtextTap: onSubtextTap ?? this.onSubtextTap,
-      pollQuestionBuilder: pollQuestionBuilder ?? this.pollQuestionBuilder,
-      pollOptionBuilder: pollOptionBuilder ?? this.pollOptionBuilder,
-      pollSelectionTextBuilder:
-          pollSelectionTextBuilder ?? this.pollSelectionTextBuilder,
-      pollSelectionText: pollSelectionText ?? this.pollSelectionText,
-      addOptionButtonBuilder:
-          addOptionButtonBuilder ?? this.addOptionButtonBuilder,
-      submitButtonBuilder: submitButtonBuilder ?? this.submitButtonBuilder,
-      subTextBuilder: subTextBuilder ?? this.subTextBuilder,
-      onSameOptionAdded: onSameOptionAdded ?? this.onSameOptionAdded,
-      isMultiChoicePoll: isMultiChoicePoll ?? this.isMultiChoicePoll,
-    );
-  }
 }
 
 class _LMChatPollState extends State<LMChatPoll> {
@@ -212,16 +126,16 @@ class _LMChatPollState extends State<LMChatPoll> {
     _setPollData();
   }
 
-  @override
-  void didUpdateWidget(covariant LMChatPoll oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _lmChatPollStyle = widget.style ??
-        LMChatPollStyle.basic(
-          primaryColor: theme.primaryColor,
-        );
-    _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
-    _setPollData();
-  }
+  // @override
+  // void didUpdateWidget(covariant LMChatPoll oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   _lmChatPollStyle = widget.style ??
+  //       LMChatPollStyle.basic(
+  //         primaryColor: theme.primaryColor,
+  //       );
+  //   _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
+  //   _setPollData();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -289,17 +203,18 @@ class _LMChatPollState extends State<LMChatPoll> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     LMChatIcon(
-                      type: LMChatIconType.icon,
-                      icon: Icons.poll,
+                      type: LMChatIconType.svg,
+                      assetPath: kPollIcon,
                       style: LMChatIconStyle(
+                        // TODO: sort out the color issues with svg icons
                         color: theme.primaryColor,
-                        size: 28,
+                        size: 32,
                       ),
                     ),
                     LMChatDefaultTheme.kHorizontalPaddingSmall,
                     LMChatText(
-                      widget.timeLeft ??
-                          _getTimeLeftInPoll(widget.pollData.expiryTime),
+                      LMChatPollUtils.getTimeLeftInPoll(
+                          widget.pollData.expiryTime),
                       style: LMChatTextStyle(
                         borderRadius: 100,
                         backgroundColor: theme.primaryColor,
@@ -331,54 +246,31 @@ class _LMChatPollState extends State<LMChatPoll> {
                           _defPollOption(index);
                     }),
                 //add and option button
-                if (widget.pollData.allowAddOption ?? false)
+                if (LMChatPollUtils.showAddOption(widget.pollData))
                   widget.addOptionButtonBuilder?.call(context,
                           _defAddOptionButton(context), _onAddOptionSubmit) ??
                       _defAddOptionButton(context),
                 widget.subTextBuilder?.call(context) ?? _defSubText(),
-                // if (widget.showSubmitButton ||
-                //     (_isVoteEditing && (widget.isMultiChoicePoll ?? false)))
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: widget.submitButtonBuilder?.call(
+                if (LMChatPollUtils.showSubmitButton(widget.pollData))
+                  widget.submitButtonBuilder?.call(
                         _defSubmitButton(),
                       ) ??
                       _defSubmitButton(),
-                ),
+                if (widget.isVoteEditing)
+                  widget.submitButtonBuilder?.call(
+                        _defEditButton(),
+                      ) ??
+                      _defEditButton(),
               ],
             ),
           );
         });
   }
 
-  String _getTimeLeftInPoll(int? expiryTime) {
-    if (expiryTime == null) {
-      return "";
-    }
-    DateTime expiryTimeInDateTime =
-        DateTime.fromMillisecondsSinceEpoch(expiryTime);
-    DateTime now = DateTime.now();
-    Duration difference = expiryTimeInDateTime.difference(now);
-    if (difference.isNegative) {
-      return "Poll Ended";
-    }
-    if (difference.inDays > 1) {
-      return "Ends in ${difference.inDays} days";
-    } else if (difference.inDays > 0) {
-      return "Ends in ${difference.inDays} day";
-    } else if (difference.inHours > 0) {
-      return "Ends in  ${difference.inHours} hours";
-    } else if (difference.inMinutes > 0) {
-      return "Ends in  ${difference.inMinutes} minutes";
-    } else {
-      return "Just Now";
-    }
-  }
-
   LMChatText _defSubText() {
     return LMChatText(
       widget.pollData.pollAnswerText ?? '',
-      onTap: widget.onSubtextTap,
+      onTap: widget.onAnswerTextTap,
       style: _lmChatPollStyle.pollAnswerStyle ??
           LMChatTextStyle(
             textStyle: TextStyle(
@@ -534,37 +426,9 @@ class _LMChatPollState extends State<LMChatPoll> {
   }
 
   void _onAddOptionSubmit(String optionText) {
-    // if ((widget.pollData.options?.length ?? 0) > 10) {
-    //   widget.onAddOptionSubmit?.call(optionText);
-    //   Navigator.of(context).pop();
-    //   return;
-    // }
-    // String text = optionText.trim();
-    // if (text.isEmpty) {
-    //   _addOptionController.clear();
-    //   return;
-    // }
-    // for (LMPollOptionViewData option in widget.pollData.options ?? []) {
-    //   if (option.text == text) {
-    //     Navigator.of(context).pop();
-    //     _addOptionController.clear();
-    //     widget.onSameOptionAdded?.call();
-    //     return;
-    //   }
-    // }
-    // setState(() {
-    //   final LMPollOptionViewData newOption = (LMPostOptionViewDataBuilder()
-    //         ..text(text)
-    //         ..percentage(0)
-    //         ..votes(0)
-    //         ..isSelected(false))
-    //       .build();
-    //   widget.pollData.options?.add(newOption);
-    //   _setPollData();
-    // });
-    // widget.onAddOptionSubmit?.call(optionText);
-    // Navigator.of(context).pop();
-    // _addOptionController.clear();
+    widget.onAddOptionSubmit?.call(optionText);
+    Navigator.of(context).pop();
+    _addOptionController.clear();
   }
 
   Widget _defPollSubtitle() {
@@ -592,11 +456,7 @@ class _LMChatPollState extends State<LMChatPoll> {
     }
     switch (pollMultiSelectState) {
       case LMChatPollMultiSelectState.exactly:
-        if (pollMultiSelectNo == 1) {
-          return null;
-        } else {
-          return "*Select ${pollMultiSelectState.name} $pollMultiSelectNo options.";
-        }
+        return "*Select ${pollMultiSelectState.name} $pollMultiSelectNo options.";
       case LMChatPollMultiSelectState.atMax:
         return "*Select ${pollMultiSelectState.name} $pollMultiSelectNo options.";
       case LMChatPollMultiSelectState.atLeast:
@@ -626,7 +486,7 @@ class _LMChatPollState extends State<LMChatPoll> {
       children: [
         InkWell(
           onTap: () {
-            // widget.onOptionSelect?.call(widget.pollData.options![index]);
+            widget.onOptionSelect?.call(widget.pollData.poll![index]);
           },
           child: Stack(
             children: [
@@ -708,7 +568,7 @@ class _LMChatPollState extends State<LMChatPoll> {
                                 )),
                         if (widget.pollData.allowAddOption ?? false)
                           LMChatText(
-                              _defAddedByMember(
+                              LMChatPollUtils.defAddedByMember(
                                   widget.pollData.poll?[index].member),
                               style: LMChatTextStyle(
                                 maxLines: 1,
@@ -722,46 +582,41 @@ class _LMChatPollState extends State<LMChatPoll> {
                               )),
                       ],
                     ),
-                    // if (_isSelectedByUser(widget.pollData.options?[index]) ||
-                    //     (widget.showTick != null &&
-                    //         widget.showTick!(widget.pollData.options![index])))
-                    Padding(
-                      padding: widget.pollData.allowAddOption ?? false
-                          ? const EdgeInsets.only(
-                              top: 5,
-                            )
-                          : EdgeInsets.zero,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: LMChatIcon(
-                          type: LMChatIconType.icon,
-                          icon: Icons.check_circle,
-                          style: LMChatIconStyle(
-                            boxSize: 24,
-                            size: 24,
-                            color: _lmChatPollStyle.pollOptionStyle
-                                    ?.pollOptionSelectedTickColor ??
-                                theme.primaryColor,
+                    if (LMChatPollUtils.showTick(widget.pollData,
+                        widget.pollData.poll![index], [], _isVoteEditing))
+                      Padding(
+                        padding: widget.pollData.allowAddOption ?? false
+                            ? const EdgeInsets.only(
+                                top: 5,
+                              )
+                            : EdgeInsets.zero,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: LMChatIcon(
+                            type: LMChatIconType.icon,
+                            icon: Icons.check_circle,
+                            style: LMChatIconStyle(
+                              boxSize: 24,
+                              size: 24,
+                              color: _lmChatPollStyle.pollOptionStyle
+                                      ?.pollOptionSelectedTickColor ??
+                                  theme.primaryColor,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
-        // if (!_lmChatPollStyle.isComposable &&
-        //     widget.pollData.toShowResult != null &&
-        //     !_isVoteEditing &&
-        //     widget.pollData.toShowResult!)
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: LMChatText(
-            voteText(widget.pollData.poll![index].noVotes ?? 0),
+            LMChatPollUtils.voteText(widget.pollData.poll![index].noVotes ?? 0),
             onTap: () {
-              // widget.onVoteClick?.call(widget.pollData.options![index]);
+              widget.onVoteClick?.call(widget.pollData.poll![index]);
             },
             style: _lmChatPollStyle.pollOptionStyle?.votesCountStyles ??
                 LMChatTextStyle(
@@ -779,23 +634,47 @@ class _LMChatPollState extends State<LMChatPoll> {
     );
   }
 
-  bool _isSelectedByUser(LMChatPollViewData? optionViewData) {
-    if (optionViewData == null) {
-      return false;
-    }
-    return widget.selectedOption.contains(optionViewData);
-  }
-
-  String _defAddedByMember(
-    LMChatUserViewData? userViewData,
-  ) {
-    return "Added by ${userViewData?.name ?? ""}";
+  LMChatButton _defEditButton() {
+    return LMChatButton(
+        onTap: () {
+          widget.onSubmit?.call([]);
+        },
+        text: LMChatText(
+          'Edit Vote',
+          style: _lmChatPollStyle.submitPollTextStyle ??
+              LMChatTextStyle(
+                textStyle: TextStyle(
+                  height: 1.33,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: theme.primaryColor,
+                ),
+              ),
+        ),
+        style: _lmChatPollStyle.submitPollButtonStyle ??
+            LMChatButtonStyle(
+              icon: LMChatIcon(
+                type: LMChatIconType.icon,
+                icon: Icons.edit,
+                style: LMChatIconStyle(
+                  color: theme.primaryColor,
+                ),
+              ),
+              backgroundColor: theme.container,
+              borderRadius: 100,
+              border: Border.all(
+                color: theme.primaryColor,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              spacing: 8,
+            ));
   }
 
   LMChatButton _defSubmitButton() {
     return LMChatButton(
         onTap: () {
-          widget.onSubmit?.call(widget.selectedOption);
+          widget.onSubmit?.call([]);
         },
         text: LMChatText(
           'Submit Vote',
@@ -824,14 +703,162 @@ class _LMChatPollState extends State<LMChatPoll> {
                 color: theme.primaryColor,
               ),
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              spacing: 8,
             ));
   }
 }
 
-String voteText(int voteCount) {
-  if (voteCount == 1) {
-    return '1 vote';
-  } else {
-    return '$voteCount votes';
+/// {@template lm_chat_poll_utils}
+/// Utility class for poll related operations.
+/// {@endtemplate}
+class LMChatPollUtils {
+  /// Determines whether to show the edit vote button.
+  static bool showEditVote(LMChatConversationViewData conversationData) {
+    if (hasPollEnded(conversationData.expiryTime)) {
+      return false;
+    }
+    if (isPollSubmitted(conversationData.poll ?? []) &&
+        conversationData.pollType == LMChatPollType.deferred) {
+      return true;
+    }
+    return false;
+  }
+
+  /// Determines whether to show the add option button.
+  static bool showAddOption(LMChatConversationViewData conversationData) {
+    // return false if poll has ended.
+    if (hasPollEnded(conversationData.expiryTime)) {
+      return false;
+    }
+    // if allowAddOption is true check if the poll is submitted or not
+    if (conversationData.allowAddOption == true) {
+      // if poll is not submitted return true
+      if (!isPollSubmitted(conversationData.poll ?? [])) {
+        return true;
+      }
+      // if poll is submitted and poll type is deferred return true
+      if (conversationData.pollType == LMChatPollType.deferred) {
+        return true;
+      }
+    }
+    // return false if the above conditions are not met
+    return false;
+  }
+
+  /// Determines whether to show the tick mark for a poll option.
+  static bool showTick(
+      LMChatConversationViewData conversationData,
+      LMChatPollOptionViewData option,
+      List<int> selectedOption,
+      bool isVoteEditing) {
+    if (isVoteEditing) {
+      return selectedOption.contains(option.id);
+    }
+    if ((isMultiChoicePoll(conversationData.multipleSelectNo,
+                conversationData.multipleSelectState) ||
+            isInstantPoll(conversationData.pollType!) == false) &&
+        option.isSelected == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /// Returns the vote count text based on the number of votes.
+  static String voteText(int voteCount) {
+    if (voteCount == 1) {
+      return '1 vote';
+    } else {
+      return '$voteCount votes';
+    }
+  }
+
+  /// Determines whether to show the submit button for the poll.
+  static bool showSubmitButton(LMChatConversationViewData conversationData) {
+    if (isPollSubmitted(conversationData.poll ?? [])) {
+      return false;
+    }
+    if ((conversationData.pollType != null &&
+            isInstantPoll(conversationData.pollType!) &&
+            isPollSubmitted(conversationData.poll!)) ||
+        hasPollEnded(conversationData.expiryTime)) {
+      return false;
+    } else if (!isMultiChoicePoll(conversationData.multipleSelectNo,
+        conversationData.multipleSelectState)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  /// Checks if the poll has been submitted.
+  static bool isPollSubmitted(List<LMChatPollOptionViewData> poll) {
+    return poll.any((element) => element.isSelected ?? false);
+  }
+
+  /// Checks if the poll has ended based on the expiry time.
+  static bool hasPollEnded(int? expiryTime) {
+    return expiryTime != null &&
+        DateTime.now().millisecondsSinceEpoch > expiryTime;
+  }
+
+  /// Checks if the poll is an instant poll.
+  static bool isInstantPoll(LMChatPollType? pollType) {
+    return pollType != null && pollType == LMChatPollType.instant;
+  }
+
+  /// Checks if the poll is a multi-choice poll.
+  static bool isMultiChoicePoll(int? pollMultiSelectNo,
+      LMChatPollMultiSelectState? pollMultiSelectState) {
+    if (pollMultiSelectNo == null || pollMultiSelectState == null) {
+      return false;
+    }
+    if (pollMultiSelectState == LMChatPollMultiSelectState.exactly &&
+        pollMultiSelectNo == 1) {
+      return false;
+    }
+    return true;
+  }
+
+  /// Determines whether the option is selected by the user.
+  static bool isSelectedByUser(
+      LMChatPollOptionViewData? optionViewData, List<int> selectedOption) {
+    if (optionViewData == null) {
+      return false;
+    }
+    return selectedOption.contains(optionViewData.id);
+  }
+
+  /// Returns the vote count text based on the number of votes.
+  static String defAddedByMember(
+    LMChatUserViewData? userViewData,
+  ) {
+    return "Added by ${userViewData?.name ?? ""}";
+  }
+
+  /// Returns the time left in the poll.
+  static String getTimeLeftInPoll(int? expiryTime) {
+    if (expiryTime == null) {
+      return "";
+    }
+    DateTime expiryTimeInDateTime =
+        DateTime.fromMillisecondsSinceEpoch(expiryTime);
+    DateTime now = DateTime.now();
+    Duration difference = expiryTimeInDateTime.difference(now);
+    if (difference.isNegative) {
+      return "Poll Ended";
+    }
+    if (difference.inDays > 1) {
+      return "Ends in ${difference.inDays} days";
+    } else if (difference.inDays > 0) {
+      return "Ends in ${difference.inDays} day";
+    } else if (difference.inHours > 0) {
+      return "Ends in  ${difference.inHours} hours";
+    } else if (difference.inMinutes > 0) {
+      return "Ends in  ${difference.inMinutes} minutes";
+    } else {
+      return "Just Now";
+    }
   }
 }

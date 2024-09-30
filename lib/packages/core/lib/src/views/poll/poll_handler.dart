@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/poll/poll_option_convertor.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 Future<void> submitVote(
   BuildContext context,
   LMChatConversationViewData conversationData,
-  List<String> poll,
-  String postId,
+  List<LMChatPollOptionViewData> option,
   Map<String, bool> isVoteEditing,
   LMChatConversationViewData previousValue,
   ValueNotifier<bool> rebuildPostWidget,
@@ -29,7 +29,7 @@ Future<void> submitVote(
           conversationData.multipleSelectState)) {
         if (conversationData.multipleSelectState! ==
                 LMChatPollMultiSelectState.exactly &&
-            poll.length != conversationData.multipleSelectNo) {
+            option.length != conversationData.multipleSelectNo) {
           toast(
             "Please select exactly ${conversationData.multipleSelectNo} poll",
           );
@@ -37,14 +37,14 @@ Future<void> submitVote(
           return;
         } else if (conversationData.multipleSelectState! ==
                 LMChatPollMultiSelectState.atLeast &&
-            poll.length < conversationData.multipleSelectNo!) {
+            option.length < conversationData.multipleSelectNo!) {
           toast(
             "Please select at least ${conversationData.multipleSelectNo} poll",
           );
           return;
         } else if (conversationData.multipleSelectState! ==
                 LMChatPollMultiSelectState.atMax &&
-            poll.length > conversationData.multipleSelectNo!) {
+            option.length > conversationData.multipleSelectNo!) {
           toast(
             "Please select at most ${conversationData.multipleSelectNo} poll",
           );
@@ -53,34 +53,16 @@ Future<void> submitVote(
       }
       bool isPollSubmittedBefore = isVoteEditing["value"] ?? false;
       isVoteEditing["value"] = false;
-      // int totalVotes = conversationData.poll?.fold(0,
-      //         (previousValue, element) => previousValue! + element.voteCount) ??
-      //     0;
-      for (int i = 0; i < conversationData.poll!.length; i++) {
-        // if (poll.contains(conversationData.poll![i].id)) {
-        //   conversationData.poll![i].isSelected = true;
-        //   conversationData.poll![i].voteCount++;
-        //   totalVotes++;
-        //   conversationData.poll![i].percentage =
-        //       (conversationData.poll![i].voteCount / totalVotes) * 100;
-        // } else if (previousValue.poll![i].isSelected) {
-        //   conversationData.poll![i].isSelected = false;
-        //   conversationData.poll![i].voteCount--;
-        //   totalVotes--;
-        //   conversationData.poll![i].percentage =
-        //       (conversationData.poll![i].voteCount / totalVotes) * 100;
-        // }
-      }
       rebuildPostWidget.value = !rebuildPostWidget.value;
       SubmitPollRequest request = (SubmitPollRequestBuilder()
             ..conversationId(conversationData.id)
-            ..polls([...poll]))
+            ..polls(option.map((e) => e.toPollOption()).toList()))
           .build();
       final response = await LMChatCore.client.submitPoll(request);
       if (!response.success) {
-        for (int i = 0; i < poll.length; i++) {
+        for (int i = 0; i < option.length; i++) {
           int index = conversationData.poll!
-              .indexWhere((element) => element.id == poll[i]);
+              .indexWhere((element) => element.id == option[i]);
           if (index != -1) {
             // conversationData.poll![index].isSelected = false;
             // conversationData.poll![index].voteCount--;
@@ -259,13 +241,13 @@ bool showSubmitButton(LMChatConversationViewData conversationData) {
 }
 
 Future<void> addOption(
-    BuildContext context,
-    LMChatConversationViewData conversationData,
-    String option,
-    String postId,
-    LMChatUserViewData? currentUser,
-    ValueNotifier<bool> rebuildPostWidget,
-    LMChatWidgetSource source) async {
+  BuildContext context,
+  LMChatConversationViewData conversationData,
+  String option,
+  LMChatUserViewData? currentUser,
+  ValueNotifier<bool> rebuildPostWidget,
+  LMChatWidgetSource source,
+) async {
   if ((conversationData.poll?.length ?? 0) > 10) {
     toast(
       "You can add only 10 options",
@@ -279,25 +261,10 @@ Future<void> addOption(
 
   final response = await LMChatCore.client.addPollOption(request);
   if (response.success) {
-    // LMChatAnalyticsBloc.instance.add(LMChatFireAnalyticsEvent(
-    //     eventName: LMChatAnalyticsKeys.pollOptionCreated,
-    //     eventProperties: {
-    //       LMChatStringConstants.pollId: conversationData.id,
-    //       LMChatStringConstants.pollOptionText: option,
-    //       LMChatStringConstants.pollTitle: conversationData.pollQuestion,
-    //     }));
-
-    // final poll = LMChatConversationViewDataConvertor.fromWidgetModel(
-    //     widget: response.data!.widget!,
-    //     users: {
-    //       currentUser!.uuid: currentUser,
-    //     });
-    // conversationData.poll!.removeLast();
-    // conversationData.poll!.add(poll.poll!.last);
-    // LMChatPostBloc.instance.add(LMChatUpdatePostEvent(
-    //     actionType: LMChatPostActionType.addPollOption,
-    //     postId: postId,
-    //     pollOption: conversationData.poll));
+    final LMChatPollOptionViewData pollOptionViewData =
+        response.data!.poll!.toPollOptionViewData();
+    conversationData.poll!.removeLast();
+    conversationData.poll!.add(pollOptionViewData);
     toast(
       "Option added successfully",
     );
@@ -389,8 +356,12 @@ void onVoteTextTap(BuildContext context,
   if (conversationData.isAnonymous ?? false) {
     showDialog(
       context: context,
-      builder: (context) => SimpleDialog(
+      builder: (context) => const SimpleDialog(
         surfaceTintColor: Colors.transparent,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 30,
+          horizontal: 8,
+        ),
         children: [
           LMChatText(
             'This being an anonymous poll, the names of the voters can not be disclosed.',
@@ -403,10 +374,6 @@ void onVoteTextTap(BuildContext context,
             ),
           )
         ],
-        contentPadding: EdgeInsets.symmetric(
-          vertical: 30,
-          horizontal: 8,
-        ),
       ),
     );
   } else if (conversationData.toShowResults! ||
@@ -415,7 +382,6 @@ void onVoteTextTap(BuildContext context,
       context,
       MaterialPageRoute(
         builder: (context) => LMChatPollResultScreen(
-          pollId: conversationData.id,
           conversationId: conversationData.id,
           pollTitle: conversationData.answer,
           pollOptions: conversationData.poll ?? [],
