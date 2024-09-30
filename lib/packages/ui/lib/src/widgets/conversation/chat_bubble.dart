@@ -313,7 +313,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   maxWidth: (widget.attachments != null &&
                           widget.attachments!.isNotEmpty)
                       ? 60.w
-                      : 65.w,
+                      : conversation.state == 10
+                          ? 70.w
+                          : 65.w,
                 ),
                 child: PhysicalShape(
                   clipper: LMChatBubbleClipper(
@@ -346,6 +348,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               LMChatBubbleHeader(
                                 conversationUser: widget.conversationUser,
                               ),
+                        // poll widget
+                        if (conversation.state == 10) widget.poll!,
                         // link preview widget
                         if (conversation.ogTags != null &&
                             conversation.deletedByUserId == null)
@@ -403,25 +407,29 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                   _defDeletedWidget(),
                                 ) ??
                                 _defDeletedWidget()
-                            : widget.contentBuilder?.call(
-                                  context,
-                                  LMChatBubbleContent(
-                                    conversation:
-                                        widget.attachments?.first.type == "gif"
-                                            ? conversation.copyWith(
-                                                answer: _getGIFText())
-                                            : conversation,
-                                    onTagTap: widget.onTagTap,
-                                  ),
-                                ) ??
-                                LMChatBubbleContent(
-                                  conversation:
-                                      widget.attachments?.first.type == "gif"
-                                          ? conversation.copyWith(
-                                              answer: _getGIFText())
-                                          : conversation,
-                                  onTagTap: widget.onTagTap,
-                                ),
+                            : conversation.state == 10
+                                ? const SizedBox.shrink()
+                                : widget.contentBuilder?.call(
+                                      context,
+                                      LMChatBubbleContent(
+                                        conversation:
+                                            widget.attachments?.first.type ==
+                                                    "gif"
+                                                ? conversation.copyWith(
+                                                    answer: _getGIFText())
+                                                : conversation,
+                                        onTagTap: widget.onTagTap,
+                                      ),
+                                    ) ??
+                                    LMChatBubbleContent(
+                                      conversation:
+                                          widget.attachments?.first.type ==
+                                                  "gif"
+                                              ? conversation.copyWith(
+                                                  answer: _getGIFText())
+                                              : conversation,
+                                      onTagTap: widget.onTagTap,
+                                    ),
                         if (conversation.deletedByUserId == null &&
                             inStyle.showFooter == true)
                           Padding(
