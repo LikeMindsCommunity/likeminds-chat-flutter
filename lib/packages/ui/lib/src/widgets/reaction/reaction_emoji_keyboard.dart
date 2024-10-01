@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 
 class LMChatReactionKeyboard extends StatelessWidget {
-  final TextEditingController textController;
+  final TextEditingController? textController;
+
+  final Function(String emoji)? onEmojiSelected;
 
   const LMChatReactionKeyboard({
     super.key,
-    required this.textController,
+    this.textController,
+    this.onEmojiSelected,
   });
 
   @override
@@ -16,13 +19,17 @@ class LMChatReactionKeyboard extends StatelessWidget {
     return SizedBox(
       height: 35.h,
       child: EmojiPicker(
-        onEmojiSelected: (category, emoji) async {},
+        onEmojiSelected: (category, emoji) async {
+          onEmojiSelected?.call(emoji.emoji);
+        },
         onBackspacePressed: null,
         textEditingController:
             textController, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
         config: Config(
-          bottomActionBarConfig: const BottomActionBarConfig(
+          bottomActionBarConfig: BottomActionBarConfig(
             buttonIconColor: Colors.grey,
+            backgroundColor: LMChatTheme.theme.container,
+            showSearchViewButton: false,
             // iconColorSelected: Colors.blue,
             // backspaceColor: Colors.blue,
             // indicatorColor: Colors.blue,
@@ -41,14 +48,13 @@ class LMChatReactionKeyboard extends StatelessWidget {
           ),
           emojiViewConfig: EmojiViewConfig(
             columns: 7,
-            emojiSizeMax: 32 *
+            emojiSizeMax: 28 *
                 (foundation.defaultTargetPlatform == TargetPlatform.iOS
                     ? 1.30
                     : 1.0), // Issue: https://github.com/flutter/flutter/issues/28894
             verticalSpacing: 0,
             horizontalSpacing: 0,
             gridPadding: EdgeInsets.zero,
-
             recentsLimit: 28,
             noRecents: const Text(
               'No Recents',
@@ -60,6 +66,7 @@ class LMChatReactionKeyboard extends StatelessWidget {
             // tabIndicatorAnimDuration: kTabScrollDuration,
             // categoryIcons: const CategoryIcons(),
             buttonMode: ButtonMode.MATERIAL,
+            backgroundColor: LMChatTheme.theme.container,
           ),
         ),
       ),
