@@ -73,7 +73,7 @@ class LMChatTile extends StatelessWidget {
                             color: Colors.grey,
                           ),
                         ),
-                    if (subtitle != null) SizedBox(height: inStyle.gap),
+                    if (subtitle != null) SizedBox(height: inStyle.verticalGap),
                     subtitle ?? const SizedBox(),
                   ],
                 ),
@@ -136,8 +136,11 @@ class LMChatTileStyle {
   /// width of the tile
   final double? width;
 
-  /// gap between the tiles
+  /// gap between the leading and title/subtitle
   final double gap;
+
+  /// gap between the title and subtitle
+  final double? verticalGap;
 
   const LMChatTileStyle({
     this.backgroundColor,
@@ -149,21 +152,22 @@ class LMChatTileStyle {
     this.margin,
     this.height,
     this.width,
+    this.verticalGap,
     required this.gap,
   });
 
-  LMChatTileStyle copyWith({
-    Color? backgroundColor,
-    Border? border,
-    double? borderRadius,
-    MainAxisAlignment? mainAxisAlignment,
-    CrossAxisAlignment? crossAxisAlignment,
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    double? height,
-    double? width,
-    double? gap,
-  }) {
+  LMChatTileStyle copyWith(
+      {Color? backgroundColor,
+      Border? border,
+      double? borderRadius,
+      MainAxisAlignment? mainAxisAlignment,
+      CrossAxisAlignment? crossAxisAlignment,
+      EdgeInsets? padding,
+      EdgeInsets? margin,
+      double? height,
+      double? width,
+      double? gap,
+      double? verticalGap}) {
     return LMChatTileStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       border: border ?? this.border,
@@ -175,6 +179,7 @@ class LMChatTileStyle {
       height: height ?? this.height,
       width: width ?? this.width,
       gap: gap ?? this.gap,
+      verticalGap: verticalGap ?? this.verticalGap,
     );
   }
 
@@ -187,6 +192,7 @@ class LMChatTileStyle {
       padding: EdgeInsets.all(12),
       width: double.infinity,
       gap: 4,
+      verticalGap: 2,
     );
   }
 }

@@ -5,7 +5,6 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/media/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_reactions.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -17,6 +16,7 @@ part 'chat_bubble_media.dart';
 part 'chat_bubble_reply.dart';
 part 'chat_bubble_sides.dart';
 part 'chat_bubble_state.dart';
+part 'chat_bubble_reactions.dart';
 
 /// {@template lm_chat_bubble}
 /// The chat bubble widget.
@@ -618,6 +618,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           controller: reactionBarController,
           arrowColor: Colors.transparent,
           barrierColor: Colors.transparent,
+          position: PreferredPosition.top,
+          verticalMargin: 4,
           menuBuilder: () => LMChatReactionBar(
             onReaction: (reaction) {
               widget.onReaction?.call(reaction);

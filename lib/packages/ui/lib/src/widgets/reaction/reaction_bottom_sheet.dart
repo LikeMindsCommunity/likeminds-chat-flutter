@@ -157,3 +157,114 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
     );
   }
 }
+
+class LMChatReactionBottomSheetStyle {
+  final EdgeInsets? padding;
+  final double? height;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final TextStyle? titleStyle;
+  final double? tabBarHeight;
+  final Color? tabBarBorderColor;
+  final double? tabBarBorderWidth;
+  final double? tabBarWidth;
+  final EdgeInsets? tabItemPadding;
+  final Color? selectedTabColor;
+  final double? selectedTabBorderWidth;
+  final TextStyle? selectedTabTextStyle;
+  final TextStyle? tabTextStyle;
+  final EdgeInsets? listItemMargin;
+  final LMChatTileStyle? userTileStyle;
+  final TextStyle? reactionTextStyle;
+  final TextStyle? removeReactionTextStyle;
+
+  const LMChatReactionBottomSheetStyle({
+    this.padding,
+    this.height,
+    this.backgroundColor,
+    this.borderRadius,
+    this.titleStyle,
+    this.tabBarHeight,
+    this.tabBarBorderColor,
+    this.tabBarBorderWidth,
+    this.tabBarWidth,
+    this.tabItemPadding,
+    this.selectedTabColor,
+    this.selectedTabBorderWidth,
+    this.selectedTabTextStyle,
+    this.tabTextStyle,
+    this.listItemMargin,
+    this.userTileStyle,
+    this.reactionTextStyle,
+    this.removeReactionTextStyle,
+  });
+
+  factory LMChatReactionBottomSheetStyle.basic() {
+    return const LMChatReactionBottomSheetStyle(
+      padding: EdgeInsets.symmetric(horizontal: 18.0),
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(12.0),
+        topRight: Radius.circular(12.0),
+      ),
+      titleStyle: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+      ),
+      tabBarHeight: 40,
+      tabBarBorderWidth: 1,
+      tabItemPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+      selectedTabBorderWidth: 2,
+      tabTextStyle: TextStyle(),
+      listItemMargin: EdgeInsets.only(bottom: 10),
+      userTileStyle: LMChatTileStyle(verticalGap: 0, gap: 4),
+      reactionTextStyle: TextStyle(fontSize: 20),
+      removeReactionTextStyle: TextStyle(
+        color: LMChatDefaultTheme.greyColor,
+      ),
+    );
+  }
+
+  LMChatReactionBottomSheetStyle copyWith({
+    EdgeInsets? padding,
+    double? height,
+    Color? backgroundColor,
+    BorderRadius? borderRadius,
+    TextStyle? titleStyle,
+    double? tabBarHeight,
+    Color? tabBarBorderColor,
+    double? tabBarBorderWidth,
+    double? tabBarWidth,
+    EdgeInsets? tabItemPadding,
+    Color? selectedTabColor,
+    double? selectedTabBorderWidth,
+    TextStyle? selectedTabTextStyle,
+    TextStyle? tabTextStyle,
+    EdgeInsets? listItemMargin,
+    LMChatTileStyle? userTileStyle,
+    TextStyle? reactionTextStyle,
+    TextStyle? removeReactionTextStyle,
+  }) {
+    return LMChatReactionBottomSheetStyle(
+      padding: padding ?? this.padding,
+      height: height ?? this.height,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      titleStyle: titleStyle ?? this.titleStyle,
+      tabBarHeight: tabBarHeight ?? this.tabBarHeight,
+      tabBarBorderColor: tabBarBorderColor ?? this.tabBarBorderColor,
+      tabBarBorderWidth: tabBarBorderWidth ?? this.tabBarBorderWidth,
+      tabBarWidth: tabBarWidth ?? this.tabBarWidth,
+      tabItemPadding: tabItemPadding ?? this.tabItemPadding,
+      selectedTabColor: selectedTabColor ?? this.selectedTabColor,
+      selectedTabBorderWidth:
+          selectedTabBorderWidth ?? this.selectedTabBorderWidth,
+      selectedTabTextStyle: selectedTabTextStyle ?? this.selectedTabTextStyle,
+      tabTextStyle: tabTextStyle ?? this.tabTextStyle,
+      listItemMargin: listItemMargin ?? this.listItemMargin,
+      userTileStyle: userTileStyle ?? this.userTileStyle,
+      reactionTextStyle: reactionTextStyle ?? this.reactionTextStyle,
+      removeReactionTextStyle:
+          removeReactionTextStyle ?? this.removeReactionTextStyle,
+    );
+  }
+}

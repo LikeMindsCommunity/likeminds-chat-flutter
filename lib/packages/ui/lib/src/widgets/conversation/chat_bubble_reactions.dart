@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
-import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
+part of 'chat_bubble.dart';
 
 class LMChatBubbleReactions extends StatefulWidget {
   final LMChatConversationViewData conversation;
@@ -11,6 +7,7 @@ class LMChatBubbleReactions extends StatefulWidget {
   final List<LMChatReactionViewData>? reactions;
   final bool? isSent;
   final Function(String reaction)? onRemoveReaction;
+  final LMChatBubbleReactionsStyle? style;
 
   const LMChatBubbleReactions({
     super.key,
@@ -20,6 +17,7 @@ class LMChatBubbleReactions extends StatefulWidget {
     required this.userMeta,
     required this.conversation,
     required this.currentUser,
+    this.style,
   });
 
   @override
@@ -50,11 +48,15 @@ class _LMChatBubbleReactionsState extends State<LMChatBubbleReactions> {
   @override
   Widget build(BuildContext context) {
     List<String> keys = mappedReactions.keys.toList();
+    LMChatBubbleReactionsStyle effectiveStyle =
+        widget.style ?? LMChatTheme.theme.bubbleReactionsStyle;
+
     return ((conversation!.hasReactions ?? false) &&
-            (widget.reactions != null && widget.reactions!.isNotEmpty))
+            (widget.reactions != null && widget.reactions!.isNotEmpty) &&
+            conversation!.deletedByUserId == null)
         ? Container(
-            padding: const EdgeInsets.only(top: 4),
-            margin: const EdgeInsets.only(left: 8),
+            padding: effectiveStyle.padding ?? EdgeInsets.zero,
+            margin: effectiveStyle.margin ?? EdgeInsets.zero,
             child: GestureDetector(
               onTap: () {
                 showModalBottomSheet(
@@ -75,51 +77,59 @@ class _LMChatBubbleReactionsState extends State<LMChatBubbleReactions> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  keys.length >= 2
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: LMChatTheme.theme.container,
-                            borderRadius: BorderRadius.circular(18.0),
-                          ),
-                          child: Text(
-                            '${keys[1]}${mappedReactions[keys[1]]!.length}',
-                          ),
-                        )
-                      : const SizedBox(),
-                  keys.length >= 3
-                      ? Container(
-                          margin: const EdgeInsets.only(left: 4.0),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: LMChatTheme.theme.container,
-                            borderRadius: BorderRadius.circular(18.0),
-                          ),
-                          child: LMChatText(
-                            '${keys[2]}${mappedReactions[keys[2]]!.length}',
-                          ),
-                        )
-                      : const SizedBox(),
+                  if (keys.length >= 2)
+                    Container(
+                      padding:
+                          effectiveStyle.containerPadding ?? EdgeInsets.zero,
+                      decoration: BoxDecoration(
+                        color: effectiveStyle.containerColor ??
+                            LMChatTheme.theme.container,
+                        borderRadius: BorderRadius.circular(
+                          effectiveStyle.containerBorderRadius ?? 18.0,
+                        ),
+                      ),
+                      child: LMChatText(
+                        '${keys[1]}${mappedReactions[keys[1]]!.length}',
+                        style: LMChatTextStyle(
+                          textStyle: effectiveStyle.reactionTextStyle ??
+                              const TextStyle(),
+                        ),
+                      ),
+                    ),
+                  if (keys.length >= 3)
+                    Container(
+                      margin: const EdgeInsets.only(left: 4.0),
+                      padding: effectiveStyle.containerPadding,
+                      decoration: BoxDecoration(
+                        color: effectiveStyle.containerColor ??
+                            LMChatTheme.theme.container,
+                        borderRadius: BorderRadius.circular(
+                          effectiveStyle.containerBorderRadius ?? 18.0,
+                        ),
+                      ),
+                      child: LMChatText(
+                        '${keys[2]}${mappedReactions[keys[2]]!.length}',
+                        style: LMChatTextStyle(
+                          textStyle: effectiveStyle.reactionTextStyle,
+                        ),
+                      ),
+                    ),
                   kHorizontalPaddingSmall,
-                  reactions.length > 3
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: LMChatTheme.theme.container,
-                            borderRadius: BorderRadius.circular(18.0),
-                          ),
-                          child: const Text('...'),
-                        )
-                      : const SizedBox(),
+                  if (reactions.length > 3)
+                    Container(
+                      padding: effectiveStyle.containerPadding,
+                      decoration: BoxDecoration(
+                        color: effectiveStyle.containerColor ??
+                            LMChatTheme.theme.container,
+                        borderRadius: BorderRadius.circular(
+                          effectiveStyle.containerBorderRadius ?? 18.0,
+                        ),
+                      ),
+                      child: Text(
+                        '...',
+                        style: effectiveStyle.reactionTextStyle,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -139,5 +149,52 @@ class _LMChatBubbleReactionsState extends State<LMChatBubbleReactions> {
       }
     }
     return mappedReactions;
+  }
+}
+
+class LMChatBubbleReactionsStyle {
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final EdgeInsets? containerPadding;
+  final Color? containerColor;
+  final double? containerBorderRadius;
+  final TextStyle? reactionTextStyle;
+
+  const LMChatBubbleReactionsStyle({
+    this.padding,
+    this.margin,
+    this.containerPadding,
+    this.containerColor,
+    this.containerBorderRadius,
+    this.reactionTextStyle,
+  });
+
+  factory LMChatBubbleReactionsStyle.basic() {
+    return const LMChatBubbleReactionsStyle(
+      padding: EdgeInsets.only(top: 4),
+      margin: EdgeInsets.only(left: 8),
+      containerPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      containerBorderRadius: 18.0,
+      reactionTextStyle: TextStyle(),
+    );
+  }
+
+  LMChatBubbleReactionsStyle copyWith({
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    EdgeInsets? containerPadding,
+    Color? containerColor,
+    double? containerBorderRadius,
+    TextStyle? reactionTextStyle,
+  }) {
+    return LMChatBubbleReactionsStyle(
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      containerPadding: containerPadding ?? this.containerPadding,
+      containerColor: containerColor ?? this.containerColor,
+      containerBorderRadius:
+          containerBorderRadius ?? this.containerBorderRadius,
+      reactionTextStyle: reactionTextStyle ?? this.reactionTextStyle,
+    );
   }
 }

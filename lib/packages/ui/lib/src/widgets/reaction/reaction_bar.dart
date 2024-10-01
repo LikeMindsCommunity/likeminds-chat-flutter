@@ -3,6 +3,8 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
+const List<String> reactionEmojis = ['\u2764', '😂', '😮', '😢', '😡', '👍'];
+
 class LMChatReactionBar extends StatelessWidget {
   /// The function to call when a reaction is made.
   final Function(String reaction)? onReaction;
@@ -13,9 +15,20 @@ class LMChatReactionBar extends StatelessWidget {
   const LMChatReactionBar({
     Key? key,
     this.onReaction,
-    this.style, // Optional style parameter
-  }) : // Default to the style class
-        super(key: key);
+    this.style,
+  }) : super(key: key);
+
+  /// Creates a copy of the current instance with the given parameters.
+  LMChatReactionBar copyWith({
+    Function(String reaction)? onReaction,
+    LMChatReactionBarStyle? style,
+  }) {
+    return LMChatReactionBar(
+      key: key,
+      onReaction: onReaction ?? this.onReaction,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +40,7 @@ class LMChatReactionBar extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: effectiveStyle.background ?? LMChatTheme.theme.container,
-          borderRadius: BorderRadius.circular(style?.borderRadius ?? 6),
+          borderRadius: BorderRadius.circular(effectiveStyle.borderRadius ?? 6),
           boxShadow: [
             BoxShadow(
               blurRadius: 1,
@@ -45,8 +58,6 @@ class LMChatReactionBar extends StatelessWidget {
     );
   }
 }
-
-const List<String> reactionEmojis = ['\u2764', '😂', '😮', '😢', '😡', '👍'];
 
 Widget getListOfReactions({required Function(String)? onTap}) {
   return Row(
