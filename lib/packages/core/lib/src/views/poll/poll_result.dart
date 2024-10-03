@@ -31,11 +31,11 @@ class LMChatPollResultScreen extends StatefulWidget {
   final int? selectedOptionId;
   // Builder for empty feed view
   final LMChatContextWidgetBuilder? noItemsFoundIndicatorBuilder;
-  // Builder for first page loader when no post are there
+  // Builder for first page loader when no user are there
   final LMChatContextWidgetBuilder? firstPageProgressIndicatorBuilder;
-  // Builder for pagination loader when more post are there
+  // Builder for pagination loader when more user are there
   final LMChatContextWidgetBuilder? newPageProgressIndicatorBuilder;
-  // Builder for widget when no more post are there
+  // Builder for widget when no more user are there
   final LMChatContextWidgetBuilder? noMoreItemsIndicatorBuilder;
   // Builder for error view while loading a new page
   final LMChatContextWidgetBuilder? newPageErrorIndicatorBuilder;

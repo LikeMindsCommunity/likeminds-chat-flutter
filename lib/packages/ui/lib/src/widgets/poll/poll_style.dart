@@ -141,6 +141,16 @@ class LMChatPollStyle {
         margin: const EdgeInsets.only(top: 12, bottom: 6),
         spacing: 8,
       ),
+      addPollOptionButtonStyle: LMChatButtonStyle(
+        backgroundColor: containerColor,
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        borderRadius: 8,
+        border: Border.all(
+          color: primaryColor ?? LMChatDefaultTheme.primaryColor,
+        ),
+      ),
     );
   }
 
@@ -162,6 +172,8 @@ class LMChatPollStyle {
     LMChatTextStyle? pollInfoStyle,
     LMChatButtonStyle? submitPollButtonStyle,
     LMChatButtonStyle? editPollButtonStyle,
+    LMChatButtonStyle? addPollOptionButtonStyle,
+    LMChatPollOptionStyle? pollOptionStyle,
   }) {
     return LMChatPollStyle(
       margin: margin ?? this.margin,
@@ -177,6 +189,9 @@ class LMChatPollStyle {
       submitPollButtonStyle:
           submitPollButtonStyle ?? this.submitPollButtonStyle,
       editPollButtonStyle: editPollButtonStyle ?? this.editPollButtonStyle,
+      addPollOptionButtonStyle:
+          addPollOptionButtonStyle ?? this.addPollOptionButtonStyle,
+      pollOptionStyle: pollOptionStyle ?? this.pollOptionStyle,
     );
   }
 }

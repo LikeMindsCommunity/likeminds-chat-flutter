@@ -90,7 +90,7 @@ Future<void> addOption(
   LMChatConversationViewData conversationData,
   String option,
   LMChatUserViewData? currentUser,
-  ValueNotifier<bool> rebuildPostWidget,
+  ValueNotifier<bool> rebuildChatWidget,
   LMChatWidgetSource source,
 ) async {
   AddPollOptionRequest request = (AddPollOptionRequestBuilder()
@@ -106,7 +106,7 @@ Future<void> addOption(
     toast(
       "Option added successfully",
     );
-    rebuildPostWidget.value = !rebuildPostWidget.value;
+    rebuildChatWidget.value = !rebuildChatWidget.value;
   }
 }
 

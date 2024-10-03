@@ -262,3 +262,18 @@ typedef LMChatTextBuilder = Widget Function(
   BuildContext,
   LMChatText,
 );
+
+/// {@template lm_chat_poll_builder}
+/// The poll builder function for the chat screen.
+/// This function is called to build the poll for the chat screen.
+/// The [LMChatPollBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatPoll] poll: The poll.
+/// - [LMChatConversationViewData] conversation: The conversation.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatPollBuilder = Widget Function(
+  BuildContext context,
+  LMChatPoll poll,
+  LMChatConversationViewData conversation,
+);

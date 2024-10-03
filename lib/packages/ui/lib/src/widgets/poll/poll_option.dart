@@ -36,6 +36,27 @@ class LMChatPollOption extends StatelessWidget {
   /// callback when the vote is clicked
   final void Function(LMChatPollOptionViewData)? onVoteClick;
 
+  /// Creates a copy of this [LMChatPollOption] but with the given fields replaced with the new values.
+  LMChatPollOption copyWith({
+    bool? isVoteEditing,
+    List<int>? selectedOption,
+    LMChatConversationViewData? pollData,
+    LMChatPollOptionViewData? option,
+    void Function(LMChatPollOptionViewData)? onOptionSelect,
+    void Function(LMChatPollOptionViewData)? onVoteClick,
+    LMChatPollOptionStyle? pollOptionStyle,
+  }) {
+    return LMChatPollOption(
+      isVoteEditing: isVoteEditing ?? _isVoteEditing,
+      selectedOption: selectedOption ?? _selectedOption,
+      pollData: pollData ?? _pollData,
+      option: option ?? _option,
+      onOptionSelect: onOptionSelect ?? this.onOptionSelect,
+      onVoteClick: onVoteClick ?? this.onVoteClick,
+      pollOptionStyle: pollOptionStyle ?? _optionStyle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(

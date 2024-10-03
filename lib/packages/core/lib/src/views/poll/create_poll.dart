@@ -3,12 +3,16 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+/// {@template lm_chat_create_poll}
+/// Create Poll widget
+/// responsible for creating the poll
+/// {@endtemplate}
 class LMChatCreatePoll extends StatefulWidget {
+  /// {@macro lm_chat_create_poll}
   const LMChatCreatePoll({
     super.key,
     required this.chatroomId,
     this.repliedConversationId,
-    this.appBarBuilder,
     this.pollQuestionStyle,
     this.optionStyle,
     this.advancedButtonBuilder,
@@ -17,11 +21,11 @@ class LMChatCreatePoll extends StatefulWidget {
     this.scrollController,
   });
 
+  /// [chatroomId] chatroomId for which poll is created
   final int chatroomId;
-  final String? repliedConversationId;
 
-  /// [LMChatPostAppBarBuilder] Builder for app bar
-  final LMChatAppBarBuilder? appBarBuilder;
+  /// [repliedConversationId] repliedConversationId for which poll is created
+  final String? repliedConversationId;
 
   /// [LMChatTextFieldStyle] for poll question
   final LMChatTextFieldStyle? pollQuestionStyle;
@@ -73,7 +77,7 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
   }) async {
     // unfocus text fields if any and request focus for date picker
     FocusScope.of(context).requestFocus(FocusNode());
-    
+
     initialDate ??= DateTime.now();
     firstDate ??= DateTime.now();
     lastDate ??= firstDate.add(const Duration(days: 365 * 200));

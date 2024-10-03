@@ -58,6 +58,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatCore.config.chatRoomConfig.builder;
   late PagingController<int, LMChatConversationViewData> pagedListController =
       PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
+  final LMChatThemeData theme = LMChatTheme.theme;
 
   @override
   void initState() {
@@ -250,6 +251,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     bool isVoteEditing = false;
 
     return LMChatPoll(
+      style: LMChatPollStyle.basic(
+        primaryColor: theme.primaryColor,
+        containerColor: theme.container,
+        inActiveColor: theme.inActiveColor,
+        onContainer: theme.onContainer,
+      ),
       rebuildPollWidget: rebuildPoll,
       pollData: conversation,
       selectedOption: selectedOptions,
@@ -315,8 +322,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           rebuildPoll,
           LMChatWidgetSource.chatroom,
         );
-        //TODO: find the way to update only poll options
-        rebuildConversationList.value = !rebuildConversationList.value;
+        // rebuildConversationList.value = !rebuildConversationList.value;
       },
       onVoteClick: (option) {
         onVoteTextTap(
@@ -525,7 +531,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       );
     }
     if (state is LMChatConversationUpdatedState) {
-      if (state.conversationViewData.id != lastConversationId || state.shouldUpdate) {
+      if (state.conversationViewData.id != lastConversationId ||
+          state.shouldUpdate) {
         conversationAttachmentsMeta.addAll(state.attachments ?? {});
         addConversationToPagedList(
           state.conversationViewData,

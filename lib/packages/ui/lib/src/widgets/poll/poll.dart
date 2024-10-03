@@ -130,6 +130,7 @@ class LMChatPoll extends StatefulWidget {
   final Widget Function(
     BuildContext,
     LMChatPollOption,
+    LMChatConversationViewData,
   )? pollOptionBuilder;
 
   /// [Widget Function(BuildContext, LMChatButton,  Function(String))] Builder for the add option button
@@ -144,6 +145,67 @@ class LMChatPoll extends StatefulWidget {
 
   /// [VoidCallback] error callback to be called when same option is added
   final VoidCallback? onSameOptionAdded;
+
+  /// copyWith method for the LMChatPoll
+  /// Returns a new instance of LMChatPoll with the updated values
+  /// The values that are not updated remain the same
+  LMChatPoll copyWith({
+    ValueNotifier<bool>? rebuildPollWidget,
+    LMChatConversationViewData? pollData,
+    Function(LMChatConversationViewData)? onEditVote,
+    LMChatPollStyle? style,
+    void Function(LMChatPollOptionViewData)? onOptionSelect,
+    bool? isVoteEditing,
+    List<int>? selectedOption,
+    void Function(String option)? onAddOptionSubmit,
+    Function(LMChatPollOptionViewData)? onVoteClick,
+    Function(List<LMChatPollOptionViewData> selectedOption)? onSubmit,
+    VoidCallback? onAnswerTextTap,
+    Widget Function(BuildContext, LMChatText)? pollTypeTextBuilder,
+    Widget Function(BuildContext)? pollHeaderSeparatorBuilder,
+    Widget Function(BuildContext, LMChatText)? votingTypeTextBuilder,
+    Widget Function(BuildContext, LMChatIcon)? pollIconBuilder,
+    Widget Function(BuildContext, LMChatText)? timeLeftTextBuilder,
+    Widget Function(BuildContext)? pollQuestionBuilder,
+    Widget Function(BuildContext, LMChatText)? pollSelectionTextBuilder,
+    Widget Function(BuildContext, LMChatPollOption, LMChatConversationViewData)?
+        pollOptionBuilder,
+    Widget Function(BuildContext, LMChatButton, Function(String))?
+        addOptionButtonBuilder,
+    LMChatButtonBuilder? submitButtonBuilder,
+    Widget Function(BuildContext, LMChatText)? subTextBuilder,
+    VoidCallback? onSameOptionAdded,
+  }) {
+    return LMChatPoll(
+      rebuildPollWidget: rebuildPollWidget ?? this.rebuildPollWidget,
+      pollData: pollData ?? this.pollData,
+      onEditVote: onEditVote ?? this.onEditVote,
+      style: style ?? this.style,
+      onOptionSelect: onOptionSelect ?? this.onOptionSelect,
+      isVoteEditing: isVoteEditing ?? this.isVoteEditing,
+      selectedOption: selectedOption ?? this.selectedOption,
+      onAddOptionSubmit: onAddOptionSubmit ?? this.onAddOptionSubmit,
+      onVoteClick: onVoteClick ?? this.onVoteClick,
+      onSubmit: onSubmit ?? this.onSubmit,
+      onAnswerTextTap: onAnswerTextTap ?? this.onAnswerTextTap,
+      pollTypeTextBuilder: pollTypeTextBuilder ?? this.pollTypeTextBuilder,
+      pollHeaderSeparatorBuilder:
+          pollHeaderSeparatorBuilder ?? this.pollHeaderSeparatorBuilder,
+      votingTypeTextBuilder:
+          votingTypeTextBuilder ?? this.votingTypeTextBuilder,
+      pollIconBuilder: pollIconBuilder ?? this.pollIconBuilder,
+      timeLeftTextBuilder: timeLeftTextBuilder ?? this.timeLeftTextBuilder,
+      pollQuestionBuilder: pollQuestionBuilder ?? this.pollQuestionBuilder,
+      pollSelectionTextBuilder:
+          pollSelectionTextBuilder ?? this.pollSelectionTextBuilder,
+      pollOptionBuilder: pollOptionBuilder ?? this.pollOptionBuilder,
+      addOptionButtonBuilder:
+          addOptionButtonBuilder ?? this.addOptionButtonBuilder,
+      submitButtonBuilder: submitButtonBuilder ?? this.submitButtonBuilder,
+      subTextBuilder: subTextBuilder ?? this.subTextBuilder,
+      onSameOptionAdded: onSameOptionAdded ?? this.onSameOptionAdded,
+    );
+  }
 
   @override
   State<LMChatPoll> createState() => _LMChatPollState();
@@ -172,6 +234,7 @@ class _LMChatPollState extends State<LMChatPoll> {
     _lmChatPollStyle = widget.style ??
         LMChatPollStyle.basic(
           primaryColor: theme.primaryColor,
+          inActiveColor: theme.inActiveColor,
         );
     // assign value notifier
     _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
@@ -185,6 +248,7 @@ class _LMChatPollState extends State<LMChatPoll> {
     _lmChatPollStyle = widget.style ??
         LMChatPollStyle.basic(
           primaryColor: theme.primaryColor,
+          inActiveColor: theme.inActiveColor,
         );
     // assign value notifier
     _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
@@ -287,6 +351,7 @@ class _LMChatPollState extends State<LMChatPoll> {
         return widget.pollOptionBuilder?.call(
               context,
               _defPollOption(index),
+              pollData,
             ) ??
             _defPollOption(index);
       },
@@ -454,23 +519,21 @@ class _LMChatPollState extends State<LMChatPoll> {
                     },
                     text: LMChatText(
                       'SUBMIT',
-                      style: _lmChatPollStyle.pollInfoStyle ??
-                          LMChatTextStyle(
-                            textStyle: TextStyle(
-                              height: 1.33,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: theme.container,
-                            ),
-                          ),
-                    ),
-                    style: _lmChatPollStyle.submitPollButtonStyle ??
-                        LMChatButtonStyle(
-                          backgroundColor: theme.primaryColor,
-                          borderRadius: 100,
-                          width: 150,
-                          height: 44,
+                      style: LMChatTextStyle(
+                        textStyle: TextStyle(
+                          height: 1.33,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: theme.container,
                         ),
+                      ),
+                    ),
+                    style: LMChatButtonStyle(
+                      backgroundColor: theme.primaryColor,
+                      borderRadius: 100,
+                      width: 150,
+                      height: 44,
+                    ),
                   ),
                   LMChatDefaultTheme.kVerticalPaddingMedium,
                 ],
@@ -489,7 +552,7 @@ class _LMChatPollState extends State<LMChatPoll> {
           ),
         ),
       ),
-      style: _lmChatPollStyle.addPollOptionButtonStyle,
+      style: _lmChatPollStyle.addPollOptionButtonStyle!,
     );
   }
 
@@ -576,15 +639,14 @@ class _LMChatPollState extends State<LMChatPoll> {
         },
         text: LMChatText(
           'SUBMIT VOTE',
-          style: _lmChatPollStyle.pollInfoStyle ??
-              LMChatTextStyle(
-                textStyle: TextStyle(
-                  height: 1.33,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: theme.primaryColor,
-                ),
-              ),
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              height: 1.33,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: theme.primaryColor,
+            ),
+          ),
         ),
         style: _lmChatPollStyle.submitPollButtonStyle);
   }

@@ -103,6 +103,9 @@ class LMChatBubble extends StatefulWidget {
   /// Poll Widget
   final LMChatPoll? poll;
 
+  /// Poll Widget builder
+  final LMChatPollBuilder? pollBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -131,6 +134,7 @@ class LMChatBubble extends StatefulWidget {
     this.mediaBuilder,
     this.linkPreviewBuilder,
     this.poll,
+    this.pollBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -139,6 +143,8 @@ class LMChatBubble extends StatefulWidget {
     LMChatConversationViewData? conversation,
     LMChatUserViewData? currentUser,
     LMChatUserViewData? conversationUser,
+    List<LMChatAttachmentViewData>? attachments,
+    bool? isSent,
     LMChatIcon? replyIcon,
     LMChatProfilePicture? avatar,
     Function(LMChatConversationViewData)? onReply,
@@ -147,6 +153,7 @@ class LMChatBubble extends StatefulWidget {
     LMChatBubbleStyle? style,
     bool? isSelected,
     Function(bool isSelected, State<LMChatBubble> state)? onTap,
+    void Function()? onMediaTap,
     Function(bool isSelected, State<LMChatBubble> state)? onLongPress,
     bool Function()? isSelectableOnTap,
     Widget Function(BuildContext context, LMChatBubbleContent content)?
@@ -164,11 +171,16 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(LMChatOGTagsViewData ogTags,
             LMChatLinkPreview oldLinkPreviewWidget)?
         linkPreviewBuilder,
+    bool? isDM,
+    LMChatPoll? poll,
+    LMChatPollBuilder? pollBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
       currentUser: currentUser ?? this.currentUser,
       conversationUser: conversationUser ?? this.conversationUser,
+      attachments: attachments ?? this.attachments,
+      isSent: isSent ?? this.isSent,
       onReply: onReply ?? this.onReply,
       onTagTap: onTagTap ?? this.onTagTap,
       replyIcon: replyIcon ?? this.replyIcon,
@@ -177,6 +189,7 @@ class LMChatBubble extends StatefulWidget {
       style: style ?? this.style,
       isSelected: isSelected ?? this.isSelected,
       onTap: onTap ?? this.onTap,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
       onLongPress: onLongPress ?? this.onLongPress,
       isSelectableOnTap: isSelectableOnTap ?? this.isSelectableOnTap,
       contentBuilder: contentBuilder ?? this.contentBuilder,
@@ -185,6 +198,9 @@ class LMChatBubble extends StatefulWidget {
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
+      isDM: isDM ?? this.isDM,
+      poll: poll ?? this.poll,
+      pollBuilder: pollBuilder ?? this.pollBuilder,
     );
   }
 
@@ -349,7 +365,20 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 conversationUser: widget.conversationUser,
                               ),
                         // poll widget
-                        if (conversation.state == 10) widget.poll!,
+                        if (conversation.state == 10) ...[
+                          widget.pollBuilder?.call(
+                                context,
+                                widget.poll ??
+                                    LMChatPoll(
+                                      pollData: conversation,
+                                    ),
+                                conversation,
+                              ) ??
+                              widget.poll ??
+                              LMChatPoll(
+                                pollData: conversation,
+                              ),
+                        ],
                         // link preview widget
                         if (conversation.ogTags != null &&
                             conversation.deletedByUserId == null)
