@@ -18,23 +18,23 @@ extension MediaConvertor on LMChatAttachmentViewData {
   }
 }
 
-// /// [MediaConvertor] is an extension on [LMChatAttachmentViewData] class.
-// /// It converts [LMChatAttachmentViewData] to [LMChatMediaModel].
-// extension ViewDataConvertor on LMChatMediaModel {
-//   /// Converts [LMChatAttachmentViewData] to [LMChatMediaModel]
-//   LMChatAttachmentViewData toAttachmentViewData() {
-//     final LMChatAttachmentViewDataBuilder attachmentBuilder =
-//         LMChatAttachmentViewDataBuilder()
-//           ..attachmentFile(mediaFile)
-//           ..fileUrl(mediaUrl)
-//           ..height(height)
-//           ..width(width)
-//           ..meta(meta)
-//           ..thumbnailFile(thumbnailFile)
-//           ..thumbnailUrl(thumbnailUrl)
-//           ..type(mapMediaTypeToString(mediaType))
-//           ..url(mediaUrl);
+/// [MediaConvertor] is an extension on [LMChatAttachmentViewData] class.
+/// It converts [LMChatAttachmentViewData] to [LMChatMediaModel].
+extension ViewDataConvertor on LMChatMediaModel {
+  /// Converts [LMChatAttachmentViewData] to [LMChatMediaModel]
+  LMChatAttachmentViewData toAttachmentViewData() {
+    final LMChatAttachmentViewDataBuilder attachmentBuilder =
+        LMChatAttachmentViewDataBuilder()
+          ..attachmentFile(mediaFile)
+          ..fileUrl(mediaUrl)
+          ..height(height)
+          ..width(width)
+          ..meta(meta)
+          ..thumbnailFile(thumbnailFile)
+          ..thumbnailUrl(thumbnailUrl)
+          ..type(mapMediaTypeToString(mediaType))
+          ..url(mediaUrl);
 
-//     return attachmentBuilder.build();
-//   }
-// }
+    return attachmentBuilder.build();
+  }
+}

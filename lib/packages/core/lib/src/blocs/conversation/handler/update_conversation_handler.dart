@@ -17,7 +17,7 @@ updateConversationsEventHandler(
               ..maxTimestamp(maxTimestamp * 1000)
               ..isLocalDB(false)
               ..page(1)
-              ..pageSize(200)
+              ..pageSize(50)
               ..conversationId(event.conversationId))
             .build());
     debugPrint("updateConversationsEventHandler: $response");

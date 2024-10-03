@@ -4,7 +4,6 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 
-
 /// {@template lm_chat_poll_result_screen}
 /// A screen to display poll results.
 /// {@endtemplate}
@@ -161,14 +160,12 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
 
   LMChatText _defOptionText(LMChatPollOptionViewData option) {
     return LMChatText(
-                          option.text,
-                        );
+      option.text,
+    );
   }
 
   LMChatText _defVoteCountText(LMChatPollOptionViewData option) {
-    return LMChatText(
-                          option.noVotes.toString(),
-                        );
+    return LMChatText(option.noVotes.toString());
   }
 
   LMChatAppBar _defAppBar() {
@@ -221,8 +218,8 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
 
   LMChatUserTile _defUserTile(LMChatUserViewData item) {
     return LMChatUserTile(
-          userViewData: item,
-        );
+      userViewData: item,
+    );
   }
 
   Center _defNoResponse() {
