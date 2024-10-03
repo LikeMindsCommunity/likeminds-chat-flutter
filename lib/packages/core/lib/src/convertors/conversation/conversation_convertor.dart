@@ -62,16 +62,22 @@ extension ConversationViewDataConvertor on Conversation {
                   conversationPollsMeta: conversationPollsMeta,
                   userMeta: userMeta))
           ..ogTags(ogTags?.toLMChatOGTagViewData())
-        // ..conversationReactions(conversationReactions?.map((LMChatReactionViewData reaction) => reaction.toReactionViewData()).toList())
-        // ..poll(poll?.toPollViewData())
-        ;
+          ..poll(this
+              .polls
+              ?.map((e) => e.toPollOptionViewData(
+                    userMeta: userMeta,
+                  ))
+              .toList());
     final polls = conversationPollsMeta?[id.toString()];
     if (polls != null) {
       polls.sort((a, b) => a.id!.compareTo(b.id!));
     }
     if (polls != null) {
-      conversationBuilder
-          .poll(polls.map((e) => e.toPollOptionViewData()).toList());
+      conversationBuilder.poll(polls
+          .map((e) => e.toPollOptionViewData(
+                userMeta: userMeta,
+              ))
+          .toList());
     }
     return conversationBuilder.build();
   }

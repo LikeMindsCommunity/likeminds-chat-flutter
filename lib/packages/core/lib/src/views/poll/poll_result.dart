@@ -4,7 +4,12 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 
+
+/// {@template lm_chat_poll_result_screen}
+/// A screen to display poll results.
+/// {@endtemplate}
 class LMChatPollResultScreen extends StatefulWidget {
+  /// {@macro lm_chat_poll_result_screen}
   const LMChatPollResultScreen({
     super.key,
     required this.conversationId,
@@ -93,29 +98,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
         backgroundColor: theme.container,
-        appBar: LMChatAppBar(
-          style: LMChatAppBarStyle(
-            height: 50,
-            padding: const EdgeInsets.only(
-              right: 16,
-            ),
-            backgroundColor: theme.container,
-            border: Border.all(
-              color: Colors.transparent,
-            ),
-          ),
-          leading: const BackButton(),
-          title: LMChatText(
-            'Poll Results',
-            style: LMChatTextStyle(
-              textStyle: TextStyle(
-                color: theme.onContainer,
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-        ),
+        appBar: _defAppBar(),
         body: Column(
           children: [
             TabBar(
@@ -150,12 +133,8 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
                               : width / 4),
                       child: Column(
                         children: [
-                          LMChatText(
-                            option.noVotes.toString(),
-                          ),
-                          LMChatText(
-                            option.text,
-                          ),
+                          _defVoteCountText(option),
+                          _defOptionText(option),
                         ],
                       ),
                     ),
@@ -180,6 +159,44 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         ));
   }
 
+  LMChatText _defOptionText(LMChatPollOptionViewData option) {
+    return LMChatText(
+                          option.text,
+                        );
+  }
+
+  LMChatText _defVoteCountText(LMChatPollOptionViewData option) {
+    return LMChatText(
+                          option.noVotes.toString(),
+                        );
+  }
+
+  LMChatAppBar _defAppBar() {
+    return LMChatAppBar(
+      style: LMChatAppBarStyle(
+        height: 50,
+        padding: const EdgeInsets.only(
+          right: 16,
+        ),
+        backgroundColor: theme.container,
+        border: Border.all(
+          color: Colors.transparent,
+        ),
+      ),
+      leading: const BackButton(),
+      title: LMChatText(
+        'Poll Results',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            color: theme.onContainer,
+            fontSize: 20,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _defListView(LMChatPollOptionViewData option) {
     if (option.noVotes != null && option.noVotes! <= 0) {
       return _defNoResponse();
@@ -192,7 +209,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
       pagingController: pagingController,
       builderDelegate: PagedChildBuilderDelegate(
         itemBuilder: (context, item, index) {
-          return UserTile(user: item);
+          return _defUserTile(item);
         },
         noItemsFoundIndicatorBuilder: (context) {
           return widget.noItemsFoundIndicatorBuilder?.call(context) ??
@@ -200,6 +217,12 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         },
       ),
     );
+  }
+
+  LMChatUserTile _defUserTile(LMChatUserViewData item) {
+    return LMChatUserTile(
+          userViewData: item,
+        );
   }
 
   Center _defNoResponse() {
@@ -245,7 +268,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   }
 
   Future<void> _getUserList(
-    PagingController<int, LMChatUserViewData> _pagingController,
+    PagingController<int, LMChatUserViewData> pagingController,
     int page,
     int pollOptionId,
   ) async {
@@ -257,50 +280,15 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
     LMResponse<GetPollUsersResponse> response =
         await LMChatCore.instance.lmChatClient.getPollUsers(request);
     if (!response.success) {
-      _pagingController.error = response.errorMessage;
+      pagingController.error = response.errorMessage;
       return;
     }
 
     final List<LMChatUserViewData> users =
         response.data!.data!.map((e) => e.toUserViewData()).toList();
 
-    _pagingController.appendLastPage(
+    pagingController.appendLastPage(
       users,
-    );
-  }
-}
-
-class UserTile extends StatelessWidget {
-  final LMChatUserViewData? user;
-  const UserTile({
-    super.key,
-    required this.user,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: LMChatUserTile(
-        userViewData: user!,
-        subtitle: const SizedBox.shrink(),
-        style: const LMChatTileStyle(
-          gap: 2,
-          padding: EdgeInsets.only(
-            left: 16.0,
-            top: 16.0,
-            right: 8.0,
-          ),
-        ),
-        onTap: () {
-          LMChatProfileBloc.instance.add(
-            LMChatRouteToUserProfileEvent(
-              uuid: user?.sdkClientInfo?.uuid ?? user?.uuid ?? '',
-              context: context,
-            ),
-          );
-        },
-      ),
     );
   }
 }

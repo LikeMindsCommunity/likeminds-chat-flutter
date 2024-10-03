@@ -39,3 +39,4 @@ export 'common/dialog/dialog.dart';
 
 export 'poll/poll.dart';
 export 'poll/poll_style.dart';
+export 'poll/poll_option.dart';

@@ -182,7 +182,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
-    ValueNotifier<bool> rebuildPoll = ValueNotifier(false);
     return LMChatBubble(
       conversation: conversation,
       attachments:
@@ -190,47 +189,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
-      poll: LMChatPoll(
-        rebuildPollWidget: rebuildPoll,
-        pollData: conversation,
-        onOptionSelect: (option) {
-          submitVote(
-            context,
-            conversation,
-            [option],
-            {},
-            conversation.copyWith(),
-            rebuildPoll,
-          );
-        },
-        onAddOptionSubmit: (optionText) async {
-          await addOption(
-            context,
-            conversation,
-            optionText,
-            user.toUserViewData(),
-            rebuildPoll,
-            LMChatWidgetSource.chatroom,
-          );
-          //TODO: find the way to update only poll options
-          rebuildConversationList.value = !rebuildConversationList.value;
-        },
-        onVoteClick: (option) {
-          onVoteTextTap(
-            context,
-            conversation,
-            LMChatWidgetSource.chatroom,
-            option: option,
-          );
-        },
-        onAnswerTextTap: () {
-          onVoteTextTap(
-            context,
-            conversation,
-            LMChatWidgetSource.chatroom,
-          );
-        },
-      ),
+      poll: _defPoll(conversation),
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -285,12 +244,105 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     );
   }
 
+  LMChatPoll _defPoll(LMChatConversationViewData conversation) {
+    ValueNotifier<bool> rebuildPoll = ValueNotifier(false);
+    final List<int> selectedOptions = [];
+    bool isVoteEditing = false;
+
+    return LMChatPoll(
+      rebuildPollWidget: rebuildPoll,
+      pollData: conversation,
+      selectedOption: selectedOptions,
+      onEditVote: (pollData) {
+        isVoteEditing = true;
+        selectedOptions.clear();
+        pollData.poll?.forEach((element) {
+          if (element.isSelected == true) {
+            selectedOptions.add(element.id!);
+          }
+        });
+        rebuildPoll.value = !rebuildPoll.value;
+      },
+      onSubmit: (options) {
+        submitVote(
+          context,
+          conversation,
+          options,
+          {},
+          conversation.copyWith(),
+          widget.chatroomId,
+        );
+      },
+      onOptionSelect: (option) {
+        // if poll has ended, then do not allow to vote
+        if (LMChatPollUtils.hasPollEnded(conversation.expiryTime)) {
+          return;
+        }
+        // if poll is submitted and not editing votes, then do not allow to vote
+        if (LMChatPollUtils.isPollSubmitted(conversation.poll ?? []) &&
+            !isVoteEditing) {
+          return;
+        }
+        // if multiple select is enabled, then add the option to the selected options
+        // else submit the vote
+        if (LMChatPollUtils.isMultiChoicePoll(
+            conversation.multipleSelectNo, conversation.multipleSelectState)) {
+          if (selectedOptions.contains(option.id)) {
+            selectedOptions.remove(option.id);
+          } else {
+            if (option.id != null) {
+              selectedOptions.add(option.id!);
+            }
+          }
+          rebuildPoll.value = !rebuildPoll.value;
+        } else {
+          submitVote(
+            context,
+            conversation,
+            [option],
+            {},
+            conversation.copyWith(),
+            widget.chatroomId,
+          );
+        }
+      },
+      onAddOptionSubmit: (optionText) async {
+        await addOption(
+          context,
+          conversation,
+          optionText,
+          user.toUserViewData(),
+          rebuildPoll,
+          LMChatWidgetSource.chatroom,
+        );
+        //TODO: find the way to update only poll options
+        rebuildConversationList.value = !rebuildConversationList.value;
+      },
+      onVoteClick: (option) {
+        onVoteTextTap(
+          context,
+          conversation,
+          LMChatWidgetSource.chatroom,
+          option: option,
+        );
+      },
+      onAnswerTextTap: () {
+        onVoteTextTap(
+          context,
+          conversation,
+          LMChatWidgetSource.chatroom,
+        );
+      },
+    );
+  }
+
   LMChatBubble _defaultReceivedChatBubble(
       LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
       attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
+      poll: _defPoll(conversation),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
       onReply: (conversation) {
@@ -473,7 +525,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       );
     }
     if (state is LMChatConversationUpdatedState) {
-      if (state.conversationViewData.id != lastConversationId) {
+      if (state.conversationViewData.id != lastConversationId || state.shouldUpdate) {
         conversationAttachmentsMeta.addAll(state.attachments ?? {});
         addConversationToPagedList(
           state.conversationViewData,

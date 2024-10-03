@@ -71,6 +71,9 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
     DateTime? firstDate,
     DateTime? lastDate,
   }) async {
+    // unfocus text fields if any and request focus for date picker
+    FocusScope.of(context).requestFocus(FocusNode());
+    
     initialDate ??= DateTime.now();
     firstDate ??= DateTime.now();
     lastDate ??= firstDate.add(const Duration(days: 365 * 200));
@@ -88,6 +91,7 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
                   primary: theme.primaryColor,
                   onPrimary: theme.onPrimary,
                 ),
+                useMaterial3: false,
               ),
               child: child!);
         });
@@ -106,6 +110,7 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
                 primary: theme.primaryColor,
                 onPrimary: theme.onPrimary,
               ),
+              useMaterial3: false,
             ),
             child: child!);
       },

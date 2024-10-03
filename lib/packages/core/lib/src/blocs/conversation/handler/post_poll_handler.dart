@@ -11,23 +11,27 @@ void postPollConversationHandler(
   final DateTime dateTime = DateTime.now();
   LMChatConversationViewData conversationViewData =
       (LMChatConversationViewDataBuilder()
+            ..allowAddOption(pollRequest.allowAddOption)
             ..answer(pollRequest.text)
             ..chatroomId(pollRequest.chatroomId)
             ..createdAt("")
+            ..expiryTime(pollRequest.expiryTime)
             ..memberId(user.id)
-            ..header("")
+            ..member(user.toUserViewData())
+            ..multipleSelectNo(pollRequest.multipleSelectNo)
+            ..multipleSelectState(LMChatPollMultiSelectState.fromValue(
+                pollRequest.multipleSelectState))
             ..date("${dateTime.day} ${dateTime.month} ${dateTime.year}")
             ..state(10)
             ..poll(event.postPollConversationRequest.polls
                 .map((e) => e.toPollOptionViewData())
                 .toList())
-            // ..replyId(pollRequest.repliedConversationId?? )
-            // ..attachmentCount(event.attachmentCount)
-            // ..replyConversationObject(event.repliedTo)
-            // ..hasFiles(event.hasFiles)
+            ..pollType(LMChatPollType.fromValue(pollRequest.pollType))
             ..member(user.toUserViewData())
             ..temporaryId(pollRequest.temporaryId)
-            ..id(1))
+            ..id(int.parse(pollRequest.temporaryId))
+            ..submitTypeText(
+                pollRequest.isAnonymous ? "Secret voting " : "Public voting"))
           .build();
   emit(LMChatLocalConversationState(conversationViewData));
 
@@ -36,15 +40,7 @@ void postPollConversationHandler(
   if (response.success && response.data != null) {
     Conversation conversation = response.data!.conversation!;
     conversationViewData = conversation.toConversationViewData();
-    // if (conversation.replyId != null ||
-    //     conversation.replyConversation != null) {
-    //   conversationViewData = conversationViewData.copyWith(
-    //     replyConversationObject: event.repliedTo,
-    //   );
-    // }
     emit(LMChatConversationPostedState(conversationViewData));
-
-    LMChatConversationBloc.instance.lastConversationId = conversation.id;
   } else {
     emit(LMChatConversationErrorState(
       response.errorMessage!,

@@ -734,61 +734,65 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          LMChatButton(
-                            onTap: () async {
-                              _popupMenuController.hideMenu();
-                              // unfocus the text field
-                              _focusNode.unfocus();
-                              // show bottom sheet to create a poll
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                useSafeArea: true,
-                                builder: (context) {
-                                  return DraggableScrollableSheet(
-                                    expand: false,
-                                    initialChildSize: 0.9,
-                                    minChildSize: 0.5,
-                                    snap: true,
-                                    builder: (_, controller) =>
-                                        LMChatCreatePoll(
-                                      chatroomId: widget.chatroom.id,
-                                      scrollController: controller,
+                    widget.chatroom.type != 10
+                        ? Expanded(
+                            child: Column(
+                              children: [
+                                LMChatButton(
+                                  onTap: () async {
+                                    _popupMenuController.hideMenu();
+                                    // unfocus the text field
+                                    _focusNode.unfocus();
+                                    // show bottom sheet to create a poll
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                      builder: (context) {
+                                        return DraggableScrollableSheet(
+                                          expand: false,
+                                          initialChildSize: 0.9,
+                                          minChildSize: 0.5,
+                                          snap: true,
+                                          builder: (_, controller) =>
+                                              LMChatCreatePoll(
+                                            chatroomId: widget.chatroom.id,
+                                            scrollController: controller,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: LMChatIcon(
+                                    type: LMChatIconType.icon,
+                                    icon: Icons.poll_outlined,
+                                    style: LMChatIconStyle(
+                                      color: LMChatTheme.theme.container,
+                                      size: 30,
+                                      boxSize: 48,
+                                      boxPadding: EdgeInsets.zero,
                                     ),
-                                  );
-                                },
-                              );
-                            },
-                            icon: LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.poll_outlined,
-                              style: LMChatIconStyle(
-                                color: LMChatTheme.theme.container,
-                                size: 30,
-                                boxSize: 48,
-                                boxPadding: EdgeInsets.zero,
-                              ),
+                                  ),
+                                  style: LMChatButtonStyle(
+                                    height: 48,
+                                    width: 48,
+                                    borderRadius: 24,
+                                    backgroundColor:
+                                        LMChatTheme.theme.secondaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                LMChatText(
+                                  'Poll',
+                                  style: LMChatTextStyle(
+                                    textStyle:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ),
+                              ],
                             ),
-                            style: LMChatButtonStyle(
-                              height: 48,
-                              width: 48,
-                              borderRadius: 24,
-                              backgroundColor: LMChatTheme.theme.secondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          LMChatText(
-                            'Poll',
-                            style: LMChatTextStyle(
-                              textStyle: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          )
+                        : const Spacer(),
                     const Spacer(),
                   ],
                 ),

@@ -121,16 +121,23 @@ class LMChatUpdateConversationsEvent extends LMChatConversationEvent {
   /// Id of the chatroom where the conversation is to be updated
   final int chatroomId;
 
+  /// check if the conversation should be updated explicitly
+  /// irrespective of the last conversation id
+  /// This is useful when editing a poll
+  final bool shouldUpdate;
+
   /// Creates and returns a new instance of [LMChatUpdateConversationsEvent]
   LMChatUpdateConversationsEvent({
     required this.conversationId,
     required this.chatroomId,
+    this.shouldUpdate = false,
   });
 
   @override
   List<Object> get props => [
         conversationId,
         chatroomId,
+        shouldUpdate,
       ];
 }
 

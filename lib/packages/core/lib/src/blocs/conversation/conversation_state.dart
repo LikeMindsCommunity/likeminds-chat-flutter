@@ -49,16 +49,23 @@ class LMChatConversationUpdatedState extends LMChatConversationState {
 
   final Map<String, List<LMChatAttachmentViewData>> attachments;
 
+  /// check if the conversation should be updated explicitly
+  /// irrespective of the last conversation id
+  /// This is useful when editing a poll
+  final bool shouldUpdate;
+
   /// Creates and returns a new instance of [LMChatConversationUpdatedState]
   LMChatConversationUpdatedState({
     required this.conversationViewData,
     required this.attachments,
+    this.shouldUpdate = false,
   });
 
   @override
   List<Object> get props => [
         conversationViewData,
         attachments,
+        shouldUpdate,
       ];
 }
 
