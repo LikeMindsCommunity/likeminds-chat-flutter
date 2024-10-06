@@ -75,7 +75,6 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   final SuggestionsBoxController _suggestionsBoxController =
       SuggestionsBoxController();
 
-  List<UserTag> userTags = [];
   List<LMChatTagViewData> tagViewData = [];
 
   int page = 1;
@@ -105,7 +104,8 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
             .data;
         if (taggingData?.members?.isNotEmpty == true) {
           setState(() {
-            userTags.addAll(taggingData!.members!);
+            tagViewData.addAll(
+                taggingData!.members!.map((e) => e.toLMChatTagViewData()));
           });
         }
       }
