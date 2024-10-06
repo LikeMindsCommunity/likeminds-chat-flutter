@@ -7,8 +7,8 @@ import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 class LMChatTaggingHelper {
   LMChatTagViewData? userTag;
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
-  static RegExp routeRegExp = RegExp(
-      r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>|<<([^<>]+)\|route://([^<>]+)>>');
+  static RegExp routeRegExp =
+      RegExp(r'<<([^<>]+)\|route://([^<>]+)\/([a-zA-Z0-9]+)>>');
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
@@ -23,8 +23,8 @@ class LMChatTaggingHelper {
         if (tagData.tagType == LMTagType.groupTag) {
           string = string.replaceAll('@$tag~', tagData.tag!);
         } else {
-          string = string.replaceAll(
-              '@$tag~', '<<${tagData.name}|route://member/${tagData.id}>>');
+          string = string.replaceAll('@$tag~',
+              '<<${tagData.name}|route://user_profile/${tagData.sdkClientInfoViewData?.uuid ?? tagData.uuid}>>');
         }
       }
     }
@@ -53,7 +53,8 @@ class LMChatTaggingHelper {
       final String tag = match.group(1) ?? match.group(4)!;
       final String? id = match.group(3);
       if (id != null) {
-        string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
+        string =
+            string.replaceAll('<<$tag|route://user_profile/$id>>', '@$tag');
       } else {
         string =
             string.replaceAll('<<@participants|route://participants>', '@$tag');
@@ -155,7 +156,8 @@ class LMChatTaggingHelper {
     return input;
   }
 
-  static String extractFirstDMStateMessage(LMChatConversationViewData input, LMChatUserViewData user) {
+  static String extractFirstDMStateMessage(
+      LMChatConversationViewData input, LMChatUserViewData user) {
     String result = input.answer;
     final RegExp tagRegex = RegExp(r"<<(?<=\<\<).+?(?=\>\>)>>");
     final Iterable<RegExpMatch> matches = tagRegex.allMatches(input.answer);

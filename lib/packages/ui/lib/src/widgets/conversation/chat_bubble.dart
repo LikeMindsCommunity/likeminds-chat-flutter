@@ -564,7 +564,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     // Measure the text width
     final textPainter = TextPainter(
       text: TextSpan(
-        text: widget.conversation.answer
+        text: LMChatTaggingHelper.convertRouteToTag(widget.conversation.answer)!
             .split('\n')
             .first, // Only take the first line
         style: const TextStyle(fontSize: 14), // Use the appropriate style

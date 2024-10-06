@@ -1,8 +1,9 @@
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+
 /// `LMTagType` is an enum class that holds the values for the tag type.
 /// This class is used to differentiate between the group tag and user tag.
 /// The values are `groupTag` and `userTag`.
 enum LMTagType { groupTag, userTag }
-
 
 /// `LMChatTagViewData` is a model class that holds the data for the tag view.
 /// This class is used to display the tag information in the chat screen.
@@ -22,6 +23,8 @@ class LMChatTagViewData {
   final int? id;
   final bool? isGuest;
   final String? userUniqueId;
+  final String? uuid;
+  final LMChatSDKClientInfoViewData? sdkClientInfoViewData;
 
   LMChatTagViewData._({
     required this.name,
@@ -34,6 +37,8 @@ class LMChatTagViewData {
     this.id,
     this.isGuest,
     this.userUniqueId,
+    this.uuid,
+    this.sdkClientInfoViewData,
   });
 
   /// copyWith method is used to create a new instance of `LMChatTagViewData` with the updated values.
@@ -49,6 +54,8 @@ class LMChatTagViewData {
     int? id,
     bool? isGuest,
     String? userUniqueId,
+    String? uuid,
+    LMChatSDKClientInfoViewData? sdkClientInfoViewData,
   }) {
     return LMChatTagViewData._(
       name: name ?? this.name,
@@ -61,6 +68,9 @@ class LMChatTagViewData {
       id: id ?? this.id,
       isGuest: isGuest ?? this.isGuest,
       userUniqueId: userUniqueId ?? this.userUniqueId,
+      uuid: uuid ?? this.uuid,
+      sdkClientInfoViewData:
+          sdkClientInfoViewData ?? this.sdkClientInfoViewData,
     );
   }
 }
@@ -78,6 +88,8 @@ class LMChatTagViewDataBuilder {
   int? _id;
   bool? _isGuest;
   String? _userUniqueId;
+  String? _uuid;
+  LMChatSDKClientInfoViewData? _sdkClientInfoViewData;
 
   void name(String name) {
     _name = name;
@@ -119,6 +131,14 @@ class LMChatTagViewDataBuilder {
     _userUniqueId = userUniqueId;
   }
 
+  void uuid(String? uuid) {
+    _uuid = uuid;
+  }
+
+  void sdkClientInfoViewData(
+      LMChatSDKClientInfoViewData? sdkClientInfoViewData) {
+    _sdkClientInfoViewData = sdkClientInfoViewData;
+  }
 
   /// build method is used to create an instance of `LMChatTagViewData` with the provided values.
   LMChatTagViewData build() {
@@ -143,6 +163,8 @@ class LMChatTagViewDataBuilder {
       id: _id,
       isGuest: _isGuest,
       userUniqueId: _userUniqueId,
+      uuid: _uuid,
+      sdkClientInfoViewData: _sdkClientInfoViewData,
     );
   }
 }

@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/tag/tag_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 class LMChatTextField extends StatefulWidget {
   final bool isDown;
@@ -18,6 +16,7 @@ class LMChatTextField extends StatefulWidget {
   final bool isSecret;
   final bool enabled;
   final ScrollPhysics? scrollPhysics;
+  final LMChatTextFieldStyle? textFieldStyle;
 
   const LMChatTextField({
     super.key,
@@ -32,6 +31,7 @@ class LMChatTextField extends StatefulWidget {
     this.decoration,
     this.onChange,
     this.scrollPhysics,
+    this.textFieldStyle,
   });
 
   LMChatTextField copyWith({
@@ -46,6 +46,7 @@ class LMChatTextField extends StatefulWidget {
     bool? isSecret,
     bool? enabled,
     ScrollPhysics? scrollPhysics,
+    LMChatTextFieldStyle? textFieldStyle,
   }) {
     return LMChatTextField(
       isDown: isDown ?? this.isDown,
@@ -59,6 +60,7 @@ class LMChatTextField extends StatefulWidget {
       isSecret: isSecret ?? this.isSecret,
       enabled: enabled ?? this.enabled,
       scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+      textFieldStyle: textFieldStyle ?? this.textFieldStyle,
     );
   }
 
@@ -81,7 +83,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   bool tagComplete = false;
   String textValue = "";
   String tagValue = "";
-  static const FIXED_SIZE = 6;
+  static const FIXED_SIZE = 20;
 
   @override
   void initState() {
@@ -101,9 +103,10 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
               .build(),
         ))
             .data;
-        if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
-          userTags.addAll(taggingData.members!.map((e) => e).toList());
-          // return userTags;
+        if (taggingData?.members?.isNotEmpty == true) {
+          setState(() {
+            userTags.addAll(taggingData!.members!);
+          });
         }
       }
     });
@@ -178,25 +181,30 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
         bottom: 4.0,
       ),
       child: TypeAheadField<LMChatTagViewData>(
-        scrollPhysics: widget.scrollPhysics ?? const FixedExtentScrollPhysics(),
-        tagColor: LMChatTheme.theme.secondaryColor,
+        scrollPhysics:
+            widget.scrollPhysics ?? const AlwaysScrollableScrollPhysics(),
+        tagColor:
+            widget.textFieldStyle?.tagColor ?? LMChatTheme.theme.linkColor,
         onTagTap: (p) {
-          // print(p);
+          print(p);
         },
         suggestionsBoxController: _suggestionsBoxController,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
-          offsetX: -2,
-          elevation: 2,
-          color: LMChatTheme.theme.container,
+          offsetX: -4.w,
+          elevation: widget.textFieldStyle?.suggestionsBoxElevation ?? 2,
+          color: widget.textFieldStyle?.suggestionsBoxColor ??
+              LMChatTheme.theme.container,
           clipBehavior: Clip.hardEdge,
-          borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+          borderRadius: widget.textFieldStyle?.suggestionsBoxBorderRadius ??
+              const BorderRadius.all(Radius.circular(12.0)),
           hasScrollbar: false,
-          constraints: const BoxConstraints(
-            maxHeight: 72,
-            minWidth: 240,
-          ),
+          constraints: widget.textFieldStyle?.suggestionsBoxConstraints ??
+              BoxConstraints(
+                // minHeight: 12.h,
+                maxHeight: 24.h,
+                minWidth: 80.w,
+              ),
         ),
-        // keepSuggestionsOnLocading: true,
         noItemsFoundBuilder: (context) => const SizedBox.shrink(),
         hideOnEmpty: true,
         hideOnLoading: true,
@@ -205,17 +213,20 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
         textFieldConfiguration: TextFieldConfiguration(
           keyboardType: TextInputType.multiline,
           controller: _controller,
-          style: widget.style ?? const TextStyle(fontSize: 14),
+          style: widget.textFieldStyle?.textStyle ??
+              widget.style ??
+              const TextStyle(fontSize: 14),
           textCapitalization: TextCapitalization.sentences,
           focusNode: _focusNode,
           minLines: 1,
           maxLines: 200,
           scrollPadding: const EdgeInsets.all(2),
           enabled: widget.decoration?.enabled ?? true,
-          decoration: widget.decoration ??
+          decoration: widget.textFieldStyle?.inputDecoration ??
+              widget.decoration ??
               InputDecoration(
                 hintText: 'Type something...',
-                hintStyle: widget.style,
+                hintStyle: widget.textFieldStyle?.textStyle ?? widget.style,
                 border: InputBorder.none,
               ),
           onChanged: ((value) {
@@ -241,26 +252,28 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
         ),
         direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
         suggestionsCallback: (suggestion) async {
-          if (!widget.enabled) {
+          if (!widget.enabled && !suggestion.contains('@')) {
             return Future.value(const Iterable.empty());
           }
           return await _getSuggestions(suggestion);
         },
-        keepSuggestionsOnSuggestionSelected: true,
-
+        keepSuggestionsOnSuggestionSelected: false,
         itemBuilder: ((context, opt) {
           return Container(
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: widget.textFieldStyle?.suggestionItemColor ??
+                  LMChatTheme.theme.container,
               border: Border(
                 bottom: BorderSide(
-                  color: LMChatTheme.theme.container,
+                  color: widget.textFieldStyle?.suggestionItemColor ??
+                      LMChatTheme.theme.container,
                   width: 0.2,
                 ),
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: widget.textFieldStyle?.suggestionItemPadding ??
+                  const EdgeInsets.symmetric(horizontal: 4),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -269,17 +282,21 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
                     LMChatProfilePicture(
                       fallbackText: opt.name,
                       imageUrl: opt.imageUrl,
-                      style: LMChatProfilePictureStyle(
-                        size: 36,
-                        backgroundColor: LMChatTheme.theme.backgroundColor,
-                      ),
+                      style: widget.textFieldStyle?.suggestionItemAvatarStyle ??
+                          LMChatProfilePictureStyle(
+                            size: 36,
+                            backgroundColor: LMChatTheme.theme.backgroundColor,
+                          ),
                     ),
                     const SizedBox(width: 12),
-                    Text(
+                    LMChatText(
                       opt.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
+                      style: widget.textFieldStyle?.suggestionItemTextStyle ??
+                          const LMChatTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
                     ),
                   ],
                 ),

@@ -6,7 +6,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 
 /// {@template lm_chatroom_bar}
@@ -481,7 +481,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return LMChatTextField(
       key: const ObjectKey('chatTextField'),
       isDown: false,
-      enabled: false,
+      enabled: true,
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
       isSecret: widget.chatroom.isSecret ?? false,
       chatroomId: widget.chatroom.id,
@@ -490,8 +490,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         tags.add(tag);
         LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
           'community_id': widget.chatroom.id,
-          'chatroom_name': widget.chatroom.title,
-          'tagged_user_id': tag.id,
+          'chatroom_name': widget.chatroom.header,
+          'tagged_user_id': tag.sdkClientInfoViewData?.uuid,
           'tagged_user_name': tag.name,
         });
       },

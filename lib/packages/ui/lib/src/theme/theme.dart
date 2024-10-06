@@ -170,10 +170,7 @@ class LMChatThemeData {
       hashTagColor: hashTagColor ?? LMChatDefaultTheme.hashTagColor,
       linkColor: linkColor ?? LMChatDefaultTheme.linkColor,
       tagColor: tagColor ?? LMChatDefaultTheme.tagColor,
-      textFieldStyle: textFieldStyle ??
-          LMChatTextFieldStyle.basic(
-            backgroundColor: LMChatDefaultTheme.backgroundColor,
-          ),
+      textFieldStyle: textFieldStyle ?? LMChatTextFieldStyle.basic(),
       dialogStyle: dialogStyle ?? const LMChatDialogStyle(),
       popUpMenuStyle: popUpMenuStyle ?? const LMChatPopUpMenuStyle(),
       loaderStyle: LMChatLoaderStyle(
@@ -283,33 +280,144 @@ class LMChatThemeData {
 }
 
 class LMChatTextFieldStyle {
+  /// Decoration for the input field
+  final InputDecoration? inputDecoration;
+
+  /// Text style for the input field
+  final TextStyle? textStyle;
+
+  /// Color of the tag in the input field
+  final Color? tagColor;
+
+  /// Background color of the suggestions box
+  final Color? suggestionsBoxColor;
+
+  /// Elevation of the suggestions box
+  final double? suggestionsBoxElevation;
+
+  /// Border radius of the suggestions box
+  final BorderRadius? suggestionsBoxBorderRadius;
+
+  /// Constraints for the suggestions box
+  final BoxConstraints? suggestionsBoxConstraints;
+
+  /// Padding for the suggestions box
+  final EdgeInsets? suggestionsBoxPadding;
+
+  /// Background color of the suggestion item
+  final Color? suggestionItemColor;
+
+  /// Padding for the suggestion item
+  final EdgeInsets? suggestionItemPadding;
+
+  /// Text style for the suggestion item
+  final LMChatTextStyle? suggestionItemTextStyle;
+
+  /// Style for the avatar in the suggestion item
+  final LMChatProfilePictureStyle? suggestionItemAvatarStyle;
+
+  /// Whether to show a loading indicator while fetching suggestions
+  final bool? showLoadingIndicator;
+
+  /// Custom widget to show when no suggestions are found
+  final Widget Function(BuildContext)? noItemsFoundBuilder;
+
+  /// Background color of the text field
   final Color? backgroundColor;
-  final InputDecoration? decoration;
+
+  /// Duration of debounce on the text field
+  final Duration? debounceDuration;
 
   const LMChatTextFieldStyle({
     this.backgroundColor,
-    this.decoration,
+    this.inputDecoration,
+    this.textStyle,
+    this.tagColor,
+    this.suggestionsBoxColor,
+    this.suggestionsBoxElevation,
+    this.suggestionsBoxBorderRadius,
+    this.suggestionsBoxConstraints,
+    this.suggestionsBoxPadding,
+    this.suggestionItemColor,
+    this.suggestionItemPadding,
+    this.suggestionItemTextStyle,
+    this.suggestionItemAvatarStyle,
+    this.noItemsFoundBuilder,
+    this.showLoadingIndicator,
+    this.debounceDuration,
   });
 
   LMChatTextFieldStyle copyWith({
+    InputDecoration? inputDecoration,
+    TextStyle? textStyle,
+    Color? tagColor,
+    Color? suggestionsBoxColor,
+    double? suggestionsBoxElevation,
+    BorderRadius? suggestionsBoxBorderRadius,
+    BoxConstraints? suggestionsBoxConstraints,
+    EdgeInsets? suggestionsBoxPadding,
+    Color? suggestionItemColor,
     Color? backgroundColor,
-    InputDecoration? decoration,
+    Duration? debounceDuration,
+    EdgeInsets? suggestionItemPadding,
+    LMChatTextStyle? suggestionItemTextStyle,
+    LMChatProfilePictureStyle? suggestionItemAvatarStyle,
   }) {
     return LMChatTextFieldStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      decoration: decoration ?? this.decoration,
+      inputDecoration: inputDecoration ?? this.inputDecoration,
+      textStyle: textStyle ?? this.textStyle,
+      tagColor: tagColor ?? this.tagColor,
+      suggestionsBoxColor: suggestionsBoxColor ?? this.suggestionsBoxColor,
+      suggestionsBoxElevation:
+          suggestionsBoxElevation ?? this.suggestionsBoxElevation,
+      suggestionsBoxBorderRadius:
+          suggestionsBoxBorderRadius ?? this.suggestionsBoxBorderRadius,
+      suggestionsBoxConstraints:
+          suggestionsBoxConstraints ?? this.suggestionsBoxConstraints,
+      suggestionsBoxPadding:
+          suggestionsBoxPadding ?? this.suggestionsBoxPadding,
+      suggestionItemColor: suggestionItemColor ?? this.suggestionItemColor,
+      suggestionItemPadding:
+          suggestionItemPadding ?? this.suggestionItemPadding,
+      suggestionItemTextStyle:
+          suggestionItemTextStyle ?? this.suggestionItemTextStyle,
+      suggestionItemAvatarStyle:
+          suggestionItemAvatarStyle ?? this.suggestionItemAvatarStyle,
+      debounceDuration: debounceDuration ?? this.debounceDuration,
     );
   }
 
-  factory LMChatTextFieldStyle.basic({
-    Color? backgroundColor,
+  static LMChatTextFieldStyle basic({
+    InputDecoration? inputDecoration,
+    TextStyle? textStyle,
+    Color? tagColor,
+    Color? suggestionsBoxColor,
+    double? suggestionsBoxElevation,
+    BorderRadius? suggestionsBoxBorderRadius,
+    BoxConstraints? suggestionsBoxConstraints,
+    EdgeInsets? suggestionsBoxPadding,
+    Color? suggestionItemColor,
+    EdgeInsets? suggestionItemPadding,
+    LMChatTextStyle? suggestionItemTextStyle,
+    LMChatProfilePictureStyle? suggestionItemAvatarStyle,
   }) {
     return LMChatTextFieldStyle(
-      backgroundColor: backgroundColor ?? LMChatDefaultTheme.backgroundColor,
-      decoration: const InputDecoration(
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-      ),
+      inputDecoration: inputDecoration ?? const InputDecoration(),
+      textStyle: textStyle ?? const TextStyle(),
+      tagColor: tagColor ?? LMChatDefaultTheme.linkColor,
+      suggestionsBoxColor: suggestionsBoxColor ?? LMChatDefaultTheme.container,
+      suggestionsBoxElevation: suggestionsBoxElevation ?? 2.0,
+      suggestionsBoxBorderRadius:
+          suggestionsBoxBorderRadius ?? BorderRadius.circular(8.0),
+      suggestionsBoxConstraints:
+          suggestionsBoxConstraints ?? const BoxConstraints(),
+      suggestionsBoxPadding: suggestionsBoxPadding ?? const EdgeInsets.all(8.0),
+      suggestionItemColor: suggestionItemColor ?? Colors.grey,
+      suggestionItemPadding: suggestionItemPadding ?? const EdgeInsets.all(4.0),
+      suggestionItemTextStyle:
+          suggestionItemTextStyle ?? LMChatTextStyle.basic(),
+      suggestionItemAvatarStyle: suggestionItemAvatarStyle,
     );
   }
 }
