@@ -221,8 +221,33 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       result = LMChatTaggingHelper.encodeString(string, tags);
       result = result?.trim();
 
+      if (replyToConversation != null) {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageReply,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': chatroom?.id,
+              'replied_to_member_id': replyToConversation!.memberId ??
+                  replyToConversation?.member?.id,
+              'replied_to_member_state': replyToConversation!.member?.state,
+              'replied_to_message_id': replyToConversation!.id,
+            },
+          ),
+        );
+      }
+
       if (editConversation != null) {
         linkModel = null;
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageEdited,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': chatroom?.id,
+            },
+          ),
+        );
         chatActionBloc.add(LMChatEditConversationEvent(
             (EditConversationRequestBuilder()
                   ..conversationId(editConversation!.id)
@@ -289,21 +314,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         }
         widget.scrollToBottom();
         chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
-        if (replyToConversation != null) {
-          LMAnalytics.get().track(
-            AnalyticsKeys.messageReply,
-            {
-              "type": "text",
-              "chatroom_id": widget.chatroom.id,
-              "replied_to_member_id": replyToConversation?.member?.id,
-              "replied_to_member_state": replyToConversation?.member?.state,
-              "replied_to_message_id": replyToConversation?.id,
-            },
-          );
-        }
       }
       if (widget.chatroom.isGuest ?? false) {
         toast("Chatroom joined");
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomFollowed,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'normal',
+            },
+          ),
+        );
         widget.chatroom.isGuest = false;
       }
       if (widget.chatroom.followStatus == false) {
@@ -488,12 +511,17 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
       onTagSelected: (tag) {
         tags.add(tag);
-        LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
-          'community_id': widget.chatroom.id,
-          'chatroom_name': widget.chatroom.header,
-          'tagged_user_id': tag.sdkClientInfoViewData?.uuid,
-          'tagged_user_name': tag.name,
-        });
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.userTagsSomeone,
+            eventProperties: {
+              'community_id': widget.chatroom.id,
+              'chatroom_name': widget.chatroom.header,
+              'tagged_user_id': tag.sdkClientInfoViewData?.uuid,
+              'tagged_user_name': tag.name,
+            },
+          ),
+        );
       },
       onChange: _onTextChanged,
       controller: _textEditingController,
@@ -806,7 +834,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           : LMChatText(
               replyToConversation!.state != 0
                   ? LMChatTaggingHelper.extractStateMessage(message)
-                  : message,
+                  : LMChatTaggingHelper.convertRouteToTag(
+                        message,
+                        withTilde: false,
+                      ) ??
+                      "Replying to Conversation",
               style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
