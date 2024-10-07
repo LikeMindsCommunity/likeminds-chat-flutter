@@ -208,6 +208,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     LMChatroomBar(
                       chatroom: chatroom.toChatRoomViewData(),
                       scrollToBottom: _scrollToBottom,
+                      enableTagging: chatroom.type != 10,
                     ),
                   ),
                   BlocBuilder(

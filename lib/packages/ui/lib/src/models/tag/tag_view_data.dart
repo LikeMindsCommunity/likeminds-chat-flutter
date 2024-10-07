@@ -145,17 +145,11 @@ class LMChatTagViewDataBuilder {
     if (_name == null) {
       throw StateError("name is required");
     }
-    if (_imageUrl == null) {
-      throw StateError("imageUrl is required");
-    }
-    if (_tagType == null) {
-      throw StateError("lmTagType is required");
-    }
 
     return LMChatTagViewData._(
       name: _name!,
-      imageUrl: _imageUrl!,
-      tagType: _tagType!,
+      imageUrl: _imageUrl ?? '',
+      tagType: _tagType ?? LMTagType.userTag,
       description: _description,
       route: _route,
       tag: _tag,
