@@ -106,6 +106,9 @@ class LMChatBubble extends StatefulWidget {
   /// Poll Widget builder
   final LMChatPollBuilder? pollBuilder;
 
+  /// Callback for reply tap
+  final VoidCallback? onReplyTap;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -135,6 +138,7 @@ class LMChatBubble extends StatefulWidget {
     this.linkPreviewBuilder,
     this.poll,
     this.pollBuilder,
+    this.onReplyTap,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -174,6 +178,7 @@ class LMChatBubble extends StatefulWidget {
     bool? isDM,
     LMChatPoll? poll,
     LMChatPollBuilder? pollBuilder,
+    VoidCallback? onReplyTap,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -201,6 +206,7 @@ class LMChatBubble extends StatefulWidget {
       isDM: isDM ?? this.isDM,
       poll: poll ?? this.poll,
       pollBuilder: pollBuilder ?? this.pollBuilder,
+      onReplyTap: onReplyTap ?? this.onReplyTap,
     );
   }
 
@@ -389,23 +395,28 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               _defLinkPreviewWidget(conversation.ogTags!),
                         if (conversation.replyConversationObject != null &&
                             conversation.deletedByUserId == null) ...[
-                          LMChatBubbleReply(
-                            replyToConversation:
-                                conversation.replyConversationObject!,
-                            title: LMChatText(
-                              currentUser.id ==
-                                      conversation
-                                          .replyConversationObject!.memberId
-                                  ? "You"
-                                  : conversation
-                                      .replyConversationObject!.member!.name,
-                              style: LMChatTextStyle(
-                                maxLines: 1,
-                                textStyle: TextStyle(
-                                  overflow: TextOverflow.ellipsis,
-                                  color: _themeData.primaryColor,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                          GestureDetector(
+                            onTap: () {
+                              widget.onReplyTap?.call();
+                            },
+                            child: LMChatBubbleReply(
+                              replyToConversation:
+                                  conversation.replyConversationObject!,
+                              title: LMChatText(
+                                currentUser.id ==
+                                        conversation
+                                            .replyConversationObject!.memberId
+                                    ? "You"
+                                    : conversation
+                                        .replyConversationObject!.member!.name,
+                                style: LMChatTextStyle(
+                                  maxLines: 1,
+                                  textStyle: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    color: _themeData.primaryColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ),
