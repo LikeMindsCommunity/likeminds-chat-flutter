@@ -3,26 +3,26 @@ part of 'chatroom_action_bloc.dart';
 @immutable
 abstract class LMChatroomActionState extends Equatable {}
 
-class ChatroomActionInitial extends LMChatroomActionState {
+class LMChatChatroomActionInitial extends LMChatroomActionState {
   @override
   List<Object?> get props => [];
 }
 
-class ChatroomActionLoading extends LMChatroomActionState {
+class LMChatChatroomActionLoading extends LMChatroomActionState {
   @override
   List<Object?> get props => [];
 }
 
-class ChatroomTopicSet extends LMChatroomActionState {
+class LMChatChatroomTopicSet extends LMChatroomActionState {
   final Conversation topic;
-  ChatroomTopicSet(this.topic);
+  LMChatChatroomTopicSet(this.topic);
   @override
   List<Object?> get props => [topic];
 }
 
-class ChatroomTopicError extends LMChatroomActionState {
+class LMChatChatroomTopicError extends LMChatroomActionState {
   final String errorMessage;
-  ChatroomTopicError({
+  LMChatChatroomTopicError({
     required this.errorMessage,
   });
   @override

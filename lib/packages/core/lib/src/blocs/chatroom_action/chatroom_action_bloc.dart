@@ -19,39 +19,59 @@ class LMChatroomActionBloc
     }
   }
 
-  LMChatroomActionBloc._() : super(ChatroomActionInitial()) {
-    on<LMChatroomActionEvent>((event, emit) async {
-      if (event is LMChatShowEmojiKeyboardEvent) {
-        emit(LMChatShowEmojiKeyboardState(
-          conversationId: event.conversationId,
-        ));
+  LMChatroomActionBloc._() : super(LMChatChatroomActionInitial()) {
+    on<LMChatroomActionEvent>(_handleEvent);
+  }
+
+  void _handleEvent(
+      LMChatroomActionEvent event, Emitter<LMChatroomActionState> emit) async {
+    if (event is LMChatShowEmojiKeyboardEvent) {
+      _handleShowEmojiKeyboard(event, emit);
+    } else if (event is LMChatHideEmojiKeyboardEvent) {
+      _handleHideEmojiKeyboard(emit);
+    } else if (event is LMChatMarkReadChatroomEvent) {
+      await _handleMarkReadChatroom(event);
+    } else if (event is LMChatSetChatroomTopicEvent) {
+      await _handleSetChatroomTopic(event, emit);
+    }
+  }
+
+  void _handleShowEmojiKeyboard(
+      LMChatShowEmojiKeyboardEvent event, Emitter<LMChatroomActionState> emit) {
+    emit(LMChatShowEmojiKeyboardState(
+      conversationId: event.conversationId,
+    ));
+  }
+
+  void _handleHideEmojiKeyboard(Emitter<LMChatroomActionState> emit) {
+    emit(LMChatHideEmojiKeyboardState());
+  }
+
+  Future<void> _handleMarkReadChatroom(
+      LMChatMarkReadChatroomEvent event) async {
+    // ignore: unused_local_variable
+    LMResponse response = await LMChatCore.client.markReadChatroom(
+        (MarkReadChatroomRequestBuilder()..chatroomId(event.chatroomId))
+            .build());
+  }
+
+  Future<void> _handleSetChatroomTopic(LMChatSetChatroomTopicEvent event,
+      Emitter<LMChatroomActionState> emit) async {
+    try {
+      emit(LMChatChatroomActionLoading());
+      LMResponse<void> response = await LMChatCore.client
+          .setChatroomTopic((SetChatroomTopicRequestBuilder()
+                ..chatroomId(event.chatroomId)
+                ..conversationId(event.conversationId))
+              .build());
+      if (response.success) {
+        emit(LMChatChatroomTopicSet(event.topic));
+      } else {
+        emit(LMChatChatroomTopicError(errorMessage: response.errorMessage!));
       }
-      if (event is LMChatHideEmojiKeyboardEvent) {
-        emit(LMChatHideEmojiKeyboardState());
-      }
-      if (event is MarkReadChatroomEvent) {
-        // ignore: unused_local_variable
-        LMResponse response = await LMChatCore.client.markReadChatroom(
-            (MarkReadChatroomRequestBuilder()..chatroomId(event.chatroomId))
-                .build());
-      } else if (event is SetChatroomTopicEvent) {
-        try {
-          emit(ChatroomActionLoading());
-          LMResponse<void> response = await LMChatCore.client
-              .setChatroomTopic((SetChatroomTopicRequestBuilder()
-                    ..chatroomId(event.chatroomId)
-                    ..conversationId(event.conversationId))
-                  .build());
-          if (response.success) {
-            emit(ChatroomTopicSet(event.topic));
-          } else {
-            emit(ChatroomTopicError(errorMessage: response.errorMessage!));
-          }
-        } catch (e) {
-          emit(ChatroomTopicError(
-              errorMessage: "An error occurred while setting topic"));
-        }
-      }
-    });
+    } catch (e) {
+      emit(LMChatChatroomTopicError(
+          errorMessage: "An error occurred while setting topic"));
+    }
   }
 }
