@@ -42,6 +42,7 @@ class LMChatThemeData {
   final LMChatStateBubbleStyle stateBubbleStyle;
   final LMChatBubbleReplyStyle replyStyle;
   final LMChatBubbleContentStyle contentStyle;
+  final LMChatBubbleReactionsStyle bubbleReactionsStyle;
 
   final LMChatReactionBarStyle reactionBarStyle;
   final LMChatReactionBottomSheetStyle reactionBottomSheetStyle;
@@ -60,8 +61,6 @@ class LMChatThemeData {
   final Color onContainer;
   final Color onPrimary;
   final Color scaffold;
-
-  final LMChatBubbleReactionsStyle bubbleReactionsStyle;
 
   const LMChatThemeData({
     required this.primaryColor,
