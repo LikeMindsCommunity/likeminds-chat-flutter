@@ -54,6 +54,7 @@ class LMChatUserTile extends LMChatTile {
             imageUrl: userViewData.imageUrl,
             onTap: onTap,
           ),
+      trailing: trailing,
       title: title ??
           LMChatText(
             userViewData.name,

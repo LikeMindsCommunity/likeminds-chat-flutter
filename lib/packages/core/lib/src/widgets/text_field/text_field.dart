@@ -43,7 +43,7 @@ class LMChatTextField extends StatefulWidget {
   final LMChatTextFieldStyle? textFieldStyle;
 
   const LMChatTextField({
-    Key? key,
+    super.key,
     required this.isDown,
     required this.chatroomId,
     required this.onTagSelected,
@@ -56,7 +56,7 @@ class LMChatTextField extends StatefulWidget {
     this.onChange,
     this.scrollPhysics,
     this.textFieldStyle,
-  }) : super(key: key);
+  });
 
   /// Creates a copy of this widget with the given fields replaced with new values.
   LMChatTextField copyWith({
@@ -103,7 +103,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   List<LMChatTagViewData> _tagViewData = [];
 
   int _page = 1;
-  bool _tagComplete = false;
+  final ValueNotifier<bool> _tagComplete = ValueNotifier(false);
   String _textValue = "";
   String _tagValue = "";
   static const int _fixedSize = 20;
@@ -154,14 +154,13 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
       return const Iterable.empty();
     }
 
-    if (!_tagComplete && query.contains('@')) {
+    if (query.contains('@') && !_tagComplete.value) {
       String tag = _tagValue.substring(1).split(' ').first;
       final taggingData = await _fetchTaggingData(1, searchQuery: tag);
 
       _tagViewData = _processTaggingData(taggingData);
       return _tagViewData;
     }
-
     return const Iterable.empty();
   }
 
@@ -193,9 +192,9 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
 
     if (newTagCount == completeCount) {
       _textValue = _controller.text;
-      _tagComplete = true;
+      _tagComplete.value = true;
     } else if (newTagCount > completeCount) {
-      _tagComplete = false;
+      _tagComplete.value = false;
       _tagValue = value.substring(value.lastIndexOf('@'));
       _textValue = value.substring(0, value.lastIndexOf('@'));
     } else {
@@ -215,20 +214,18 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
 
   void _handleSuggestionSelected(LMChatTagViewData suggestion) {
     widget.onTagSelected.call(suggestion);
-    setState(() {
-      _tagComplete = true;
-      int currentPosition = _controller.selection.base.offset;
-      String suffix = _controller.text.substring(currentPosition);
+    int currentPosition = _controller.selection.base.offset;
+    String suffix = _controller.text.substring(currentPosition);
 
-      _textValue = _buildTaggedText(suggestion);
-      _controller.text = '$_textValue $suffix';
-      _controller.selection = TextSelection.fromPosition(
-          TextPosition(offset: _controller.text.length - suffix.length));
+    _textValue = _buildTaggedText(suggestion);
+    _controller.text = '$_textValue $suffix';
+    _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length - suffix.length));
 
-      _tagValue = '';
-      _textValue = _controller.text;
-      _page = 1;
-    });
+    _tagValue = '';
+    _textValue = _controller.text;
+    _page = 1;
+    _tagComplete.value = true;
   }
 
   String _buildTaggedText(LMChatTagViewData suggestion) {
@@ -241,32 +238,35 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 6.0, right: 6.0, bottom: 4.0),
-      child: TypeAheadField<LMChatTagViewData>(
-        scrollPhysics:
-            widget.scrollPhysics ?? const AlwaysScrollableScrollPhysics(),
-        tagColor:
-            widget.textFieldStyle?.tagColor ?? LMChatTheme.theme.linkColor,
-        onTagTap: (p) {
-          print(p);
+      child: ValueListenableBuilder(
+        valueListenable: _tagComplete,
+        builder: (context, value, child) {
+          return TypeAheadField<LMChatTagViewData>(
+            scrollPhysics:
+                widget.scrollPhysics ?? const AlwaysScrollableScrollPhysics(),
+            tagColor:
+                widget.textFieldStyle?.tagColor ?? LMChatTheme.theme.linkColor,
+            onTagTap: (p) {
+              print(p);
+            },
+            suggestionsBoxController: _suggestionsBoxController,
+            suggestionsBoxDecoration: _buildSuggestionsBoxDecoration(),
+            noItemsFoundBuilder: (context) => const SizedBox.shrink(),
+            hideOnEmpty: true,
+            hideOnLoading: true,
+            debounceDuration: const Duration(milliseconds: 500),
+            scrollController: _scrollController,
+            textFieldConfiguration: _buildTextFieldConfiguration(),
+            direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
+            getImmediateSuggestions: true,
+            suggestionsCallback: widget.enabled
+                ? (suggestion) => _getSuggestions(suggestion)
+                : (s) => Future.value(const Iterable.empty()),
+            keepSuggestionsOnSuggestionSelected: true,
+            itemBuilder: _buildSuggestionItem,
+            onSuggestionSelected: _handleSuggestionSelected,
+          );
         },
-        suggestionsBoxController: _suggestionsBoxController,
-        suggestionsBoxDecoration: _buildSuggestionsBoxDecoration(),
-        noItemsFoundBuilder: (context) => const SizedBox.shrink(),
-        hideOnEmpty: true,
-        hideOnLoading: true,
-        debounceDuration: const Duration(milliseconds: 500),
-        scrollController: _scrollController,
-        textFieldConfiguration: _buildTextFieldConfiguration(),
-        direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
-        suggestionsCallback: (suggestion) async {
-          if (!widget.enabled && !suggestion.contains('@')) {
-            return Future.value(const Iterable.empty());
-          }
-          return await _getSuggestions(suggestion);
-        },
-        keepSuggestionsOnSuggestionSelected: false,
-        itemBuilder: _buildSuggestionItem,
-        onSuggestionSelected: _handleSuggestionSelected,
       ),
     );
   }

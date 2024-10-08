@@ -15,6 +15,8 @@ part 'handler/reply_conversation_event_handler.dart';
 part 'handler/refresh_bar_event_handler.dart';
 part 'handler/text_change_event_handler.dart';
 part 'handler/link_preview_removed_event_handler.dart';
+part 'handler/put_reaction_handler.dart';
+part 'handler/delete_reaction_handler.dart';
 
 /// {@template lm_chat_conversation_action_bloc}
 /// [LMChatConversationActionBloc] is responsible for handling the conversation actions.
@@ -46,47 +48,7 @@ class LMChatConversationActionBloc
     on<LMChatRefreshBarEvent>(_refreshBarEventHandler);
     on<LMChatConversationTextChangeEvent>(_textChangeEventHandler);
     on<LMChatLinkPreviewRemovedEvent>(_linkPreviewRemovedEventHandler);
-    on<LMChatPutReaction>(
-      (event, emit) async {
-        emit(
-          LMChatPutReactionState(
-            conversationId: event.conversationId,
-            reaction: event.reaction,
-          ),
-        );
-        LMResponse response =
-            await LMChatCore.client.putReaction((PutReactionRequestBuilder()
-                  ..conversationId(event.conversationId)
-                  ..reaction(event.reaction))
-                .build());
-        if (!response.success) {
-          emit(LMChatPutReactionError(
-            errorMessage: response.errorMessage ?? 'An error occured',
-            conversationId: event.conversationId,
-            reaction: event.reaction,
-          ));
-        }
-      },
-    );
-    on<LMChatDeleteReaction>(
-      (event, emit) async {
-        emit(LMChatDeleteReactionState(
-          conversationId: event.conversationId,
-          reaction: event.reaction,
-        ));
-        LMResponse response = await LMChatCore.client
-            .deleteReaction((DeleteReactionRequestBuilder()
-                  ..conversationId(event.conversationId)
-                  ..reaction(event.reaction))
-                .build());
-        if (!response.success) {
-          emit(LMChatDeleteReactionError(
-            errorMessage: response.errorMessage ?? 'An error occurred',
-            conversationId: event.conversationId,
-            reaction: event.reaction,
-          ));
-        }
-      },
-    );
+    on<LMChatPutReaction>(_putReactionHandler);
+    on<LMChatDeleteReaction>(_deleteReactionHandler);
   }
 }

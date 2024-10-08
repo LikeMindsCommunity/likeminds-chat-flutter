@@ -126,7 +126,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       onPopInvoked: (p) {
-        _chatroomActionBloc.add(MarkReadChatroomEvent(
+        _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
           chatroomId: chatroom.id,
         ));
       },
@@ -157,7 +157,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 chatroomId: chatroom.id,
                 conversationId: lastConversationId,
               ));
-              _chatroomActionBloc.add(MarkReadChatroomEvent(
+              _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
                 chatroomId: chatroom.id,
               ));
               LMChatAnalyticsBloc.instance.add(
@@ -215,6 +215,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     LMChatroomBar(
                       chatroom: chatroom.toChatRoomViewData(),
                       scrollToBottom: _scrollToBottom,
+                      enableTagging: chatroom.type != 10,
                     ),
                   ),
                   BlocBuilder(
@@ -321,7 +322,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           } else {
             Navigator.of(context).pop();
             _chatroomActionBloc.add(
-              MarkReadChatroomEvent(
+              LMChatMarkReadChatroomEvent(
                 chatroomId: widget.chatroomId,
               ),
             );

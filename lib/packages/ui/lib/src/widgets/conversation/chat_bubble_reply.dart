@@ -50,7 +50,7 @@ class LMChatBubbleReply extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            height: 5.h,
+            height: 6.h,
             width: 1.w,
             decoration: BoxDecoration(
               color: inStyle.highlightColor ?? theme.primaryColor,
@@ -95,7 +95,10 @@ class LMChatBubbleReply extends StatelessWidget {
                     : LMChatText(
                         replyToConversation.answer.isEmpty
                             ? "Media files"
-                            : replyToConversation.answer,
+                            : LMChatTaggingHelper.convertRouteToTag(
+                                replyToConversation.answer,
+                                withTilde: false,
+                              )!,
                         style: LMChatTextStyle(
                           maxLines: 1,
                           textStyle: TextStyle(
