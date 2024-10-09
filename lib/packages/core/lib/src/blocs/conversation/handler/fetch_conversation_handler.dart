@@ -33,7 +33,7 @@ fetchConversationsEventHandler(
           .userMeta?[element.replyConversationObject?.memberId];
       //Assigning attachment to the conversation from attachmentMeta
     }
-    emit(LMChatConversationLoadedState(conversationResponse));
+    emit(LMChatConversationLoadedState(conversationResponse, event.direction));
   } else {
     emit(LMChatConversationErrorState(response.errorMessage!, ''));
   }
