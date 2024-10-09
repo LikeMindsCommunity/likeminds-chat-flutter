@@ -1,31 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:super_sliver_list/super_sliver_list.dart'; // Ensure you have the SuperListView package
+import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_controller.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
-typedef ItemBuilder<T> = Widget Function(BuildContext context, T item);
+/// A builder function that builds a widget for an item in the list.
+/// The [context] is the build context.
+/// The [item] is the item to build the widget for.
+/// The [index] is the index of the item in the list.
+typedef ItemBuilder<T> = Widget Function(
+    BuildContext context, T item, int index);
+
+/// A builder function that builds a widget for loading the first page.
+/// The [context] is the build context.
+/// The [retry] is a callback function to retry loading the first page.
 typedef LoadingBuilder = Widget Function(BuildContext context);
+
+/// A builder function that builds a widget for loading more items.
+/// The [context] is the build context.
+/// The [retry] is a callback function to retry loading more items.
 typedef ErrorBuilder = Widget Function(
     BuildContext context, VoidCallback retry);
 
+/// enum to represent the direction of pagination
+enum PaginationDirection {
+  /// top side pagination
+  top,
+
+  /// bottom side pagination
+  bottom,
+}
+
+/// {@template lm_dual_side_paged_list}
+/// A widget that displays a list of items that can be paginated from both sides.
+/// {@endtemplate}
+
 class LMDualSidePagedList<T> extends StatefulWidget {
-  final Future<List<T>> Function(int page, int pageSize) fetchData;
+  /// The function to call when pagination is triggered.
+  final Future<void> Function(
+    int page,
+    PaginationDirection paginationDirection,
+    T? item,
+  ) onPaginationTriggered;
+
+  /// The function to build a widget for an item in the list.
   final ItemBuilder<T> itemBuilder;
+
+  /// The function to build a widget for loading the first page.
   final LoadingBuilder? firstPageLoadingBuilder;
+
+  /// The function to build a widget for loading more items.
   final LoadingBuilder? paginationLoadingBuilder;
+
+  /// The function to build a widget when there are no items.
   final WidgetBuilder? noItemsBuilder;
+
+  /// The function to build a widget when there are no more items.
   final WidgetBuilder? noMoreItemsBuilder;
+
+  /// The function to build a widget when there is an error.
   final ErrorBuilder? errorBuilder;
+
+  /// The function to build a widget when there is an error during pagination.
   final ErrorBuilder? paginationErrorBuilder;
-  final int pageSize;
+
+  /// The initial page to load.
   final int initialPage;
+
+  /// The limit for the top side of the list.
   final int? topSideLimit;
+
+  /// The limit for the bottom side of the list.
   final int? bottomSideLimit;
-  final ScrollController? scrollController;
-  final ListController? listController;
+
+  /// The pagination controller to manage the pagination.
+  final LMChatPaginationController<T> paginationController;
+
+  /// {@macro lm_dual_side_paged_list}
 
   const LMDualSidePagedList({
     super.key,
-    required this.fetchData,
+    required this.onPaginationTriggered,
     required this.itemBuilder,
     this.firstPageLoadingBuilder,
     this.paginationLoadingBuilder,
@@ -33,48 +87,46 @@ class LMDualSidePagedList<T> extends StatefulWidget {
     this.noMoreItemsBuilder,
     this.errorBuilder,
     this.paginationErrorBuilder,
-    this.pageSize = 20,
     required this.initialPage,
     this.topSideLimit,
     this.bottomSideLimit,
-    this.scrollController,
-    this.listController,
+    required this.paginationController,
   });
 
   @override
-  LMDualSidePagedListState<T> createState() => LMDualSidePagedListState<T>();
+  State<LMDualSidePagedList<T>> createState() => _LMDualSidePagedListState<T>();
 }
 
-class LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
-  final List<T> items = [];
-  late int currentPage; // Starting page
-  late int upSidePage;
-  late int downSidePage;
+class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
+  late int _currentPage; // Starting page
+  late int _upSidePage;
+  late int _downSidePage;
   bool _isLoadingFirstPage = true;
-  bool _isLoadingTop = false;
-  bool _isLoadingBottom = false;
   bool _hasError = false;
   bool _paginationError = false;
-  late final ScrollController scrollController;
-  late final ListController listController;
+  late final ScrollController _scrollController;
+  late final ListController _listController;
 
   @override
   void initState() {
     super.initState();
-    currentPage = widget.initialPage;
-    upSidePage = currentPage;
-    downSidePage = currentPage;
-    scrollController = widget.scrollController ?? ScrollController();
-    listController = widget.listController ?? ListController();
+    _currentPage = widget.initialPage;
+    _upSidePage = _currentPage;
+    _downSidePage = _currentPage;
+    _scrollController = widget.paginationController.scrollController;
+    _listController = widget.paginationController.listController;
     _loadInitialData();
   }
 
   Future<void> _loadInitialData() async {
     try {
-      final newData = await widget.fetchData(currentPage, widget.pageSize);
+      await widget.onPaginationTriggered(
+        _currentPage,
+        PaginationDirection.bottom,
+        null,
+      );
       if (mounted) {
         setState(() {
-          items.addAll(newData);
           _isLoadingFirstPage = false;
           _hasError = false;
         });
@@ -90,72 +142,78 @@ class LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
   }
 
   Future<void> _loadMoreTop() async {
-    // Check if the top side limit is reached
-    if (widget.topSideLimit != null && upSidePage <= widget.topSideLimit!) {
+    // check if last page is reached
+    if (widget.paginationController.isLastPageToTopReached) {
       return;
     }
-    if (_isLoadingTop) return; // Prevent multiple calls
+    // Check if the top side limit is reached
+    if (widget.topSideLimit != null && _upSidePage <= widget.topSideLimit!) {
+      return;
+    }
+    if (widget.paginationController.isLoadingTop) {
+      return; // Prevent multiple calls
+    }
     setState(() {
-      _isLoadingTop = true;
+      widget.paginationController.isLoadingTop = true;
     });
 
     try {
-      final newData = await widget.fetchData(--upSidePage, widget.pageSize);
-      if (newData.isNotEmpty) {
-        // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          // Insert new data at the top
-          items.insertAll(0, newData);
-          listController.jumpToItem(
-            index: newData.length + 3,
-            scrollController: scrollController,
-            alignment: 0.0,
-          );
-          // setState(() {
-          _isLoadingTop = false; // Stop the loading state
-          // });
-        });
-      } else {
-        upSidePage++; // Revert if no new data
-        setState(() {
-          _isLoadingTop = false;
-        });
-      }
+      _upSidePage--;
+      int previousItemsCount = widget.paginationController.items.length;
+      await widget.onPaginationTriggered(
+        _upSidePage,
+        PaginationDirection.top,
+        widget.paginationController.items.first,
+      );
+      int newItemsCount = widget.paginationController.items.length;
+      int newItemsLength = newItemsCount - previousItemsCount;
+      // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _listController.jumpToItem(
+          index: newItemsLength - 1,
+          scrollController: _scrollController,
+          alignment: 0.0,
+        );
+        widget.paginationController.isLoadingTop =
+            false; // Stop the loading state
+      });
     } catch (e) {
-      upSidePage++; // Revert if error occurs
+      _upSidePage++; // Revert if error occurs
       setState(() {
         _paginationError = true;
-        _isLoadingTop = false;
       });
     }
   }
 
   Future<void> _loadMoreBottom() async {
-    // Check if the bottom side limit is reached
-    if (widget.bottomSideLimit != null &&
-        downSidePage >= widget.bottomSideLimit!) {
+    // check if last page is reached
+    if (widget.paginationController.isLastPageToBottomReached) {
       return;
     }
-    if (_isLoadingBottom) return; // Prevent multiple calls
+    // Check if the bottom side limit is reached
+    if (widget.bottomSideLimit != null &&
+        _downSidePage >= widget.bottomSideLimit!) {
+      return;
+    }
+    if (widget.paginationController.isLoadingBottom) {
+      return; // Prevent multiple calls
+    }
+
     setState(() {
-      _isLoadingBottom = true;
+      widget.paginationController.isLoadingBottom = true;
     });
 
     try {
-      final newData = await widget.fetchData(++downSidePage, widget.pageSize);
-      if (newData.isNotEmpty && mounted) {
-        setState(() {
-          items.addAll(newData);
-        });
-      }
+      _downSidePage++;
+      await widget.onPaginationTriggered(
+        _downSidePage,
+        PaginationDirection.bottom,
+        widget.paginationController.items.last,
+      );
     } catch (e) {
-      downSidePage--; // revert page increment if no data is returned
+      _downSidePage--; // revert page increment if no data is returned
       setState(() {
         _paginationError = true;
-      });
-    } finally {
-      setState(() {
-        _isLoadingBottom = false;
       });
     }
   }
@@ -171,6 +229,7 @@ class LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       return widget.errorBuilder?.call(context, _loadInitialData) ??
           const Center(child: Text("An error occurred"));
     }
+    final items = widget.paginationController.items;
 
     if (items.isEmpty) {
       return widget.noItemsBuilder?.call(context) ??
@@ -178,18 +237,20 @@ class LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     }
 
     return SuperListView.builder(
-      controller: scrollController,
-      listController: listController,
-      itemCount:
-          items.length + (_isLoadingBottom ? 1 : 0) + (_isLoadingTop ? 1 : 0),
+      controller: _scrollController,
+      listController: _listController,
+      reverse: true,
+      itemCount: items.length +
+          (widget.paginationController.isLoadingBottom ? 1 : 0) +
+          (widget.paginationController.isLoadingTop ? 1 : 0),
       itemBuilder: (context, index) {
         // Trigger _loadMoreTop() when the first item is being built
-        if (index == 0 && !_isLoadingTop) {
+        if (index == 3 && !widget.paginationController.isLoadingTop) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             _loadMoreTop();
           });
         }
-        if (index == 0 && _isLoadingTop) {
+        if (index == 0 && widget.paginationController.isLoadingTop) {
           return widget.paginationLoadingBuilder?.call(context) ??
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -198,7 +259,8 @@ class LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
                 ),
               );
         }
-        if (_isLoadingBottom && index == items.length) {
+        if (widget.paginationController.isLoadingBottom &&
+            index == items.length) {
           return widget.paginationLoadingBuilder?.call(context) ??
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -208,17 +270,18 @@ class LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
               );
         }
 
-        final actualIndex = _isLoadingTop ? index - 1 : index;
+        final actualIndex =
+            widget.paginationController.isLoadingTop ? index - 1 : index;
 
         // Trigger _loadMoreBottom() when the last item is being built
-        if (actualIndex == items.length - 1 && !_isLoadingBottom) {
-          debugPrint("Triggering load more bottom");
+        if (actualIndex == items.length - 3 &&
+            !widget.paginationController.isLoadingBottom) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             _loadMoreBottom();
           });
         }
         if (actualIndex < items.length) {
-          return widget.itemBuilder(context, items[actualIndex]);
+          return widget.itemBuilder(context, items[actualIndex], actualIndex);
         }
         return null;
       },
