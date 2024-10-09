@@ -32,11 +32,16 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
   /// Number of conversations to be fetched
   final int pageSize;
 
+  final PaginationDirection direction;
+  final int? lastConversationId;
+
   /// Creates and returns a new instance of [LMChatFetchConversationsEvent]
   LMChatFetchConversationsEvent({
     required this.chatroomId,
     required this.page,
     required this.pageSize,
+    required this.direction,
+    required this.lastConversationId,
   });
 
   @override
