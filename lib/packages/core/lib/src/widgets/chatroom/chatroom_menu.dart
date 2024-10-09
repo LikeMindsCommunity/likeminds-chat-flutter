@@ -4,7 +4,6 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/participants.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -17,12 +16,12 @@ class LMChatroomMenu extends StatefulWidget {
   final LMChatCustomPopupMenuStyle? style;
 
   const LMChatroomMenu({
-    Key? key,
+    super.key,
     required this.controller,
     required this.chatroom,
     required this.chatroomActions,
     this.style,
-  }) : super(key: key);
+  });
   LMChatroomMenu copyWith({
     CustomPopupMenuController? controller,
     LMChatCustomPopupMenuStyle? style,
@@ -178,18 +177,22 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       // widget.controller.hideMenu();
       // rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       if (action.title.toLowerCase() == "mute notifications") {
-        LMAnalytics.get().track(
-          AnalyticsKeys.chatroomMuted,
-          {
-            'chatroom_name ': widget.chatroom.header,
-          },
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomMuted,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+            },
+          ),
         );
       } else {
-        LMAnalytics.get().track(
-          AnalyticsKeys.chatroomUnMuted,
-          {
-            'chatroom_name ': widget.chatroom.header,
-          },
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomUnMuted,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+            },
+          ),
         );
       }
       toast((action.title.toLowerCase() == "mute notifications")
@@ -224,13 +227,16 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               .build());
       if (response.success) {
         widget.chatroom.isGuest = true;
-        LMAnalytics.get().track(
-          AnalyticsKeys.chatroomLeft,
-          {
-            'chatroom_name ': widget.chatroom.header,
-            'chatroom_id': widget.chatroom.id,
-            'chatroom_type': 'normal',
-          },
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomUnfollowed,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'normal',
+              'source': 'overflow_menu',
+            },
+          ),
         );
         toast("Chatroom left");
         widget.controller!.hideMenu();
@@ -247,13 +253,15 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               .build());
       if (response.success) {
         widget.chatroom.isGuest = true;
-        LMAnalytics.get().track(
-          AnalyticsKeys.chatroomLeft,
-          {
-            'chatroom_name ': widget.chatroom.header,
-            'chatroom_id': widget.chatroom.id,
-            'chatroom_type': 'secret',
-          },
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomLeft,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'secret',
+            },
+          ),
         );
         toast("Chatroom left");
         widget.controller!.hideMenu();

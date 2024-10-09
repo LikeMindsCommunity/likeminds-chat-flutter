@@ -237,6 +237,25 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageSelected,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.emoticonTrayOpened,
+            eventProperties: {
+              'from': 'long press',
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
       },
       isSelectableOnTap: () {
         return _selectedIds.isNotEmpty;
@@ -244,6 +263,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       onTap: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);
+          LMChatAnalyticsBloc.instance.add(
+            LMChatFireAnalyticsEvent(
+              eventName: LMChatAnalyticsKeys.messageSelected,
+              eventProperties: {
+                'type': 'text',
+                'chatroom_id': widget.chatroomId,
+              },
+            ),
+          );
         } else {
           _selectedIds.remove(conversation.id);
         }
@@ -317,6 +345,25 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageSelected,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.emoticonTrayOpened,
+            eventProperties: {
+              'from': 'long press',
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
       },
       isSelectableOnTap: () {
         return _selectedIds.isNotEmpty;
@@ -324,6 +371,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       onTap: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);
+          LMChatAnalyticsBloc.instance.add(
+            LMChatFireAnalyticsEvent(
+              eventName: LMChatAnalyticsKeys.messageSelected,
+              eventProperties: {
+                'type': 'text',
+                'chatroom_id': widget.chatroomId,
+              },
+            ),
+          );
         } else {
           _selectedIds.remove(conversation.id);
         }
@@ -631,19 +687,17 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         ),
       );
     } else {
-      /// TODO: Check for follow status of chatroom
-      // if (!chatroom.followStatus!) {
-      //   Future<LMResponse> response = locator<LikeMindsService>()
-      //       .followChatroom((FollowChatroomRequestBuilder()
-      //             ..chatroomId(chatroom.id)
-      //             ..memberId(loggedinUser.id)
-      //             ..value(true))
-      //           .build())
-      //     ..then((value) {
-      //       if (value.success) {
-      //         toast("Chatroom joined");
-      //       }
-      //     });
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.reactionAdded,
+          eventProperties: {
+            'reaction': reaction,
+            'from': 'long_press',
+            'message_id': conversationId,
+            'chatroom_id': widget.chatroomId,
+          },
+        ),
+      );
       _convActionBloc.add(LMChatPutReaction(
         conversationId: conversationId,
         reaction: reaction,
@@ -654,6 +708,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   onRemoveReaction(String reaction, int conversationId) {
+    LMChatAnalyticsBloc.instance.add(
+      LMChatFireAnalyticsEvent(
+        eventName: LMChatAnalyticsKeys.reactionRemoved,
+        eventProperties: {
+          'message_id': conversationId,
+          'chatroom_id': widget.chatroomId,
+        },
+      ),
+    );
     _convActionBloc.add(LMChatDeleteReaction(
       conversationId: conversationId,
       reaction: reaction,

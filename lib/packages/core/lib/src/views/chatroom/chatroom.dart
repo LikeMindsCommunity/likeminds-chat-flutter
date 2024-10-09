@@ -160,16 +160,23 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
                 chatroomId: chatroom.id,
               ));
-              LMAnalytics.get().track(
-                AnalyticsKeys.syncComplete,
-                {'sync_complete': true},
+              LMChatAnalyticsBloc.instance.add(
+                const LMChatFireAnalyticsEvent(
+                  eventName: LMChatAnalyticsKeys.syncComplete,
+                  eventProperties: {'sync_complete': true},
+                ),
               );
-              LMAnalytics.get().track(AnalyticsKeys.chatroomOpened, {
-                'chatroom_id': chatroom.id,
-                'community_id': chatroom.communityId,
-                'chatroom_type': chatroom.type,
-                'source': 'home_feed',
-              });
+              LMChatAnalyticsBloc.instance.add(
+                LMChatFireAnalyticsEvent(
+                  eventName: LMChatAnalyticsKeys.chatroomOpened,
+                  eventProperties: {
+                    'chatroom_id': chatroom.id,
+                    'community_id': chatroom.communityId,
+                    'chatroom_type': chatroom.type,
+                    'source': 'home_feed',
+                  },
+                ),
+              );
             }
           },
           builder: (chatroomContext, chatroomState) {
@@ -218,6 +225,18 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                           return SafeArea(
                             child: LMChatReactionKeyboard(
                               onEmojiSelected: (reaction) {
+                                LMChatAnalyticsBloc.instance.add(
+                                  LMChatFireAnalyticsEvent(
+                                    eventName:
+                                        LMChatAnalyticsKeys.reactionAdded,
+                                    eventProperties: {
+                                      'reaction': reaction,
+                                      'from': 'keyboard',
+                                      'message_id': state.conversationId,
+                                      'chatroom_id': chatroom.id,
+                                    },
+                                  ),
+                                );
                                 _convActionBloc.add(
                                   LMChatPutReaction(
                                     conversationId: state.conversationId,
@@ -473,6 +492,15 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               Clipboard.setData(
                 ClipboardData(text: copiedMessage),
               ).then((data) {
+                LMChatAnalyticsBloc.instance.add(
+                  LMChatFireAnalyticsEvent(
+                    eventName: LMChatAnalyticsKeys.messageCopied,
+                    eventProperties: {
+                      'type': 'text',
+                      'chatroom_id': chatroom.id,
+                    },
+                  ),
+                );
                 toast("Copied to clipboard");
                 _selectedIds.clear();
                 rebuildAppBar.value = !rebuildAppBar.value;
@@ -584,6 +612,15 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                             LMChatDeleteConversationEvent(
                               conversationIds: _selectedIds.copy(),
                               reason: "Delete",
+                            ),
+                          );
+                          LMChatAnalyticsBloc.instance.add(
+                            LMChatFireAnalyticsEvent(
+                              eventName: LMChatAnalyticsKeys.messageDeleted,
+                              eventProperties: {
+                                'type': 'text',
+                                'chatroom_id': chatroom.id,
+                              },
                             ),
                           );
                           _selectedIds.clear();
