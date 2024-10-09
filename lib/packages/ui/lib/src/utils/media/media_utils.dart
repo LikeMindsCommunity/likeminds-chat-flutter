@@ -78,12 +78,14 @@ Widget getChatItemAttachmentTile(
       children: [
         LMChatText(message),
         const LMChatIcon(
-          type: LMChatIconType.icon,
-          icon: Icons.poll,
+          type: LMChatIconType.svg,
+          assetPath: kPollIcon,
           style: LMChatIconStyle(
+            size: 14,
             color: LMChatDefaultTheme.greyColor,
-            size: 16,
-            margin: EdgeInsets.only(right: 4),
+            boxPadding: EdgeInsets.only(
+              right: 4,
+            ),
           ),
         ),
         LMChatText(

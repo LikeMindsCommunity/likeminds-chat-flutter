@@ -365,7 +365,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 conversationUser: widget.conversationUser,
                               ),
                         // poll widget
-                        if (conversation.state == 10) ...[
+                        if (conversation.state == 10 && !_isDeleted) ...[
                           widget.pollBuilder?.call(
                                 context,
                                 widget.poll ??

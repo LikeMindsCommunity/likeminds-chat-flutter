@@ -361,7 +361,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       ),
       subtitle: ((chatroom.lastConversation?.attachmentsUploaded ?? false) &&
                   chatroom.lastConversation?.deletedByUserId == null) ||
-              chatroom.lastConversation?.state == 10
+              (chatroom.lastConversation?.state == 10 &&
+                  chatroom.lastConversation?.deletedByUserId == null)
           ? getChatItemAttachmentTile(
               message, chatroom.attachments, chatroom.lastConversation!)
           : LMChatText(

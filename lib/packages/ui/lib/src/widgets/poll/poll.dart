@@ -388,11 +388,14 @@ class _LMChatPollState extends State<LMChatPoll> {
   }
 
   LMChatIcon _defPollIcon() {
-    return const LMChatIcon(
+    return LMChatIcon(
       type: LMChatIconType.svg,
       assetPath: kPollIcon,
       style: LMChatIconStyle(
         size: 32,
+        backgroundColor: theme.primaryColor,
+        boxPadding: const EdgeInsets.all(8),
+        boxBorderRadius: 100,
       ),
     );
   }

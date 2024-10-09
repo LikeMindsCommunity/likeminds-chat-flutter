@@ -644,7 +644,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(conversation.id.toString())) {
-      conversationMeta[conversation.id..toString()]!.deletedByUserId = user.id;
+      conversationMeta[conversation.id.toString()]!.deletedByUserId = user.id;
     }
     pagedListController.itemList = conversationList;
     scrollController.animateTo(

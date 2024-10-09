@@ -764,13 +764,14 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                     );
                                   },
                                   icon: LMChatIcon(
-                                    type: LMChatIconType.icon,
-                                    icon: Icons.poll_outlined,
+                                    type: LMChatIconType.svg,
+                                    assetPath: kPollIcon,
                                     style: LMChatIconStyle(
-                                      color: LMChatTheme.theme.container,
-                                      size: 30,
-                                      boxSize: 48,
-                                      boxPadding: EdgeInsets.zero,
+                                      size: 38,
+                                      backgroundColor:
+                                          _themeData.secondaryColor,
+                                      boxPadding: const EdgeInsets.all(8),
+                                      boxBorderRadius: 100,
                                     ),
                                   ),
                                   style: LMChatButtonStyle(
