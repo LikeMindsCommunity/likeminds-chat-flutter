@@ -20,12 +20,55 @@ class LMChatroomBar extends StatefulWidget {
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
   final VoidCallback scrollToBottom;
 
+  /// [pollQuestionStyle] is the style for the poll question.
+  final LMChatTextFieldStyle? pollQuestionStyle;
+
+  /// [optionStyle] is the style for the poll options.
+  final LMChatTextFieldStyle? optionStyle;
+
+  /// [advancedButtonBuilder] is the builder for the advanced button.
+  final LMChatButtonBuilder? advancedButtonBuilder;
+
+  /// [postButtonBuilder] is the builder for the post button.
+  final LMChatButtonBuilder? postButtonBuilder;
+
+  /// [addOptionButtonBuilder] is the builder for the add option button.
+  final LMChatButtonBuilder? addOptionButtonBuilder;
+
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
+    this.pollQuestionStyle,
+    this.optionStyle,
+    this.advancedButtonBuilder,
+    this.postButtonBuilder,
+    this.addOptionButtonBuilder,
   });
+
+  /// Creates a copy of the [LMChatroomBar] with the given parameters.
+  LMChatroomBar copyWith({
+    LMChatRoomViewData? chatroom,
+    VoidCallback? scrollToBottom,
+    LMChatTextFieldStyle? pollQuestionStyle,
+    LMChatTextFieldStyle? optionStyle,
+    LMChatButtonBuilder? advancedButtonBuilder,
+    LMChatButtonBuilder? postButtonBuilder,
+    LMChatButtonBuilder? addOptionButtonBuilder,
+  }) {
+    return LMChatroomBar(
+      chatroom: chatroom ?? this.chatroom,
+      scrollToBottom: scrollToBottom ?? this.scrollToBottom,
+      pollQuestionStyle: pollQuestionStyle ?? this.pollQuestionStyle,
+      optionStyle: optionStyle ?? this.optionStyle,
+      advancedButtonBuilder:
+          advancedButtonBuilder ?? this.advancedButtonBuilder,
+      postButtonBuilder: postButtonBuilder ?? this.postButtonBuilder,
+      addOptionButtonBuilder:
+          addOptionButtonBuilder ?? this.addOptionButtonBuilder,
+    );
+  }
 
   @override
   State<LMChatroomBar> createState() => _LMChatroomBarState();
