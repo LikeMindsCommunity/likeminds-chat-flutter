@@ -784,6 +784,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       MaterialPageRoute(
         builder: (context) => LMChatMediaForwardingScreen(
           chatroomId: widget.chatroom.id,
+          chatroomName: widget.chatroom.header,
           replyConversation: replyToConversation,
           textFieldText: _textEditingController.text,
         ),
