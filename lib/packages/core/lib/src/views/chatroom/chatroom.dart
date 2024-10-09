@@ -17,6 +17,7 @@ import 'package:likeminds_chat_flutter_core/src/views/report/report.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 /// {@template chatroom_screen}
 /// Chatroom screen is the main screen where the user can chat with other users.
@@ -60,8 +61,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   ValueNotifier<bool> rebuildFloatingButton = ValueNotifier(false);
 
   ScrollController scrollController = ScrollController();
-  PagingController<int, LMChatConversationViewData> pagedListController =
-      PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
+  ListController listController = ListController();
+  LMChatPaginationController<LMChatConversationViewData>? pagedListController;
 
   final List<int> _selectedIds = <int>[];
   final LMChatroomBuilderDelegate _screenBuilder =
@@ -84,6 +85,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
+    pagedListController = LMChatPaginationController(
+      listController: listController,
+      scrollController: scrollController,
+    );
     scrollController.addListener(() {
       _showScrollToBottomButton();
     });
@@ -98,6 +103,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
+    pagedListController = LMChatPaginationController(
+      listController: listController,
+      scrollController: scrollController,
+    );
     scrollController.addListener(() {
       _showScrollToBottomButton();
     });
@@ -229,28 +238,28 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             chatroom.id,
             _defaultConvList(),
           )
-        : _screenBuilder.dmConversationList(
-            chatroom.id,
-            _defaultDMConvList(),
-          );
+        : SizedBox();
+    // _screenBuilder.dmConversationList(
+    //     chatroom.id,
+    //     _defaultDMConvList(),
+    //   );
   }
 
-  LMChatDMConversationList _defaultDMConvList() {
-    return LMChatDMConversationList(
-      chatroomId: widget.chatroomId,
-      appBarNotifier: rebuildAppBar,
-      selectedConversations: _selectedIds,
-      scrollController: scrollController,
-      listController: pagedListController,
-    );
-  }
+  // LMChatDMConversationList _defaultDMConvList() {
+  //   return LMChatDMConversationList(
+  //     chatroomId: widget.chatroomId,
+  //     appBarNotifier: rebuildAppBar,
+  //     selectedConversations: _selectedIds,
+  //     scrollController: scrollController,
+  //     listController: pagedListController,
+  //   );
+  // }
 
   LMChatConversationList _defaultConvList() {
     return LMChatConversationList(
       chatroomId: widget.chatroomId,
       appBarNotifier: rebuildAppBar,
       selectedConversations: _selectedIds,
-      scrollController: scrollController,
       listController: pagedListController,
     );
   }
@@ -376,8 +385,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   List<Widget> _defaultSelectedChatroomMenu() {
     final LMChatConversationViewData? conversationViewData = pagedListController
-        .value.itemList
-        ?.firstWhere((element) => element.id == _selectedIds.first);
+        ?.items
+        .firstWhere((element) => element.id == _selectedIds.first);
 
     bool haveDeletePermission = conversationViewData != null &&
         LMChatMemberRightUtil.checkDeletePermissions(conversationViewData) &&
@@ -423,8 +432,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         const SizedBox(width: 8),
         _screenBuilder.copyButton(
           context,
-          pagedListController.value.itemList
-                  ?.where(
+          pagedListController?.items
+                  .where(
                       (conversation) => _selectedIds.contains(conversation.id))
                   .toList() ??
               [],
@@ -438,8 +447,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               String copiedMessage = "";
               if (isMultiple) {
                 for (int id in _selectedIds) {
-                  LMChatConversationViewData conversation = pagedListController
-                      .value.itemList!
+                  LMChatConversationViewData conversation = pagedListController!
+                      .items
                       .firstWhere((element) => element.id == id);
                   copiedMessage +=
                       "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";

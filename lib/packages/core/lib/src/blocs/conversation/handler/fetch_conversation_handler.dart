@@ -7,14 +7,16 @@ fetchConversationsEventHandler(
 ) async {
   emit(LMChatConversationLoadingState());
   final currentTime = DateTime.now().millisecondsSinceEpoch;
+  final int minTimestamp = event.minTimestamp ?? 0;
+  final int maxTimestamp = event.maxTimestamp ?? currentTime;
   final GetConversationRequest getConversationRequest =
       (GetConversationRequestBuilder()
             ..chatroomId(event.chatroomId)
             ..page(event.page)
             ..pageSize(event.pageSize)
             ..isLocalDB(false)
-            ..minTimestamp(0)
-            ..maxTimestamp(currentTime))
+            ..minTimestamp(minTimestamp)
+            ..maxTimestamp(maxTimestamp))
           .build();
   LMResponse response =
       await LMChatCore.client.getConversation(getConversationRequest);

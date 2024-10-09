@@ -11,6 +11,8 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 class LMChatPaginationController<T> {
   final StreamController<bool> isFirstPageLoadedController =
       StreamController<bool>();
+  final StreamController<int> upSidePage = StreamController<int>();
+  final StreamController<int> downSidePage = StreamController<int>();
 
   /// The list of items that have been loaded so far.
   List<T> items = [];
@@ -58,7 +60,7 @@ class LMChatPaginationController<T> {
     // if(nextPageKey == 2) {
     isFirstPageLoadedController.add(true);
     // }
-
+    downSidePage.add(nextPageKey ?? 0);
     final previousItems = items;
     final itemList = previousItems + newItems;
     items = itemList;
@@ -77,6 +79,7 @@ class LMChatPaginationController<T> {
     }
     final previousItems = items;
     final itemList = newItems + previousItems;
+    upSidePage.add(previousPageKey ?? 0);
     // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
     SchedulerBinding.instance.addPostFrameCallback((_) {
       items = itemList;
@@ -99,7 +102,18 @@ class LMChatPaginationController<T> {
   /// For example, when you want to load a new list of items.
   void clear() {
     items = [];
+    upSidePage.add(0);
+    downSidePage.add(0);
     _isLastPageToBottomReached = false;
     _isLastPageToTopReached = false;
+  }
+
+  /// Appends [newItems] to the previously loaded ones.
+  void addAll(List<T> newItems) {
+    items.addAll(newItems);
+    upSidePage.add(2);
+    downSidePage.add(2);
+    isLoadingBottom = false;
+    isLoadingTop = false;
   }
 }

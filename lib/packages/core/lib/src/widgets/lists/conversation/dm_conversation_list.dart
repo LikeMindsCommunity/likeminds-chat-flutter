@@ -315,13 +315,13 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   _addPaginationListener() {
     pagedListController.addPageRequestListener(
       (pageKey) {
-        _conversationBloc.add(
-          LMChatFetchConversationsEvent(
-            chatroomId: widget.chatroomId,
-            page: pageKey,
-            pageSize: 500,
-          ),
-        );
+        // _conversationBloc.add(
+        //   LMChatFetchConversationsEvent(
+        //     chatroomId: widget.chatroomId,
+        //     page: pageKey,
+        //     pageSize: 500,
+        //   ),
+        // );
       },
     );
   }

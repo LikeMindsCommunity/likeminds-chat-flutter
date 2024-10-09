@@ -32,6 +32,9 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
   /// Number of conversations to be fetched
   final int pageSize;
 
+  final int? minTimestamp;
+  final int? maxTimestamp;
+
   final PaginationDirection direction;
   final int? lastConversationId;
 
@@ -42,6 +45,8 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
     required this.pageSize,
     required this.direction,
     required this.lastConversationId,
+    this.minTimestamp,
+    this.maxTimestamp,
   });
 
   @override
@@ -49,6 +54,10 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
         chatroomId,
         page,
         pageSize,
+        direction,
+        lastConversationId ?? -1,
+        minTimestamp ?? 0,
+        maxTimestamp ?? 0,
       ];
 }
 

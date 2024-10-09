@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_controller.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_typedef.dart';
@@ -174,6 +175,12 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
         });
       }
     });
+    widget.paginationController.upSidePage.stream.listen((event) {
+      _upSidePage = event;
+    });
+    widget.paginationController.downSidePage.stream.listen((event) {
+      _downSidePage = event;
+    });
   }
 
   Future<void> _loadInitialData() async {
@@ -216,7 +223,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     });
 
     try {
-      _upSidePage++;
+      // _upSidePage++;
       int previousItemsCount = widget.paginationController.items.length;
       await widget.onPaginationTriggered(
         _upSidePage,
@@ -262,7 +269,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     });
 
     try {
-      _downSidePage++;
+      // _downSidePage++;
       await widget.onPaginationTriggered(
         _downSidePage,
         PaginationDirection.bottom,
@@ -321,7 +328,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       delayPopulatingCacheArea: widget.delayPopulatingCacheArea ?? false,
       controller: _scrollController,
       listController: _listController,
-      reverse: true,
+      reverse: widget.reverse ?? false,
       itemCount: items.length +
           (widget.paginationController.isLoadingBottom ? 1 : 0) +
           (widget.paginationController.isLoadingTop ? 1 : 0),
