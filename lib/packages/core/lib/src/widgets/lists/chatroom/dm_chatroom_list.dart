@@ -50,6 +50,12 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
     feedBloc = LMChatDMFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
     _addPaginationListener();
+    LMChatAnalyticsBloc.instance.add(
+      const LMChatFireAnalyticsEvent(
+        eventName: LMChatAnalyticsKeys.dmScreenOpened,
+        eventProperties: {'source': 'home_feed'},
+      ),
+    );
     super.initState();
   }
 

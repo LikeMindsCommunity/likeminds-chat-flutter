@@ -108,11 +108,25 @@ class LMChatBubble extends StatefulWidget {
   /// The function to call when a reaction is removed from bottom sheet.
   final Function(String reaction)? onRemoveReaction;
 
+  /// The builder function to build a reply widget
+  final Function(LMChatConversationViewData reply, LMChatBubbleReply oldWidget)?
+      replyBuilder;
+
   /// The Link Preview widget builder.s
   final Widget Function(
     LMChatOGTagsViewData ogTags,
     LMChatLinkPreview oldLinkPreviewWidget,
   )? linkPreviewBuilder;
+
+  /// Builder for bubble reactions
+  final Widget Function(List<LMChatReactionViewData> reactions,
+      LMChatBubbleReactions oldWidget)? bubbleReactionsBuilder;
+
+  /// Builder for reactions bar on chat bubble
+  final Widget Function(LMChatReactionBar oldWidget)? reactionBarBuilder;
+
+  ///Callback for catching when reactions are tapped
+  final VoidCallback? onReactionsTap;
 
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
@@ -145,6 +159,10 @@ class LMChatBubble extends StatefulWidget {
     this.mediaBuilder,
     this.onReaction,
     this.linkPreviewBuilder,
+    this.bubbleReactionsBuilder,
+    this.reactionBarBuilder,
+    this.replyBuilder,
+    this.onReactionsTap,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -179,6 +197,10 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(LMChatOGTagsViewData ogTags,
             LMChatLinkPreview oldLinkPreviewWidget)?
         linkPreviewBuilder,
+    Widget Function(List<LMChatReactionViewData> reactions,
+            LMChatBubbleReactions oldWidget)?
+        bubbleReactionsBuilder,
+    Widget Function(LMChatReactionBar oldWidget)? reactionBarBuilder,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -201,6 +223,9 @@ class LMChatBubble extends StatefulWidget {
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       onReaction: onReaction ?? this.onReaction,
       linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
+      bubbleReactionsBuilder:
+          bubbleReactionsBuilder ?? this.bubbleReactionsBuilder,
+      reactionBarBuilder: reactionBarBuilder ?? this.reactionBarBuilder,
     );
   }
 
@@ -396,30 +421,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 if (conversation.replyConversationObject !=
                                         null &&
                                     conversation.deletedByUserId == null) ...[
-                                  LMChatBubbleReply(
-                                    replyToConversation:
-                                        conversation.replyConversationObject!,
-                                    title: LMChatText(
-                                      currentUser.id ==
-                                              conversation
-                                                  .replyConversationObject!
-                                                  .memberId
-                                          ? "You"
-                                          : conversation
-                                              .replyConversationObject!
-                                              .member!
-                                              .name,
-                                      style: LMChatTextStyle(
-                                        maxLines: 1,
-                                        textStyle: TextStyle(
-                                          overflow: TextOverflow.ellipsis,
-                                          color: _themeData.primaryColor,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  widget.replyBuilder?.call(
+                                          conversation.replyConversationObject!,
+                                          _defReplyWidget()) ??
+                                      _defReplyWidget(),
                                   const SizedBox(height: 4),
                                 ],
                                 AbsorbPointer(
@@ -490,13 +495,24 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         ),
                       ),
                     ),
-                    LMChatBubbleReactions(
-                      conversation: conversation,
-                      currentUser: currentUser,
-                      userMeta: widget.userMeta ?? {},
-                      onRemoveReaction: widget.onRemoveReaction,
-                      reactions: reactions,
-                    ),
+                    widget.bubbleReactionsBuilder?.call(
+                            reactions ?? [],
+                            LMChatBubbleReactions(
+                              conversation: conversation,
+                              currentUser: currentUser,
+                              userMeta: widget.userMeta ?? {},
+                              onRemoveReaction: widget.onRemoveReaction,
+                              reactions: reactions,
+                              onReactionsTap: widget.onReactionsTap,
+                            )) ??
+                        LMChatBubbleReactions(
+                          conversation: conversation,
+                          currentUser: currentUser,
+                          userMeta: widget.userMeta ?? {},
+                          onRemoveReaction: widget.onRemoveReaction,
+                          reactions: reactions,
+                          onReactionsTap: widget.onReactionsTap,
+                        ),
                   ],
                 ),
                 const SizedBox(width: 6),
@@ -506,6 +522,26 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           ),
           _buildReactionButton(),
         ],
+      ),
+    );
+  }
+
+  LMChatBubbleReply _defReplyWidget() {
+    return LMChatBubbleReply(
+      replyToConversation: conversation.replyConversationObject!,
+      title: LMChatText(
+        currentUser.id == conversation.replyConversationObject!.memberId
+            ? "You"
+            : conversation.replyConversationObject!.member!.name,
+        style: LMChatTextStyle(
+          maxLines: 1,
+          textStyle: TextStyle(
+            overflow: TextOverflow.ellipsis,
+            color: _themeData.primaryColor,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }
@@ -620,21 +656,37 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           barrierColor: Colors.transparent,
           position: PreferredPosition.top,
           verticalMargin: 4,
-          menuBuilder: () => LMChatReactionBar(
-            onReaction: (reaction) {
-              widget.onReaction?.call(reaction);
-              reactionBarController.hideMenu();
-              if (_isSelected) {
-                _isSelected = false;
-                widget.onTap?.call(_isSelected, this);
-              } else {
-                if (widget.isSelectableOnTap?.call() ?? false) {
-                  _isSelected = !_isSelected;
-                  widget.onTap?.call(_isSelected, this);
-                }
-              }
-            },
-          ),
+          menuBuilder: () =>
+              widget.reactionBarBuilder?.call(LMChatReactionBar(
+                onReaction: (reaction) {
+                  widget.onReaction?.call(reaction);
+                  reactionBarController.hideMenu();
+                  if (_isSelected) {
+                    _isSelected = false;
+                    widget.onTap?.call(_isSelected, this);
+                  } else {
+                    if (widget.isSelectableOnTap?.call() ?? false) {
+                      _isSelected = !_isSelected;
+                      widget.onTap?.call(_isSelected, this);
+                    }
+                  }
+                },
+              )) ??
+              LMChatReactionBar(
+                onReaction: (reaction) {
+                  widget.onReaction?.call(reaction);
+                  reactionBarController.hideMenu();
+                  if (_isSelected) {
+                    _isSelected = false;
+                    widget.onTap?.call(_isSelected, this);
+                  } else {
+                    if (widget.isSelectableOnTap?.call() ?? false) {
+                      _isSelected = !_isSelected;
+                      widget.onTap?.call(_isSelected, this);
+                    }
+                  }
+                },
+              ),
           child: const SizedBox(),
         ),
       ),

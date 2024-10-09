@@ -220,6 +220,33 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         onRemoveReaction(r, conversation.id);
         setState(() {});
       },
+      replyBuilder: (reply, oldWidget) {
+        String message = getGIFText(reply);
+        return oldWidget.copyWith(
+          subtitle: ((reply.attachmentsUploaded ?? false) &&
+                  reply.deletedByUserId == null)
+              ? getChatItemAttachmentTile(message,
+                  conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
+              : LMChatText(
+                  reply.state != 0
+                      ? LMChatTaggingHelper.extractStateMessage(message)
+                      : LMChatTaggingHelper.convertRouteToTag(
+                            message,
+                            withTilde: false,
+                          ) ??
+                          "Replying to Conversation",
+                  style: LMChatTextStyle(
+                    maxLines: 1,
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      color: LMChatTheme.theme.onContainer,
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+        );
+      },
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -267,6 +294,17 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       },
       isSelectableOnTap: () {
         return _selectedIds.isNotEmpty;
+      },
+      onReactionsTap: () {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.reactionListOpened,
+            eventProperties: {
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
       },
       onTap: (value, state) {
         if (value) {
@@ -334,10 +372,48 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           ),
         );
       },
+      replyBuilder: (reply, oldWidget) {
+        String message = getGIFText(reply);
+        return oldWidget.copyWith(
+          subtitle: ((reply.attachmentsUploaded ?? false) &&
+                  reply.deletedByUserId == null)
+              ? getChatItemAttachmentTile(message,
+                  conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
+              : LMChatText(
+                  reply.state != 0
+                      ? LMChatTaggingHelper.extractStateMessage(message)
+                      : LMChatTaggingHelper.convertRouteToTag(
+                            message,
+                            withTilde: false,
+                          ) ??
+                          "Replying to Conversation",
+                  style: LMChatTextStyle(
+                    maxLines: 1,
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      color: LMChatTheme.theme.onContainer,
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+        );
+      },
       isSent: false,
       isDM: true,
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       isSelected: _selectedIds.contains(conversation.id),
+      onReactionsTap: () {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.reactionListOpened,
+            eventProperties: {
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+      },
       onLongPress: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);

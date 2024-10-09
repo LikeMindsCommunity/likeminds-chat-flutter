@@ -1,5 +1,6 @@
 export 'constants/strings.dart';
 export 'constants/enums.dart';
+export 'constants/analytics.dart';
 
 export 'preferences/preferences.dart';
 

@@ -107,6 +107,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   String _textValue = "";
   String _tagValue = "";
   static const int _fixedSize = 20;
+  late LMChatTextFieldStyle effectiveStyle;
 
   @override
   void initState() {
@@ -114,6 +115,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
     _focusNode = widget.focusNode;
     _controller = widget.controller!;
     _setupScrollListener();
+    effectiveStyle = widget.textFieldStyle ?? LMChatTheme.theme.textFieldStyle;
   }
 
   void _setupScrollListener() {
@@ -244,8 +246,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           return TypeAheadField<LMChatTagViewData>(
             scrollPhysics:
                 widget.scrollPhysics ?? const AlwaysScrollableScrollPhysics(),
-            tagColor:
-                widget.textFieldStyle?.tagColor ?? LMChatTheme.theme.linkColor,
+            tagColor: effectiveStyle.tagColor ?? LMChatTheme.theme.linkColor,
             onTagTap: (p) {
               print(p);
             },
@@ -274,23 +275,23 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   SuggestionsBoxDecoration _buildSuggestionsBoxDecoration() {
     return SuggestionsBoxDecoration(
       offsetX: -4.w,
-      elevation: widget.textFieldStyle?.suggestionsBoxElevation ?? 2,
-      color: widget.textFieldStyle?.suggestionsBoxColor ??
-          LMChatTheme.theme.container,
+      elevation: effectiveStyle.suggestionsBoxElevation ?? 2,
+      color: effectiveStyle.suggestionsBoxColor ?? LMChatTheme.theme.container,
       clipBehavior: Clip.hardEdge,
-      borderRadius: widget.textFieldStyle?.suggestionsBoxBorderRadius ??
+      borderRadius: effectiveStyle.suggestionsBoxBorderRadius ??
           const BorderRadius.all(Radius.circular(12.0)),
       hasScrollbar: false,
-      constraints: widget.textFieldStyle?.suggestionsBoxConstraints ??
+      constraints: effectiveStyle.suggestionsBoxConstraints ??
           BoxConstraints(maxHeight: 24.h, minWidth: 80.w),
     );
   }
 
   TextFieldConfiguration _buildTextFieldConfiguration() {
     return TextFieldConfiguration(
+      textInputAction: TextInputAction.done,
       keyboardType: TextInputType.multiline,
       controller: _controller,
-      style: widget.textFieldStyle?.textStyle ??
+      style: effectiveStyle.textStyle ??
           widget.style ??
           const TextStyle(fontSize: 14),
       textCapitalization: TextCapitalization.sentences,
@@ -299,12 +300,13 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
       maxLines: 200,
       scrollPadding: const EdgeInsets.all(2),
       enabled: widget.decoration?.enabled ?? true,
-      decoration: widget.textFieldStyle?.inputDecoration ??
+      decoration: effectiveStyle.inputDecoration ??
           widget.decoration ??
           InputDecoration(
             hintText: 'Type something...',
-            hintStyle: widget.textFieldStyle?.textStyle ?? widget.style,
+            hintStyle: widget.style,
             border: InputBorder.none,
+            focusColor: LMChatTheme.theme.linkColor,
           ),
       onChanged: _handleTextChange,
     );
@@ -313,28 +315,30 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   Widget _buildSuggestionItem(BuildContext context, LMChatTagViewData opt) {
     return Container(
       decoration: BoxDecoration(
-        color: widget.textFieldStyle?.suggestionItemColor ??
-            LMChatTheme.theme.container,
+        color:
+            effectiveStyle.suggestionItemColor ?? LMChatTheme.theme.container,
         border: Border(
           bottom: BorderSide(
-            color: widget.textFieldStyle?.suggestionItemColor ??
+            color: effectiveStyle.suggestionItemColor ??
                 LMChatTheme.theme.container,
             width: 0.2,
           ),
         ),
       ),
       child: Padding(
-        padding: widget.textFieldStyle?.suggestionItemPadding ??
+        padding: effectiveStyle.suggestionItemPadding ??
             const EdgeInsets.symmetric(horizontal: 4),
         child: Container(
           width: double.infinity,
+          color:
+              effectiveStyle.suggestionsBoxColor ?? LMChatTheme.theme.container,
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               LMChatProfilePicture(
                 fallbackText: opt.name,
                 imageUrl: opt.imageUrl,
-                style: widget.textFieldStyle?.suggestionItemAvatarStyle ??
+                style: effectiveStyle.suggestionItemAvatarStyle ??
                     LMChatProfilePictureStyle(
                       size: 36,
                       backgroundColor: LMChatTheme.theme.backgroundColor,
@@ -343,7 +347,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
               const SizedBox(width: 12),
               LMChatText(
                 opt.name,
-                style: widget.textFieldStyle?.suggestionItemTextStyle ??
+                style: effectiveStyle.suggestionItemTextStyle ??
                     const LMChatTextStyle(
                       textStyle: TextStyle(fontSize: 14),
                     ),
