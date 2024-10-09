@@ -33,16 +33,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
   await LMChatCore.instance.initialize(
-      excludedConversationStates: [
-        ConversationState.memberJoinedOpenChatroom,
-        ConversationState.memberLeftOpenChatroom,
-        ConversationState.memberLeftSecretChatroom,
-        ConversationState.memberAddedToChatroom,
-      ],
-      analyticsListener: (state) {
-        debugPrint(
-            "Caught in example:- ${state.eventName} : ${state.eventProperties.toString()}");
-      });
+    excludedConversationStates: [
+      ConversationState.memberJoinedOpenChatroom,
+      ConversationState.memberLeftOpenChatroom,
+      ConversationState.memberLeftSecretChatroom,
+      ConversationState.memberAddedToChatroom,
+    ],
+  );
   runApp(const LMChatSampleApp());
 }
 
@@ -102,17 +99,18 @@ Future<String> deviceId() async {
 /// 4. Return FCM token
 Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
-  // messaging.setForegroundNotificationPresentationOptions(
-  //   alert: true,
-  //   badge: true,
-  //   sound: true,
-  // );
+  messaging.setForegroundNotificationPresentationOptions(
+    // alert: true,
+    badge: true,
+    sound: true,
+  );
   await messaging.requestPermission(
     alert: true,
+    announcement: false,
     badge: true,
     carPlay: false,
-    criticalAlert: false,
-    provisional: true,
+    criticalAlert: true,
+    provisional: false,
     sound: true,
   );
   if (Platform.isIOS) {

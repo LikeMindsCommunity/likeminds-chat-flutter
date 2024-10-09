@@ -135,7 +135,8 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: LMChatTheme.theme.disabledColor,
+                  color: style.tabBarBorderColor ??
+                      LMChatTheme.theme.disabledColor,
                   width: 1,
                 ),
               ),
@@ -170,12 +171,19 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
                           : null),
                   child: LMChatText(
                     '${mappedReactions!.keys.elementAt(reactionIndex)} (${mappedReactions!.values.elementAt(reactionIndex).length})',
-                    style: LMChatTextStyle(
-                      textStyle: selectedKey ==
-                              mappedReactions!.keys.elementAt(reactionIndex)
-                          ? TextStyle(color: LMChatTheme.theme.primaryColor)
-                          : const TextStyle(),
-                    ),
+                    style: selectedKey ==
+                            mappedReactions!.keys.elementAt(reactionIndex)
+                        ? style.selectedTabTextStyle ??
+                            LMChatTextStyle(
+                              textStyle: TextStyle(
+                                color: style.selectedTabColor ??
+                                    LMChatTheme.theme.primaryColor,
+                              ),
+                            )
+                        : style.tabTextStyle ??
+                            const LMChatTextStyle(
+                              textStyle: TextStyle(),
+                            ),
                   ),
                 ),
               ),
@@ -195,6 +203,7 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
           margin: const EdgeInsets.only(bottom: 10),
           child: LMChatUserTile(
             absorbTouch: false,
+            style: style.userTileStyle,
             onTap: mappedReactions![selectedKey]![itemIndex].userId ==
                     currentUser!.id
                 ? () => widget.onRemoveReaction?.call(

@@ -7,6 +7,11 @@ import 'package:meta/meta.dart';
 part 'chatroom_action_event.dart';
 part 'chatroom_action_state.dart';
 
+part 'handler/show_emoji_keyboard_handler.dart';
+part 'handler/hide_emoji_keyboard_handler.dart';
+part 'handler/mark_read_chatroom_handler.dart';
+part 'handler/set_chatroom_topic_handler.dart';
+
 class LMChatroomActionBloc
     extends Bloc<LMChatroomActionEvent, LMChatroomActionState> {
   static LMChatroomActionBloc? _instance;
@@ -33,45 +38,6 @@ class LMChatroomActionBloc
       await _handleMarkReadChatroom(event);
     } else if (event is LMChatSetChatroomTopicEvent) {
       await _handleSetChatroomTopic(event, emit);
-    }
-  }
-
-  void _handleShowEmojiKeyboard(
-      LMChatShowEmojiKeyboardEvent event, Emitter<LMChatroomActionState> emit) {
-    emit(LMChatShowEmojiKeyboardState(
-      conversationId: event.conversationId,
-    ));
-  }
-
-  void _handleHideEmojiKeyboard(Emitter<LMChatroomActionState> emit) {
-    emit(LMChatHideEmojiKeyboardState());
-  }
-
-  Future<void> _handleMarkReadChatroom(
-      LMChatMarkReadChatroomEvent event) async {
-    // ignore: unused_local_variable
-    LMResponse response = await LMChatCore.client.markReadChatroom(
-        (MarkReadChatroomRequestBuilder()..chatroomId(event.chatroomId))
-            .build());
-  }
-
-  Future<void> _handleSetChatroomTopic(LMChatSetChatroomTopicEvent event,
-      Emitter<LMChatroomActionState> emit) async {
-    try {
-      emit(LMChatChatroomActionLoading());
-      LMResponse<void> response = await LMChatCore.client
-          .setChatroomTopic((SetChatroomTopicRequestBuilder()
-                ..chatroomId(event.chatroomId)
-                ..conversationId(event.conversationId))
-              .build());
-      if (response.success) {
-        emit(LMChatChatroomTopicSet(event.topic));
-      } else {
-        emit(LMChatChatroomTopicError(errorMessage: response.errorMessage!));
-      }
-    } catch (e) {
-      emit(LMChatChatroomTopicError(
-          errorMessage: "An error occurred while setting topic"));
     }
   }
 }

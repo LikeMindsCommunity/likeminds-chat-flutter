@@ -210,14 +210,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                       },
                     ),
                   ),
-                  _screenBuilder.chatBarBuilder(
-                    context,
-                    LMChatroomBar(
-                      chatroom: chatroom.toChatRoomViewData(),
-                      scrollToBottom: _scrollToBottom,
-                      enableTagging: chatroom.type != 10,
-                    ),
-                  ),
                   BlocBuilder(
                       bloc: _chatroomActionBloc,
                       builder: (context, state) {
@@ -250,7 +242,14 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                             ),
                           );
                         }
-                        return const SizedBox();
+                        return _screenBuilder.chatBarBuilder(
+                          context,
+                          LMChatroomBar(
+                            chatroom: chatroom.toChatRoomViewData(),
+                            scrollToBottom: _scrollToBottom,
+                            enableTagging: chatroom.type != 10,
+                          ),
+                        );
                       }),
                 ],
               );

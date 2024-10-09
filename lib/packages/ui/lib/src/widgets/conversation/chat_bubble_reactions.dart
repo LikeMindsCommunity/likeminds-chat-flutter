@@ -8,6 +8,7 @@ class LMChatBubbleReactions extends StatefulWidget {
   final bool? isSent;
   final Function(String reaction)? onRemoveReaction;
   final LMChatBubbleReactionsStyle? style;
+  final VoidCallback? onReactionsTap;
 
   const LMChatBubbleReactions({
     super.key,
@@ -18,6 +19,7 @@ class LMChatBubbleReactions extends StatefulWidget {
     required this.conversation,
     required this.currentUser,
     this.style,
+    this.onReactionsTap,
   });
 
   @override
@@ -72,6 +74,7 @@ class _LMChatBubbleReactionsState extends State<LMChatBubbleReactions> {
                     onRemoveReaction: widget.onRemoveReaction,
                   ),
                 );
+                widget.onReactionsTap?.call();
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,

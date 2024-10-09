@@ -91,9 +91,10 @@ class LMChatReactionBar extends StatelessWidget {
               child: LMChatIcon(
                 type: LMChatIconType.icon,
                 icon: Icons.add_reaction_outlined,
-                style: LMChatIconStyle(
-                  size: effectiveStyle.size ?? 24,
-                ),
+                style: effectiveStyle.addIconStyle ??
+                    LMChatIconStyle(
+                      size: effectiveStyle.size ?? 24,
+                    ),
               ),
             )
           ],
@@ -118,6 +119,9 @@ class LMChatReactionBarStyle {
   /// The size of the reaction icons within the bar.
   final double? size;
 
+  /// The style of the add icon in reaction bar
+  final LMChatIconStyle? addIconStyle;
+
   /// Creates an instance of [LMChatReactionBarStyle].
   LMChatReactionBarStyle({
     this.background,
@@ -125,6 +129,7 @@ class LMChatReactionBarStyle {
     this.height,
     this.size,
     this.borderRadius,
+    this.addIconStyle,
   });
 
   /// A factory constructor that returns a basic instance of [LMChatReactionBarStyle].
