@@ -115,7 +115,7 @@ class _LMChatBubbleReactionsState extends State<LMChatBubbleReactions> {
                       ),
                     ),
                   kHorizontalPaddingSmall,
-                  if (reactions.length > 3)
+                  if (keys.length > 3)
                     Container(
                       padding: effectiveStyle.containerPadding,
                       decoration: BoxDecoration(
@@ -152,14 +152,33 @@ class _LMChatBubbleReactionsState extends State<LMChatBubbleReactions> {
   }
 }
 
+///{@template lm_chat_bubble_reactions_style}
+/// A class that defines the style for the chat bubble reactions.
+///
+/// This class contains properties that determine the appearance of the
+/// reaction bubbles in the chat interface, including padding, margin,
+/// container color, border radius, and text style for the reactions.
+/// {@endtemplate}
 class LMChatBubbleReactionsStyle {
+  /// The padding applied to the entire reaction bubble.
   final EdgeInsets? padding;
+
+  /// The margin applied around the reaction bubble.
   final EdgeInsets? margin;
+
+  /// The padding applied inside the container of the reaction bubble.
   final EdgeInsets? containerPadding;
+
+  /// The background color of the reaction bubble container.
   final Color? containerColor;
+
+  /// The border radius of the reaction bubble container.
   final double? containerBorderRadius;
+
+  /// The text style applied to the reaction text within the bubble.
   final TextStyle? reactionTextStyle;
 
+  /// {@macro lm_chat_bubble_reactions_style}
   const LMChatBubbleReactionsStyle({
     this.padding,
     this.margin,

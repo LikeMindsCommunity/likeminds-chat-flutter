@@ -132,7 +132,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
           color: Colors.black,
         ),
         controller: _reportReasonController,
-        decoration: theme.textFieldStyle.decoration?.copyWith(
+        decoration: theme.textFieldStyle.inputDecoration?.copyWith(
               hintText: 'Reason',
               hintStyle: theme.contentStyle.textStyle,
               border: UnderlineInputBorder(

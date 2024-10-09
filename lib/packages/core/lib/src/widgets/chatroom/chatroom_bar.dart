@@ -6,7 +6,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 
 /// {@template lm_chatroom_bar}
@@ -20,7 +20,13 @@ class LMChatroomBar extends StatefulWidget {
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
   final VoidCallback scrollToBottom;
 
+  /// [controller] is an optional [TextEditingController] that can be used to control the text input field.
+  /// If provided, it allows external management of the text input, such as setting the text or listening for changes.
   final TextEditingController? controller;
+
+  /// Indicates whether tagging is enabled in the chatroom bar.
+  /// If true, users can tag other users in their messages.
+  final bool? enableTagging;
 
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
@@ -28,6 +34,7 @@ class LMChatroomBar extends StatefulWidget {
     required this.chatroom,
     required this.scrollToBottom,
     this.controller,
+    this.enableTagging,
   });
 
   @override
@@ -360,7 +367,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     String? convertedMsgText = LMChatTaggingHelper.convertRouteToTag(message);
     // set the text in the text field
     _textEditingController.value = TextEditingValue(
-      text: convertedMsgText ?? '',
+      text: '$convertedMsgText ',
       selection: TextSelection.fromPosition(
         TextPosition(
           offset: _textEditingController.text.length - 1,
@@ -481,7 +488,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return LMChatTextField(
       key: const ObjectKey('chatTextField'),
       isDown: false,
-      enabled: false,
+      enabled: widget.enableTagging ?? true,
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
       isSecret: widget.chatroom.isSecret ?? false,
       chatroomId: widget.chatroom.id,
@@ -490,8 +497,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         tags.add(tag);
         LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
           'community_id': widget.chatroom.id,
-          'chatroom_name': widget.chatroom.title,
-          'tagged_user_id': tag.id,
+          'chatroom_name': widget.chatroom.header,
+          'tagged_user_id': tag.sdkClientInfoViewData?.uuid,
           'tagged_user_name': tag.name,
         });
       },
@@ -835,7 +842,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         _textEditingController.clear();
       },
       subtitle: LMChatText(
-        LMChatTaggingHelper.convertRouteToTag(editConversation?.answer) ?? "",
+        LMChatTaggingHelper.convertRouteToTag(
+              editConversation?.answer,
+              withTilde: false,
+            ) ??
+            "",
         style: LMChatTextStyle(
           textStyle: Theme.of(context).textTheme.bodySmall,
         ),

@@ -1,14 +1,14 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
-// import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 
 class LMChatTaggingHelper {
   LMChatTagViewData? userTag;
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
-  static RegExp routeRegExp = RegExp(
-      r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>|<<([^<>]+)\|route://([^<>]+)>>');
+  static RegExp routeRegExp =
+      RegExp(r'<<([^<>]+)\|route://([^<>]+)\/([a-zA-Z0-9]+)>>');
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
@@ -23,42 +23,26 @@ class LMChatTaggingHelper {
         if (tagData.tagType == LMTagType.groupTag) {
           string = string.replaceAll('@$tag~', tagData.tag!);
         } else {
-          string = string.replaceAll(
-              '@$tag~', '<<${tagData.name}|route://member/${tagData.id}>>');
+          string = string.replaceAll('@$tag~',
+              '<<${tagData.name}|route://user_profile/${tagData.sdkClientInfoViewData?.uuid ?? tagData.uuid}>>');
         }
       }
     }
     return string;
   }
 
-  // static String encodeString(String string, List<UserTag> userTags) {
-  //   final Iterable<RegExpMatch> matches = tagRegExp.allMatches(string);
-  //   for (final match in matches) {
-  //     final String tag = match.group(1)!;
-  //     final UserTag? userTag =
-  //         userTags.firstWhereOrNull((element) => element.name! == tag);
-  //     if (userTag != null) {
-  //       string = string.replaceAll('@$tag~',
-  //           '<<${userTag.name}|route://member/${userTag.userUniqueId}>>');
-  //     }
-  //   }
-  //   return string;
-  // }
-
   /// Decodes the string with the user tags and returns the decoded string
   static Map<String, String> decodeString(String string) {
     Map<String, String> result = {};
+    final RegExp routeRegExp =
+        RegExp(r'<<([^<>]+)\|route://(?:member|user_profile)/([^<>]+)>>');
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(string);
     for (final match in matches) {
-      final String tag = match.group(1) ?? match.group(4)!;
-      final String? id = match.group(3);
-      if (id != null) {
-        string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
-      } else {
-        string =
-            string.replaceAll('<<@participants|route://participants>', '@$tag');
-      }
-      result.addAll({'@$tag': id ?? ''});
+      final String tag = match.group(1)!;
+      final String id = match.group(2)!;
+      string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
+      string = string.replaceAll('<<$tag|route://user_profile/$id>>', '@$tag');
+      result.addAll({'@$tag': id});
     }
     return result;
   }
@@ -86,18 +70,20 @@ class LMChatTaggingHelper {
 
   static String? convertRouteToTag(String? text, {bool withTilde = true}) {
     if (text == null) return null;
+    Map<String, String> result = {};
+    final RegExp routeRegExp = RegExp(
+        r'<<([^<>]+)\|route://(?:member|user_profile|participants)/([^<>]+)>>');
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(text);
 
     for (final match in matches) {
-      final String tag = match.group(1) ?? match.group(4)!;
-      final String? mid = match.group(2);
-      final String? id = match.group(3);
-      if (id != null) {
-        text = text!.replaceAll(
-            '<<$tag|route://$mid/$id>>', withTilde ? '@$tag~' : '@$tag');
-      } else {
-        text = text!.replaceAll('<<@participants|route://participants>>', tag);
-      }
+      final String tag = match.group(1)!;
+      final String id = match.group(2)!;
+      text = text!.replaceAll(
+          '<<$tag|route://member/$id>>', withTilde ? '@$tag~' : '@$tag');
+      text = text.replaceAll(
+          '<<$tag|route://user_profile/$id>>', withTilde ? '@$tag~' : '@$tag');
+      text = text.replaceAll('<<@participants|route://participants>>', tag);
+      result.addAll({'@$tag': id});
     }
     return text;
   }
@@ -127,16 +113,18 @@ class LMChatTaggingHelper {
   }
 
   static List<LMChatTagViewData> addUserTagsIfMatched(String input) {
+    final RegExp routeRegExp = RegExp(
+        r'<<([^<>]+)\|route://(?:member|user_profile|participants)/([^<>]+)>>');
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(input);
     List<LMChatTagViewData> userTags = [];
+
     for (final match in matches) {
-      final String tag = match.group(1) ?? match.group(4)!;
-      // final String mid = match.group(2)!;
-      final String? id = match.group(3);
+      final String tag = match.group(1)!;
+      final String id = match.group(2)!;
       userTags.add(
         (LMChatTagViewDataBuilder()
               ..name(tag)
-              ..id(int.tryParse(id ?? '')))
+              ..id(int.tryParse(id)))
             .build(),
       );
     }
@@ -155,7 +143,8 @@ class LMChatTaggingHelper {
     return input;
   }
 
-  static String extractFirstDMStateMessage(LMChatConversationViewData input, LMChatUserViewData user) {
+  static String extractFirstDMStateMessage(
+      LMChatConversationViewData input, LMChatUserViewData user) {
     String result = input.answer;
     final RegExp tagRegex = RegExp(r"<<(?<=\<\<).+?(?=\>\>)>>");
     final Iterable<RegExpMatch> matches = tagRegex.allMatches(input.answer);

@@ -59,7 +59,6 @@ class LMChatEditingConversationEvent extends LMChatConversationActionEvent {
       ];
 }
 
-///
 class LMChatEditRemoveEvent extends LMChatConversationActionEvent {
   @override
   List<Object> get props => [];

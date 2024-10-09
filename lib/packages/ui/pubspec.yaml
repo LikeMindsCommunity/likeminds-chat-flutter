@@ -27,7 +27,6 @@ dependencies:
   path: ^1.9.0
   flutter_cache_manager: ^3.4.1
   custom_pop_up_menu: ^1.2.4
-  flutter_emoji: ^2.5.1
   emoji_picker_flutter: ^3.0.0
 
 dev_dependencies:

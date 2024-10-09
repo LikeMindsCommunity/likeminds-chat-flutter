@@ -1,4 +1,5 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/sdk_client_info_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 extension GroupTagConvertor on GroupTag {
@@ -23,7 +24,9 @@ extension UserTagConvertor on UserTag {
       ..customTitle(customTitle)
       ..id(id)
       ..isGuest(isGuest)
-      ..userUniqueId(userUniqueId);
+      ..userUniqueId(userUniqueId)
+      ..uuid(uuid)
+      ..sdkClientInfoViewData(sdkClientInfo?.toSDKClientInfoViewdata());
     return builder.build();
   }
 }
