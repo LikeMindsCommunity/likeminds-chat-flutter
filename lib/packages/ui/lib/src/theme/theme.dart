@@ -14,8 +14,10 @@ class LMChatTheme {
 
   void initialise({
     LMChatThemeData? theme,
+    TextTheme? textTheme,
   }) {
     themeData = theme ?? LMChatThemeData.light();
+    textTheme = textTheme;
   }
 }
 
@@ -28,17 +30,21 @@ class LMChatThemeData {
   final LMChatPopUpMenuStyle popUpMenuStyle;
   final LMChatBottomSheetStyle bottomSheetStyle;
   final LMChatSnackBarStyle snackBarTheme;
+  final LMChatTileStyle chatTileStyle;
+  final LMChatAppBarStyle appBarStyle;
+
   final LMChatImageStyle imageStyle;
   final LMChatVideoStyle videoStyle;
   final LMChatDocumentStyle documentStyle;
   final LMChatGIFStyle gifStyle;
-  final LMChatTileStyle chatTileStyle;
-  final LMChatAppBarStyle appBarStyle;
 
   final LMChatBubbleStyle bubbleStyle;
   final LMChatStateBubbleStyle stateBubbleStyle;
   final LMChatBubbleReplyStyle replyStyle;
   final LMChatBubbleContentStyle contentStyle;
+
+  final LMChatReactionBarStyle reactionBarStyle;
+  final LMChatReactionBottomSheetStyle reactionBottomSheetStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -54,6 +60,8 @@ class LMChatThemeData {
   final Color onContainer;
   final Color onPrimary;
   final Color scaffold;
+
+  final LMChatBubbleReactionsStyle bubbleReactionsStyle;
 
   const LMChatThemeData({
     required this.primaryColor,
@@ -88,6 +96,9 @@ class LMChatThemeData {
     required this.chatTileStyle,
     required this.stateBubbleStyle,
     required this.appBarStyle,
+    required this.reactionBarStyle,
+    required this.reactionBottomSheetStyle,
+    required this.bubbleReactionsStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -138,6 +149,9 @@ class LMChatThemeData {
     LMChatTileStyle? chatTileStyle,
     LMChatStateBubbleStyle? stateBubbleStyle,
     LMChatAppBarStyle? appBarStyle,
+    LMChatReactionBarStyle? reactionBarStyle,
+    LMChatReactionBottomSheetStyle? reactionBottomSheetStyle,
+    LMChatBubbleReactionsStyle? bubbleReactionsStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
@@ -182,6 +196,11 @@ class LMChatThemeData {
       stateBubbleStyle:
           stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
       appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
+      reactionBarStyle: reactionBarStyle ?? LMChatReactionBarStyle.basic(),
+      reactionBottomSheetStyle:
+          reactionBottomSheetStyle ?? LMChatReactionBottomSheetStyle.basic(),
+      bubbleReactionsStyle:
+          bubbleReactionsStyle ?? LMChatBubbleReactionsStyle.basic(),
     );
   }
 
@@ -218,6 +237,9 @@ class LMChatThemeData {
     LMChatTileStyle? chatTileStyle,
     LMChatStateBubbleStyle? stateBubbleStyle,
     LMChatAppBarStyle? appBarStyle,
+    LMChatReactionBarStyle? reactionBarStyle,
+    LMChatReactionBottomSheetStyle? reactionBottomSheetStyle,
+    LMChatBubbleReactionsStyle? bubbleReactionsStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -252,6 +274,10 @@ class LMChatThemeData {
       chatTileStyle: chatTileStyle ?? this.chatTileStyle,
       stateBubbleStyle: stateBubbleStyle ?? this.stateBubbleStyle,
       appBarStyle: appBarStyle ?? this.appBarStyle,
+      reactionBarStyle: reactionBarStyle ?? this.reactionBarStyle,
+      reactionBottomSheetStyle:
+          reactionBottomSheetStyle ?? this.reactionBottomSheetStyle,
+      bubbleReactionsStyle: bubbleReactionsStyle ?? this.bubbleReactionsStyle,
     );
   }
 }

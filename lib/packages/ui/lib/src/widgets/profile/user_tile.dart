@@ -59,7 +59,7 @@ class LMChatUserTile extends LMChatTile {
             userViewData.name,
             style: const LMChatTextStyle(
               textStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
             ),

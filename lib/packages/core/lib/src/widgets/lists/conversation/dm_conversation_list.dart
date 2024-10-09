@@ -50,6 +50,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   Map<String, Conversation> conversationMeta = <String, Conversation>{};
   Map<String, List<LMChatAttachmentViewData>> conversationAttachmentsMeta =
       <String, List<LMChatAttachmentViewData>>{};
+  Map<String, List<LMChatReactionViewData>> conversationReactionsMeta =
+      <String, List<LMChatReactionViewData>>{};
   Map<int, User?> userMeta = <int, User?>{};
   List<int> _selectedIds = [];
 
@@ -109,6 +111,12 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             }
             if (state is LMChatConversationEdited) {
               updateEditedConversation(state.conversationViewData);
+            }
+            if (state is LMChatPutReactionState ||
+                state is LMChatPutReactionError ||
+                state is LMChatDeleteReactionState ||
+                state is LMChatDeleteReactionError) {
+              _updateReactions(state);
             }
           },
         ),
@@ -198,6 +206,20 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
               conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
+      userMeta: userMeta.map((id, user) {
+        return MapEntry(id, user!.toUserViewData());
+      }),
+      reactions:
+          conversationReactionsMeta[conversation.temporaryId.toString()] ??
+              conversationReactionsMeta[conversation.id.toString()],
+      onReaction: (r) {
+        onReaction(r, conversation.id);
+        setState(() {});
+      },
+      onRemoveReaction: (r) {
+        onRemoveReaction(r, conversation.id);
+        setState(() {});
+      },
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -246,6 +268,20 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
+      userMeta: userMeta.map((id, user) {
+        return MapEntry(id, user!.toUserViewData());
+      }),
+      reactions:
+          conversationReactionsMeta[conversation.temporaryId.toString()] ??
+              conversationReactionsMeta[conversation.id.toString()],
+      onReaction: (r) {
+        onReaction(r, conversation.id);
+        setState(() {});
+      },
+      onRemoveReaction: (r) {
+        onRemoveReaction(r, conversation.id);
+        setState(() {});
+      },
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -352,6 +388,21 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         });
         conversationAttachmentsMeta.addAll(getConversationAttachmentData);
       }
+      if (state.getConversationResponse.conversationReactionMeta != null &&
+          state.getConversationResponse.conversationReactionMeta!.isNotEmpty) {
+        Map<String, List<LMChatReactionViewData>> getConversationReactionsData =
+            state.getConversationResponse.conversationReactionMeta!
+                .map((key, value) {
+          return MapEntry(
+            key,
+            (value as List<Reaction>?)
+                    ?.map((e) => e.toReactionViewData())
+                    .toList() ??
+                [],
+          );
+        });
+        conversationReactionsMeta.addAll(getConversationReactionsData);
+      }
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
@@ -408,7 +459,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId) {
-        conversationAttachmentsMeta.addAll(state.attachments ?? {});
+        conversationAttachmentsMeta.addAll(state.attachments);
         addConversationToPagedList(
           state.conversationViewData,
         );
@@ -543,6 +594,140 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           editedConversation.toConversation();
     }
     pagedListController.itemList = conversationList;
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  onReaction(
+    String reaction,
+    int conversationId,
+  ) {
+    if (reaction == 'Add') {
+      LMChatroomActionBloc.instance.add(
+        LMChatShowEmojiKeyboardEvent(
+          conversationId: conversationId,
+        ),
+      );
+    } else {
+      /// TODO: Check for follow status of chatroom
+      // if (!chatroom.followStatus!) {
+      //   Future<LMResponse> response = locator<LikeMindsService>()
+      //       .followChatroom((FollowChatroomRequestBuilder()
+      //             ..chatroomId(chatroom.id)
+      //             ..memberId(loggedinUser.id)
+      //             ..value(true))
+      //           .build())
+      //     ..then((value) {
+      //       if (value.success) {
+      //         toast("Chatroom joined");
+      //       }
+      //     });
+      _convActionBloc.add(LMChatPutReaction(
+        conversationId: conversationId,
+        reaction: reaction,
+      ));
+      _selectedIds.remove(conversationId);
+      rebuildAppBar.value = !rebuildAppBar.value;
+    }
+  }
+
+  onRemoveReaction(String reaction, int conversationId) {
+    _convActionBloc.add(LMChatDeleteReaction(
+      conversationId: conversationId,
+      reaction: reaction,
+    ));
+    Navigator.pop(context);
+  }
+
+  void _updateReactions(LMChatConversationActionState state) {
+    if (state is LMChatPutReactionState) {
+      LMChatReactionViewData addedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      if (!userMeta.containsKey(user.id)) {
+        userMeta[user.id] = user;
+      }
+      _addReaction(addedReaction, state.conversationId);
+    }
+    if (state is LMChatPutReactionError) {
+      toast(state.errorMessage);
+      LMChatReactionViewData addedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      _removeReaction(addedReaction);
+    }
+    if (state is LMChatDeleteReactionState) {
+      LMChatReactionViewData deletedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      _removeReaction(deletedReaction);
+    }
+    if (state is LMChatDeleteReactionError) {
+      toast(state.errorMessage);
+      LMChatReactionViewData deletedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      _addReaction(deletedReaction, state.conversationId);
+    }
+  }
+
+  void _addReaction(LMChatReactionViewData reaction, int conversationId) {
+    String conversationIdStr = conversationId.toString();
+    if (conversationReactionsMeta.containsKey(conversationIdStr)) {
+      final existingReactions = conversationReactionsMeta[conversationIdStr]!;
+      final existingReactionIndex =
+          existingReactions.indexWhere((r) => r.userId == reaction.userId);
+      if (existingReactionIndex != -1) {
+        existingReactions[existingReactionIndex] =
+            reaction; // Update existing reaction
+      } else {
+        existingReactions.add(reaction); // Add new reaction
+      }
+    } else {
+      conversationReactionsMeta[conversationIdStr] = [reaction];
+    }
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
+    int index =
+        conversationList.indexWhere((element) => element.id == conversationId);
+    if (index != -1) {
+      conversationList[index] =
+          conversationList[index].copyWith(hasReactions: true);
+    }
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  void _removeReaction(LMChatReactionViewData reaction) {
+    String conversationIdStr = reaction.conversationId.toString();
+    if (conversationReactionsMeta.containsKey(conversationIdStr)) {
+      final existingReactions = conversationReactionsMeta[conversationIdStr]!;
+      final existingReactionIndex =
+          existingReactions.indexWhere((r) => r.userId == reaction.userId);
+      if (existingReactionIndex != -1) {
+        existingReactions
+            .removeAt(existingReactionIndex); // Remove existing reaction
+      }
+    }
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
+    int index = conversationList
+        .indexWhere((element) => element.id == reaction.conversationId);
+    if (index != -1) {
+      conversationList[index] = conversationList[index].copyWith(
+          hasReactions:
+              conversationReactionsMeta[conversationIdStr]!.isNotEmpty);
+    }
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 }

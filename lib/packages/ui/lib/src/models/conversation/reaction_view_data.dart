@@ -67,7 +67,7 @@ class LMChatReactionViewDataBuilder {
     return LMChatReactionViewData._(
       chatroomId: _chatroomId!,
       conversationId: _conversationId!,
-      reactionId: _reactionId!,
+      reactionId: _reactionId,
       userId: _userId!,
       reaction: _reaction!,
     );

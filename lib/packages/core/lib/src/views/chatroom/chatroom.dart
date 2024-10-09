@@ -210,6 +210,28 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                       scrollToBottom: _scrollToBottom,
                     ),
                   ),
+                  BlocBuilder(
+                      bloc: _chatroomActionBloc,
+                      builder: (context, state) {
+                        if (state is LMChatShowEmojiKeyboardState) {
+                          return SafeArea(
+                            child: LMChatReactionKeyboard(
+                              onEmojiSelected: (reaction) {
+                                _convActionBloc.add(
+                                  LMChatPutReaction(
+                                    conversationId: state.conversationId,
+                                    reaction: reaction,
+                                  ),
+                                );
+                                _chatroomActionBloc.add(
+                                  LMChatHideEmojiKeyboardEvent(),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        return const SizedBox();
+                      }),
                 ],
               );
             }

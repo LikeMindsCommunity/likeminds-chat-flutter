@@ -176,7 +176,7 @@ class LMChatSkeletonChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> list = List.generate(
-      11,
+      10,
       (index) => LMChatSkeletonChatBubble(isSent: index % 3 == 0),
     );
 

@@ -59,7 +59,7 @@ class LMChatEditingConversationEvent extends LMChatConversationActionEvent {
       ];
 }
 
-/// 
+///
 class LMChatEditRemoveEvent extends LMChatConversationActionEvent {
   @override
   List<Object> get props => [];
@@ -123,8 +123,7 @@ class LMChatReplyRemoveEvent extends LMChatConversationActionEvent {
   List<Object> get props => [time];
 }
 
-/// {@templete lm_chat_refresh_bar_event} is used to refresh the chatroom bar.}
-/// 
+/// {@macro lm_chat_refresh_bar_event} is used to refresh the chatroom bar.}
 class LMChatRefreshBarEvent extends LMChatConversationActionEvent {
   final LMChatRoomViewData chatroom;
 
@@ -151,11 +150,43 @@ class LMChatConversationTextChangeEvent extends LMChatConversationActionEvent {
 
 class LMChatLinkPreviewRemovedEvent extends LMChatConversationActionEvent {
   final bool isPermanentlyRemoved;
-   LMChatLinkPreviewRemovedEvent({
+  LMChatLinkPreviewRemovedEvent({
     this.isPermanentlyRemoved = false,
   });
   @override
   List<Object> get props => [
-    isPermanentlyRemoved,
-  ];
+        isPermanentlyRemoved,
+      ];
+}
+
+class LMChatPutReaction extends LMChatConversationActionEvent {
+  final int conversationId;
+  final String reaction;
+
+  LMChatPutReaction({
+    required this.conversationId,
+    required this.reaction,
+  });
+
+  @override
+  List<Object> get props => [
+        conversationId,
+        reaction,
+      ];
+}
+
+class LMChatDeleteReaction extends LMChatConversationActionEvent {
+  final int conversationId;
+  final String reaction;
+
+  LMChatDeleteReaction({
+    required this.conversationId,
+    required this.reaction,
+  });
+
+  @override
+  List<Object> get props => [
+        conversationId,
+        reaction,
+      ];
 }

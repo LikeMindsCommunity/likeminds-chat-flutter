@@ -10,7 +10,7 @@ import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
 
 /// Flutter flavour/environment manager v0.0.1
-const isDebug = bool.fromEnvironment('DEBUG');
+const isDebug = bool.fromEnvironment('LM_DEBUG_ENV');
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();

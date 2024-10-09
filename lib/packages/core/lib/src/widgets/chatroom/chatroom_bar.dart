@@ -20,11 +20,14 @@ class LMChatroomBar extends StatefulWidget {
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
   final VoidCallback scrollToBottom;
 
+  final TextEditingController? controller;
+
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
+    this.controller,
   });
 
   @override
@@ -39,7 +42,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   // Flutter and other dependecies needed
   final CustomPopupMenuController _popupMenuController =
       CustomPopupMenuController();
-  final TextEditingController _textEditingController = TextEditingController();
+  late final TextEditingController _textEditingController;
   final FocusNode _focusNode = FocusNode();
 
   // Instances of BLoCs required
@@ -62,21 +65,17 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatRoomViewData? chatroom;
   List<LMChatTagViewData> tags = [];
   LMChatMediaModel? linkModel;
-  String _textFieldValue = '';
-  // if set to false link preview should not be displayed
 
+  /// if set to false link preview should not be displayed
   bool showLinkPreview = true;
 
-  // if a message contains a link, this should be set to true
-
+  /// if a message contains a link, this should be set to true
   bool isActiveLink = false;
 
-  // debounce timer for link preview
-
+  /// debounce timer for link preview
   Timer? _debounce;
 
-  // flag to check if a message is sent before the link preview is fetched
-
+  /// flag to check if a message is sent before the link preview is fetched
   bool _isSentBeforeLinkFetched = false;
 
   String getText() {
@@ -88,8 +87,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   void _onTextChanged(String message) {
-    _textFieldValue = message;
-
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
     }
@@ -112,6 +109,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   void initState() {
     super.initState();
     chatroom = widget.chatroom;
+    _textEditingController = widget.controller ?? TextEditingController();
   }
 
   @override

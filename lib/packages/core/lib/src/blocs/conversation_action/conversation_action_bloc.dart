@@ -46,5 +46,47 @@ class LMChatConversationActionBloc
     on<LMChatRefreshBarEvent>(_refreshBarEventHandler);
     on<LMChatConversationTextChangeEvent>(_textChangeEventHandler);
     on<LMChatLinkPreviewRemovedEvent>(_linkPreviewRemovedEventHandler);
+    on<LMChatPutReaction>(
+      (event, emit) async {
+        emit(
+          LMChatPutReactionState(
+            conversationId: event.conversationId,
+            reaction: event.reaction,
+          ),
+        );
+        LMResponse response =
+            await LMChatCore.client.putReaction((PutReactionRequestBuilder()
+                  ..conversationId(event.conversationId)
+                  ..reaction(event.reaction))
+                .build());
+        if (!response.success) {
+          emit(LMChatPutReactionError(
+            errorMessage: response.errorMessage ?? 'An error occured',
+            conversationId: event.conversationId,
+            reaction: event.reaction,
+          ));
+        }
+      },
+    );
+    on<LMChatDeleteReaction>(
+      (event, emit) async {
+        emit(LMChatDeleteReactionState(
+          conversationId: event.conversationId,
+          reaction: event.reaction,
+        ));
+        LMResponse response = await LMChatCore.client
+            .deleteReaction((DeleteReactionRequestBuilder()
+                  ..conversationId(event.conversationId)
+                  ..reaction(event.reaction))
+                .build());
+        if (!response.success) {
+          emit(LMChatDeleteReactionError(
+            errorMessage: response.errorMessage ?? 'An error occurred',
+            conversationId: event.conversationId,
+            reaction: event.reaction,
+          ));
+        }
+      },
+    );
   }
 }

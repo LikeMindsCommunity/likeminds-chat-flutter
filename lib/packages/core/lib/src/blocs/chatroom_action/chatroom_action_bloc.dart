@@ -8,7 +8,7 @@ part 'chatroom_action_event.dart';
 part 'chatroom_action_state.dart';
 
 class LMChatroomActionBloc
-    extends Bloc<ChatroomActionEvent, ChatroomActionState> {
+    extends Bloc<LMChatroomActionEvent, LMChatroomActionState> {
   static LMChatroomActionBloc? _instance;
   // Creating a singleton instance of the LMChatHomeFeedBloc
   static LMChatroomActionBloc get instance {
@@ -20,7 +20,15 @@ class LMChatroomActionBloc
   }
 
   LMChatroomActionBloc._() : super(ChatroomActionInitial()) {
-    on<ChatroomActionEvent>((event, emit) async {
+    on<LMChatroomActionEvent>((event, emit) async {
+      if (event is LMChatShowEmojiKeyboardEvent) {
+        emit(LMChatShowEmojiKeyboardState(
+          conversationId: event.conversationId,
+        ));
+      }
+      if (event is LMChatHideEmojiKeyboardEvent) {
+        emit(LMChatHideEmojiKeyboardState());
+      }
       if (event is MarkReadChatroomEvent) {
         // ignore: unused_local_variable
         LMResponse response = await LMChatCore.client.markReadChatroom(

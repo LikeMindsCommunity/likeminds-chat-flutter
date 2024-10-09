@@ -2,6 +2,7 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/og_tag/og_tag_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/reaction/reaction_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// [ConversationViewDataConvertor] is an extension on [Conversation] class.
@@ -54,6 +55,10 @@ extension ConversationViewDataConvertor on Conversation {
           ..replyConversationObject(
               replyConversationObject?.toConversationViewData())
           ..ogTags(ogTags?.toLMChatOGTagViewData())
+          ..hasReactions(hasReactions)
+          ..conversationReactions(conversationReactions
+              ?.map((r) => r.toReactionViewData())
+              .toList())
         // ..conversationReactions(conversationReactions?.map((LMChatReactionViewData reaction) => reaction.toReactionViewData()).toList())
         // ..poll(poll?.toPollViewData())
         ;
@@ -109,7 +114,10 @@ extension ConversationConvertor on LMChatConversationViewData {
       replyConversation: replyConversation,
       replyConversationObject: replyConversationObject?.toConversation(),
       ogTags: ogTags?.toOGTag(),
-      // conversationReactions: conversationReactions?.map((LMChatReactionViewData reaction) => reaction.toReaction()).toList(),
+      hasReactions: hasReactions,
+      conversationReactions: conversationReactions
+          ?.map((LMChatReactionViewData reaction) => reaction.toReaction())
+          .toList(),
       // poll: poll?.toPoll(),
     );
   }
