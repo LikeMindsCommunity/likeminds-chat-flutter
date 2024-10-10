@@ -12,23 +12,24 @@ class LMChatPollOption extends StatelessWidget {
     bool isVoteEditing = false,
     required List<int> selectedOption,
     required LMChatConversationViewData pollData,
-    required LMChatPollOptionViewData option,
+    required this.option,
     this.onOptionSelect,
     this.onVoteClick,
-    pollOptionStyle,
-  })  : _option = option,
-        _pollData = pollData,
+    this.style,
+  })  : _pollData = pollData,
         _selectedOption = selectedOption,
-        _isVoteEditing = isVoteEditing,
-        _optionStyle = pollOptionStyle ?? LMChatPollOptionStyle.basic();
+        _isVoteEditing = isVoteEditing;
 
   final bool _isVoteEditing;
-
   final LMChatThemeData _theme = LMChatTheme.theme;
   final List<int> _selectedOption;
   final LMChatConversationViewData _pollData;
-  final LMChatPollOptionViewData _option;
-  final LMChatPollOptionStyle _optionStyle;
+
+  /// poll option data
+  final LMChatPollOptionViewData option;
+
+  /// poll option style
+  final LMChatPollOptionStyle? style;
 
   /// callback when the option is selected
   final void Function(LMChatPollOptionViewData)? onOptionSelect;
@@ -38,22 +39,24 @@ class LMChatPollOption extends StatelessWidget {
 
   /// Creates a copy of this [LMChatPollOption] but with the given fields replaced with the new values.
   LMChatPollOption copyWith({
+    Key? key,
     bool? isVoteEditing,
     List<int>? selectedOption,
     LMChatConversationViewData? pollData,
     LMChatPollOptionViewData? option,
+    LMChatPollOptionStyle? style,
     void Function(LMChatPollOptionViewData)? onOptionSelect,
     void Function(LMChatPollOptionViewData)? onVoteClick,
-    LMChatPollOptionStyle? pollOptionStyle,
   }) {
     return LMChatPollOption(
+      key: key ?? this.key,
       isVoteEditing: isVoteEditing ?? _isVoteEditing,
       selectedOption: selectedOption ?? _selectedOption,
       pollData: pollData ?? _pollData,
-      option: option ?? _option,
+      option: option ?? this.option,
+      style: style ?? this.style,
       onOptionSelect: onOptionSelect ?? this.onOptionSelect,
       onVoteClick: onVoteClick ?? this.onVoteClick,
-      pollOptionStyle: pollOptionStyle ?? _optionStyle,
     );
   }
 
@@ -64,7 +67,7 @@ class LMChatPollOption extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            onOptionSelect?.call(_option);
+            onOptionSelect?.call(option);
           },
           child: Stack(
             children: [
@@ -75,10 +78,10 @@ class LMChatPollOption extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8, bottom: 4),
                     child: LinearProgressIndicator(
-                      value: (_option.percentage ?? 0) / 100,
-                      color: _option.isSelected ?? false
-                          ? _optionStyle.pollOptionSelectedColor
-                          : _optionStyle.pollOptionOtherColor,
+                      value: (option.percentage ?? 0) / 100,
+                      color: option.isSelected ?? false
+                          ? style?.pollOptionSelectedColor
+                          : style?.pollOptionOtherColor,
                       backgroundColor: _theme.container,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -87,17 +90,17 @@ class LMChatPollOption extends StatelessWidget {
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.only(top: 8, bottom: 4),
-                decoration: _optionStyle.pollOptionDecoration ??
+                decoration: style?.pollOptionDecoration ??
                     BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: LMChatPollUtils.showTick(
                           _pollData,
-                          _option,
+                          option,
                           _selectedOption,
                           _isVoteEditing,
                         )
-                            ? _optionStyle.pollOptionSelectedBorderColor ??
+                            ? style?.pollOptionSelectedBorderColor ??
                                 _theme.primaryColor
                             : _theme.inActiveColor,
                       ),
@@ -109,8 +112,8 @@ class LMChatPollOption extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        LMChatText(_option.text,
-                            style: _optionStyle.pollOptionTextStyle ??
+                        LMChatText(option.text,
+                            style: style?.pollOptionTextStyle ??
                                 const LMChatTextStyle(
                                   maxLines: 1,
                                   textStyle: TextStyle(
@@ -122,7 +125,7 @@ class LMChatPollOption extends StatelessWidget {
                                 )),
                         if (_pollData.allowAddOption ?? false)
                           LMChatText(
-                              LMChatPollUtils.defAddedByMember(_option.member),
+                              LMChatPollUtils.defAddedByMember(option.member),
                               style: LMChatTextStyle(
                                 maxLines: 1,
                                 textStyle: TextStyle(
@@ -137,7 +140,7 @@ class LMChatPollOption extends StatelessWidget {
                     ),
                     if (LMChatPollUtils.showTick(
                       _pollData,
-                      _option,
+                      option,
                       _selectedOption,
                       _isVoteEditing,
                     ))
@@ -155,7 +158,7 @@ class LMChatPollOption extends StatelessWidget {
                             style: LMChatIconStyle(
                               boxSize: 20,
                               size: 20,
-                              color: _optionStyle.pollOptionSelectedTickColor ??
+                              color: style?.pollOptionSelectedTickColor ??
                                   _theme.primaryColor,
                             ),
                           ),
@@ -170,11 +173,11 @@ class LMChatPollOption extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: LMChatText(
-            LMChatPollUtils.voteText(_option.noVotes ?? 0),
+            LMChatPollUtils.voteText(option.noVotes ?? 0),
             onTap: () {
-              onVoteClick?.call(_option);
+              onVoteClick?.call(option);
             },
-            style: _optionStyle.votesCountStyles ??
+            style: style?.votesCountStyles ??
                 LMChatTextStyle(
                   textStyle: TextStyle(
                     height: 1.33,

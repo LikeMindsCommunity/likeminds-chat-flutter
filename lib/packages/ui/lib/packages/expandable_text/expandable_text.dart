@@ -82,6 +82,76 @@ class LMChatExpandableText extends StatefulWidget {
   final Function(String) onTagTap;
   final bool enableSelection;
 
+  /// Creates a copy of this [LMChatExpandableText] but with the given fields
+  /// updated to the new values.
+  LMChatExpandableText copyWith({
+    String? text,
+    String? expandText,
+    String? collapseText,
+    bool? expanded,
+    ValueChanged<bool>? onExpandedChanged,
+    VoidCallback? onLinkTap,
+    Color? linkColor,
+    bool? linkEllipsis,
+    TextStyle? linkStyle,
+    String? prefixText,
+    TextStyle? prefixStyle,
+    VoidCallback? onPrefixTap,
+    TextStyle? urlStyle,
+    StringCallback? onUrlTap,
+    TextStyle? hashtagStyle,
+    StringCallback? onHashtagTap,
+    TextStyle? mentionStyle,
+    StringCallback? onMentionTap,
+    bool? expandOnTextTap,
+    bool? collapseOnTextTap,
+    TextStyle? style,
+    TextDirection? textDirection,
+    TextAlign? textAlign,
+    double? textScaleFactor,
+    int? maxLines,
+    bool? animation,
+    Duration? animationDuration,
+    Curve? animationCurve,
+    String? semanticsLabel,
+    Function(String)? onTagTap,
+    bool? enableSelection,
+  }) {
+    return LMChatExpandableText(
+      text ?? this.text,
+      expandText: expandText ?? this.expandText,
+      collapseText: collapseText ?? this.collapseText,
+      expanded: expanded ?? this.expanded,
+      onExpandedChanged: onExpandedChanged ?? this.onExpandedChanged,
+      onLinkTap: onLinkTap ?? this.onLinkTap,
+      linkColor: linkColor ?? this.linkColor,
+      linkEllipsis: linkEllipsis ?? this.linkEllipsis,
+      linkStyle: linkStyle ?? this.linkStyle,
+      prefixText: prefixText ?? this.prefixText,
+      prefixStyle: prefixStyle ?? this.prefixStyle,
+      onPrefixTap: onPrefixTap ?? this.onPrefixTap,
+      urlStyle: urlStyle ?? this.urlStyle,
+      onUrlTap: onUrlTap ?? this.onUrlTap,
+      hashtagStyle: hashtagStyle ?? this.hashtagStyle,
+      onHashtagTap: onHashtagTap ?? this.onHashtagTap,
+      mentionStyle: mentionStyle ?? this.mentionStyle,
+      onMentionTap: onMentionTap ?? this.onMentionTap,
+      expandOnTextTap: expandOnTextTap ?? this.expandOnTextTap,
+      collapseOnTextTap: collapseOnTextTap ?? this.collapseOnTextTap,
+      style: style ?? this.style,
+      textDirection: textDirection ?? this.textDirection,
+      textAlign: textAlign ?? this.textAlign,
+      textScaleFactor: textScaleFactor ?? this.textScaleFactor,
+      maxLines: maxLines ?? this.maxLines,
+      animation: animation ?? this.animation,
+      animationDuration: animationDuration ?? this.animationDuration,
+      animationCurve: animationCurve ?? this.animationCurve,
+      semanticsLabel: semanticsLabel ?? this.semanticsLabel,
+      onTagTap: onTagTap ?? this.onTagTap,
+      enableSelection: enableSelection ?? this.enableSelection,
+    );
+  }
+
   @override
   LMChatExpandableTextState createState() => LMChatExpandableTextState();
 }

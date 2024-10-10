@@ -20,12 +20,30 @@ class LMChatroomBar extends StatefulWidget {
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
   final VoidCallback scrollToBottom;
 
+  /// [createPollWidgetBuilder] is the builder to create the poll widget.
+  final Widget Function(BuildContext, LMChatCreatePoll)?
+      createPollWidgetBuilder;
+
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
+    this.createPollWidgetBuilder,
   });
+
+  LMChatroomBar copyWith(
+      {LMChatRoomViewData? chatroom,
+      VoidCallback? scrollToBottom,
+      Widget Function(BuildContext, LMChatCreatePoll)?
+          createPollWidgetBuilder}) {
+    return LMChatroomBar(
+      chatroom: chatroom ?? this.chatroom,
+      scrollToBottom: scrollToBottom ?? this.scrollToBottom,
+      createPollWidgetBuilder:
+          createPollWidgetBuilder ?? this.createPollWidgetBuilder,
+    );
+  }
 
   @override
   State<LMChatroomBar> createState() => _LMChatroomBarState();
@@ -754,11 +772,20 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                           initialChildSize: 0.9,
                                           minChildSize: 0.5,
                                           snap: true,
-                                          builder: (_, controller) =>
+                                          builder: (context, controller) =>
+                                              widget.createPollWidgetBuilder
+                                                  ?.call(
+                                                context,
+                                                LMChatCreatePoll(
+                                                  chatroomId:
+                                                      widget.chatroom.id,
+                                                  scrollController: controller,
+                                                ),
+                                              ) ??
                                               LMChatCreatePoll(
-                                            chatroomId: widget.chatroom.id,
-                                            scrollController: controller,
-                                          ),
+                                                chatroomId: widget.chatroom.id,
+                                                scrollController: controller,
+                                              ),
                                         );
                                       },
                                     );

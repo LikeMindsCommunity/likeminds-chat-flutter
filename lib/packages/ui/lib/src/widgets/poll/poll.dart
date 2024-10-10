@@ -121,7 +121,8 @@ class LMChatPoll extends StatefulWidget {
   final Widget Function(BuildContext, LMChatText)? timeLeftTextBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the poll question
-  final Widget Function(BuildContext)? pollQuestionBuilder;
+  final Widget Function(BuildContext, LMChatExpandableText)?
+      pollQuestionBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the poll selection text
   final Widget Function(BuildContext, LMChatText)? pollSelectionTextBuilder;
@@ -166,7 +167,7 @@ class LMChatPoll extends StatefulWidget {
     Widget Function(BuildContext, LMChatText)? votingTypeTextBuilder,
     Widget Function(BuildContext, LMChatIcon)? pollIconBuilder,
     Widget Function(BuildContext, LMChatText)? timeLeftTextBuilder,
-    Widget Function(BuildContext)? pollQuestionBuilder,
+    Widget Function(BuildContext, LMChatExpandableText)? pollQuestionBuilder,
     Widget Function(BuildContext, LMChatText)? pollSelectionTextBuilder,
     Widget Function(BuildContext, LMChatPollOption, LMChatConversationViewData)?
         pollOptionBuilder,
@@ -304,7 +305,8 @@ class _LMChatPollState extends State<LMChatPoll> {
                         _defTimeLeftText(),
                   ],
                 ),
-                widget.pollQuestionBuilder?.call(context) ?? _defPollQuestion(),
+                widget.pollQuestionBuilder?.call(context, _defPollQuestion()) ??
+                    _defPollQuestion(),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
                 widget.pollSelectionTextBuilder?.call(
                       context,
@@ -602,6 +604,7 @@ class _LMChatPollState extends State<LMChatPoll> {
 
   LMChatPollOption _defPollOption(int index) {
     return LMChatPollOption(
+      style: widget.style?.pollOptionStyle ?? LMChatPollOptionStyle.basic(),
       option: pollData.poll![index],
       isVoteEditing: _isVoteEditing,
       selectedOption: selectedOption,
