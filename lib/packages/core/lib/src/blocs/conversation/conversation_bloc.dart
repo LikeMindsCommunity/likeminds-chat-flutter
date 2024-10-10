@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/services/media_service.dart';
@@ -47,13 +44,6 @@ class LMChatConversationBloc
   }
 
   LMChatConversationBloc._() : super(LMChatConversationInitialState()) {
-    realTime.onChildChanged.listen((e) => _handleRealTimeEvent(e));
-    realTime.onValue.listen(
-      (event) => _handleRealTimeEvent(event),
-      onError: (e, s) =>
-          debugPrint("REALTIME ISSUE :- ${e.toString()} \n ${s.toString()}"),
-    );
-
     // Handle initialise conversation event through handler
     on<LMChatInitialiseConversationsEvent>(initialiseConversationsEventHandler);
     // Handle fetch conversation events through handler
@@ -69,21 +59,10 @@ class LMChatConversationBloc
     on<LMChatLocalConversationEvent>(localConversationEventHandler);
   }
 
-  void _initializeRealTimeListener() {}
-
-  void _handleRealTimeEvent(DatabaseEvent event) {
-    if (event.snapshot.value != null && _currentChatroomId != null) {
-      final response = event.snapshot.value as Map;
-      final conversationId = int.tryParse(response["answer_id"]);
-      if (lastConversationId != null &&
-          conversationId != lastConversationId &&
-          conversationId != null) {
-        LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
-          chatroomId: _currentChatroomId!,
-          conversationId: conversationId,
-        ));
-      }
-    }
+  @override
+  Future<void> close() {
+    _currentChatroomId = null;
+    return super.close();
   }
 
   initialiseConversationsEventHandler(
@@ -92,11 +71,22 @@ class LMChatConversationBloc
   ) async {
     _currentChatroomId = event.chatroomId;
     lastConversationId = event.conversationId;
-  }
 
-  @override
-  Future<void> close() {
-    _currentChatroomId = null;
-    return super.close();
+    realTime.onValue.listen(
+      (event) {
+        if (event.snapshot.value != null && _currentChatroomId != null) {
+          final response = event.snapshot.value as Map;
+          final conversationId = int.tryParse(response["answer_id"]);
+          if (lastConversationId != null &&
+              conversationId != lastConversationId &&
+              conversationId != null) {
+            LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
+              chatroomId: _currentChatroomId!,
+              conversationId: conversationId,
+            ));
+          }
+        }
+      },
+    );
   }
 }
