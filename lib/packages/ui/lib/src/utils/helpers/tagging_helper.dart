@@ -34,9 +34,10 @@ class LMChatTaggingHelper {
   /// Decodes the string with the user tags and returns the decoded string
   static Map<String, String> decodeString(String string) {
     Map<String, String> result = {};
-    final RegExp routeRegExp =
-        RegExp(r'<<([^<>]+)\|route://(?:member|user_profile)/([^<>]+)>>');
+    final RegExp routeRegExp = RegExp(
+        r'<<([^<>]+)\|route://(?:member|user_profile|participants)/([^<>]+)>>');
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(string);
+
     for (final match in matches) {
       final String tag = match.group(1)!;
       final String id = match.group(2)!;
@@ -44,6 +45,12 @@ class LMChatTaggingHelper {
       string = string.replaceAll('<<$tag|route://user_profile/$id>>', '@$tag');
       result.addAll({'@$tag': id});
     }
+
+    // Handle the participants case
+    if (string.contains('participants')) {
+      result.addAll({'@participants': 'participants'});
+    }
+
     return result;
   }
 
@@ -69,7 +76,7 @@ class LMChatTaggingHelper {
   }
 
   static String? convertRouteToTag(String? text, {bool withTilde = true}) {
-    if (text == null) return null;
+    if (text == null) return "";
     Map<String, String> result = {};
     final RegExp routeRegExp = RegExp(
         r'<<([^<>]+)\|route://(?:member|user_profile|participants)/([^<>]+)>>');
@@ -82,9 +89,16 @@ class LMChatTaggingHelper {
           '<<$tag|route://member/$id>>', withTilde ? '@$tag~' : '@$tag');
       text = text.replaceAll(
           '<<$tag|route://user_profile/$id>>', withTilde ? '@$tag~' : '@$tag');
-      text = text.replaceAll('<<@participants|route://participants>>', tag);
       result.addAll({'@$tag': id});
     }
+
+    // Handle the participants case
+    if (text!.contains('participants')) {
+      result.addAll({'@participants': 'participants'});
+      text = text.replaceAll(
+          '<<@participants|route://participants>>', '@participants');
+    }
+
     return text;
   }
 

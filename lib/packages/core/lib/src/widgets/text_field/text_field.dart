@@ -106,7 +106,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   final ValueNotifier<bool> _tagComplete = ValueNotifier(false);
   String _textValue = "";
   String _tagValue = "";
-  static const int _fixedSize = 20;
+  static const int _fixedSize = 50;
   late LMChatTextFieldStyle effectiveStyle;
 
   @override
@@ -250,6 +250,8 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
             onTagTap: (p) {
               print(p);
             },
+            autoFlipListDirection: false,
+            autoFlipDirection: true,
             suggestionsBoxController: _suggestionsBoxController,
             suggestionsBoxDecoration: _buildSuggestionsBoxDecoration(),
             noItemsFoundBuilder: (context) => const SizedBox.shrink(),
@@ -258,8 +260,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
             debounceDuration: const Duration(milliseconds: 500),
             scrollController: _scrollController,
             textFieldConfiguration: _buildTextFieldConfiguration(),
-            direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
-            getImmediateSuggestions: true,
+            direction: AxisDirection.down,
             suggestionsCallback: widget.enabled
                 ? (suggestion) => _getSuggestions(suggestion)
                 : (s) => Future.value(const Iterable.empty()),
