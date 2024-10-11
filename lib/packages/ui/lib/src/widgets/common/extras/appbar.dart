@@ -132,8 +132,8 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 title ??
                                 const SizedBox.shrink(),
                           ),
-                          subtitle != null
-                              ? const SizedBox(height: 1)
+                          (subtitleBuilder != null || subtitle != null)
+                              ? const SizedBox(height: 0)
                               : const SizedBox.shrink(),
                           subtitleBuilder
                                   ?.call(subtitle ?? const SizedBox.shrink()) ??

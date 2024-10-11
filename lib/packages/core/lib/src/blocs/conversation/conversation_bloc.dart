@@ -72,7 +72,7 @@ class LMChatConversationBloc
     _currentChatroomId = event.chatroomId;
     lastConversationId = event.conversationId;
 
-    realTime.onValue.listen(
+    realTime.onChildChanged.listen(
       (event) {
         if (event.snapshot.value != null && _currentChatroomId != null) {
           final response = event.snapshot.value as Map;

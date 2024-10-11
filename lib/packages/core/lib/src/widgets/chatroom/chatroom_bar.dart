@@ -443,9 +443,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 2,
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+              top: 2,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -473,7 +474,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       width: 90.w,
       constraints: BoxConstraints(
         minHeight: 4.h,
-        maxHeight: 24.h,
+        maxHeight: 6.h,
       ),
       decoration: BoxDecoration(
         color: _themeData.container,
