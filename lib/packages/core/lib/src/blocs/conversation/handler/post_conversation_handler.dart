@@ -54,9 +54,29 @@ postConversationEventHandler(
         );
       }
       emit(LMChatConversationPostedState(conversationViewData));
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.chatroomResponded,
+          eventProperties: {
+            'chatroom_id': event.chatroomId,
+            'chatroom_type': 'normal',
+            'community_id':
+                LMChatLocalPreference.instance.getCommunityData()?.id,
+          },
+        ),
+      );
       LMChatConversationBloc.instance.lastConversationId = conversation.id;
       return false;
     } else {
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.messageSendingError,
+          eventProperties: {
+            'chatroom_id': event.chatroomId,
+            'chatroom_type': 'normal',
+          },
+        ),
+      );
       emit(LMChatConversationErrorState(
         response.errorMessage!,
         tempId,
@@ -64,6 +84,15 @@ postConversationEventHandler(
       return false;
     }
   } catch (e) {
+    LMChatAnalyticsBloc.instance.add(
+      LMChatFireAnalyticsEvent(
+        eventName: LMChatAnalyticsKeys.messageSendingError,
+        eventProperties: {
+          'chatroom_id': event.chatroomId,
+          'chatroom_type': 'normal',
+        },
+      ),
+    );
     emit(LMChatConversationErrorState(
       "An error occurred",
       tempId,

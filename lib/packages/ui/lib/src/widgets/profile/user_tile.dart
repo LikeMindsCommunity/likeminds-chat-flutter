@@ -54,12 +54,13 @@ class LMChatUserTile extends LMChatTile {
             imageUrl: userViewData.imageUrl,
             onTap: onTap,
           ),
+      trailing: trailing,
       title: title ??
           LMChatText(
             userViewData.name,
             style: const LMChatTextStyle(
               textStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),
             ),

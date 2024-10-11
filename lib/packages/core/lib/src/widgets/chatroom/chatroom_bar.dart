@@ -6,7 +6,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 
 /// {@template lm_chatroom_bar}
@@ -20,11 +20,21 @@ class LMChatroomBar extends StatefulWidget {
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
   final VoidCallback scrollToBottom;
 
+  /// [controller] is an optional [TextEditingController] that can be used to control the text input field.
+  /// If provided, it allows external management of the text input, such as setting the text or listening for changes.
+  final TextEditingController? controller;
+
+  /// Indicates whether tagging is enabled in the chatroom bar.
+  /// If true, users can tag other users in their messages.
+  final bool? enableTagging;
+
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
+    this.controller,
+    this.enableTagging,
   });
 
   @override
@@ -39,7 +49,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   // Flutter and other dependecies needed
   final CustomPopupMenuController _popupMenuController =
       CustomPopupMenuController();
-  final TextEditingController _textEditingController = TextEditingController();
+  late final TextEditingController _textEditingController;
   final FocusNode _focusNode = FocusNode();
 
   // Instances of BLoCs required
@@ -62,21 +72,17 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatRoomViewData? chatroom;
   List<LMChatTagViewData> tags = [];
   LMChatMediaModel? linkModel;
-  String _textFieldValue = '';
-  // if set to false link preview should not be displayed
 
+  /// if set to false link preview should not be displayed
   bool showLinkPreview = true;
 
-  // if a message contains a link, this should be set to true
-
+  /// if a message contains a link, this should be set to true
   bool isActiveLink = false;
 
-  // debounce timer for link preview
-
+  /// debounce timer for link preview
   Timer? _debounce;
 
-  // flag to check if a message is sent before the link preview is fetched
-
+  /// flag to check if a message is sent before the link preview is fetched
   bool _isSentBeforeLinkFetched = false;
 
   String getText() {
@@ -88,8 +94,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   void _onTextChanged(String message) {
-    _textFieldValue = message;
-
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
     }
@@ -112,6 +116,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   void initState() {
     super.initState();
     chatroom = widget.chatroom;
+    _textEditingController = widget.controller ?? TextEditingController();
   }
 
   @override
@@ -223,8 +228,33 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       result = LMChatTaggingHelper.encodeString(string, tags);
       result = result?.trim();
 
+      if (replyToConversation != null) {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageReply,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': chatroom?.id,
+              'replied_to_member_id': replyToConversation!.memberId ??
+                  replyToConversation?.member?.id,
+              'replied_to_member_state': replyToConversation!.member?.state,
+              'replied_to_message_id': replyToConversation!.id,
+            },
+          ),
+        );
+      }
+
       if (editConversation != null) {
         linkModel = null;
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageEdited,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': chatroom?.id,
+            },
+          ),
+        );
         chatActionBloc.add(LMChatEditConversationEvent(
             (EditConversationRequestBuilder()
                   ..conversationId(editConversation!.id)
@@ -291,21 +321,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         }
         widget.scrollToBottom();
         chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
-        if (replyToConversation != null) {
-          LMAnalytics.get().track(
-            AnalyticsKeys.messageReply,
-            {
-              "type": "text",
-              "chatroom_id": widget.chatroom.id,
-              "replied_to_member_id": replyToConversation?.member?.id,
-              "replied_to_member_state": replyToConversation?.member?.state,
-              "replied_to_message_id": replyToConversation?.id,
-            },
-          );
-        }
       }
       if (widget.chatroom.isGuest ?? false) {
         toast("Chatroom joined");
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomFollowed,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'normal',
+            },
+          ),
+        );
         widget.chatroom.isGuest = false;
       }
       if (widget.chatroom.followStatus == false) {
@@ -362,7 +390,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     String? convertedMsgText = LMChatTaggingHelper.convertRouteToTag(message);
     // set the text in the text field
     _textEditingController.value = TextEditingValue(
-      text: convertedMsgText ?? '',
+      text: '$convertedMsgText ',
       selection: TextSelection.fromPosition(
         TextPosition(
           offset: _textEditingController.text.length - 1,
@@ -415,9 +443,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 2,
+            padding: const EdgeInsets.only(
+              left: 12,
+              right: 12,
+              top: 2,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -445,7 +474,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       width: 90.w,
       constraints: BoxConstraints(
         minHeight: 4.h,
-        maxHeight: 24.h,
+        maxHeight: 6.h,
       ),
       decoration: BoxDecoration(
         color: _themeData.container,
@@ -483,19 +512,24 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return LMChatTextField(
       key: const ObjectKey('chatTextField'),
       isDown: false,
-      enabled: false,
+      enabled: widget.enableTagging ?? true,
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
       isSecret: widget.chatroom.isSecret ?? false,
       chatroomId: widget.chatroom.id,
       style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
       onTagSelected: (tag) {
         tags.add(tag);
-        LMAnalytics.get().track(AnalyticsKeys.userTagsSomeone, {
-          'community_id': widget.chatroom.id,
-          'chatroom_name': widget.chatroom.title,
-          'tagged_user_id': tag.id,
-          'tagged_user_name': tag.name,
-        });
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.userTagsSomeone,
+            eventProperties: {
+              'community_id': widget.chatroom.id,
+              'chatroom_name': widget.chatroom.header,
+              'tagged_user_id': tag.sdkClientInfoViewData?.uuid,
+              'tagged_user_name': tag.name,
+            },
+          ),
+        );
       },
       onChange: _onTextChanged,
       controller: _textEditingController,
@@ -751,6 +785,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       MaterialPageRoute(
         builder: (context) => LMChatMediaForwardingScreen(
           chatroomId: widget.chatroom.id,
+          chatroomName: widget.chatroom.header,
           replyConversation: replyToConversation,
           textFieldText: _textEditingController.text,
         ),
@@ -808,7 +843,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           : LMChatText(
               replyToConversation!.state != 0
                   ? LMChatTaggingHelper.extractStateMessage(message)
-                  : message,
+                  : LMChatTaggingHelper.convertRouteToTag(
+                        message,
+                        withTilde: false,
+                      ) ??
+                      "Replying to Conversation",
               style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
@@ -837,7 +876,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         _textEditingController.clear();
       },
       subtitle: LMChatText(
-        LMChatTaggingHelper.convertRouteToTag(editConversation?.answer) ?? "",
+        LMChatTaggingHelper.convertRouteToTag(
+              editConversation?.answer,
+              withTilde: false,
+            ) ??
+            "",
         style: LMChatTextStyle(
           textStyle: Theme.of(context).textTheme.bodySmall,
         ),

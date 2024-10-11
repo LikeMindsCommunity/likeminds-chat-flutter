@@ -1,22 +1,22 @@
 part of 'chatroom_action_bloc.dart';
 
 @immutable
-abstract class ChatroomActionEvent extends Equatable {}
+abstract class LMChatroomActionEvent extends Equatable {}
 
-class MarkReadChatroomEvent extends ChatroomActionEvent {
+class LMChatMarkReadChatroomEvent extends LMChatroomActionEvent {
   final int chatroomId;
 
-  MarkReadChatroomEvent({required this.chatroomId});
+  LMChatMarkReadChatroomEvent({required this.chatroomId});
 
   @override
   List<Object> get props => [chatroomId];
 }
 
-class FollowChatroomEvent extends ChatroomActionEvent {
+class LMChatFollowChatroomEvent extends LMChatroomActionEvent {
   final int chatroomId;
   final bool follow;
 
-  FollowChatroomEvent({
+  LMChatFollowChatroomEvent({
     required this.chatroomId,
     required this.follow,
   });
@@ -25,20 +25,20 @@ class FollowChatroomEvent extends ChatroomActionEvent {
   List<Object> get props => [chatroomId];
 }
 
-class LeaveChatroomEvent extends ChatroomActionEvent {
+class LMChatLeaveChatroomEvent extends LMChatroomActionEvent {
   final int chatroomId;
 
-  LeaveChatroomEvent({required this.chatroomId});
+  LMChatLeaveChatroomEvent({required this.chatroomId});
 
   @override
   List<Object> get props => [chatroomId];
 }
 
-class MuteChatroomEvent extends ChatroomActionEvent {
+class LMChatMuteChatroomEvent extends LMChatroomActionEvent {
   final int chatroomId;
   final bool mute;
 
-  MuteChatroomEvent({
+  LMChatMuteChatroomEvent({
     required this.chatroomId,
     required this.mute,
   });
@@ -47,12 +47,12 @@ class MuteChatroomEvent extends ChatroomActionEvent {
   List<Object> get props => [chatroomId];
 }
 
-class SetChatroomTopicEvent extends ChatroomActionEvent {
+class LMChatSetChatroomTopicEvent extends LMChatroomActionEvent {
   final int chatroomId;
   final int conversationId;
   final Conversation topic;
 
-  SetChatroomTopicEvent({
+  LMChatSetChatroomTopicEvent({
     required this.chatroomId,
     required this.conversationId,
     required this.topic,
@@ -62,15 +62,31 @@ class SetChatroomTopicEvent extends ChatroomActionEvent {
   List<Object> get props => [chatroomId, conversationId, topic];
 }
 
-class ShareChatroomUrlEvent extends ChatroomActionEvent {
+class LMChatShareChatroomUrlEvent extends LMChatroomActionEvent {
   final int chatroomId;
   final String domain;
 
-  ShareChatroomUrlEvent({
+  LMChatShareChatroomUrlEvent({
     required this.chatroomId,
     required this.domain,
   });
 
   @override
   List<Object> get props => [chatroomId];
+}
+
+class LMChatShowEmojiKeyboardEvent extends LMChatroomActionEvent {
+  final int conversationId;
+
+  LMChatShowEmojiKeyboardEvent({required this.conversationId});
+
+  @override
+  List<Object?> get props => [conversationId];
+}
+
+class LMChatHideEmojiKeyboardEvent extends LMChatroomActionEvent {
+  LMChatHideEmojiKeyboardEvent();
+
+  @override
+  List<Object?> get props => [];
 }

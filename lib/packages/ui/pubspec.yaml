@@ -1,6 +1,6 @@
 name: likeminds_chat_flutter_ui
 description: UI package for LikeMinds Chat SDK, build your own Chat experiences using our widgets.
-version: 0.7.5
+version: 0.8.0
 homepage: https://likemind.community
 
 environment:
@@ -26,6 +26,8 @@ dependencies:
   gif: ^2.3.0
   path: ^1.9.0
   flutter_cache_manager: ^3.4.1
+  custom_pop_up_menu: ^1.2.4
+  emoji_picker_flutter: ^3.0.0
 
 dev_dependencies:
   flutter_test:

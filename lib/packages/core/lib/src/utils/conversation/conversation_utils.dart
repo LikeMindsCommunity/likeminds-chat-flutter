@@ -19,11 +19,14 @@ List<LMChatConversationViewData>? addTimeStampInConversationList(
       if (mappedConversations.containsKey(conversation.date)) {
         mappedConversations[conversation.date]!.add(conversation);
       } else {
-        mappedConversations[conversation.date!] = <LMChatConversationViewData>[conversation];
+        mappedConversations[conversation.date!] = <LMChatConversationViewData>[
+          conversation
+        ];
       }
     }
   }
-  List<LMChatConversationViewData> conversationListWithTimeStamp = <LMChatConversationViewData>[];
+  List<LMChatConversationViewData> conversationListWithTimeStamp =
+      <LMChatConversationViewData>[];
   mappedConversations.forEach(
     (key, value) {
       conversationListWithTimeStamp.addAll(value);
@@ -63,7 +66,8 @@ Conversation conversationToLocalTopicStateMessage(
   return stateMessage;
 }
 
-String getDeletedText(LMChatConversationViewData conversation, LMChatUserViewData user) {
+String getDeletedText(
+    LMChatConversationViewData conversation, LMChatUserViewData user) {
   return conversation.deletedByUserId == conversation.memberId
       ? conversation.deletedByUserId == user.id
           ? 'This message was deleted'
@@ -71,7 +75,8 @@ String getDeletedText(LMChatConversationViewData conversation, LMChatUserViewDat
       : "This message was deleted by Admin";
 }
 
-LMChatText getDeletedTextWidget(LMChatConversationViewData conversation, LMChatUserViewData user,
+LMChatText getDeletedTextWidget(
+    LMChatConversationViewData conversation, LMChatUserViewData user,
     {int? maxLines}) {
   return LMChatText(
     getDeletedText(conversation, user),
@@ -84,4 +89,17 @@ LMChatText getDeletedTextWidget(LMChatConversationViewData conversation, LMChatU
       ),
     ),
   );
+}
+
+Map<String, List<Reaction>> convertListToMapReaction(List<Reaction> reaction) {
+  Map<String, List<Reaction>> mappedReactions = {};
+  mappedReactions = {'All': reaction};
+  for (var element in reaction) {
+    if (mappedReactions.containsKey(element.reaction)) {
+      mappedReactions[element.reaction]?.add(element);
+    } else {
+      mappedReactions[element.reaction] = [element];
+    }
+  }
+  return mappedReactions;
 }
