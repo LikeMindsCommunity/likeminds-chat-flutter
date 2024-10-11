@@ -19,6 +19,7 @@ class LMChatPollOption extends StatelessWidget {
     this.userTextBuilder,
     this.optionTextBuilder,
     this.selectedIconBuilder,
+    this.voteCountTextBuilder,
   })  : _pollData = pollData,
         _selectedOption = selectedOption,
         _isVoteEditing = isVoteEditing;
@@ -49,6 +50,9 @@ class LMChatPollOption extends StatelessWidget {
   /// Builder for selected icon
   final LMChatIconBuilder? selectedIconBuilder;
 
+  /// Builder for vote count text
+  final LMChatTextBuilder? voteCountTextBuilder;
+
   /// Creates a copy of this [LMChatPollOption] but with the given fields replaced with the new values.
   LMChatPollOption copyWith({
     Key? key,
@@ -62,6 +66,7 @@ class LMChatPollOption extends StatelessWidget {
     LMChatTextBuilder? userTextBuilder,
     LMChatTextBuilder? optionTextBuilder,
     LMChatIconBuilder? selectedIconBuilder,
+    LMChatTextBuilder? voteCountTextBuilder,
   }) {
     return LMChatPollOption(
       key: key ?? this.key,
@@ -75,6 +80,7 @@ class LMChatPollOption extends StatelessWidget {
       userTextBuilder: userTextBuilder ?? this.userTextBuilder,
       optionTextBuilder: optionTextBuilder ?? this.optionTextBuilder,
       selectedIconBuilder: selectedIconBuilder ?? this.selectedIconBuilder,
+      voteCountTextBuilder: voteCountTextBuilder ?? this.voteCountTextBuilder,
     );
   }
 
@@ -125,75 +131,78 @@ class LMChatPollOption extends StatelessWidget {
                     ),
                 padding:
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: Stack(
+                child: Row(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        optionTextBuilder?.call(
-                                context, _defPollOptionText()) ??
-                            _defPollOptionText(),
-                        if (_pollData.allowAddOption ?? false)
-                          userTextBuilder?.call(context, _defAddedByText()) ??
-                              _defAddedByText(),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          optionTextBuilder?.call(
+                                  context, _defPollOptionText()) ??
+                              _defPollOptionText(),
+                          if (_pollData.allowAddOption ?? false)
+                            userTextBuilder?.call(context, _defAddedByText()) ??
+                                _defAddedByText(),
+                        ],
+                      ),
                     ),
                     if (LMChatPollUtils.showTick(
-                      _pollData,
-                      option,
-                      _selectedOption,
-                      _isVoteEditing,
-                    ))
-                      Padding(
-                        padding: _pollData.allowAddOption ?? false
-                            ? const EdgeInsets.only(
-                                top: 5,
-                              )
-                            : EdgeInsets.zero,
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: selectedIconBuilder?.call(
-                                  context, _defSelectedIcon()) ??
-                              _defSelectedIcon(),
-                        ),
-                      ),
+                        _pollData, option, _selectedOption, _isVoteEditing))
+                      selectedIconBuilder?.call(context, _defSelectedIcon()) ??
+                          _defSelectedIcon(),
                   ],
                 ),
               ),
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: LMChatText(
-            LMChatPollUtils.voteText(option.noVotes ?? 0),
-            onTap: () {
-              onVoteClick?.call(option);
-            },
-            style: style?.votesCountStyles ??
-                LMChatTextStyle(
-                  textStyle: TextStyle(
-                    height: 1.33,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: _theme.inActiveColor,
-                  ),
-                ),
+        if (LMChatPollUtils.showVoteText(
+          _pollData,
+        ))
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: voteCountTextBuilder?.call(
+                  context,
+                  _defVoteText(),
+                ) ??
+                _defVoteText(),
           ),
-        ),
         LMChatDefaultTheme.kVerticalPaddingMedium,
       ],
     );
   }
 
+  LMChatText _defVoteText() {
+    return LMChatText(
+      LMChatPollUtils.voteText(option.noVotes ?? 0),
+      onTap: () {
+        onVoteClick?.call(option);
+      },
+      style: style?.votesCountStyles ??
+          LMChatTextStyle(
+            textStyle: TextStyle(
+              height: 1.33,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: _theme.inActiveColor,
+            ),
+          ),
+    );
+  }
+
   LMChatIcon _defSelectedIcon() {
     return LMChatIcon(
-      type: LMChatIconType.icon,
-      icon: Icons.check_circle,
+      type: LMChatIconType.svg,
+      assetPath: kTickIcon,
       style: LMChatIconStyle(
-        boxSize: 20,
+        boxSize: 22,
+        margin: const EdgeInsets.only(left: 4),
+        boxBorderRadius: 100,
+        boxPadding: const EdgeInsets.all(4),
         size: 20,
-        color: style?.pollOptionSelectedCheckColor ?? _theme.primaryColor,
+        color: _theme.container,
+        backgroundColor:
+            style?.pollOptionSelectedCheckColor ?? _theme.primaryColor,
       ),
     );
   }
@@ -205,7 +214,7 @@ class LMChatPollOption extends StatelessWidget {
               maxLines: 1,
               textStyle: TextStyle(
                 overflow: TextOverflow.ellipsis,
-                height: 1.25,
+                height: 1.50,
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
               ),

@@ -49,6 +49,7 @@ void postPollConversationHandler(
             ..member(user.toUserViewData())
             ..temporaryId(event.temporaryId)
             ..id(int.parse(event.temporaryId))
+            ..toShowResults(true)
             ..submitTypeText(
                 event.isAnonymous ? "Secret voting " : "Public voting"))
           .build();
