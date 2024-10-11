@@ -93,6 +93,20 @@ Future<void> addOption(
   ValueNotifier<bool> rebuildChatWidget,
   LMChatWidgetSource source,
 ) async {
+  String optionText = option.trim();
+  // check if the answer is empty
+  if (optionText.isEmpty) {
+    toast(
+      "Option can not be empty",
+    );
+    return;
+  }
+  // check if the option already exists
+  if (conversationData.poll!.any((element) => element.text == optionText)) {
+    toast('Options should be unique');
+    return;
+  }
+
   AddPollOptionRequest request = (AddPollOptionRequestBuilder()
         ..conversationId(conversationData.id)
         ..poll(option))

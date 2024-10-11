@@ -277,3 +277,16 @@ typedef LMChatPollBuilder = Widget Function(
   LMChatPoll poll,
   LMChatConversationViewData conversation,
 );
+
+/// {@template lm_chat_icon_builder}
+/// The icon builder function for the chat screen.
+/// This function is called to build the icon for the chat screen.
+/// The [LMChatIconBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatIcon] icon: The icon.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatIconBuilder = Widget Function(
+  BuildContext context,
+  LMChatIcon icon,
+);

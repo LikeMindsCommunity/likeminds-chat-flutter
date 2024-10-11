@@ -21,7 +21,7 @@ class LMChatroomBar extends StatefulWidget {
   final VoidCallback scrollToBottom;
 
   /// [createPollWidgetBuilder] is the builder to create the poll widget.
-  final Widget Function(BuildContext, LMChatCreatePoll)?
+  final Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
       createPollWidgetBuilder;
 
   /// {@macro lm_chatroom_bar}
@@ -35,7 +35,7 @@ class LMChatroomBar extends StatefulWidget {
   LMChatroomBar copyWith(
       {LMChatRoomViewData? chatroom,
       VoidCallback? scrollToBottom,
-      Widget Function(BuildContext, LMChatCreatePoll)?
+      Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
           createPollWidgetBuilder}) {
     return LMChatroomBar(
       chatroom: chatroom ?? this.chatroom,
@@ -776,13 +776,13 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                                               widget.createPollWidgetBuilder
                                                   ?.call(
                                                 context,
-                                                LMChatCreatePoll(
+                                                LMChatCreatePollBottomSheet(
                                                   chatroomId:
                                                       widget.chatroom.id,
                                                   scrollController: controller,
                                                 ),
                                               ) ??
-                                              LMChatCreatePoll(
+                                              LMChatCreatePollBottomSheet(
                                                 chatroomId: widget.chatroom.id,
                                                 scrollController: controller,
                                               ),

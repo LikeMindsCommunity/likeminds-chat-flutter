@@ -3,13 +3,13 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-/// {@template lm_chat_create_poll}
+/// {@template lm_chat_create_poll_bottom_sheet}
 /// Create Poll widget
 /// responsible for creating the poll
 /// {@endtemplate}
-class LMChatCreatePoll extends StatefulWidget {
-  /// {@macro lm_chat_create_poll}
-  const LMChatCreatePoll({
+class LMChatCreatePollBottomSheet extends StatefulWidget {
+  /// {@macro lm_chat_create_poll_bottom_sheet}
+  const LMChatCreatePollBottomSheet({
     super.key,
     required this.chatroomId,
     this.repliedConversationId,
@@ -23,6 +23,11 @@ class LMChatCreatePoll extends StatefulWidget {
     this.scrollController,
     this.expiryDateTitleBuilder,
     this.expiryDateTextBuilder,
+    this.titleTextBuilder,
+    this.cancelButtonBuilder,
+    this.questionTitleBuilder,
+    this.answerTitleBuilder,
+    this.headerBuilder,
   });
 
   /// [chatroomId] chatroomId for which poll is created
@@ -57,12 +62,29 @@ class LMChatCreatePoll extends StatefulWidget {
   /// [ScrollController] scrollController for the widget
   final ScrollController? scrollController;
 
+  /// [LMChatTextBuilder] Builder for expiry date title
   final LMChatTextBuilder? expiryDateTitleBuilder;
 
+  /// [LMChatTextBuilder] Builder for expiry date text
   final LMChatTextBuilder? expiryDateTextBuilder;
 
-  /// Creates a copy of this [LMChatCreatePoll] but with the given fields replaced with the new values.
-  LMChatCreatePoll copyWith({
+  /// [LMChatTextBuilder] Builder for title
+  final LMChatTextBuilder? titleTextBuilder;
+
+  /// [LMChatButton] Builder for cancel button
+  final LMChatButtonBuilder? cancelButtonBuilder;
+
+  /// [LMChatTextBuilder] Builder for Question title text
+  final LMChatTextBuilder? questionTitleBuilder;
+
+  /// [LMChatTextBuilder] Builder for Answer title text
+  final LMChatTextBuilder? answerTitleBuilder;
+
+  /// [LMChatContextWidgetBuilder] Builder for header
+  final LMChatContextWidgetBuilder? headerBuilder;
+
+  /// Creates a copy of this [LMChatCreatePollBottomSheet] but with the given fields replaced with the new values.
+  LMChatCreatePollBottomSheet copyWith({
     Key? key,
     int? chatroomId,
     String? repliedConversationId,
@@ -76,8 +98,13 @@ class LMChatCreatePoll extends StatefulWidget {
     ScrollController? scrollController,
     LMChatTextBuilder? expiryDateTitleBuilder,
     LMChatTextBuilder? expiryDateTextBuilder,
+    LMChatTextBuilder? titleTextBuilder,
+    LMChatButtonBuilder? cancelButtonBuilder,
+    LMChatTextBuilder? questionTitleBuilder,
+    LMChatTextBuilder? answerTitleBuilder,
+    LMChatContextWidgetBuilder? headerBuilder,
   }) {
-    return LMChatCreatePoll(
+    return LMChatCreatePollBottomSheet(
       key: key ?? this.key,
       chatroomId: chatroomId ?? this.chatroomId,
       repliedConversationId:
@@ -96,14 +123,21 @@ class LMChatCreatePoll extends StatefulWidget {
           expiryDateTitleBuilder ?? this.expiryDateTitleBuilder,
       expiryDateTextBuilder:
           expiryDateTextBuilder ?? this.expiryDateTextBuilder,
+      titleTextBuilder: titleTextBuilder ?? this.titleTextBuilder,
+      cancelButtonBuilder: cancelButtonBuilder ?? this.cancelButtonBuilder,
+      questionTitleBuilder: questionTitleBuilder ?? this.questionTitleBuilder,
+      answerTitleBuilder: answerTitleBuilder ?? this.answerTitleBuilder,
+      headerBuilder: headerBuilder ?? this.headerBuilder,
     );
   }
 
   @override
-  State<LMChatCreatePoll> createState() => _LMChatCreatePollState();
+  State<LMChatCreatePollBottomSheet> createState() =>
+      _LMChatCreatePollBottomSheetState();
 }
 
-class _LMChatCreatePollState extends State<LMChatCreatePoll> {
+class _LMChatCreatePollBottomSheetState
+    extends State<LMChatCreatePollBottomSheet> {
   late Size screenSize;
   LMChatThemeData theme = LMChatTheme.theme;
   LMChatUserViewData? user =
@@ -262,7 +296,7 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _defHeader(),
+          widget.headerBuilder?.call(context) ?? _defHeader(),
           Expanded(
             child: SingleChildScrollView(
               controller: widget.scrollController,
@@ -598,15 +632,11 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-            child: LMChatText(
-              'Answer Options',
-              style: LMChatTextStyle(
-                textStyle: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: theme.primaryColor),
-              ),
-            ),
+            child: widget.answerTitleBuilder?.call(
+                  context,
+                  _defAnswerTitleText(),
+                ) ??
+                _defAnswerTitleText(),
           ),
           ValueListenableBuilder(
               valueListenable: _optionBuilder,
@@ -624,6 +654,18 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
           widget.addOptionButtonBuilder?.call(context, _defAddOptionTile()) ??
               _defAddOptionTile(),
         ],
+      ),
+    );
+  }
+
+  LMChatText _defAnswerTitleText() {
+    return LMChatText(
+      'Answer Options',
+      style: LMChatTextStyle(
+        textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.primaryColor),
       ),
     );
   }
@@ -699,15 +741,11 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LMChatText(
-            'Poll question',
-            style: LMChatTextStyle(
-              textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: theme.primaryColor),
-            ),
-          ),
+          widget.questionTitleBuilder?.call(
+                context,
+                _defPollQuestionTitle(),
+              ) ??
+              _defPollQuestionTitle(),
           TextField(
             controller: _questionController,
             maxLines: 3,
@@ -729,6 +767,18 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
                 ),
           ),
         ],
+      ),
+    );
+  }
+
+  LMChatText _defPollQuestionTitle() {
+    return LMChatText(
+      'Poll question',
+      style: LMChatTextStyle(
+        textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.primaryColor),
       ),
     );
   }
@@ -774,35 +824,50 @@ class _LMChatCreatePollState extends State<LMChatCreatePoll> {
       ),
       child: Row(
         children: [
-          LMChatButton(
-            onTap: () => Navigator.pop(context),
-            text: LMChatText(
-              "Cancel",
-              style: LMChatTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: theme.primaryColor,
-                ),
-              ),
-            ),
-          ),
+          widget.cancelButtonBuilder?.call(
+                _defCancelButton(),
+              ) ??
+              _defCancelButton(),
           const Spacer(
             flex: 1,
           ),
-          const LMChatText(
-            'New Poll',
-            style: LMChatTextStyle(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
+          widget.titleTextBuilder?.call(
+                context,
+                _defTitleText(),
+              ) ??
+              _defTitleText(),
           const Spacer(
             flex: 2,
           ),
         ],
+      ),
+    );
+  }
+
+  LMChatButton _defCancelButton() {
+    return LMChatButton(
+      onTap: () => Navigator.pop(context),
+      text: LMChatText(
+        "Cancel",
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  LMChatText _defTitleText() {
+    return const LMChatText(
+      'New Poll',
+      style: LMChatTextStyle(
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }

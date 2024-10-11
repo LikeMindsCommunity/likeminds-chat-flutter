@@ -23,6 +23,9 @@ enum LMChatWidgetSource {
   /// media preview screen
   mediaPreview,
 
+  /// poll result screen
+  pollResult,
+
   /// other screen
   other,
 }

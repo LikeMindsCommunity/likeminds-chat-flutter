@@ -322,7 +322,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           rebuildPoll,
           LMChatWidgetSource.chatroom,
         );
-        // rebuildConversationList.value = !rebuildConversationList.value;
+        rebuildConversationList.value = !rebuildConversationList.value;
       },
       onVoteClick: (option) {
         onVoteTextTap(

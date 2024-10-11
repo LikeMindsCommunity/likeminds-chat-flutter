@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/constants/assets.dart';
 
 part './poll_utils.dart';
 
@@ -39,8 +38,8 @@ class LMChatPoll extends StatefulWidget {
     this.pollSelectionTextBuilder,
     this.addOptionButtonBuilder,
     this.submitButtonBuilder,
+    this.editButtonBuilder,
     this.subTextBuilder,
-    this.onSameOptionAdded,
     this.pollTypeTextBuilder,
     this.pollHeaderSeparatorBuilder,
     this.votingTypeTextBuilder,
@@ -131,21 +130,21 @@ class LMChatPoll extends StatefulWidget {
   final Widget Function(
     BuildContext,
     LMChatPollOption,
-    LMChatConversationViewData,
+    LMChatPollOptionViewData,
   )? pollOptionBuilder;
 
   /// [Widget Function(BuildContext, LMChatButton,  Function(String))] Builder for the add option button
   final Widget Function(BuildContext, LMChatButton, Function(String))?
       addOptionButtonBuilder;
 
-  /// [Widget Function(BuildContext)] Builder for the submit button
+  /// [LMChatButtonBuilder] Builder for the submit button
   final LMChatButtonBuilder? submitButtonBuilder;
+
+  /// [LMChatButtonBuilder] Builder for the edit button
+  final LMChatButtonBuilder? editButtonBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the subtext
   final Widget Function(BuildContext, LMChatText)? subTextBuilder;
-
-  /// [VoidCallback] error callback to be called when same option is added
-  final VoidCallback? onSameOptionAdded;
 
   /// copyWith method for the LMChatPoll
   /// Returns a new instance of LMChatPoll with the updated values
@@ -164,18 +163,21 @@ class LMChatPoll extends StatefulWidget {
     VoidCallback? onAnswerTextTap,
     Widget Function(BuildContext, LMChatText)? pollTypeTextBuilder,
     Widget Function(BuildContext)? pollHeaderSeparatorBuilder,
-    Widget Function(BuildContext, LMChatText)? votingTypeTextBuilder,
+    Widget Function(BuildContext, LMChatText)? voteTypeTextBuilder,
     Widget Function(BuildContext, LMChatIcon)? pollIconBuilder,
     Widget Function(BuildContext, LMChatText)? timeLeftTextBuilder,
     Widget Function(BuildContext, LMChatExpandableText)? pollQuestionBuilder,
     Widget Function(BuildContext, LMChatText)? pollSelectionTextBuilder,
-    Widget Function(BuildContext, LMChatPollOption, LMChatConversationViewData)?
-        pollOptionBuilder,
+    Widget Function(
+      BuildContext,
+      LMChatPollOption,
+      LMChatPollOptionViewData,
+    )? pollOptionBuilder,
     Widget Function(BuildContext, LMChatButton, Function(String))?
         addOptionButtonBuilder,
     LMChatButtonBuilder? submitButtonBuilder,
+    LMChatButtonBuilder? editButtonBuilder,
     Widget Function(BuildContext, LMChatText)? subTextBuilder,
-    VoidCallback? onSameOptionAdded,
   }) {
     return LMChatPoll(
       rebuildPollWidget: rebuildPollWidget ?? this.rebuildPollWidget,
@@ -192,8 +194,7 @@ class LMChatPoll extends StatefulWidget {
       pollTypeTextBuilder: pollTypeTextBuilder ?? this.pollTypeTextBuilder,
       pollHeaderSeparatorBuilder:
           pollHeaderSeparatorBuilder ?? this.pollHeaderSeparatorBuilder,
-      votingTypeTextBuilder:
-          votingTypeTextBuilder ?? this.votingTypeTextBuilder,
+      votingTypeTextBuilder: voteTypeTextBuilder ?? this.votingTypeTextBuilder,
       pollIconBuilder: pollIconBuilder ?? this.pollIconBuilder,
       timeLeftTextBuilder: timeLeftTextBuilder ?? this.timeLeftTextBuilder,
       pollQuestionBuilder: pollQuestionBuilder ?? this.pollQuestionBuilder,
@@ -203,8 +204,8 @@ class LMChatPoll extends StatefulWidget {
       addOptionButtonBuilder:
           addOptionButtonBuilder ?? this.addOptionButtonBuilder,
       submitButtonBuilder: submitButtonBuilder ?? this.submitButtonBuilder,
+      editButtonBuilder: editButtonBuilder ?? this.editButtonBuilder,
       subTextBuilder: subTextBuilder ?? this.subTextBuilder,
-      onSameOptionAdded: onSameOptionAdded ?? this.onSameOptionAdded,
     );
   }
 
@@ -333,7 +334,7 @@ class _LMChatPollState extends State<LMChatPoll> {
                       _defSubmitButton(),
                 if (LMChatPollUtils.showEditVote(
                     widget.pollData, _isVoteEditing))
-                  widget.submitButtonBuilder?.call(
+                  widget.editButtonBuilder?.call(
                         _defEditButton(),
                       ) ??
                       _defEditButton(),
@@ -353,7 +354,7 @@ class _LMChatPollState extends State<LMChatPoll> {
         return widget.pollOptionBuilder?.call(
               context,
               _defPollOption(index),
-              pollData,
+              pollData.poll![index],
             ) ??
             _defPollOption(index);
       },
@@ -616,23 +617,23 @@ class _LMChatPollState extends State<LMChatPoll> {
 
   LMChatButton _defEditButton() {
     return LMChatButton(
-        onTap: () {
-          _isVoteEditing = true;
-          widget.onEditVote?.call(widget.pollData);
-        },
-        text: LMChatText(
-          'EDIT VOTE',
-          style: _lmChatPollStyle.pollInfoStyle ??
-              LMChatTextStyle(
-                textStyle: TextStyle(
-                  height: 1.33,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: theme.primaryColor,
-                ),
-              ),
+      onTap: () {
+        _isVoteEditing = true;
+        widget.onEditVote?.call(widget.pollData);
+      },
+      text: LMChatText(
+        'EDIT VOTE',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            height: 1.33,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.primaryColor,
+          ),
         ),
-        style: _lmChatPollStyle.editPollButtonStyle);
+      ),
+      style: _lmChatPollStyle.editPollButtonStyle,
+    );
   }
 
   LMChatButton _defSubmitButton() {

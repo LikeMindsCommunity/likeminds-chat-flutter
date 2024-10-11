@@ -3,6 +3,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
+import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/builder.dart';
 
 /// {@template lm_chat_poll_result_screen}
 /// A screen to display poll results.
@@ -15,32 +16,22 @@ class LMChatPollResultScreen extends StatefulWidget {
     required this.pollOptions,
     this.pollTitle,
     this.selectedOptionId,
-    this.noItemsFoundIndicatorBuilder,
-    this.firstPageProgressIndicatorBuilder,
-    this.newPageProgressIndicatorBuilder,
-    this.noMoreItemsIndicatorBuilder,
-    this.newPageErrorIndicatorBuilder,
-    this.firstPageErrorIndicatorBuilder,
     this.tabWidth,
   });
 
+  /// conversation id
   final int conversationId;
+
+  /// poll title
   final String? pollTitle;
+
+  /// poll options
   final List<LMChatPollOptionViewData> pollOptions;
+
+  /// selected option id
   final int? selectedOptionId;
-  // Builder for empty feed view
-  final LMChatContextWidgetBuilder? noItemsFoundIndicatorBuilder;
-  // Builder for first page loader when no user are there
-  final LMChatContextWidgetBuilder? firstPageProgressIndicatorBuilder;
-  // Builder for pagination loader when more user are there
-  final LMChatContextWidgetBuilder? newPageProgressIndicatorBuilder;
-  // Builder for widget when no more user are there
-  final LMChatContextWidgetBuilder? noMoreItemsIndicatorBuilder;
-  // Builder for error view while loading a new page
-  final LMChatContextWidgetBuilder? newPageErrorIndicatorBuilder;
-  // Builder for error view while loading the first page
-  final LMChatContextWidgetBuilder? firstPageErrorIndicatorBuilder;
-  // width for the poll options tab
+
+  /// width for the poll options tab
   final double? tabWidth;
 
   @override
@@ -55,6 +46,8 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   int initialIndex = 0;
   late TabController _tabController;
   late PageController _pagingController;
+  final LMChatPollBuilderDelegate _screenBuilder =
+      LMChatCore.config.pollConfig.builder;
 
   @override
   initState() {
@@ -95,50 +88,14 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return Scaffold(
+    return _screenBuilder.scaffold(
         backgroundColor: theme.container,
-        appBar: _defAppBar(),
+        appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
         body: Column(
           children: [
-            TabBar(
-              onTap: (index) {
-                _pagingController.animateToPage(index,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut);
-              },
-              controller: _tabController,
-              dividerColor: theme.inActiveColor,
-              indicatorColor: theme.primaryColor,
-              indicatorWeight: 4,
-              isScrollable: true,
-              labelColor: theme.primaryColor,
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-              unselectedLabelColor: theme.inActiveColor,
-              tabs: [
-                for (var option in widget.pollOptions)
-                  Tab(
-                    child: SizedBox(
-                      width: widget.tabWidth ??
-                          (widget.pollOptions.length == 2
-                              ? width / 3
-                              : width / 4),
-                      child: Column(
-                        children: [
-                          _defVoteCountText(option),
-                          _defOptionText(option),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
+            _screenBuilder.tabBarBuilder(
+              context,
+              _defTabBar(width),
             ),
             Expanded(
               child: SafeArea(
@@ -158,6 +115,53 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         ));
   }
 
+  TabBar _defTabBar(double width) {
+    return TabBar(
+      onTap: (index) {
+        _pagingController.animateToPage(index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
+      },
+      controller: _tabController,
+      dividerColor: theme.inActiveColor,
+      indicatorColor: theme.primaryColor,
+      indicatorWeight: 4,
+      isScrollable: true,
+      labelColor: theme.primaryColor,
+      indicatorSize: TabBarIndicatorSize.tab,
+      labelStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+      unselectedLabelColor: theme.inActiveColor,
+      tabs: [
+        for (var option in widget.pollOptions)
+          Tab(
+            child: SizedBox(
+              width: widget.tabWidth ??
+                  (widget.pollOptions.length == 2 ? width / 3 : width / 4),
+              child: Column(
+                children: [
+                  _screenBuilder.voteCountTextBuilder(
+                    context,
+                    _defVoteCountText(option),
+                  ),
+                  _screenBuilder.pollOptionTextBuilder(
+                    context,
+                    _defOptionText(option),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   LMChatText _defOptionText(LMChatPollOptionViewData option) {
     return LMChatText(
       option.text,
@@ -171,16 +175,35 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   LMChatAppBar _defAppBar() {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
-        height: 50,
-        padding: const EdgeInsets.only(
-          right: 16,
-        ),
+        height: 72,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        gap: 3.w,
         backgroundColor: theme.container,
         border: Border.all(
           color: Colors.transparent,
         ),
       ),
-      leading: const BackButton(),
+      leading: LMChatButton(
+        onTap: () {
+          Navigator.of(context).pop();
+        },
+        style: LMChatButtonStyle(
+          height: 28,
+          width: 28,
+          borderRadius: 6,
+          padding: EdgeInsets.zero,
+          icon: LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.arrow_back,
+            style: LMChatIconStyle(
+              color: LMChatTheme.theme.onPrimary,
+              size: 20,
+              boxSize: 28,
+            ),
+          ),
+          backgroundColor: LMChatTheme.theme.primaryColor,
+        ),
+      ),
       title: LMChatText(
         'Poll Results',
         style: LMChatTextStyle(
@@ -206,11 +229,29 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
       pagingController: pagingController,
       builderDelegate: PagedChildBuilderDelegate(
         itemBuilder: (context, item, index) {
-          return _defUserTile(item);
+          return _screenBuilder.userTileBuilder(
+            context,
+            item,
+            _defUserTile(item),
+          );
         },
         noItemsFoundIndicatorBuilder: (context) {
-          return widget.noItemsFoundIndicatorBuilder?.call(context) ??
-              _defNoResponse();
+          return _screenBuilder.noItemsFoundIndicatorBuilder(
+            context,
+            _defNoResponse(),
+          );
+        },
+        firstPageProgressIndicatorBuilder: (context) {
+          return _screenBuilder.firstPageProgressIndicatorBuilder(
+            context,
+            const LMChatLoader(),
+          );
+        },
+        firstPageErrorIndicatorBuilder: (context) {
+          return _screenBuilder.firstPageErrorIndicatorBuilder(
+            context,
+            _defNoResponse(),
+          );
         },
       ),
     );

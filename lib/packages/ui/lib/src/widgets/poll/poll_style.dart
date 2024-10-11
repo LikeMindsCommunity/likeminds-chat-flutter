@@ -207,7 +207,7 @@ class LMChatPollOptionStyle {
   final Color? pollOptionOtherColor;
 
   ///[Color] for tick in poll option selected
-  final Color? pollOptionSelectedTickColor;
+  final Color? pollOptionSelectedCheckColor;
 
   ///[Color] for border of selected poll option
   final Color? pollOptionSelectedBorderColor;
@@ -231,7 +231,7 @@ class LMChatPollOptionStyle {
   const LMChatPollOptionStyle({
     this.pollOptionSelectedColor,
     this.pollOptionOtherColor,
-    this.pollOptionSelectedTickColor,
+    this.pollOptionSelectedCheckColor,
     this.pollOptionSelectedBorderColor,
     this.pollOptionSelectedTextColor,
     this.votesCountStyles,
@@ -256,8 +256,8 @@ class LMChatPollOptionStyle {
       pollOptionSelectedColor:
           pollOptionSelectedColor ?? this.pollOptionSelectedColor,
       pollOptionOtherColor: pollOptionOtherColor ?? this.pollOptionOtherColor,
-      pollOptionSelectedTickColor:
-          pollOptionSelectedTickColor ?? this.pollOptionSelectedTickColor,
+      pollOptionSelectedCheckColor:
+          pollOptionSelectedTickColor ?? this.pollOptionSelectedCheckColor,
       pollOptionSelectedBorderColor:
           pollOptionSelectedBorderColor ?? this.pollOptionSelectedBorderColor,
       pollOptionSelectedTextColor:

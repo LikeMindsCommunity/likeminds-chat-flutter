@@ -88,14 +88,17 @@ Widget getChatItemAttachmentTile(
             ),
           ),
         ),
-        LMChatText(
-          answerText,
-          style: const LMChatTextStyle(
-            maxLines: 1,
-            textStyle: TextStyle(
-              overflow: TextOverflow.ellipsis,
-              fontSize: 12,
-              fontWeight: FontWeight.normal,
+        SizedBox(
+          width: 42.w,
+          child: LMChatText(
+            answerText,
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ),
         ),

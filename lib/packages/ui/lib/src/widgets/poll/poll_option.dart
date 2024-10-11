@@ -16,6 +16,9 @@ class LMChatPollOption extends StatelessWidget {
     this.onOptionSelect,
     this.onVoteClick,
     this.style,
+    this.userTextBuilder,
+    this.optionTextBuilder,
+    this.selectedIconBuilder,
   })  : _pollData = pollData,
         _selectedOption = selectedOption,
         _isVoteEditing = isVoteEditing;
@@ -37,6 +40,15 @@ class LMChatPollOption extends StatelessWidget {
   /// callback when the vote is clicked
   final void Function(LMChatPollOptionViewData)? onVoteClick;
 
+  /// Builder for user text
+  final LMChatTextBuilder? userTextBuilder;
+
+  /// Builder for option text
+  final LMChatTextBuilder? optionTextBuilder;
+
+  /// Builder for selected icon
+  final LMChatIconBuilder? selectedIconBuilder;
+
   /// Creates a copy of this [LMChatPollOption] but with the given fields replaced with the new values.
   LMChatPollOption copyWith({
     Key? key,
@@ -47,6 +59,9 @@ class LMChatPollOption extends StatelessWidget {
     LMChatPollOptionStyle? style,
     void Function(LMChatPollOptionViewData)? onOptionSelect,
     void Function(LMChatPollOptionViewData)? onVoteClick,
+    LMChatTextBuilder? userTextBuilder,
+    LMChatTextBuilder? optionTextBuilder,
+    LMChatIconBuilder? selectedIconBuilder,
   }) {
     return LMChatPollOption(
       key: key ?? this.key,
@@ -57,6 +72,9 @@ class LMChatPollOption extends StatelessWidget {
       style: style ?? this.style,
       onOptionSelect: onOptionSelect ?? this.onOptionSelect,
       onVoteClick: onVoteClick ?? this.onVoteClick,
+      userTextBuilder: userTextBuilder ?? this.userTextBuilder,
+      optionTextBuilder: optionTextBuilder ?? this.optionTextBuilder,
+      selectedIconBuilder: selectedIconBuilder ?? this.selectedIconBuilder,
     );
   }
 
@@ -112,30 +130,12 @@ class LMChatPollOption extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        LMChatText(option.text,
-                            style: style?.pollOptionTextStyle ??
-                                const LMChatTextStyle(
-                                  maxLines: 1,
-                                  textStyle: TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                    height: 1.25,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                )),
+                        optionTextBuilder?.call(
+                                context, _defPollOptionText()) ??
+                            _defPollOptionText(),
                         if (_pollData.allowAddOption ?? false)
-                          LMChatText(
-                              LMChatPollUtils.defAddedByMember(option.member),
-                              style: LMChatTextStyle(
-                                maxLines: 1,
-                                textStyle: TextStyle(
-                                  overflow: TextOverflow.ellipsis,
-                                  height: 1.25,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: _theme.inActiveColor,
-                                ),
-                              )),
+                          userTextBuilder?.call(context, _defAddedByText()) ??
+                              _defAddedByText(),
                       ],
                     ),
                     if (LMChatPollUtils.showTick(
@@ -152,16 +152,9 @@ class LMChatPollOption extends StatelessWidget {
                             : EdgeInsets.zero,
                         child: Align(
                           alignment: Alignment.bottomRight,
-                          child: LMChatIcon(
-                            type: LMChatIconType.icon,
-                            icon: Icons.check_circle,
-                            style: LMChatIconStyle(
-                              boxSize: 20,
-                              size: 20,
-                              color: style?.pollOptionSelectedTickColor ??
-                                  _theme.primaryColor,
-                            ),
-                          ),
+                          child: selectedIconBuilder?.call(
+                                  context, _defSelectedIcon()) ??
+                              _defSelectedIcon(),
                         ),
                       ),
                   ],
@@ -191,5 +184,45 @@ class LMChatPollOption extends StatelessWidget {
         LMChatDefaultTheme.kVerticalPaddingMedium,
       ],
     );
+  }
+
+  LMChatIcon _defSelectedIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.check_circle,
+      style: LMChatIconStyle(
+        boxSize: 20,
+        size: 20,
+        color: style?.pollOptionSelectedCheckColor ?? _theme.primaryColor,
+      ),
+    );
+  }
+
+  LMChatText _defPollOptionText() {
+    return LMChatText(option.text,
+        style: style?.pollOptionTextStyle ??
+            const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                height: 1.25,
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ));
+  }
+
+  LMChatText _defAddedByText() {
+    return LMChatText(LMChatPollUtils.defAddedByMember(option.member),
+        style: LMChatTextStyle(
+          maxLines: 1,
+          textStyle: TextStyle(
+            overflow: TextOverflow.ellipsis,
+            height: 1.25,
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: _theme.inActiveColor,
+          ),
+        ));
   }
 }
