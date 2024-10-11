@@ -92,8 +92,7 @@ class LMChatPollBuilderDelegate {
     LMChatUserViewData user,
     LMChatUserTile userTile,
   ) {
-    //TODO: check for userTile.style
-    return Text(user.name);
+    return userTile;
   }
 
   /// no item builder

@@ -260,15 +260,16 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   LMChatUserTile _defUserTile(LMChatUserViewData item) {
     return LMChatUserTile(
       userViewData: item,
+      style: LMChatTileStyle.basic(),
     );
   }
 
   Center _defNoResponse() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          LMChatImage(
+          const LMChatImage(
             imageAssetPath: emptyViewImage,
             style: LMChatImageStyle(
               height: 100,
@@ -282,6 +283,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
+                color: theme.inActiveColor,
               ),
             ),
           )
