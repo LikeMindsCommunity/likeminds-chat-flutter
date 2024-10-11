@@ -270,7 +270,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
     _isSelected = widget.isSelected;
-    _isDeleted = conversation.deletedByUserId != null;
+    _isDeleted = _isDeleted;
     reactions = widget.reactions;
   }
 
@@ -362,7 +362,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AbsorbPointer(
-                      absorbing: conversation.deletedByUserId != null,
+                      absorbing: _isDeleted,
                       child: Container(
                         constraints: BoxConstraints(
                           minHeight: 2.h,
@@ -383,14 +383,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           child: Padding(
                             padding: isSent
                                 ? EdgeInsets.only(
-                                    top: 1.h,
-                                    bottom: 1.h,
+                                    top: _isDeleted ? 0.8.h : 1.h,
+                                    bottom: _isDeleted ? 1.2.h : 1.h,
                                     left: 2.w,
                                     right: 4.w,
                                   )
                                 : EdgeInsets.only(
-                                    top: 1.h,
-                                    bottom: 1.h,
+                                    top: _isDeleted ? 0.8.h : 1.h,
+                                    bottom: _isDeleted ? 1.2.h : 1.h,
                                     left: 4.w,
                                     right: 2.w,
                                   ),
@@ -445,7 +445,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                     ),
                                   ),
                                 ),
-                                conversation.deletedByUserId != null
+                                _isDeleted
                                     ? widget.deletedText ??
                                         widget.deletedTextBuilder?.call(
                                           context,
@@ -561,7 +561,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     return LMChatText(
       _getDeletedText(),
       style: LMChatTextStyle(
-        textStyle: conversation.deletedByUserId != null
+        textStyle: _isDeleted
             ? TextStyle(
                 fontStyle: FontStyle.italic,
                 color: LMChatTheme.theme.disabledColor,

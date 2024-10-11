@@ -364,7 +364,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
               type: LMChatIconType.icon,
               icon: Icons.close,
               style: LMChatIconStyle(
-                color: theme.disabledColor,
+                color: theme.onContainer,
               ),
             ),
           ),

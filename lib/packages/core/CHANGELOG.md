@@ -26,3 +26,10 @@
 ## 0.7.5
 
 - Added support for Link Preview
+
+## 0.8.0
+
+- Added support for Tagging
+- Added support for Reactions
+- Added retry mechanism
+- Added Analytics support
