@@ -1,8 +1,7 @@
 // attachment models
 export 'attachment/attachment_view_data.dart';
-export 'attachment/poll_info_view_data.dart';
-export 'attachment/poll_option_view_data.dart';
-export 'attachment/poll_view_data.dart';
+export 'poll/poll_option_view_data.dart';
+export 'poll/poll_enum.dart';
 
 // chatroom models
 export 'chatroom/chatroom_view_data.dart';

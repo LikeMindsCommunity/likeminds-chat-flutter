@@ -49,7 +49,7 @@ Widget getChatItemAttachmentTile(
           withTilde: false) ??
       '';
   if (conversation.ogTags != null) {
-    return  Row(
+    return Row(
       children: [
         LMChatText(
           message,
@@ -68,6 +68,38 @@ Widget getChatItemAttachmentTile(
           style: LMChatIconStyle(
             color: LMChatDefaultTheme.greyColor,
             size: 16,
+          ),
+        ),
+      ],
+    );
+  }
+  if (conversation.state == 10) {
+    return Row(
+      children: [
+        LMChatText(message),
+        const LMChatIcon(
+          type: LMChatIconType.svg,
+          assetPath: kPollIcon,
+          style: LMChatIconStyle(
+            size: 14,
+            color: LMChatDefaultTheme.greyColor,
+            boxPadding: EdgeInsets.only(
+              right: 4,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 42.w,
+          child: LMChatText(
+            answerText,
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
           ),
         ),
       ],

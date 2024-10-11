@@ -6,6 +6,7 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
+import 'package:likeminds_chat_flutter_core/src/views/poll/poll_handler.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -57,6 +58,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatCore.config.chatRoomConfig.builder;
   late PagingController<int, LMChatConversationViewData> pagedListController =
       PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
+  final LMChatThemeData theme = LMChatTheme.theme;
 
   @override
   void initState() {
@@ -188,6 +190,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
+      poll: _defPoll(conversation),
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -242,12 +245,110 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     );
   }
 
+  LMChatPoll _defPoll(LMChatConversationViewData conversation) {
+    ValueNotifier<bool> rebuildPoll = ValueNotifier(false);
+    final List<int> selectedOptions = [];
+    bool isVoteEditing = false;
+
+    return LMChatPoll(
+      style: LMChatPollStyle.basic(
+        primaryColor: theme.primaryColor,
+        containerColor: theme.container,
+        inActiveColor: theme.inActiveColor,
+        onContainer: theme.onContainer,
+      ),
+      rebuildPollWidget: rebuildPoll,
+      pollData: conversation,
+      selectedOption: selectedOptions,
+      onEditVote: (pollData) {
+        isVoteEditing = true;
+        selectedOptions.clear();
+        pollData.poll?.forEach((element) {
+          if (element.isSelected == true) {
+            selectedOptions.add(element.id!);
+          }
+        });
+        rebuildPoll.value = !rebuildPoll.value;
+      },
+      onSubmit: (options) {
+        submitVote(
+          context,
+          conversation,
+          options,
+          {},
+          conversation.copyWith(),
+          widget.chatroomId,
+        );
+      },
+      onOptionSelect: (option) {
+        // if poll has ended, then do not allow to vote
+        if (LMChatPollUtils.hasPollEnded(conversation.expiryTime)) {
+          return;
+        }
+        // if poll is submitted and not editing votes, then do not allow to vote
+        if (LMChatPollUtils.isPollSubmitted(conversation.poll ?? []) &&
+            !isVoteEditing) {
+          return;
+        }
+        // if multiple select is enabled, then add the option to the selected options
+        // else submit the vote
+        if (LMChatPollUtils.isMultiChoicePoll(
+            conversation.multipleSelectNo, conversation.multipleSelectState)) {
+          if (selectedOptions.contains(option.id)) {
+            selectedOptions.remove(option.id);
+          } else {
+            if (option.id != null) {
+              selectedOptions.add(option.id!);
+            }
+          }
+          rebuildPoll.value = !rebuildPoll.value;
+        } else {
+          submitVote(
+            context,
+            conversation,
+            [option],
+            {},
+            conversation.copyWith(),
+            widget.chatroomId,
+          );
+        }
+      },
+      onAddOptionSubmit: (optionText) async {
+        await addOption(
+          context,
+          conversation,
+          optionText,
+          user.toUserViewData(),
+          rebuildPoll,
+          LMChatWidgetSource.chatroom,
+        );
+        rebuildConversationList.value = !rebuildConversationList.value;
+      },
+      onVoteClick: (option) {
+        onVoteTextTap(
+          context,
+          conversation,
+          LMChatWidgetSource.chatroom,
+          option: option,
+        );
+      },
+      onAnswerTextTap: () {
+        onVoteTextTap(
+          context,
+          conversation,
+          LMChatWidgetSource.chatroom,
+        );
+      },
+    );
+  }
+
   LMChatBubble _defaultReceivedChatBubble(
       LMChatConversationViewData conversation) {
     return LMChatBubble(
       conversation: conversation,
       attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
+      poll: _defPoll(conversation),
       conversationUser: conversation.member!,
       onTagTap: (tag) {},
       onReply: (conversation) {
@@ -378,10 +479,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
-      List<LMChatConversationViewData>? conversationData = state
-          .getConversationResponse.conversationData
-          ?.map((e) => e.toConversationViewData())
-          .toList();
+      List<LMChatConversationViewData>? conversationData =
+          state.getConversationResponse.conversationData
+              ?.map((e) => e.toConversationViewData(
+                    conversationPollsMeta:
+                        state.getConversationResponse.conversationPollsMeta,
+                    userMeta: state.getConversationResponse.userMeta,
+                  ))
+              .toList();
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,
           LMChatLocalPreference.instance.getCommunityData()!.id);
@@ -426,7 +531,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       );
     }
     if (state is LMChatConversationUpdatedState) {
-      if (state.conversationViewData.id != lastConversationId) {
+      if (state.conversationViewData.id != lastConversationId ||
+          state.shouldUpdate) {
         conversationAttachmentsMeta.addAll(state.attachments ?? {});
         addConversationToPagedList(
           state.conversationViewData,
@@ -538,7 +644,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(conversation.id.toString())) {
-      conversationMeta[conversation.id..toString()]!.deletedByUserId = user.id;
+      conversationMeta[conversation.id.toString()]!.deletedByUserId = user.id;
     }
     pagedListController.itemList = conversationList;
     scrollController.animateTo(

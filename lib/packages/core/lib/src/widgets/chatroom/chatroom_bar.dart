@@ -20,12 +20,30 @@ class LMChatroomBar extends StatefulWidget {
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
   final VoidCallback scrollToBottom;
 
+  /// [createPollWidgetBuilder] is the builder to create the poll widget.
+  final Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
+      createPollWidgetBuilder;
+
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
+    this.createPollWidgetBuilder,
   });
+
+  LMChatroomBar copyWith(
+      {LMChatRoomViewData? chatroom,
+      VoidCallback? scrollToBottom,
+      Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
+          createPollWidgetBuilder}) {
+    return LMChatroomBar(
+      chatroom: chatroom ?? this.chatroom,
+      scrollToBottom: scrollToBottom ?? this.scrollToBottom,
+      createPollWidgetBuilder:
+          createPollWidgetBuilder ?? this.createPollWidgetBuilder,
+    );
+  }
 
   @override
   State<LMChatroomBar> createState() => _LMChatroomBarState();
@@ -646,12 +664,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 2.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
                     Expanded(
                       child: Column(
                         children: [
@@ -693,6 +705,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
                     Expanded(
                       child: Column(
                         children: [
@@ -734,6 +752,76 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                         ],
                       ),
                     ),
+                    widget.chatroom.type != 10
+                        ? Expanded(
+                            child: Column(
+                              children: [
+                                LMChatButton(
+                                  onTap: () async {
+                                    _popupMenuController.hideMenu();
+                                    // unfocus the text field
+                                    _focusNode.unfocus();
+                                    // show bottom sheet to create a poll
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      useSafeArea: true,
+                                      builder: (context) {
+                                        return DraggableScrollableSheet(
+                                          expand: false,
+                                          initialChildSize: 0.9,
+                                          minChildSize: 0.5,
+                                          snap: true,
+                                          builder: (context, controller) =>
+                                              widget.createPollWidgetBuilder
+                                                  ?.call(
+                                                context,
+                                                LMChatCreatePollBottomSheet(
+                                                  chatroomId:
+                                                      widget.chatroom.id,
+                                                  scrollController: controller,
+                                                ),
+                                              ) ??
+                                              LMChatCreatePollBottomSheet(
+                                                chatroomId: widget.chatroom.id,
+                                                scrollController: controller,
+                                              ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: LMChatIcon(
+                                    type: LMChatIconType.svg,
+                                    assetPath: kPollIcon,
+                                    style: LMChatIconStyle(
+                                      size: 38,
+                                      backgroundColor:
+                                          _themeData.secondaryColor,
+                                      boxPadding: const EdgeInsets.all(8),
+                                      boxBorderRadius: 100,
+                                    ),
+                                  ),
+                                  style: LMChatButtonStyle(
+                                    height: 48,
+                                    width: 48,
+                                    borderRadius: 24,
+                                    backgroundColor:
+                                        LMChatTheme.theme.secondaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                LMChatText(
+                                  'Poll',
+                                  style: LMChatTextStyle(
+                                    textStyle:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ],

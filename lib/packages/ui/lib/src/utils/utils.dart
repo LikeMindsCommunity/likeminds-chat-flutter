@@ -4,6 +4,7 @@ export 'typedefs.dart';
 export 'time_ago/time_ago.dart';
 export 'time_ago/time_ago_message.dart';
 export 'constants/constants.dart';
+export 'constants/assets.dart';
 
 export 'helpers/tagging_helper.dart';
 export 'helpers/text_helper.dart';

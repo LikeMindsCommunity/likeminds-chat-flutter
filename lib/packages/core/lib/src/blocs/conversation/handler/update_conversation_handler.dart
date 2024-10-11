@@ -7,7 +7,8 @@ updateConversationsEventHandler(
 ) async {
   int? lastConversationId = LMChatConversationBloc.instance.lastConversationId;
   if (lastConversationId != null &&
-      event.conversationId != lastConversationId) {
+          event.conversationId != lastConversationId ||
+      event.shouldUpdate) {
     int maxTimestamp = DateTime.now().millisecondsSinceEpoch;
     final response =
         await LMChatCore.client.getConversation((GetConversationRequestBuilder()
@@ -16,9 +17,10 @@ updateConversationsEventHandler(
               ..maxTimestamp(maxTimestamp * 1000)
               ..isLocalDB(false)
               ..page(1)
-              ..pageSize(5)
+              ..pageSize(50)
               ..conversationId(event.conversationId))
             .build());
+    debugPrint("updateConversationsEventHandler: $response");
     if (response.success) {
       GetConversationResponse conversationResponse = response.data!;
       for (var element in conversationResponse.conversationData!) {
@@ -60,8 +62,12 @@ updateConversationsEventHandler(
 
       emit(
         LMChatConversationUpdatedState(
-          conversationViewData: realTimeConversation.toConversationViewData(),
+          conversationViewData: realTimeConversation.toConversationViewData(
+            conversationPollsMeta: conversationResponse.conversationPollsMeta,
+            userMeta: conversationResponse.userMeta,
+          ),
           attachments: attachments,
+          shouldUpdate: event.shouldUpdate,
         ),
       );
       lastConversationId = event.conversationId;

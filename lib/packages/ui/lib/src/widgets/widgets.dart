@@ -36,3 +36,7 @@ export 'conversation/chat_bubble.dart';
 export 'common/menu/menu.dart';
 export 'common/menu/menu_item.dart';
 export 'common/dialog/dialog.dart';
+
+export 'poll/poll.dart';
+export 'poll/poll_style.dart';
+export 'poll/poll_option.dart';
