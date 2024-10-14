@@ -70,7 +70,7 @@ String getDeletedText(
     LMChatConversationViewData conversation, LMChatUserViewData user) {
   return conversation.deletedByUserId == conversation.memberId
       ? conversation.deletedByUserId == user.id
-          ? 'This message was deleted'
+          ? 'You deleted this message'
           : "This message was deleted by user"
       : "This message was deleted by Admin";
 }
