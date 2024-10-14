@@ -251,12 +251,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     bool isVoteEditing = false;
 
     return LMChatPoll(
-      style: LMChatPollStyle.basic(
-        primaryColor: theme.primaryColor,
-        containerColor: theme.container,
-        inActiveColor: theme.inActiveColor,
-        onContainer: theme.onContainer,
-      ),
+      style: theme.pollStyle,
       rebuildPollWidget: rebuildPoll,
       pollData: conversation,
       selectedOption: selectedOptions,

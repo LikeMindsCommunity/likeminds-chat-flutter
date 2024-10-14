@@ -39,6 +39,7 @@ class LMChatThemeData {
   final LMChatStateBubbleStyle stateBubbleStyle;
   final LMChatBubbleReplyStyle replyStyle;
   final LMChatBubbleContentStyle contentStyle;
+  final LMChatPollStyle pollStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -88,6 +89,7 @@ class LMChatThemeData {
     required this.chatTileStyle,
     required this.stateBubbleStyle,
     required this.appBarStyle,
+    required this.pollStyle,
   });
 
   factory LMChatThemeData.fromThemeData(ThemeData theme) {
@@ -138,6 +140,7 @@ class LMChatThemeData {
     LMChatTileStyle? chatTileStyle,
     LMChatStateBubbleStyle? stateBubbleStyle,
     LMChatAppBarStyle? appBarStyle,
+    LMChatPollStyle? pollStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
@@ -182,6 +185,13 @@ class LMChatThemeData {
       stateBubbleStyle:
           stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
       appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
+      pollStyle: pollStyle ??
+          LMChatPollStyle.basic(
+            primaryColor: primaryColor,
+            containerColor: container,
+            onContainer: onContainer,
+            inActiveColor: inActiveColor,
+          ),
     );
   }
 
@@ -218,6 +228,7 @@ class LMChatThemeData {
     LMChatTileStyle? chatTileStyle,
     LMChatStateBubbleStyle? stateBubbleStyle,
     LMChatAppBarStyle? appBarStyle,
+    LMChatPollStyle? pollStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -252,6 +263,7 @@ class LMChatThemeData {
       chatTileStyle: chatTileStyle ?? this.chatTileStyle,
       stateBubbleStyle: stateBubbleStyle ?? this.stateBubbleStyle,
       appBarStyle: appBarStyle ?? this.appBarStyle,
+      pollStyle: pollStyle ?? this.pollStyle,
     );
   }
 }
