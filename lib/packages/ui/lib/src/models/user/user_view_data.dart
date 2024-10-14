@@ -13,12 +13,26 @@ class LMChatUserViewData {
 
   /// image url of the user
   String? imageUrl;
+
+  /// isGuest is a boolean value to check if the user is a guest user
   bool? isGuest;
+
+  /// isDeleted is a boolean value to check if the user is deleted
   bool? isDeleted;
+
+  /// uuid is a unique identifier of the user
   String uuid;
+
+  /// organisationName is the name of the organisation to which the user belongs
   String? organisationName;
+
+  /// sdkClientInfo is a view data class to hold the sdk client info data
   LMChatSDKClientInfoViewData? sdkClientInfo;
+
+  /// updatedAt is the timestamp when the user data is updated
   int? updatedAt;
+
+  /// isOwner is a boolean value to check if the user is the owner of the community
   bool? isOwner;
 
   /// custom title of the user
@@ -27,13 +41,23 @@ class LMChatUserViewData {
 
   /// date since the user is a member of the community
   String? memberSince;
+
+  /// route of the user
   String? route;
+
+  /// state of the user
   int? state;
 
   /// community id of the community to which the user belongs
   int? communityId;
+
+  /// createdAt is the timestamp when the user is created
   int? createdAt;
+
+  /// customIntroText is the custom intro text of the user
   String? customIntroText;
+
+  /// memberSinceEpoch is the epoch time since the user is a member of the community
   int? memberSinceEpoch;
 
   /// widget for storing custom data
@@ -124,75 +148,93 @@ class LMChatUserViewDataBuilder {
   int? _communityId;
   int? _createdAt;
   LMChatWidgetViewData? _widget;
+
+  /// Sets the id of the user
   void id(int? id) {
     _id = id;
   }
 
+  /// Sets the name of the user
   void name(String? name) {
     _name = name;
   }
 
+  /// Sets the image URL of the user
   void imageUrl(String? imageUrl) {
     _imageUrl = imageUrl;
   }
 
+  /// Sets whether the user is a guest
   void isGuest(bool? isGuest) {
     _isGuest = isGuest;
   }
 
+  /// Sets whether the user is deleted
   void isDeleted(bool? isDeleted) {
     _isDeleted = isDeleted;
   }
 
+  /// Sets the UUID of the user
   void uuid(String? uuid) {
     _uuid = uuid;
   }
 
+  /// Sets the organisation name of the user
   void organisationName(String? organisationName) {
     _organisationName = organisationName;
   }
 
+  /// Sets the SDK client info of the user
   void sdkClientInfo(LMChatSDKClientInfoViewData? sdkClientInfo) {
     _sdkClientInfo = sdkClientInfo;
   }
 
+  /// Sets the updated timestamp of the user
   void updatedAt(int? updatedAt) {
     _updatedAt = updatedAt;
   }
 
+  /// Sets whether the user is the owner
   void isOwner(bool? isOwner) {
     _isOwner = isOwner;
   }
 
+  /// Sets the custom title of the user
   void customTitle(String? customTitle) {
     _customTitle = customTitle;
   }
 
+  /// Sets the member since date of the user
   void memberSince(String? memberSince) {
     _memberSince = memberSince;
   }
 
+  /// Sets the route of the user
   void route(String? route) {
     _route = route;
   }
 
+  /// Sets the state of the user
   void state(int? state) {
     _state = state;
   }
 
+  /// Sets the community ID of the user
   void communityId(int? communityId) {
     _communityId = communityId;
   }
 
+  /// Sets the created timestamp of the user
   void createdAt(int? createdAt) {
     _createdAt = createdAt;
   }
 
+  /// Sets the widget data of the user
   void widget(LMChatWidgetViewData? widget) {
     _widget = widget;
   }
 
-  /// {@macro user_view_data_builder}
+  /// Builds and returns an instance of [LMChatUserViewData]
   LMChatUserViewData build() {
     if (_id == null) {
       throw Exception('id must not be null');

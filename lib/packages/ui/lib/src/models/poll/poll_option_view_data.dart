@@ -1,118 +1,128 @@
-/// `LMChatPollOPtionViewData` is a model class used to represent the poll option data in the chat.
-/// This class is used to display the poll options in the chat screen.
-class LMChatPollOPtionViewData {
-  final String? id;
-  final String text;
-  final bool? isSelected;
-  final int? percentage;
-  final String? subText;
-  final int? noVotes;
-  final String? userId;
-  final int? conversationId;
-  final int? count;
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-  LMChatPollOPtionViewData._({
+/// {@template lm_chat_poll_option_view_data}
+/// `LMChatPollOptionViewData` is a model class used to represent the poll option data in the chat.
+/// This class is used to display the poll options in the chat screen.
+/// {@endtemplate}
+
+class LMChatPollOptionViewData {
+  /// Represents the unique identifier for the poll option.
+  final int? id;
+
+  /// The text description of the poll option.
+  final String text;
+
+  /// Indicates whether the poll option is selected by the user.
+  final bool? isSelected;
+
+  /// The percentage of votes received by the poll option.
+  final int? percentage;
+
+  /// The number of votes received by the poll option.
+  final int? noVotes;
+
+  /// The identifier for the conversation associated with the poll option.
+  final int? conversationId;
+
+  /// The user data of the member who created or is associated with the poll option.
+  final LMChatUserViewData? member;
+
+  LMChatPollOptionViewData._({
     required this.id,
     required this.text,
     required this.isSelected,
     required this.percentage,
-    required this.subText,
     required this.noVotes,
-    required this.userId,
     required this.conversationId,
-    required this.count,
+    this.member,
   });
 
   /// copyWith method is used to create a new instance of `LMChatPollOPtionViewData` with the updated values.
   /// If the new values are not provided, the old values are used.
-  LMChatPollOPtionViewData copyWith({
-    String? id,
+  LMChatPollOptionViewData copyWith({
+    int? id,
     String? text,
     bool? isSelected,
     int? percentage,
-    String? subText,
     int? noVotes,
-    String? userId,
     int? conversationId,
-    int? count,
+    LMChatUserViewData? member,
   }) {
-    return LMChatPollOPtionViewData._(
+    return LMChatPollOptionViewData._(
       id: id ?? this.id,
       text: text ?? this.text,
       isSelected: isSelected ?? this.isSelected,
       percentage: percentage ?? this.percentage,
-      subText: subText ?? this.subText,
       noVotes: noVotes ?? this.noVotes,
-      userId: userId ?? this.userId,
       conversationId: conversationId ?? this.conversationId,
-      count: count ?? this.count,
+      member: member ?? this.member,
     );
   }
 }
 
+/// {@template lm_chat_poll_option_view_data_builder}
 /// `LMChatPollOptionViewDataBuilder` is a builder class used to create an instance of `LMChatPollOPtionViewData`.
 /// This class is used to create an instance of `LMChatPollOPtionViewData` with the provided values.
+/// {@endtemplate}
 class LMChatPollOptionViewDataBuilder {
-  String? _id;
+  int? _id;
   String? _text;
   bool? _isSelected;
   int? _percentage;
-  String? _subText;
-  int? _noVotes;
-  String? _userId;
-  int? _conversationId;
-  int? _count;
 
-  void id(String? id) {
+  int? _noVotes;
+
+  int? _conversationId;
+
+  LMChatUserViewData? _member;
+
+  /// id method is used to set the unique identifier for the poll option.
+  void id(int? id) {
     _id = id;
   }
 
+  /// text method is used to set the text description of the poll option.
   void text(String text) {
     _text = text;
   }
 
+  /// isSelected method is used to set whether the poll option is selected by the user.
   void isSelected(bool? isSelected) {
     _isSelected = isSelected;
   }
 
+  /// percentage method is used to set the percentage of votes received by the poll option.
   void percentage(int? percentage) {
     _percentage = percentage;
   }
 
-  void subText(String? subText) {
-    _subText = subText;
-  }
-
+  /// noVotes method is used to set the number of votes received by the poll option.
   void noVotes(int? noVotes) {
     _noVotes = noVotes;
   }
 
-  void userId(String? userId) {
-    _userId = userId;
-  }
-
+  /// conversationId method is used to set the identifier for the conversation associated with the poll option.
   void conversationId(int? conversationId) {
     _conversationId = conversationId;
   }
 
-  void count(int? count) {
-    _count = count;
+  /// member method is used to set the user data of the member who created or is associated with the poll option.
+  void member(LMChatUserViewData? member) {
+    _member = member;
   }
 
   /// build method is used to create an instance of `LMChatPollOPtionViewData` with the provided values.
-  LMChatPollOPtionViewData build() {
+  LMChatPollOptionViewData build() {
     if (_text == null) throw Exception('text is required');
 
-    return LMChatPollOPtionViewData._(
+    return LMChatPollOptionViewData._(
       id: _id,
       text: _text!,
       isSelected: _isSelected,
       percentage: _percentage,
-      subText: _subText,
       noVotes: _noVotes,
-      userId: _userId,
       conversationId: _conversationId,
-      count: _count,
+      member: _member,
     );
   }
 }

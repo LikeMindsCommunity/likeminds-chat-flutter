@@ -51,7 +51,7 @@ String getHomeChatroomPreviewMessage(
       ? 'You: '
       : '${conversation.member!.name.split(' ').first}: ';
   String message = conversation.deletedByUserId == null
-      ? conversation.attachmentCount == 0
+      ? conversation.attachmentCount == 0 && conversation.state != 10
           ? '$personLabel${conversation.state != 0 ? LMChatTaggingHelper.extractStateMessage(
               conversation.answer,
             ) : LMChatTaggingHelper.convertRouteToTag(

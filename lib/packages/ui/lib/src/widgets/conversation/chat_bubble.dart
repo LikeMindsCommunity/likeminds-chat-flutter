@@ -128,6 +128,12 @@ class LMChatBubble extends StatefulWidget {
   ///Callback for catching when reactions are tapped
   final VoidCallback? onReactionsTap;
 
+  /// Poll Widget
+  final LMChatPoll? poll;
+
+  /// Poll Widget builder
+  final LMChatPollBuilder? pollBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -159,6 +165,8 @@ class LMChatBubble extends StatefulWidget {
     this.mediaBuilder,
     this.onReaction,
     this.linkPreviewBuilder,
+    this.poll,
+    this.pollBuilder,
     this.bubbleReactionsBuilder,
     this.reactionBarBuilder,
     this.replyBuilder,
@@ -171,6 +179,8 @@ class LMChatBubble extends StatefulWidget {
     LMChatConversationViewData? conversation,
     LMChatUserViewData? currentUser,
     LMChatUserViewData? conversationUser,
+    List<LMChatAttachmentViewData>? attachments,
+    bool? isSent,
     LMChatIcon? replyIcon,
     LMChatProfilePicture? avatar,
     Function(LMChatConversationViewData)? onReply,
@@ -179,6 +189,7 @@ class LMChatBubble extends StatefulWidget {
     LMChatBubbleStyle? style,
     bool? isSelected,
     Function(bool isSelected, State<LMChatBubble> state)? onTap,
+    void Function()? onMediaTap,
     Function(bool isSelected, State<LMChatBubble> state)? onLongPress,
     bool Function()? isSelectableOnTap,
     Widget Function(BuildContext context, LMChatBubbleContent content)?
@@ -197,6 +208,9 @@ class LMChatBubble extends StatefulWidget {
     Widget Function(LMChatOGTagsViewData ogTags,
             LMChatLinkPreview oldLinkPreviewWidget)?
         linkPreviewBuilder,
+    bool? isDM,
+    LMChatPoll? poll,
+    LMChatPollBuilder? pollBuilder,
     Widget Function(List<LMChatReactionViewData> reactions,
             LMChatBubbleReactions oldWidget)?
         bubbleReactionsBuilder,
@@ -206,6 +220,8 @@ class LMChatBubble extends StatefulWidget {
       conversation: conversation ?? this.conversation,
       currentUser: currentUser ?? this.currentUser,
       conversationUser: conversationUser ?? this.conversationUser,
+      attachments: attachments ?? this.attachments,
+      isSent: isSent ?? this.isSent,
       onReply: onReply ?? this.onReply,
       onTagTap: onTagTap ?? this.onTagTap,
       replyIcon: replyIcon ?? this.replyIcon,
@@ -214,6 +230,7 @@ class LMChatBubble extends StatefulWidget {
       style: style ?? this.style,
       isSelected: isSelected ?? this.isSelected,
       onTap: onTap ?? this.onTap,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
       onLongPress: onLongPress ?? this.onLongPress,
       isSelectableOnTap: isSelectableOnTap ?? this.isSelectableOnTap,
       contentBuilder: contentBuilder ?? this.contentBuilder,
@@ -223,6 +240,9 @@ class LMChatBubble extends StatefulWidget {
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       onReaction: onReaction ?? this.onReaction,
       linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
+      isDM: isDM ?? this.isDM,
+      poll: poll ?? this.poll,
+      pollBuilder: pollBuilder ?? this.pollBuilder,
       bubbleReactionsBuilder:
           bubbleReactionsBuilder ?? this.bubbleReactionsBuilder,
       reactionBarBuilder: reactionBarBuilder ?? this.reactionBarBuilder,
@@ -270,7 +290,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
     _isSelected = widget.isSelected;
-    _isDeleted = _isDeleted;
+    _isDeleted = conversation.deletedByUserId != null;
     reactions = widget.reactions;
   }
 
@@ -372,7 +392,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           maxWidth: (widget.attachments != null &&
                                   widget.attachments!.isNotEmpty)
                               ? 60.w
-                              : 65.w,
+                      : conversation.state == 10
+                          ? 70.w
+                                  : 65.w,
                         ),
                         child: PhysicalShape(
                           clipper: LMChatBubbleClipper(
@@ -408,6 +430,21 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         conversationUser:
                                             widget.conversationUser,
                                       ),
+                        // poll widget
+                        if (conversation.state == 10 && !_isDeleted) ...[
+                          widget.pollBuilder?.call(
+                                context,
+                                widget.poll ??
+                                    LMChatPoll(
+                                      pollData: conversation,
+                                    ),
+                                conversation,
+                              ) ??
+                              widget.poll ??
+                              LMChatPoll(
+                                pollData: conversation,
+                              ),
+                        ],
                                 // link preview widget
                                 if (conversation.ogTags != null &&
                                     conversation.deletedByUserId == null)
@@ -452,27 +489,31 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                           _defDeletedWidget(),
                                         ) ??
                                         _defDeletedWidget()
-                                    : widget.contentBuilder?.call(
-                                          context,
-                                          LMChatBubbleContent(
-                                            conversation: widget.attachments
-                                                        ?.first.type ==
+                            : conversation.state == 10
+                                ? const SizedBox.shrink()
+                                        : widget.contentBuilder?.call(
+                                              context,
+                                              LMChatBubbleContent(
+                                                conversation: widget.attachments
+                                                            ?.first.type ==
+                                                   
                                                     "gif"
-                                                ? conversation.copyWith(
-                                                    answer: _getGIFText())
-                                                : conversation,
-                                            onTagTap: widget.onTagTap,
-                                          ),
-                                        ) ??
-                                        LMChatBubbleContent(
-                                          conversation:
-                                              widget.attachments?.first.type ==
+                                                    ? conversation.copyWith(
+                                                        answer: _getGIFText())
+                                                    : conversation,
+                                                onTagTap: widget.onTagTap,
+                                              ),
+                                            ) ??
+                                            LMChatBubbleContent(
+                                              conversation:
+                                                  widget.attachments?.first.type ==
+                                                 
                                                       "gif"
-                                                  ? conversation.copyWith(
-                                                      answer: _getGIFText())
-                                                  : conversation,
-                                          onTagTap: widget.onTagTap,
-                                        ),
+                                                      ? conversation.copyWith(
+                                                          answer: _getGIFText())
+                                                      : conversation,
+                                              onTagTap: widget.onTagTap,
+                                            ),
                                 if (conversation.deletedByUserId == null &&
                                     inStyle.showFooter == true)
                                   Padding(
@@ -597,6 +638,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   }
 
   double calculateFinalWidth() {
+    // if the conversation is a poll, return the max width
+    if (conversation.state == 10) return double.infinity;
     // Measure the text width
     final textPainter = TextPainter(
       text: TextSpan(

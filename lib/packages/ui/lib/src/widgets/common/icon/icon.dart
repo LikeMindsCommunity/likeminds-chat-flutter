@@ -66,7 +66,8 @@ class LMChatIcon extends StatelessWidget {
     return Container(
       height: inStyle.boxSize ?? inStyle.size,
       width: inStyle.boxSize ?? inStyle.size,
-      padding: inStyle.boxPadding ?? const EdgeInsets.all(0),
+      margin: inStyle.margin,
+      padding: inStyle.boxPadding,
       decoration: BoxDecoration(
         color: inStyle.backgroundColor,
         borderRadius: BorderRadius.all(
@@ -119,6 +120,9 @@ class LMChatIconStyle {
   /// padding around icon with respect to the box
   final EdgeInsets? boxPadding;
 
+  /// margin around the box
+  final EdgeInsets? margin;
+
   /// color of the box, or background color of icon
   final Color? backgroundColor;
 
@@ -133,6 +137,7 @@ class LMChatIconStyle {
     this.boxBorderColor,
     this.boxBorderRadius,
     this.boxPadding,
+    this.margin,
     this.backgroundColor,
     this.fit,
   });
@@ -153,6 +158,7 @@ class LMChatIconStyle {
     double? boxBorderRadius,
     Color? boxBorderColor,
     EdgeInsets? boxPadding,
+    EdgeInsets? margin,
     Color? backgroundColor,
     BoxFit? fit,
   }) {
@@ -164,6 +170,7 @@ class LMChatIconStyle {
       boxBorderColor: boxBorderColor ?? this.boxBorderColor,
       boxBorderRadius: boxBorderRadius ?? this.boxBorderRadius,
       boxPadding: boxPadding ?? this.boxPadding,
+      margin: margin ?? this.margin,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       fit: fit ?? this.fit,
     );

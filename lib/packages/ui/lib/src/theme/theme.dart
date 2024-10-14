@@ -92,6 +92,7 @@ class LMChatThemeData {
 
   /// Style for bubble content in the chat
   final LMChatBubbleContentStyle contentStyle;
+  final LMChatPollStyle pollStyle;
 
   /// Style for bubble reactions in the chat
   final LMChatBubbleReactionsStyle bubbleReactionsStyle;
@@ -184,6 +185,7 @@ class LMChatThemeData {
     required this.reactionBottomSheetStyle,
     required this.bubbleReactionsStyle,
     required this.reactionKeyboardStyle,
+    required this.pollStyle,
   });
 
   /// Creates a light theme data from the provided ThemeData
@@ -240,6 +242,7 @@ class LMChatThemeData {
     LMChatReactionBottomSheetStyle? reactionBottomSheetStyle,
     LMChatBubbleReactionsStyle? bubbleReactionsStyle,
     LMChatReactionKeyboardStyle? reactionKeyboardStyle,
+    LMChatPollStyle? pollStyle,
   }) {
     return LMChatThemeData(
         buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
@@ -281,6 +284,13 @@ class LMChatThemeData {
         stateBubbleStyle:
             stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
         appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
+      pollStyle: pollStyle ??
+          LMChatPollStyle.basic(
+            primaryColor: primaryColor,
+            containerColor: container,
+            onContainer: onContainer,
+            inActiveColor: inActiveColor,
+          ),
         reactionBarStyle: reactionBarStyle ?? LMChatReactionBarStyle.basic(),
         reactionBottomSheetStyle:
             reactionBottomSheetStyle ?? LMChatReactionBottomSheetStyle.basic(),
@@ -328,6 +338,7 @@ class LMChatThemeData {
     LMChatReactionBottomSheetStyle? reactionBottomSheetStyle,
     LMChatBubbleReactionsStyle? bubbleReactionsStyle,
     LMChatReactionKeyboardStyle? reactionKeyboardStyle,
+    LMChatPollStyle? pollStyle,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -368,6 +379,7 @@ class LMChatThemeData {
       bubbleReactionsStyle: bubbleReactionsStyle ?? this.bubbleReactionsStyle,
       reactionKeyboardStyle:
           reactionKeyboardStyle ?? this.reactionKeyboardStyle,
+      pollStyle: pollStyle ?? this.pollStyle,
     );
   }
 }

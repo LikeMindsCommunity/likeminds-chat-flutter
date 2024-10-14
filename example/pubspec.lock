@@ -808,7 +808,7 @@ packages:
       path: "../../LikeMinds-Flutter-GroupChat-SDK"
       relative: true
     source: path
-    version: "1.8.0"
+    version: "1.9.0"
   likeminds_chat_flutter_core:
     dependency: "direct main"
     description:
