@@ -7,6 +7,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 /// {@template lm_chat_media_forwarding_screen}
 /// A screen to preview media before adding attachments to a conversation
@@ -25,12 +26,15 @@ class LMChatMediaForwardingScreen extends StatefulWidget {
 
   final String? textFieldText;
 
+  final String? chatroomName;
+
   ///{@macro lm_chat_media_forwarding_screen}
   const LMChatMediaForwardingScreen({
     super.key,
     required this.chatroomId,
     this.replyConversation,
     this.textFieldText,
+    this.chatroomName,
   });
 
   @override
@@ -51,6 +55,8 @@ class _LMChatMediaForwardingScreenState
 
   final LMChatMediaForwardingBuilderDelegate _screenBuilder =
       LMChatCore.config.mediaForwardingConfig.builder;
+
+  List<LMChatTagViewData> tags = [];
 
   @override
   void initState() {
@@ -225,9 +231,22 @@ class _LMChatMediaForwardingScreenState
                     chatroomId: widget.chatroomId,
                     style: Theme.of(context).textTheme.bodyMedium!,
                     onChange: (value) {
-                      // print(value);
+                      // Handle text change if needed
                     },
-                    onTagSelected: (tag) {},
+                    onTagSelected: (tag) {
+                      tags.add(tag);
+                      LMChatAnalyticsBloc.instance.add(
+                        LMChatFireAnalyticsEvent(
+                          eventName: LMChatAnalyticsKeys.userTagsSomeone,
+                          eventProperties: {
+                            'community_id': widget.chatroomId,
+                            'chatroom_name': widget.chatroomName,
+                            'tagged_user_id': tag.sdkClientInfoViewData?.uuid,
+                            'tagged_user_name': tag.name,
+                          },
+                        ),
+                      );
+                    },
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintMaxLines: 1,
@@ -287,6 +306,17 @@ class _LMChatMediaForwardingScreenState
   /// [LMChatConversationBloc] with the selected media and the chatroom id.
   /// It also pops the current route.
   void _onSend() {
+    if (_textEditingController.text.trim().isEmpty) {
+      toast("Text can't be empty");
+      return;
+    }
+
+    // Encode tags in the message
+    String result = LMChatTaggingHelper.encodeString(
+      _textEditingController.text,
+      tags,
+    ).trim();
+
     LMChatConversationBloc.instance.add(
       LMChatPostMultiMediaConversationEvent(
         (PostConversationRequestBuilder()
@@ -294,7 +324,7 @@ class _LMChatMediaForwardingScreenState
               ..attachmentCount(mediaList.length)
               ..chatroomId(widget.chatroomId)
               ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
-              ..text(_textEditingController.text)
+              ..text(result)
               ..hasFiles(true))
             .build(),
         LMChatMediaHandler.instance.pickedMedia.copy(),

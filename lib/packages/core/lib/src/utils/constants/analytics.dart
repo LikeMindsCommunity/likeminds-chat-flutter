@@ -1,35 +1,4 @@
-import 'package:flutter/foundation.dart';
-
-class LMAnalytics {
-  static LMAnalytics? _instance;
-  static LMAnalytics get() => _instance ??= LMAnalytics._();
-
-  // LMSDKCallback? sdkCallback;
-
-  LMAnalytics._();
-
-  void initialize() {
-    // sdkCallback =
-    //     DIService.getIt.isRegistered<LMSDKCallback>(instanceName: "LMCallback")
-    //         ? DIService.getIt.get<LMSDKCallback>(
-    //             instanceName: "LMCallback",
-    //           )
-    //         : null;
-    debugPrint("Analytics initialized");
-  }
-
-  void logEvent(String eventKey, Map<String, dynamic> propertiesMap) {
-    debugPrint('Event: $eventKey');
-    debugPrint('Params: $propertiesMap');
-  }
-
-  void track(String eventKey, Map<String, dynamic> propertiesMap) {
-    logEvent(eventKey, propertiesMap);
-    // sdkCallback?.eventFiredCallback(eventKey, propertiesMap);
-  }
-}
-
-class AnalyticsKeys {
+class LMChatAnalyticsKeys {
   static const String chatroomCreationStarted = 'Chatroom creation started';
   static const String chatroomCreationCompleted = 'Chatroom creation completed';
   static const String chatroomRenamed = 'Chatroom renamed';
@@ -66,12 +35,6 @@ class AnalyticsKeys {
   static const String notificationRemoved = 'Notification removed';
   static const String notificationMuted = 'Notification muted';
   static const String aboutSectionViewed = 'About section viewed';
-  static const String postSectionViewed = 'Post section viewed';
-  static const String activitySectionViewed = 'Activity section viewed';
-  static const String savedPostViewed = 'Saved post viewed';
-  static const String postCreationStarted = 'Post creation started';
-  static const String clickedOnAttachment = 'Clicked on Attachment';
-  static const String userTaggedInPost = 'User tagged in a post';
   static const String pinnedChatroomsViewed = 'Pinned chatrooms viewed';
   static const String memberGroupAdded = 'Member group added';
   static const String chatroomLeft = 'Chatroom left';
@@ -92,4 +55,9 @@ class AnalyticsKeys {
   static const String messageReply = 'Message reply';
   static const String messageReported = 'Message reported';
   static const String messageEdited = 'Messages edited';
+  static const String emoticonTrayOpened = 'Emoticon Tray Opened';
+  static const String reactionAdded = 'Reaction Added';
+  static const String reactionListOpened = 'Reaction List Opened';
+  static const String reactionRemoved = 'Reaction Removed';
+  static const String dmScreenOpened = 'Direct messages screen opened';
 }

@@ -7,8 +7,13 @@ import 'package:meta/meta.dart';
 part 'chatroom_action_event.dart';
 part 'chatroom_action_state.dart';
 
+part 'handler/show_emoji_keyboard_handler.dart';
+part 'handler/hide_emoji_keyboard_handler.dart';
+part 'handler/mark_read_chatroom_handler.dart';
+part 'handler/set_chatroom_topic_handler.dart';
+
 class LMChatroomActionBloc
-    extends Bloc<ChatroomActionEvent, ChatroomActionState> {
+    extends Bloc<LMChatroomActionEvent, LMChatroomActionState> {
   static LMChatroomActionBloc? _instance;
   // Creating a singleton instance of the LMChatHomeFeedBloc
   static LMChatroomActionBloc get instance {
@@ -19,31 +24,20 @@ class LMChatroomActionBloc
     }
   }
 
-  LMChatroomActionBloc._() : super(ChatroomActionInitial()) {
-    on<ChatroomActionEvent>((event, emit) async {
-      if (event is MarkReadChatroomEvent) {
-        // ignore: unused_local_variable
-        LMResponse response = await LMChatCore.client.markReadChatroom(
-            (MarkReadChatroomRequestBuilder()..chatroomId(event.chatroomId))
-                .build());
-      } else if (event is SetChatroomTopicEvent) {
-        try {
-          emit(ChatroomActionLoading());
-          LMResponse<void> response = await LMChatCore.client
-              .setChatroomTopic((SetChatroomTopicRequestBuilder()
-                    ..chatroomId(event.chatroomId)
-                    ..conversationId(event.conversationId))
-                  .build());
-          if (response.success) {
-            emit(ChatroomTopicSet(event.topic));
-          } else {
-            emit(ChatroomTopicError(errorMessage: response.errorMessage!));
-          }
-        } catch (e) {
-          emit(ChatroomTopicError(
-              errorMessage: "An error occurred while setting topic"));
-        }
-      }
-    });
+  LMChatroomActionBloc._() : super(LMChatChatroomActionInitial()) {
+    on<LMChatroomActionEvent>(_handleEvent);
+  }
+
+  void _handleEvent(
+      LMChatroomActionEvent event, Emitter<LMChatroomActionState> emit) async {
+    if (event is LMChatShowEmojiKeyboardEvent) {
+      _handleShowEmojiKeyboard(event, emit);
+    } else if (event is LMChatHideEmojiKeyboardEvent) {
+      _handleHideEmojiKeyboard(emit);
+    } else if (event is LMChatMarkReadChatroomEvent) {
+      await _handleMarkReadChatroom(event);
+    } else if (event is LMChatSetChatroomTopicEvent) {
+      await _handleSetChatroomTopic(event, emit);
+    }
   }
 }

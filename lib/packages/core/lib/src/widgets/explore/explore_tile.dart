@@ -345,6 +345,17 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             .build();
         response =
             await LMChatCore.instance.lmChatClient.followChatroom(request);
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomUnfollowed,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'normal',
+              'source': 'overflow_menu',
+            },
+          ),
+        );
       } else {
         final request = (DeleteParticipantRequestBuilder()
               ..chatroomId(chatroom.id)
@@ -353,6 +364,17 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             .build();
         response =
             await LMChatCore.instance.lmChatClient.deleteParticipant(request);
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomLeft,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'normal',
+              'source': 'overflow_menu',
+            },
+          ),
+        );
       }
       chatroom = chatroom.copyWith(followStatus: false);
       isJoinedNotifier.value = !isJoinedNotifier.value;
@@ -375,6 +397,17 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
       chatroom = chatroom.copyWith(followStatus: true);
       isJoinedNotifier.value = !isJoinedNotifier.value;
       if (!response.success) {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomFollowed,
+            eventProperties: {
+              'chatroom_name ': widget.chatroom.header,
+              'chatroom_id': widget.chatroom.id,
+              'chatroom_type': 'normal',
+              'source': 'overflow_menu',
+            },
+          ),
+        );
         chatroom = chatroom.copyWith(followStatus: false);
         isJoinedNotifier.value = !isJoinedNotifier.value;
         toast(response.errorMessage ?? 'An error occurred');

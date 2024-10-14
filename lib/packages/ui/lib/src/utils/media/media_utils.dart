@@ -224,7 +224,6 @@ Widget getChatItemAttachmentTile(
     }
     return Row(
       children: <Widget>[
-        LMChatText(message),
         mediaFiles.length > 1
             ? LMChatText(
                 '${mediaFiles.length}',

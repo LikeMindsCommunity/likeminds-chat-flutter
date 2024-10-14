@@ -8,4 +8,4 @@ export 'src/core/configurations/chat_builder.dart';
 export 'src/core/configurations/widget_source.dart';
 export 'src/utils/utils.dart';
 
-const bool isDebug = bool.fromEnvironment('DEBUG');
+const bool isDebug = bool.fromEnvironment('LM_DEBUG_ENV');

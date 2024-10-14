@@ -753,7 +753,7 @@ class _LMChatCreatePollBottomSheetState
             style: TextStyle(
               color: theme.onContainer,
             ),
-            decoration: widget.pollQuestionStyle?.decoration ??
+            decoration: widget.pollQuestionStyle?.inputDecoration ??
                 InputDecoration(
                   hintText: 'Ask a question',
                   hintStyle: TextStyle(
@@ -1001,7 +1001,7 @@ class _LMChatOptionTileState extends State<LMChatOptionTile> {
             style: TextStyle(
               color: theme.onContainer,
             ),
-            decoration: widget.optionStyle?.decoration ??
+            decoration: widget.optionStyle?.inputDecoration ??
                 InputDecoration(
                   hintText: 'Option',
                   hintStyle: TextStyle(
