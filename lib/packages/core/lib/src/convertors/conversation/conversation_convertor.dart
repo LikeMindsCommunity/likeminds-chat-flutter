@@ -1,5 +1,6 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/poll/poll_option_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/og_tag/og_tag_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/reaction/reaction_convertor.dart';
@@ -9,9 +10,13 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 /// It converts [Conversation] to [LMChatConversationViewData].
 extension ConversationViewDataConvertor on Conversation {
   /// Converts [Conversation] to [LMChatConversationViewData]
-  LMChatConversationViewData toConversationViewData() {
+  LMChatConversationViewData toConversationViewData({
+    Map<String, List<PollOption>>? conversationPollsMeta,
+    Map<int, User>? userMeta,
+  }) {
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
+          ..allowAddOption(allowAddOption)
           ..answer(answer)
           ..attachmentCount(attachmentCount)
           ..attachments(
@@ -36,10 +41,11 @@ extension ConversationViewDataConvertor on Conversation {
           ..locationLat(locationLat)
           ..locationLong(locationLong)
           ..multipleSelectNo(multipleSelectNo)
-          ..multipleSelectState(multipleSelectState)
+          ..multipleSelectState(
+              LMChatPollMultiSelectState.fromValue(multipleSelectState))
           ..onlineLinkEnableBefore(onlineLinkEnableBefore)
           ..pollAnswerText(pollAnswerText)
-          ..pollType(pollType)
+          ..pollType(LMChatPollType.fromValue(pollType))
           ..replyChatroomId(replyChatroomId)
           ..replyId(replyId)
           ..startTime(startTime)
@@ -53,16 +59,31 @@ extension ConversationViewDataConvertor on Conversation {
           ..member(member?.toUserViewData())
           ..replyConversation(replyConversation)
           ..replyConversationObject(
-              replyConversationObject?.toConversationViewData())
+              replyConversationObject?.toConversationViewData(
+                  conversationPollsMeta: conversationPollsMeta,
+                  userMeta: userMeta))
           ..ogTags(ogTags?.toLMChatOGTagViewData())
           ..hasReactions(hasReactions)
           ..conversationReactions(conversationReactions
               ?.map((r) => r.toReactionViewData())
               .toList())
-        // ..conversationReactions(conversationReactions?.map((LMChatReactionViewData reaction) => reaction.toReactionViewData()).toList())
-        // ..poll(poll?.toPollViewData())
-        ;
-
+          ..poll(this
+              .polls
+              ?.map((e) => e.toPollOptionViewData(
+                    userMeta: userMeta,
+                  ))
+              .toList());
+    final polls = conversationPollsMeta?[id.toString()];
+    if (polls != null) {
+      polls.sort((a, b) => a.id!.compareTo(b.id!));
+    }
+    if (polls != null) {
+      conversationBuilder.poll(polls
+          .map((e) => e.toPollOptionViewData(
+                userMeta: userMeta,
+              ))
+          .toList());
+    }
     return conversationBuilder.build();
   }
 }
@@ -73,6 +94,7 @@ extension ConversationConvertor on LMChatConversationViewData {
   /// Converts [LMChatConversationViewData] to [Conversation]
   Conversation toConversation() {
     return Conversation(
+      allowAddOption: allowAddOption,
       answer: answer,
       attachmentsUploaded: attachmentsUploaded,
       attachmentCount: attachmentCount,
@@ -96,10 +118,10 @@ extension ConversationConvertor on LMChatConversationViewData {
       locationLat: locationLat,
       locationLong: locationLong,
       multipleSelectNo: multipleSelectNo,
-      multipleSelectState: multipleSelectState,
+      multipleSelectState: multipleSelectState?.value,
       onlineLinkEnableBefore: onlineLinkEnableBefore,
       pollAnswerText: pollAnswerText,
-      pollType: pollType,
+      pollType: pollType?.value,
       replyChatroomId: replyChatroomId,
       replyId: replyId,
       startTime: startTime,

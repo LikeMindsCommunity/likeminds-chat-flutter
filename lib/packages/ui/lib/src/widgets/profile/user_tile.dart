@@ -25,7 +25,33 @@ class LMChatUserTile extends LMChatTile {
 
   @override
   Widget build(BuildContext context) {
-    return _defUserTile();
+    return userViewData.isDeleted == true
+        ? _defDeletedUserTile()
+        : _defUserTile();
+  }
+
+  Widget _defDeletedUserTile() {
+    return Row(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(27),
+          ),
+          height: 54,
+          width: 54,
+        ),
+        LMChatDefaultTheme.kHorizontalPaddingSmall,
+        LMChatDefaultTheme.kHorizontalPaddingMedium,
+        const LMChatText(
+          'Deleted User',
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: LMChatDefaultTheme.kFontMedium,
+            ),
+          ),
+        )
+      ],
+    );
   }
 
   LMChatTile _defUserTile() {

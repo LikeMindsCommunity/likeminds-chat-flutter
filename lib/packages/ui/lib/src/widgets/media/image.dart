@@ -21,16 +21,20 @@ class LMChatImage extends StatefulWidget {
     super.key,
     this.imageUrl,
     this.imageFile,
+    this.imageAssetPath,
     this.onError,
     this.style,
     this.onTap,
-  }) : assert(imageUrl != null || imageFile != null);
+  }) : assert(imageUrl != null || imageFile != null || imageAssetPath != null);
 
   /// The URL of the image (image from network)
   final String? imageUrl;
 
   /// The file of the image (image from file)
   final File? imageFile;
+
+  /// The path of the image (image from asset)
+  final String? imageAssetPath;
 
   /// {@macro chat_error_handler}
   final LMChatErrorHandler? onError;
@@ -49,16 +53,18 @@ class LMChatImage extends StatefulWidget {
   LMChatImage copyWith({
     String? imageUrl,
     File? imageFile,
+    String? imageAssetPath,
     LMChatImageStyle? style,
-    Function(String, StackTrace)? onError,
-    VoidCallback? onMediaTap,
+    LMChatErrorHandler? onError,
+    VoidCallback? onTap,
   }) {
     return LMChatImage(
       imageUrl: imageUrl ?? this.imageUrl,
       imageFile: imageFile ?? this.imageFile,
+      imageAssetPath: imageAssetPath ?? this.imageAssetPath,
       style: style ?? this.style,
       onError: onError ?? this.onError,
-      onTap: onMediaTap ?? onTap,
+      onTap: onTap ?? this.onTap,
     );
   }
 }
@@ -92,11 +98,14 @@ class _LMImageState extends State<LMChatImage> {
   Widget _buildImageWidget() {
     if (widget.imageUrl != null) {
       return _buildNetworkImage();
-    } else if (widget.imageFile != null) {
-      return _buildFileImage();
-    } else {
-      return const SizedBox();
     }
+    if (widget.imageFile != null) {
+      return _buildFileImage();
+    }
+    if (widget.imageAssetPath != null) {
+      return _buildAssetImage();
+    }
+    return const SizedBox();
   }
 
   Widget _buildNetworkImage() {
@@ -143,6 +152,23 @@ class _LMImageState extends State<LMChatImage> {
       ),
       child: Image.file(
         widget.imageFile!,
+        height: style!.height,
+        width: style!.width,
+        fit: style!.boxFit ?? BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildAssetImage() {
+    return Container(
+      padding: style?.padding,
+      margin: style?.margin,
+      decoration: BoxDecoration(
+        borderRadius: style!.borderRadius ?? BorderRadius.zero,
+        color: style?.backgroundColor,
+      ),
+      child: Image.asset(
+        widget.imageAssetPath!,
         height: style!.height,
         width: style!.width,
         fit: style!.boxFit ?? BoxFit.contain,

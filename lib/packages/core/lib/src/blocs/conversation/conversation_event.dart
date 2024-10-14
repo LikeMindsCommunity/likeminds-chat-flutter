@@ -121,16 +121,23 @@ class LMChatUpdateConversationsEvent extends LMChatConversationEvent {
   /// Id of the chatroom where the conversation is to be updated
   final int chatroomId;
 
+  /// check if the conversation should be updated explicitly
+  /// irrespective of the last conversation id
+  /// This is useful when editing a poll
+  final bool shouldUpdate;
+
   /// Creates and returns a new instance of [LMChatUpdateConversationsEvent]
   LMChatUpdateConversationsEvent({
     required this.conversationId,
     required this.chatroomId,
+    this.shouldUpdate = false,
   });
 
   @override
   List<Object> get props => [
         conversationId,
         chatroomId,
+        shouldUpdate,
       ];
 }
 
@@ -144,5 +151,78 @@ class LMChatLocalConversationEvent extends LMChatConversationEvent {
   @override
   List<Object> get props => [
         conversation,
+      ];
+}
+
+/// {@template lm_chat_post_poll_conversation_event}
+/// Event responsible for creating and posting a poll conversation
+/// {@endtemplate}
+class LMChatPostPollConversationEvent extends LMChatConversationEvent {
+  /// The ID of the chatroom.
+  final int chatroomId;
+
+  /// The text content of the conversation.
+  final String text;
+
+  /// The state of the conversation.
+  final int state;
+
+  /// A list of poll options.
+  final List<String> polls;
+
+  /// The type of the poll.
+  final int pollType;
+
+  /// The state of multiple selection.
+  final int multipleSelectState;
+
+  /// The number of multiple selections allowed.
+  final int multipleSelectNo;
+
+  /// Indicates if the conversation is anonymous.
+  final bool isAnonymous;
+
+  /// Allows adding options to the poll.
+  final bool allowAddOption;
+
+  /// The expiry time of the poll.
+  final int expiryTime;
+
+  /// A temporary ID for the conversation.
+  final String temporaryId;
+
+  /// The ID of the replied conversation, if any.
+  final String? repliedConversationId;
+
+  /// {@macro lm_chat_post_poll_conversation_event}
+  LMChatPostPollConversationEvent({
+    required this.chatroomId,
+    required this.text,
+    this.state = 10,
+    required this.polls,
+    required this.pollType,
+    required this.multipleSelectState,
+    required this.multipleSelectNo,
+    required this.isAnonymous,
+    required this.allowAddOption,
+    required this.expiryTime,
+    required this.temporaryId,
+    this.repliedConversationId,
+  });
+
+  @override
+  List<Object> get props => [
+        chatroomId,
+        text,
+        state,
+        polls,
+        pollType,
+        multipleSelectState,
+        multipleSelectNo,
+        isAnonymous,
+        allowAddOption,
+        expiryTime,
+        temporaryId,
+        repliedConversationId ?? -1,
       ];
 }
