@@ -34,3 +34,8 @@
 - Added support for Reactions
 - Added retry mechanism
 - Added Analytics support
+
+### 0.9.0
+
+- Added support for poll
+- Fixed Deleted text and link preview ui
