@@ -290,7 +290,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     conversationUser = widget.conversationUser;
     isSent = currentUser.id == conversationUser.id;
     _isSelected = widget.isSelected;
-    _isDeleted = _isDeleted;
+    _isDeleted = conversation.deletedByUserId != null;
     reactions = widget.reactions;
   }
 

@@ -233,11 +233,7 @@ class _LMChatPollState extends State<LMChatPoll> {
   void initState() {
     super.initState();
     // set poll style
-    _lmChatPollStyle = widget.style ??
-        LMChatPollStyle.basic(
-          primaryColor: theme.primaryColor,
-          inActiveColor: theme.inActiveColor,
-        );
+    _lmChatPollStyle = widget.style ?? theme.pollStyle;
     // assign value notifier
     _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
     _setPollData();
@@ -247,11 +243,7 @@ class _LMChatPollState extends State<LMChatPoll> {
   void didUpdateWidget(covariant LMChatPoll oldWidget) {
     super.didUpdateWidget(oldWidget);
     // set poll style
-    _lmChatPollStyle = widget.style ??
-        LMChatPollStyle.basic(
-          primaryColor: theme.primaryColor,
-          inActiveColor: theme.inActiveColor,
-        );
+    _lmChatPollStyle = widget.style ?? theme.pollStyle;
     // assign value notifier
     _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
     _setPollData();
@@ -306,6 +298,7 @@ class _LMChatPollState extends State<LMChatPoll> {
                         _defTimeLeftText(),
                   ],
                 ),
+                LMChatDefaultTheme.kVerticalPaddingMedium,
                 widget.pollQuestionBuilder?.call(context, _defPollQuestion()) ??
                     _defPollQuestion(),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
@@ -605,7 +598,7 @@ class _LMChatPollState extends State<LMChatPoll> {
 
   LMChatPollOption _defPollOption(int index) {
     return LMChatPollOption(
-      style: widget.style?.pollOptionStyle ?? LMChatPollOptionStyle.basic(),
+      style: widget.style?.pollOptionStyle ?? theme.pollStyle.pollOptionStyle,
       option: pollData.poll![index],
       isVoteEditing: _isVoteEditing,
       selectedOption: selectedOption,

@@ -73,6 +73,7 @@ class LMChatPollStyle {
     Color? inActiveColor,
   }) {
     return LMChatPollStyle(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
       backgroundColor: containerColor ?? Colors.white,
       decoration: BoxDecoration(
         color: containerColor ?? Colors.white,
@@ -94,7 +95,7 @@ class LMChatPollStyle {
           height: 1.33,
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: primaryColor,
+          color: primaryColor ?? LMChatDefaultTheme.primaryColor,
         ),
         padding: const EdgeInsets.symmetric(
           vertical: 6,
@@ -104,7 +105,7 @@ class LMChatPollStyle {
         textStyle: TextStyle(
           height: 1.33,
           fontSize: 14,
-          color: inActiveColor,
+          color: inActiveColor ?? LMChatDefaultTheme.inactiveColor,
         ),
       ),
       editPollButtonStyle: LMChatButtonStyle(
@@ -112,10 +113,10 @@ class LMChatPollStyle {
           type: LMChatIconType.icon,
           icon: Icons.edit,
           style: LMChatIconStyle(
-            color: primaryColor,
+            color: primaryColor ?? LMChatDefaultTheme.primaryColor,
           ),
         ),
-        backgroundColor: containerColor,
+        backgroundColor: containerColor ?? LMChatDefaultTheme.container,
         borderRadius: 100,
         border: Border.all(
           color: primaryColor ?? LMChatDefaultTheme.primaryColor,
@@ -129,10 +130,10 @@ class LMChatPollStyle {
           type: LMChatIconType.icon,
           icon: Icons.touch_app_outlined,
           style: LMChatIconStyle(
-            color: primaryColor,
+            color: primaryColor ?? LMChatDefaultTheme.primaryColor,
           ),
         ),
-        backgroundColor: containerColor,
+        backgroundColor: containerColor ?? LMChatDefaultTheme.container,
         borderRadius: 100,
         border: Border.all(
           color: primaryColor ?? LMChatDefaultTheme.primaryColor,
@@ -142,7 +143,7 @@ class LMChatPollStyle {
         spacing: 8,
       ),
       addPollOptionButtonStyle: LMChatButtonStyle(
-        backgroundColor: containerColor,
+        backgroundColor: containerColor ?? LMChatDefaultTheme.container,
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -150,6 +151,10 @@ class LMChatPollStyle {
         border: Border.all(
           color: primaryColor ?? LMChatDefaultTheme.primaryColor,
         ),
+      ),
+      pollOptionStyle: LMChatPollOptionStyle.basic(
+        primaryColor: primaryColor,
+        inActiveColor: inActiveColor,
       ),
     );
   }
@@ -274,10 +279,10 @@ class LMChatPollOptionStyle {
   factory LMChatPollOptionStyle.basic(
       {Color? primaryColor, Color? inActiveColor}) {
     return LMChatPollOptionStyle(
-      pollOptionSelectedColor: primaryColor?.withOpacity(0.2) ??
-          LMChatDefaultTheme.primaryColor.withOpacity(0.2),
-      pollOptionOtherColor:
-          inActiveColor ?? const Color.fromRGBO(230, 235, 245, 1),
+      pollOptionSelectedColor: primaryColor?.withOpacity(0.3) ??
+          const Color.fromARGB(255, 196, 208, 237),
+      pollOptionOtherColor: inActiveColor?.withOpacity(0.3) ??
+          const Color.fromRGBO(155, 155, 155, 0.3),
     );
   }
 }
