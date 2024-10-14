@@ -19,7 +19,7 @@ class LMChatSampleApp extends StatelessWidget {
         debugShowCheckedModeBanner: isDebug,
         scaffoldMessengerKey: rootScaffoldMessengerKey,
         theme: ThemeData.from(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
         home: const CredScreen(),
       ),

@@ -33,6 +33,8 @@ export 'media/link_preview.dart';
 
 export 'conversation/chat_bubble.dart';
 
+export 'reaction/reaction.dart';
+
 export 'common/menu/menu.dart';
 export 'common/menu/menu_item.dart';
 export 'common/dialog/dialog.dart';

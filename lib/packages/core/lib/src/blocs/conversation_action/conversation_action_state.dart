@@ -154,7 +154,7 @@ class LMChatRefreshBarState extends LMChatConversationActionState {
   List<Object> get props => [chatroom];
 }
 
-/// {@templete lm_chat_link_attached_state} 
+/// {@template lm_chat_link_attached_state}
 /// It is the state when a link is attached to the conversation.
 /// [ogTags] - The Open Graph tags of the link
 /// [link] - The link
@@ -162,10 +162,11 @@ class LMChatRefreshBarState extends LMChatConversationActionState {
 class LMChatLinkAttachedState extends LMChatConversationActionState {
   /// The Open Graph tags of the link
   final LMChatOGTagsViewData ogTags;
+
   /// The link
   final String link;
 
-/// {@macro lm_chat_link_attached_state}
+  /// {@macro lm_chat_link_attached_state}
   LMChatLinkAttachedState({
     required this.ogTags,
     required this.link,
@@ -186,7 +187,7 @@ class LMChatLinkRemovedState extends LMChatConversationActionState {
   /// If the link is permanently removed
   final bool isPermanentlyRemoved;
 
-/// {@macro lm_chat_link_removed_state}
+  /// {@macro lm_chat_link_removed_state}
   LMChatLinkRemovedState({
     this.isPermanentlyRemoved = false,
   });
@@ -195,4 +196,60 @@ class LMChatLinkRemovedState extends LMChatConversationActionState {
   List<Object> get props => [
         isPermanentlyRemoved,
       ];
+}
+
+class LMChatPutReactionState extends LMChatConversationActionState {
+  final int conversationId;
+  final String reaction;
+
+  LMChatPutReactionState({
+    required this.conversationId,
+    required this.reaction,
+  });
+
+  @override
+  List<Object> get props => [conversationId, reaction];
+}
+
+class LMChatPutReactionError extends LMChatConversationActionState {
+  final String errorMessage;
+  final int conversationId;
+  final String reaction;
+
+  LMChatPutReactionError({
+    required this.errorMessage,
+    required this.conversationId,
+    required this.reaction,
+  });
+
+  @override
+  List<Object> get props => [errorMessage, conversationId, reaction];
+}
+
+class LMChatDeleteReactionState extends LMChatConversationActionState {
+  final int conversationId;
+  final String reaction;
+
+  LMChatDeleteReactionState({
+    required this.conversationId,
+    required this.reaction,
+  });
+
+  @override
+  List<Object> get props => [conversationId, reaction];
+}
+
+class LMChatDeleteReactionError extends LMChatConversationActionState {
+  final String errorMessage;
+  final int conversationId;
+  final String reaction;
+
+  LMChatDeleteReactionError({
+    required this.errorMessage,
+    required this.conversationId,
+    required this.reaction,
+  });
+
+  @override
+  List<Object> get props => [errorMessage, conversationId, reaction];
 }

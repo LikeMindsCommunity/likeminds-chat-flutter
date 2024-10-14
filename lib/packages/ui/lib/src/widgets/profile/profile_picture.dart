@@ -26,64 +26,68 @@ class LMChatProfilePicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inStyle = style ?? LMChatProfilePictureStyle.basic();
-    return GestureDetector(
-      onTap: () {
-        if (onTap != null) onTap!();
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            height: inStyle.size,
-            width: inStyle.size,
-            decoration: BoxDecoration(
-              borderRadius: inStyle.boxShape == null
-                  ? BorderRadius.circular(inStyle.borderRadius ?? 0)
-                  : null,
-              border: Border.all(
-                color: Colors.white,
-                width: inStyle.border ?? 0,
+    return AbsorbPointer(
+      absorbing: onTap == null,
+      child: GestureDetector(
+        onTap: () {
+          if (onTap != null) onTap!();
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              height: inStyle.size,
+              width: inStyle.size,
+              decoration: BoxDecoration(
+                borderRadius: inStyle.boxShape == null
+                    ? BorderRadius.circular(inStyle.borderRadius ?? 0)
+                    : null,
+                border: Border.all(
+                  color: Colors.white,
+                  width: inStyle.border ?? 0,
+                ),
+                shape: inStyle.boxShape ?? BoxShape.rectangle,
+                color: imageUrl != null && imageUrl!.isNotEmpty
+                    ? Colors.grey.shade300
+                    : inStyle.backgroundColor ?? LMChatTheme.theme.primaryColor,
+                image: filePath != null
+                    ? DecorationImage(
+                        image: FileImage(File(filePath!)),
+                        fit: BoxFit.cover,
+                      )
+                    : imageUrl != null && imageUrl!.isNotEmpty
+                        ? DecorationImage(
+                            image: NetworkImage(imageUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
               ),
-              shape: inStyle.boxShape ?? BoxShape.rectangle,
-              color: imageUrl != null && imageUrl!.isNotEmpty
-                  ? Colors.grey.shade300
-                  : inStyle.backgroundColor ?? LMChatTheme.theme.primaryColor,
-              image: filePath != null
-                  ? DecorationImage(
-                      image: FileImage(File(filePath!)),
-                      fit: BoxFit.cover,
-                    )
-                  : imageUrl != null && imageUrl!.isNotEmpty
-                      ? DecorationImage(
-                          image: NetworkImage(imageUrl!),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-            ),
-            padding: inStyle.textPadding ?? const EdgeInsets.all(5),
-            child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
-                ? Center(
-                    child: LMChatText(
-                      getInitials(fallbackText).toUpperCase(),
-                      style: inStyle.fallbackTextStyle ??
-                          LMChatTextStyle(
-                            maxLines: 1,
-                            minLines: 1,
-                            textAlign: TextAlign.center,
-                            textStyle: TextStyle(
-                              overflow: TextOverflow.clip,
-                              color: LMChatTheme.theme.onPrimary,
-                              fontSize:
-                                  inStyle.size != null ? inStyle.size! / 2 : 24,
-                              fontWeight: FontWeight.w600,
+              padding: inStyle.textPadding ?? const EdgeInsets.all(5),
+              child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
+                  ? Center(
+                      child: LMChatText(
+                        getInitials(fallbackText).toUpperCase(),
+                        style: inStyle.fallbackTextStyle ??
+                            LMChatTextStyle(
+                              maxLines: 1,
+                              minLines: 1,
+                              textAlign: TextAlign.center,
+                              textStyle: TextStyle(
+                                overflow: TextOverflow.clip,
+                                color: LMChatTheme.theme.onPrimary,
+                                fontSize: inStyle.size != null
+                                    ? inStyle.size! / 2
+                                    : 24,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                    ),
-                  )
-                : null,
-          ),
-          if (overlay != null) overlay!,
-        ],
+                      ),
+                    )
+                  : null,
+            ),
+            if (overlay != null) overlay!,
+          ],
+        ),
       ),
     );
   }

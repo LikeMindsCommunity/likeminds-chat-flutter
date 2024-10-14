@@ -10,7 +10,7 @@ import 'package:likeminds_chat_flutter_sample/app.dart';
 import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
 
 /// Flutter flavour/environment manager v0.0.1
-const isDebug = bool.fromEnvironment('DEBUG');
+const isDebug = bool.fromEnvironment('LM_DEBUG_ENV');
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -99,17 +99,18 @@ Future<String> deviceId() async {
 /// 4. Return FCM token
 Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
-  // messaging.setForegroundNotificationPresentationOptions(
-  //   alert: true,
-  //   badge: true,
-  //   sound: true,
-  // );
+  messaging.setForegroundNotificationPresentationOptions(
+    // alert: true,
+    badge: true,
+    sound: true,
+  );
   await messaging.requestPermission(
     alert: true,
+    announcement: false,
     badge: true,
     carPlay: false,
-    criticalAlert: false,
-    provisional: true,
+    criticalAlert: true,
+    provisional: false,
     sound: true,
   );
   if (Platform.isIOS) {

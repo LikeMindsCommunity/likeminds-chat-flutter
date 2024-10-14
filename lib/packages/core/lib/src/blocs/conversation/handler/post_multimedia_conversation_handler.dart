@@ -101,6 +101,7 @@ postMultimediaConversationEventHandler(
             LMResponse<PutMediaResponse> uploadFileResponse =
                 await LMChatCore.client.putMultimedia(putMediaRequest);
             if (!uploadFileResponse.success) {
+              _callAnalyticEvent(event);
               emit(
                 LMChatMultiMediaConversationErrorState(
                   uploadFileResponse.errorMessage!,
@@ -109,6 +110,7 @@ postMultimediaConversationEventHandler(
               );
             }
           } on Exception catch (e) {
+            _callAnalyticEvent(event);
             emit(
               LMChatMultiMediaConversationErrorState(
                 e.toString(),
@@ -125,10 +127,21 @@ postMultimediaConversationEventHandler(
             mediaList,
           ),
         );
-
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomResponded,
+            eventProperties: {
+              'chatroom_id': event.postConversationRequest.chatroomId,
+              'chatroom_type': 'normal',
+              'community_id':
+                  LMChatLocalPreference.instance.getCommunityData()?.id,
+            },
+          ),
+        );
         LMChatMediaHandler.instance.clearPickedMedia();
       }
     } else {
+      _callAnalyticEvent(event);
       emit(
         LMChatMultiMediaConversationErrorState(
           response.errorMessage!,
@@ -138,6 +151,7 @@ postMultimediaConversationEventHandler(
       return false;
     }
   } catch (e) {
+    _callAnalyticEvent(event);
     emit(
       LMChatConversationErrorState(
         "An error occurred",
@@ -146,4 +160,16 @@ postMultimediaConversationEventHandler(
     );
     return false;
   }
+}
+
+void _callAnalyticEvent(event) {
+  LMChatAnalyticsBloc.instance.add(
+    LMChatFireAnalyticsEvent(
+      eventName: LMChatAnalyticsKeys.attachmentUploadedError,
+      eventProperties: {
+        'chatroom_id': event.postConversationRequest.chatroomId,
+        'chatroom_type': 'normal',
+      },
+    ),
+  );
 }
