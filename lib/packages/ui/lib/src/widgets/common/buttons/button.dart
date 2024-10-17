@@ -15,6 +15,7 @@ class LMChatButton extends StatefulWidget {
     this.style,
     this.onTextTap,
     this.icon,
+    this.onHold,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -31,6 +32,9 @@ class LMChatButton extends StatefulWidget {
 
   /// Action to perform after tapping on the button
   final VoidCallback? onTap;
+
+  /// Action to perform after holding the button
+  final VoidCallback? onHold;
 
   /// Text to be displayed in the button if the button is active
   final LMChatText? activeText;
@@ -86,6 +90,7 @@ class _LMButtonState extends State<LMChatButton> {
         });
         widget.onTap?.call();
       },
+      onLongPress: widget.onHold,
       behavior: HitTestBehavior.opaque,
       child: Container(
         height: inStyle.height,
