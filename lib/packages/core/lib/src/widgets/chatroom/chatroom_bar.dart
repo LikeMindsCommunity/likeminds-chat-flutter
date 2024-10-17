@@ -103,6 +103,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   /// flag to check if a message is sent before the link preview is fetched
   bool _isSentBeforeLinkFetched = false;
 
+  // Create a ValueNotifier to hold the text input state
+  final ValueNotifier<String> _textInputNotifier = ValueNotifier<String>('');
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -112,6 +115,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   void _onTextChanged(String message) {
+    _textInputNotifier.value = message; // Update the ValueNotifier
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
     }
@@ -135,14 +139,21 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     super.initState();
     chatroom = widget.chatroom;
     _textEditingController = widget.controller ?? TextEditingController();
+    _textEditingController.addListener(() {
+      _onTextChanged(_textEditingController.text); // Notify on text change
+    });
   }
 
   @override
   void dispose() {
     _popupMenuController.dispose();
+    _textEditingController.removeListener(() {
+      _onTextChanged(_textEditingController.text); // Clean up listener
+    });
     _textEditingController.dispose();
     _focusNode.dispose();
     _debounce?.cancel();
+    _textInputNotifier.dispose(); // Dispose the ValueNotifier
     super.dispose();
   }
 
@@ -170,13 +181,20 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   _isRespondingAllowed()
                       ? _defTextField(context)
                       : _defDisabledTextField(context),
-                  if (_isRespondingAllowed())
-                    _screenBuilder.sendButton(
-                      context,
-                      _textEditingController,
-                      _onSend,
-                      _defSendButton(context),
-                    ),
+                  ValueListenableBuilder<String>(
+                    valueListenable: _textInputNotifier,
+                    builder: (context, text, child) {
+                      return text.isEmpty
+                          ? _defVoiceButton(
+                              context) // Show voice button if empty
+                          : _screenBuilder.sendButton(
+                              context,
+                              _textEditingController,
+                              _onSend,
+                              _defSendButton(context),
+                            );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -990,6 +1008,33 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ),
         );
       },
+    );
+  }
+
+  // Add the _defVoiceButton function
+  LMChatButton _defVoiceButton(BuildContext context) {
+    return LMChatButton(
+      onTap: () {
+        // TODO: Handle permission and toasting
+      },
+      onHold: () {
+        // TODO: Handle permission as well as audio
+      },
+      style: LMChatButtonStyle(
+        backgroundColor: _themeData.primaryColor,
+        borderRadius: 100,
+        height: 6.h,
+        width: 6.h,
+      ),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.mic,
+        style: LMChatIconStyle(
+          size: 28,
+          boxSize: 28,
+          color: _themeData.container,
+        ),
+      ),
     );
   }
 }
