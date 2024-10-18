@@ -43,6 +43,8 @@
 	<string>We require microphone access for recording videos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We require access to your photo library to upload files</string>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>We require access to microphone to record audio in chat</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -50,6 +52,7 @@
 		<string>fetch</string>
 		<string>remote-notification</string>
 		<string>processing</string>
+		<string>audio</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
