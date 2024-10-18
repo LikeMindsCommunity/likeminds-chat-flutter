@@ -1017,7 +1017,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       onTap: () {
         // TODO: Handle permission and toasting
       },
-      onHold: () {
+      onLongPress: () {
         // TODO: Handle permission as well as audio
       },
       style: LMChatButtonStyle(

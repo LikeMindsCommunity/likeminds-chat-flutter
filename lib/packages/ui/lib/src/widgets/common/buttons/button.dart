@@ -3,8 +3,8 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/enums.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
-// This widget is used to display a text button
-// The [LMChatButton] can be customized by passing in the required parameters
+/// This widget is used to display a text button
+/// The [LMChatButton] can be customized by passing in the required parameters
 class LMChatButton extends StatefulWidget {
   const LMChatButton({
     super.key,
@@ -15,7 +15,10 @@ class LMChatButton extends StatefulWidget {
     this.style,
     this.onTextTap,
     this.icon,
-    this.onHold,
+    this.onLongPress,
+    this.onLongPressStart,
+    this.onLongPressEnd,
+    this.onLongPressMoveUpdate,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -34,12 +37,22 @@ class LMChatButton extends StatefulWidget {
   final VoidCallback? onTap;
 
   /// Action to perform after holding the button
-  final VoidCallback? onHold;
+  final VoidCallback? onLongPress;
 
   /// Text to be displayed in the button if the button is active
   final LMChatText? activeText;
 
+  /// Action to perform after text in the button is tapped
   final VoidCallback? onTextTap;
+
+  /// Action to perform after just starting holding the button
+  final Function(LongPressStartDetails)? onLongPressStart;
+
+  /// Action to perform after just ending holding the button
+  final Function(LongPressEndDetails)? onLongPressEnd;
+
+  /// Action to perform when there is a drag while holding the button
+  final Function(LongPressMoveUpdateDetails)? onLongPressMoveUpdate;
 
   @override
   State<LMChatButton> createState() => _LMButtonState();
@@ -90,9 +103,19 @@ class _LMButtonState extends State<LMChatButton> {
         });
         widget.onTap?.call();
       },
-      onLongPress: widget.onHold,
+      onLongPress: widget.onLongPress,
+      onLongPressStart: (details) {
+        widget.onLongPressStart?.call(details);
+      },
+      onLongPressEnd: (details) {
+        widget.onLongPressEnd?.call(details);
+      },
+      onLongPressMoveUpdate: (details) {
+        widget.onLongPressMoveUpdate?.call(details);
+      },
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(seconds: 1),
         height: inStyle.height,
         width: inStyle.width,
         margin: inStyle.margin,
