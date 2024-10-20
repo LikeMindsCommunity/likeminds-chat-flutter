@@ -9,6 +9,7 @@ class LMChatBubbleMedia extends StatelessWidget {
   final LMChatImageBuilder? imageBuilder;
   final LMChatVideoBuilder? videoBuilder;
   final LMChatGIFBuilder? gifBuilder;
+  final LMChatVoiceNoteBuilder? audioBuilder; // Add audio builder
 
   final LMChatDocumentThumbnailBuilder? documentThumbnailBuilder;
   final LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder;
@@ -22,6 +23,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     this.imageBuilder,
     this.videoBuilder,
     this.gifBuilder,
+    this.audioBuilder, // Add audio builder
     this.documentThumbnailBuilder,
     this.documentTilePreviewBuilder,
   });
@@ -34,6 +36,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     LMChatImageBuilder? imageBuilder,
     LMChatVideoBuilder? videoBuilder,
     LMChatGIFBuilder? gifBuilder,
+    LMChatVoiceNoteBuilder? audioBuilder, // Add audio builder
     LMChatDocumentThumbnailBuilder? documentThumbnailBuilder,
     LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder,
   }) {
@@ -45,6 +48,7 @@ class LMChatBubbleMedia extends StatelessWidget {
       imageBuilder: imageBuilder ?? this.imageBuilder,
       videoBuilder: videoBuilder ?? this.videoBuilder,
       gifBuilder: gifBuilder ?? this.gifBuilder,
+      audioBuilder: audioBuilder ?? this.audioBuilder, // Add audio builder
       documentThumbnailBuilder:
           documentThumbnailBuilder ?? this.documentThumbnailBuilder,
       documentTilePreviewBuilder:
@@ -65,8 +69,6 @@ class LMChatBubbleMedia extends StatelessWidget {
   }
 
   Widget? getContent(BuildContext context) {
-    // If conversation has media but not uploaded yet
-    // show local files
     Widget? mediaWidget;
     if (count > 0 &&
         conversation.deletedByUserId == null &&
@@ -100,6 +102,9 @@ class LMChatBubbleMedia extends StatelessWidget {
       } else if (attachments.first.type ==
           mapMediaTypeToString(LMChatMediaType.gif)) {
         mediaWidget = LMChatGIF(media: attachments.first.toMediaModel());
+      } else if (attachments.first.type ==
+          mapMediaTypeToString(LMChatMediaType.voiceNote)) {
+        mediaWidget = LMChatVoiceNote(media: attachments.first.toMediaModel());
       } else {
         mediaWidget = null;
       }
