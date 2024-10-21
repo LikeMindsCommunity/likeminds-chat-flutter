@@ -17,6 +17,9 @@ class LMChatBubbleFooter extends StatelessWidget {
   /// Optional style for the footer.
   final LMChatBubbleFooterStyle? style;
 
+  /// Optional timestamp text widget.
+  final Widget? voiceDuration;
+
   /// Creates an instance of [LMChatBubbleFooter].
   const LMChatBubbleFooter({
     super.key,
@@ -25,6 +28,7 @@ class LMChatBubbleFooter extends StatelessWidget {
     this.pendingTimer,
     this.timeStamp,
     this.style,
+    this.voiceDuration,
   });
 
   @override
@@ -36,12 +40,15 @@ class LMChatBubbleFooter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          if (voiceDuration != null) const SizedBox(width: 60),
+          voiceDuration ?? const SizedBox.shrink(),
+          if (voiceDuration != null) const Spacer(),
           if (conversation.isEdited ?? false) ...[
             LMChatText(
               'Edited',
               style: LMChatTextStyle(
                 textStyle: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   color: LMChatTheme.theme.onContainer.withOpacity(0.6),
                 ),
               ),
@@ -50,7 +57,7 @@ class LMChatBubbleFooter extends StatelessWidget {
               ' • ',
               style: LMChatTextStyle(
                 textStyle: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   color: LMChatTheme.theme.onContainer.withOpacity(0.6),
                 ),
               ),
@@ -61,7 +68,7 @@ class LMChatBubbleFooter extends StatelessWidget {
                   conversation.createdAt,
                   style: LMChatTextStyle(
                     textStyle: TextStyle(
-                      fontSize: 10,
+                      fontSize: 12,
                       color: LMChatTheme.theme.onContainer.withOpacity(0.6),
                     ),
                   ),
@@ -70,7 +77,7 @@ class LMChatBubbleFooter extends StatelessWidget {
                   type: LMChatIconType.icon,
                   icon: Icons.timer_outlined,
                   style: LMChatIconStyle(
-                    size: 10,
+                    size: 12,
                     color: LMChatTheme.theme.onContainer.withOpacity(0.6),
                   ),
                 ),

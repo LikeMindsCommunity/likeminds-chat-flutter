@@ -5,6 +5,7 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/media/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
+import 'package:likeminds_chat_flutter_ui/src/widgets/media/voice_note.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -392,8 +393,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           maxWidth: (widget.attachments != null &&
                                   widget.attachments!.isNotEmpty)
                               ? 60.w
-                      : conversation.state == 10
-                          ? 70.w
+                              : conversation.state == 10
+                                  ? 70.w
                                   : 65.w,
                         ),
                         child: PhysicalShape(
@@ -430,21 +431,22 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         conversationUser:
                                             widget.conversationUser,
                                       ),
-                        // poll widget
-                        if (conversation.state == 10 && !_isDeleted) ...[
-                          widget.pollBuilder?.call(
-                                context,
-                                widget.poll ??
-                                    LMChatPoll(
-                                      pollData: conversation,
-                                    ),
-                                conversation,
-                              ) ??
-                              widget.poll ??
-                              LMChatPoll(
-                                pollData: conversation,
-                              ),
-                        ],
+                                // poll widget
+                                if (conversation.state == 10 &&
+                                    !_isDeleted) ...[
+                                  widget.pollBuilder?.call(
+                                        context,
+                                        widget.poll ??
+                                            LMChatPoll(
+                                              pollData: conversation,
+                                            ),
+                                        conversation,
+                                      ) ??
+                                      widget.poll ??
+                                      LMChatPoll(
+                                        pollData: conversation,
+                                      ),
+                                ],
                                 // link preview widget
                                 if (conversation.ogTags != null &&
                                     conversation.deletedByUserId == null)
@@ -489,15 +491,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                           _defDeletedWidget(),
                                         ) ??
                                         _defDeletedWidget()
-                            : conversation.state == 10
-                                ? const SizedBox.shrink()
+                                    : conversation.state == 10
+                                        ? const SizedBox.shrink()
                                         : widget.contentBuilder?.call(
                                               context,
                                               LMChatBubbleContent(
                                                 conversation: widget.attachments
                                                             ?.first.type ==
-                                                   
-                                                    "gif"
+                                                        "gif"
                                                     ? conversation.copyWith(
                                                         answer: _getGIFText())
                                                     : conversation,
@@ -505,13 +506,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                               ),
                                             ) ??
                                             LMChatBubbleContent(
-                                              conversation:
-                                                  widget.attachments?.first.type ==
-                                                 
+                                              conversation: widget.attachments
+                                                          ?.first.type ==
                                                       "gif"
-                                                      ? conversation.copyWith(
-                                                          answer: _getGIFText())
-                                                      : conversation,
+                                                  ? conversation.copyWith(
+                                                      answer: _getGIFText())
+                                                  : conversation,
                                               onTagTap: widget.onTagTap,
                                             ),
                                 if (conversation.deletedByUserId == null &&
@@ -528,6 +528,22 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         LMChatBubbleFooter(
                                           conversation: conversation,
                                           textWidth: finalWidth,
+                                          voiceDuration:
+                                              kAttachmentTypeVoiceNote ==
+                                                      widget.attachments?.first
+                                                          .type
+                                                  ? LMChatText(
+                                                      "00:18",
+                                                      style: LMChatTextStyle(
+                                                        textStyle: TextStyle(
+                                                          fontSize: 12,
+                                                          color: LMChatTheme
+                                                              .theme.onContainer
+                                                              .withOpacity(0.6),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : null,
                                         ),
                                   ),
                               ],
