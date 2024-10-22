@@ -56,46 +56,44 @@ class LMChatButton extends StatefulWidget {
 
   @override
   State<LMChatButton> createState() => _LMButtonState();
-
-  LMChatButton copyWith({
-    bool? isActive,
-    LMChatButtonStyle? style,
-    LMChatText? text,
-    LMChatIcon? icon,
-    Function()? onTap,
-    LMChatText? activeText,
-    VoidCallback? onTextTap,
-  }) {
-    return LMChatButton(
-      isActive: isActive ?? this.isActive,
-      style: style ?? this.style,
-      text: text ?? this.text,
-      icon: icon ?? this.icon,
-      onTap: onTap ?? this.onTap,
-      activeText: activeText ?? this.activeText,
-      onTextTap: onTextTap ?? this.onTextTap,
-    );
-  }
 }
 
-class _LMButtonState extends State<LMChatButton> {
+class _LMButtonState extends State<LMChatButton>
+    with SingleTickerProviderStateMixin {
   bool _active = false;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
-    _active = widget.isActive;
     super.initState();
+    _active = widget.isActive;
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(_controller);
   }
 
   @override
   void didUpdateWidget(LMChatButton oldWidget) {
-    _active = widget.isActive;
     super.didUpdateWidget(oldWidget);
+    _active = widget.isActive;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final inStyle = widget.style ?? LMChatButtonStyle.basic();
+    _scaleAnimation =
+        Tween<double>(begin: 1.0, end: inStyle.scaleOnLongPress ?? 1.0)
+            .animate(_controller);
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -103,82 +101,92 @@ class _LMButtonState extends State<LMChatButton> {
         });
         widget.onTap?.call();
       },
-      onLongPress: widget.onLongPress,
       onLongPressStart: (details) {
+        _controller.forward();
         widget.onLongPressStart?.call(details);
       },
       onLongPressEnd: (details) {
+        _controller.reverse();
         widget.onLongPressEnd?.call(details);
       },
       onLongPressMoveUpdate: (details) {
         widget.onLongPressMoveUpdate?.call(details);
       },
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(seconds: 1),
-        height: inStyle.height,
-        width: inStyle.width,
-        margin: inStyle.margin,
-        padding: inStyle.padding ?? EdgeInsets.zero,
-        decoration: BoxDecoration(
-          color: inStyle.backgroundColor ?? LMChatTheme.theme.backgroundColor,
-          borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
-          border: inStyle.border,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment:
-              inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
-          children: [
-            inStyle.placement == LMChatIconButtonPlacement.start
-                ? _active
-                    ? (inStyle.activeIcon ?? inStyle.icon ?? widget.icon) ??
-                        const SizedBox.shrink()
-                    : inStyle.icon ?? widget.icon ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-            GestureDetector(
-              onTap: inStyle.showText ? widget.onTextTap : null,
-              behavior: HitTestBehavior.translucent,
-              child: Row(
-                children: [
-                  inStyle.placement == LMChatIconButtonPlacement.start
-                      ? (widget.icon != null ||
-                              inStyle.icon != null ||
-                              inStyle.activeIcon != null)
-                          ? SizedBox(
-                              width: inStyle.spacing ?? 0,
-                            )
-                          : const SizedBox.shrink()
-                      : const SizedBox.shrink(),
-                  inStyle.showText
-                      ? Container(
-                          padding: inStyle.textPadding,
-                          child: _active
-                              ? widget.activeText ??
-                                  widget.text ??
-                                  const SizedBox.shrink()
-                              : widget.text ?? const SizedBox.shrink(),
-                        )
-                      : const SizedBox.shrink(),
-                  inStyle.placement == LMChatIconButtonPlacement.end
-                      ? (widget.icon != null ||
-                              inStyle.icon != null ||
-                              inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.spacing ?? 0)
-                          : const SizedBox.shrink()
-                      : const SizedBox.shrink(),
-                ],
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: AnimatedContainer(
+          duration: const Duration(seconds: 1),
+          height: inStyle.height,
+          width: inStyle.width,
+          margin: inStyle.margin,
+          padding: inStyle.padding ?? EdgeInsets.zero,
+          decoration: BoxDecoration(
+            color: inStyle.backgroundColor ?? LMChatTheme.theme.backgroundColor,
+            borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
+            border: inStyle.border,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment:
+                inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
+            children: [
+              inStyle.placement == LMChatIconButtonPlacement.start
+                  ? _active
+                      ? (inStyle.activeIcon ?? inStyle.icon ?? widget.icon) ??
+                          const SizedBox.shrink()
+                      : inStyle.icon ?? widget.icon ?? const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+              GestureDetector(
+                onTap: inStyle.showText ? widget.onTextTap : null,
+                behavior: HitTestBehavior.translucent,
+                child: Row(
+                  children: [
+                    inStyle.placement == LMChatIconButtonPlacement.start
+                        ? (widget.icon != null ||
+                                inStyle.icon != null ||
+                                inStyle.activeIcon != null)
+                            ? SizedBox(
+                                width: inStyle.spacing ?? 0,
+                              )
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                    inStyle.showText
+                        ? Container(
+                            padding: inStyle.textPadding,
+                            child: _active
+                                ? widget.activeText ??
+                                    widget.text ??
+                                    const SizedBox.shrink()
+                                : widget.text ?? const SizedBox.shrink(),
+                          )
+                        : const SizedBox.shrink(),
+                    inStyle.placement == LMChatIconButtonPlacement.end
+                        ? (widget.icon != null ||
+                                inStyle.icon != null ||
+                                inStyle.activeIcon != null)
+                            ? SizedBox(width: inStyle.spacing ?? 0)
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                  ],
+                ),
               ),
-            ),
-            inStyle.placement == LMChatIconButtonPlacement.end
-                ? _active
-                    ? inStyle.activeIcon ??
-                        widget.icon ??
-                        inStyle.icon ??
-                        const SizedBox.shrink()
-                    : widget.icon ?? inStyle.icon ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-          ],
+              inStyle.placement == LMChatIconButtonPlacement.end
+                  ? _active
+                      ? inStyle.activeIcon ??
+                          widget.icon ??
+                          inStyle.icon ??
+                          const SizedBox.shrink()
+                      : widget.icon ?? inStyle.icon ?? const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+            ],
+          ),
         ),
       ),
     );
@@ -231,6 +239,9 @@ class LMChatButtonStyle {
   /// padding for the text
   final EdgeInsets? textPadding;
 
+  /// Scale factor for the button when long pressed
+  final double? scaleOnLongPress;
+
   /// {@macro lm_chat_button_style}
   const LMChatButtonStyle({
     this.padding,
@@ -247,6 +258,7 @@ class LMChatButtonStyle {
     this.icon,
     this.activeIcon,
     this.textPadding,
+    this.scaleOnLongPress,
   });
 
   /// Basic style factory constructor; used as default style
@@ -277,6 +289,7 @@ class LMChatButtonStyle {
     LMChatIcon? icon,
     LMChatIcon? activeIcon,
     EdgeInsets? textPadding,
+    double? scaleOnLongPress,
   }) {
     return LMChatButtonStyle(
       padding: padding ?? this.padding,
@@ -293,6 +306,7 @@ class LMChatButtonStyle {
       icon: icon ?? this.icon,
       activeIcon: activeIcon ?? this.activeIcon,
       textPadding: textPadding ?? this.textPadding,
+      scaleOnLongPress: scaleOnLongPress ?? this.scaleOnLongPress,
     );
   }
 }

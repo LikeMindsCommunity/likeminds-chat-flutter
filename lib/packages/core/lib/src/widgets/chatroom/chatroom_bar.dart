@@ -1016,15 +1016,24 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return LMChatButton(
       onTap: () {
         // TODO: Handle permission and toasting
+        toast(
+          "Hold to start recording",
+          duration: const Duration(milliseconds: 200),
+        );
       },
       onLongPress: () {
         // TODO: Handle permission as well as audio
+        print("Long press started");
+      },
+      onLongPressEnd: (p0) {
+        print("Long press ended");
       },
       style: LMChatButtonStyle(
         backgroundColor: _themeData.primaryColor,
         borderRadius: 100,
         height: 6.h,
         width: 6.h,
+        scaleOnLongPress: 1.6,
       ),
       icon: LMChatIcon(
         type: LMChatIconType.icon,
