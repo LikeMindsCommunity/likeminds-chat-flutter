@@ -28,6 +28,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   custom_pop_up_menu: ^1.2.4
   emoji_picker_flutter: ^3.0.0
+  flutter_sound: ^9.6.0
 
 dev_dependencies:
   flutter_test:

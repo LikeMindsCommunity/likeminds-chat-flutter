@@ -8,7 +8,6 @@ import 'package:giphy_get/giphy_get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/credentials/credentials.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/credentials/giphy.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
