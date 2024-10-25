@@ -106,6 +106,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   // Create a ValueNotifier to hold the text input state
   final ValueNotifier<String> _textInputNotifier = ValueNotifier<String>('');
 
+  // Create a ValueNotifier to hold the voice button state
+  final ValueNotifier<bool> _isVoiceButtonHeld = ValueNotifier<bool>(false);
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -159,283 +162,58 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LMChatConversationActionBloc,
-        LMChatConversationActionState>(
-      bloc: chatActionBloc,
-      listener: _blocListener,
-      builder: (context, state) {
-        return Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.only(
-                left: 2.w,
-                right: 2.w,
-                top: 1.5.h,
-                bottom: 1.5.h,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  _isRespondingAllowed()
-                      ? _defTextField(context)
-                      : _defDisabledTextField(context),
-                  ValueListenableBuilder<String>(
-                    valueListenable: _textInputNotifier,
-                    builder: (context, text, child) {
-                      return text.isEmpty
-                          ? _defVoiceButton(
-                              context) // Show voice button if empty
-                          : _screenBuilder.sendButton(
-                              context,
-                              _textEditingController,
-                              _onSend,
-                              _defSendButton(context),
-                            );
-                    },
+    return Stack(
+      children: [
+        // Existing UI components
+        BlocConsumer<LMChatConversationActionBloc,
+            LMChatConversationActionState>(
+          bloc: chatActionBloc,
+          listener: _blocListener,
+          builder: (context, state) {
+            return Column(
+              children: [
+                SafeArea(
+                  bottom: true,
+                  top: false,
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(
+                      left: 2.w,
+                      right: 2.w,
+                      top: 1.5.h,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _isRespondingAllowed()
+                            ? _defTextField(context)
+                            : _defDisabledTextField(context),
+                        ValueListenableBuilder<String>(
+                          valueListenable: _textInputNotifier,
+                          builder: (context, text, child) {
+                            return text.isEmpty
+                                ? _defVoiceButton(
+                                    context) // Show voice button if empty
+                                : _screenBuilder.sendButton(
+                                    context,
+                                    _textEditingController,
+                                    _onSend,
+                                    _defSendButton(context),
+                                  );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _blocListener(context, state) {
-    if (state is LMChatEditConversationState) {
-      replyToConversation = null;
-      editConversation = state.editConversation;
-      _setupEditText();
-    } else if (state is LMChatEditRemoveState) {
-      editConversation = null;
-      _setupEditText();
-    } else if (state is LMChatReplyConversationState) {
-      editConversation = null;
-      _setupEditText();
-      replyToConversation = state.conversation;
-      replyConversationAttachments = state.attachments;
-      _focusNode.requestFocus();
-    } else if (state is LMChatReplyRemoveState) {
-      replyToConversation = null;
-      _focusNode.requestFocus();
-    } else if (state is LMChatRefreshBarState) {
-      chatroom = state.chatroom;
-    } else if (state is LMChatLinkAttachedState) {
-      // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
-      if (_isSentBeforeLinkFetched) {
-        _isSentBeforeLinkFetched = false;
-        bool isCurrentTextHasLink =
-            LMChatTaggingHelper.getFirstValidLinkFromString(
-                    _textEditingController.text)
-                .isNotEmpty;
-        if (!isCurrentTextHasLink) {
-          return;
-        }
-      }
-      linkModel = LMChatMediaModel(
-        mediaType: LMChatMediaType.link,
-        ogTags: state.ogTags,
-        link: state.link,
-      );
-      previewLink = state.link;
-      isActiveLink = true;
-    } else if (state is LMChatLinkRemovedState) {
-      linkModel = null;
-      previewLink = '';
-      isActiveLink = false;
-      showLinkPreview = !state.isPermanentlyRemoved;
-    }
-  }
-
-  // Handler functions of the LMChatroomBar
-  void _onSend() {
-    if (_textEditingController.text.trim().isEmpty) {
-      toast("Text can't be empty");
-      return;
-    } else {
-      _isSentBeforeLinkFetched = true;
-      final string = _textEditingController.text;
-
-      tags = LMChatTaggingHelper.matchTags(string, tags);
-
-      result = LMChatTaggingHelper.encodeString(string, tags);
-      result = result?.trim();
-
-      if (replyToConversation != null) {
-        LMChatAnalyticsBloc.instance.add(
-          LMChatFireAnalyticsEvent(
-            eventName: LMChatAnalyticsKeys.messageReply,
-            eventProperties: {
-              'type': 'text',
-              'chatroom_id': chatroom?.id,
-              'replied_to_member_id': replyToConversation!.memberId ??
-                  replyToConversation?.member?.id,
-              'replied_to_member_state': replyToConversation!.member?.state,
-              'replied_to_message_id': replyToConversation!.id,
-            },
-          ),
-        );
-      }
-
-      if (editConversation != null) {
-        linkModel = null;
-        LMChatAnalyticsBloc.instance.add(
-          LMChatFireAnalyticsEvent(
-            eventName: LMChatAnalyticsKeys.messageEdited,
-            eventProperties: {
-              'type': 'text',
-              'chatroom_id': chatroom?.id,
-            },
-          ),
-        );
-        chatActionBloc.add(LMChatEditConversationEvent(
-            (EditConversationRequestBuilder()
-                  ..conversationId(editConversation!.id)
-                  ..text(result!))
-                .build(),
-            replyConversation:
-                editConversation!.replyConversationObject?.toConversation()));
-        linkModel = null;
-        isActiveLink = false;
-        if (!showLinkPreview) {
-          showLinkPreview = true;
-        }
-        widget.scrollToBottom();
-      } else {
-        if (isActiveLink && linkModel != null) {
-          final extractedLink =
-              LMChatTaggingHelper.getFirstValidLinkFromString(result!);
-          if (extractedLink.isEmpty) {
-            return;
-          }
-          conversationBloc.add(
-            LMChatPostMultiMediaConversationEvent(
-              (PostConversationRequestBuilder()
-                    ..chatroomId(widget.chatroom.id)
-                    ..temporaryId(
-                        DateTime.now().millisecondsSinceEpoch.toString())
-                    ..text(result!)
-                    ..replyId(replyToConversation?.id)
-                    ..ogTags(linkModel!.ogTags!.toOGTag())
-                    ..shareLink(linkModel!.link!))
-                  .build(),
-              [
-                LMChatMediaModel(
-                  mediaType: LMChatMediaType.link,
-                  ogTags: linkModel!.ogTags,
                 ),
               ],
-            ),
-          );
-          if (!showLinkPreview) {
-            showLinkPreview = true;
-          }
-          widget.scrollToBottom();
-          chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
-        } else {
-          String? extractedLink;
-
-          if (showLinkPreview) {
-            extractedLink =
-                LMChatTaggingHelper.getFirstValidLinkFromString(result!);
-          }
-          conversationBloc.add(
-            LMChatPostConversationEvent(
-              text: result ?? '',
-              chatroomId: widget.chatroom.id,
-              replyId: replyToConversation?.id,
-              repliedTo: replyToConversation,
-              shareLink: extractedLink,
-            ),
-          );
-        }
-        if (!showLinkPreview) {
-          showLinkPreview = true;
-        }
-        widget.scrollToBottom();
-        chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
-      }
-      if (widget.chatroom.isGuest ?? false) {
-        toast("Chatroom joined");
-        LMChatAnalyticsBloc.instance.add(
-          LMChatFireAnalyticsEvent(
-            eventName: LMChatAnalyticsKeys.chatroomFollowed,
-            eventProperties: {
-              'chatroom_name ': widget.chatroom.header,
-              'chatroom_id': widget.chatroom.id,
-              'chatroom_type': 'normal',
-            },
-          ),
-        );
-        widget.chatroom.isGuest = false;
-      }
-      if (widget.chatroom.followStatus == false) {
-        toast("Chatroom joined");
-        widget.chatroom.isGuest = false;
-      }
-      _textEditingController.clear();
-      tags = [];
-      result = "";
-      if (editConversation == null) {
-        widget.scrollToBottom();
-      }
-      if (replyToConversation != null) {
-        chatActionBloc.add(LMChatReplyRemoveEvent());
-      }
-      editConversation = null;
-      replyToConversation = null;
-    }
-  }
-
-  bool _isRespondingAllowed() {
-    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
-      return false;
-    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
-      return false;
-    } else if (chatroom!.chatRequestState == 2) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  String _getChatBarHintText() {
-    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
-      return 'Only Community Managers can respond here';
-    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
-      return 'The community managers have restricted you from responding here';
-    } else if (chatroom!.chatRequestState == 2) {
-      return "You can not respond to a rejected connection.";
-    } else {
-      return "Type your response";
-    }
-  }
-
-  void _setupEditText() {
-    // if the edit conversation is null, return
-    if (editConversation == null) {
-      return;
-    }
-    // remove GIF message in the text
-    String message = getGIFText(editConversation!);
-
-    // Check for user tags in the message
-    String? convertedMsgText = LMChatTaggingHelper.convertRouteToTag(message);
-    // set the text in the text field
-    _textEditingController.value = TextEditingValue(
-      text: '$convertedMsgText ',
-      selection: TextSelection.fromPosition(
-        TextPosition(
-          offset: _textEditingController.text.length - 1,
+            );
+          },
         ),
-      ),
+        // Show overlay when button is held
+      ],
     );
-    _focusNode.requestFocus();
-    tags = LMChatTaggingHelper.addUserTagsIfMatched(
-        editConversation?.answer ?? '');
   }
 
   Widget _defTextField(BuildContext context) {
@@ -616,7 +394,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         : const SizedBox();
   }
 
-  Container _defAttachmentMenu() {
+  Widget _defAttachmentMenu() {
     return Container(
       margin: EdgeInsets.only(bottom: 1.h),
       child: ClipRRect(
@@ -884,36 +662,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
-  void _navigateToForwarding() async {
-    _popupMenuController.hideMenu();
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LMChatMediaForwardingScreen(
-          chatroomId: widget.chatroom.id,
-          chatroomName: widget.chatroom.header,
-          replyConversation: replyToConversation,
-          textFieldText: _textEditingController.text,
-        ),
-      ),
-    );
-
-    // Clear replying or editing state after returning from the forwarding screen
-    if (result == true) {
-      if (replyToConversation != null) {
-        chatActionBloc.add(LMChatReplyRemoveEvent());
-      }
-      if (editConversation != null) {
-        chatActionBloc.add(LMChatEditRemoveEvent());
-        _textEditingController.clear();
-      }
-      if (linkModel != null) {
-        chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
-      }
-      _textEditingController.clear();
-    }
-  }
-
   LMChatIcon _defAttachmentIcon() {
     return LMChatIcon(
       type: LMChatIconType.icon,
@@ -1011,7 +759,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
-  // Add the _defVoiceButton function
+  // Update the _defVoiceButton function
   LMChatButton _defVoiceButton(BuildContext context) {
     return LMChatButton(
       onTap: () {
@@ -1022,10 +770,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         );
       },
       onLongPress: () {
-        // TODO: Handle permission as well as audio
-        print("Long press started");
+        _isVoiceButtonHeld.value = true; // Set the state to show overlay
       },
       onLongPressEnd: (p0) {
+        _isVoiceButtonHeld.value = false; // Reset the state
+        // TODO: Handle permission as well as audio
         print("Long press ended");
       },
       style: LMChatButtonStyle(
@@ -1045,5 +794,281 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         ),
       ),
     );
+  }
+
+  void _blocListener(context, state) {
+    if (state is LMChatEditConversationState) {
+      replyToConversation = null;
+      editConversation = state.editConversation;
+      _setupEditText();
+    } else if (state is LMChatEditRemoveState) {
+      editConversation = null;
+      _setupEditText();
+    } else if (state is LMChatReplyConversationState) {
+      editConversation = null;
+      _setupEditText();
+      replyToConversation = state.conversation;
+      replyConversationAttachments = state.attachments;
+      _focusNode.requestFocus();
+    } else if (state is LMChatReplyRemoveState) {
+      replyToConversation = null;
+      _focusNode.requestFocus();
+    } else if (state is LMChatRefreshBarState) {
+      chatroom = state.chatroom;
+    } else if (state is LMChatLinkAttachedState) {
+      // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
+      if (_isSentBeforeLinkFetched) {
+        _isSentBeforeLinkFetched = false;
+        bool isCurrentTextHasLink =
+            LMChatTaggingHelper.getFirstValidLinkFromString(
+                    _textEditingController.text)
+                .isNotEmpty;
+        if (!isCurrentTextHasLink) {
+          return;
+        }
+      }
+      linkModel = LMChatMediaModel(
+        mediaType: LMChatMediaType.link,
+        ogTags: state.ogTags,
+        link: state.link,
+      );
+      previewLink = state.link;
+      isActiveLink = true;
+    } else if (state is LMChatLinkRemovedState) {
+      linkModel = null;
+      previewLink = '';
+      isActiveLink = false;
+      showLinkPreview = !state.isPermanentlyRemoved;
+    }
+  }
+
+  // Handler functions of the LMChatroomBar
+  void _onSend() {
+    final message = _textEditingController.text.trim();
+    if (message.isEmpty) {
+      toast("Text can't be empty");
+      return;
+    }
+
+    _isSentBeforeLinkFetched = true;
+    tags = LMChatTaggingHelper.matchTags(message, tags);
+    result = LMChatTaggingHelper.encodeString(message, tags).trim();
+
+    _logAnalyticsEvent();
+
+    if (editConversation != null) {
+      _handleEditConversation();
+    } else {
+      _handleNewMessage();
+    }
+
+    _handleChatroomStatus();
+    _resetMessageInput();
+  }
+
+  void _logAnalyticsEvent() {
+    if (replyToConversation != null) {
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.messageReply,
+          eventProperties: {
+            'type': 'text',
+            'chatroom_id': chatroom?.id,
+            'replied_to_member_id': replyToConversation!.memberId ??
+                replyToConversation?.member?.id,
+            'replied_to_member_state': replyToConversation!.member?.state,
+            'replied_to_message_id': replyToConversation!.id,
+          },
+        ),
+      );
+    }
+  }
+
+  void _handleEditConversation() {
+    linkModel = null;
+    LMChatAnalyticsBloc.instance.add(
+      LMChatFireAnalyticsEvent(
+        eventName: LMChatAnalyticsKeys.messageEdited,
+        eventProperties: {
+          'type': 'text',
+          'chatroom_id': chatroom?.id,
+        },
+      ),
+    );
+    chatActionBloc.add(LMChatEditConversationEvent(
+      (EditConversationRequestBuilder()
+            ..conversationId(editConversation!.id)
+            ..text(result!))
+          .build(),
+      replyConversation:
+          editConversation!.replyConversationObject?.toConversation(),
+    ));
+    _updateLinkPreviewState();
+    widget.scrollToBottom();
+  }
+
+  void _handleNewMessage() {
+    if (isActiveLink && linkModel != null) {
+      final extractedLink =
+          LMChatTaggingHelper.getFirstValidLinkFromString(result!);
+      if (extractedLink.isEmpty) return;
+
+      conversationBloc.add(
+        LMChatPostMultiMediaConversationEvent(
+          (PostConversationRequestBuilder()
+                ..chatroomId(widget.chatroom.id)
+                ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
+                ..text(result!)
+                ..replyId(replyToConversation?.id)
+                ..ogTags(linkModel!.ogTags!.toOGTag())
+                ..shareLink(linkModel!.link!))
+              .build(),
+          [
+            LMChatMediaModel(
+              mediaType: LMChatMediaType.link,
+              ogTags: linkModel!.ogTags,
+            ),
+          ],
+        ),
+      );
+      _updateLinkPreviewState();
+      widget.scrollToBottom();
+      chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
+    } else {
+      String? extractedLink = showLinkPreview
+          ? LMChatTaggingHelper.getFirstValidLinkFromString(result!)
+          : null;
+      conversationBloc.add(
+        LMChatPostConversationEvent(
+          text: result ?? '',
+          chatroomId: widget.chatroom.id,
+          replyId: replyToConversation?.id,
+          repliedTo: replyToConversation,
+          shareLink: extractedLink,
+        ),
+      );
+      _updateLinkPreviewState();
+      widget.scrollToBottom();
+      chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
+    }
+  }
+
+  void _updateLinkPreviewState() {
+    if (!showLinkPreview) {
+      showLinkPreview = true;
+    }
+  }
+
+  void _handleChatroomStatus() {
+    if (widget.chatroom.isGuest ?? false) {
+      toast("Chatroom joined");
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.chatroomFollowed,
+          eventProperties: {
+            'chatroom_name ': widget.chatroom.header,
+            'chatroom_id': widget.chatroom.id,
+            'chatroom_type': 'normal',
+          },
+        ),
+      );
+      widget.chatroom.isGuest = false;
+    }
+    if (widget.chatroom.followStatus == false) {
+      toast("Chatroom joined");
+      widget.chatroom.isGuest = false;
+    }
+  }
+
+  void _resetMessageInput() {
+    _textEditingController.clear();
+    tags = [];
+    result = "";
+    if (editConversation == null) {
+      widget.scrollToBottom();
+    }
+    if (replyToConversation != null) {
+      chatActionBloc.add(LMChatReplyRemoveEvent());
+    }
+    editConversation = null;
+    replyToConversation = null;
+  }
+
+  bool _isRespondingAllowed() {
+    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
+      return false;
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
+      return false;
+    } else if (chatroom!.chatRequestState == 2) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  String _getChatBarHintText() {
+    if (getMemberState!.member!.state != 1 && widget.chatroom.type == 7) {
+      return 'Only Community Managers can respond here';
+    } else if (!LMChatMemberRightUtil.checkRespondRights(getMemberState)) {
+      return 'The community managers have restricted you from responding here';
+    } else if (chatroom!.chatRequestState == 2) {
+      return "You can not respond to a rejected connection.";
+    } else {
+      return "Type your response";
+    }
+  }
+
+  void _setupEditText() {
+    // if the edit conversation is null, return
+    if (editConversation == null) {
+      return;
+    }
+    // remove GIF message in the text
+    String message = getGIFText(editConversation!);
+
+    // Check for user tags in the message
+    String? convertedMsgText = LMChatTaggingHelper.convertRouteToTag(message);
+    // set the text in the text field
+    _textEditingController.value = TextEditingValue(
+      text: '$convertedMsgText ',
+      selection: TextSelection.fromPosition(
+        TextPosition(
+          offset: _textEditingController.text.length - 1,
+        ),
+      ),
+    );
+    _focusNode.requestFocus();
+    tags = LMChatTaggingHelper.addUserTagsIfMatched(
+        editConversation?.answer ?? '');
+  }
+
+  void _navigateToForwarding() async {
+    _popupMenuController.hideMenu();
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LMChatMediaForwardingScreen(
+          chatroomId: widget.chatroom.id,
+          chatroomName: widget.chatroom.header,
+          replyConversation: replyToConversation,
+          textFieldText: _textEditingController.text,
+        ),
+      ),
+    );
+
+    // Clear replying or editing state after returning from the forwarding screen
+    if (result == true) {
+      if (replyToConversation != null) {
+        chatActionBloc.add(LMChatReplyRemoveEvent());
+      }
+      if (editConversation != null) {
+        chatActionBloc.add(LMChatEditRemoveEvent());
+        _textEditingController.clear();
+      }
+      if (linkModel != null) {
+        chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
+      }
+      _textEditingController.clear();
+    }
   }
 }
