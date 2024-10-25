@@ -94,7 +94,7 @@ class LMChatBubbleFooter extends StatelessWidget {
     final footerPainter = TextPainter(
       text: TextSpan(
         text: conversation.createdAt, // Use the footer content.
-        style: const TextStyle(fontSize: 11), // Use the appropriate style.
+        style: const TextStyle(fontSize: 13), // Use the appropriate style.
       ),
       maxLines: 1,
       textDirection: TextDirection.ltr,
@@ -106,7 +106,7 @@ class LMChatBubbleFooter extends StatelessWidget {
       final editedTextPainter = TextPainter(
         text: const TextSpan(
           text: 'Edited  • ', // Use the appropriate text for edited status.
-          style: TextStyle(fontSize: 10), // Use the appropriate style.
+          style: TextStyle(fontSize: 12), // Use the appropriate style.
         ),
         maxLines: 1,
         textDirection: TextDirection.ltr,
