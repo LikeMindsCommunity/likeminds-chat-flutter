@@ -14,12 +14,15 @@ class LMChatBubbleMedia extends StatelessWidget {
   final LMChatDocumentThumbnailBuilder? documentThumbnailBuilder;
   final LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder;
 
+  final LMChatAudioHandler? audioHandler;
+
   const LMChatBubbleMedia({
     super.key,
     required this.conversation,
     required this.attachments,
     required this.count,
     required this.attachmentUploaded,
+    this.audioHandler,
     this.imageBuilder,
     this.videoBuilder,
     this.gifBuilder,
@@ -104,7 +107,10 @@ class LMChatBubbleMedia extends StatelessWidget {
         mediaWidget = LMChatGIF(media: attachments.first.toMediaModel());
       } else if (attachments.first.type ==
           mapMediaTypeToString(LMChatMediaType.voiceNote)) {
-        mediaWidget = LMChatVoiceNote(media: attachments.first.toMediaModel());
+        mediaWidget = LMChatVoiceNote(
+          media: attachments.first.toMediaModel(),
+          handler: audioHandler,
+        );
       } else {
         mediaWidget = null;
       }

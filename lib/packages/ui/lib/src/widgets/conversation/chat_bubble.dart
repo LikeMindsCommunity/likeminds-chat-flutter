@@ -135,6 +135,9 @@ class LMChatBubble extends StatefulWidget {
   /// Poll Widget builder
   final LMChatPollBuilder? pollBuilder;
 
+  /// Instance of [LMChatAudioHandler] to manage audio playback seamlessly
+  final LMChatAudioHandler? audioHandler;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -143,6 +146,7 @@ class LMChatBubble extends StatefulWidget {
     required this.currentUser,
     required this.conversationUser,
     required this.onTagTap,
+    this.audioHandler,
     this.reactions,
     this.userMeta,
     this.onRemoveReaction,
@@ -475,6 +479,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                       }
                                     },
                                     child: LMChatBubbleMedia(
+                                      audioHandler: widget.audioHandler,
                                       conversation: conversation,
                                       attachments: widget.attachments ?? [],
                                       count: conversation.attachmentCount ?? 0,

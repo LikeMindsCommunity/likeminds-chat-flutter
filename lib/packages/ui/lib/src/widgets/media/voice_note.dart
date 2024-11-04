@@ -21,6 +21,7 @@ class LMChatVoiceNote extends StatefulWidget {
     this.onSlide,
     this.onSlideEnd,
     this.onSlideStart,
+    this.handler,
   });
 
   /// Creates a copy of this [LMChatVoiceNote] but with the given fields replaced with the new values.
@@ -62,121 +63,139 @@ class LMChatVoiceNote extends StatefulWidget {
   /// Callback function that is called when the audio slider change ends.
   final Function(double)? onSlideEnd;
 
+  /// External FlutterSoundPlayer instance that can be passed to control audio externally
+  final LMChatAudioHandler? handler;
+
   @override
   State<LMChatVoiceNote> createState() => _LMChatVoiceNoteState();
 }
 
 class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
-  final FlutterSoundPlayer _player = FlutterSoundPlayer();
-  bool _isAudioPlaying = false; // Indicates if the audio is currently playing
-  double _progress = 0.0; // Progress of the audio playback
-  bool _mPlayerIsInited = false; // Indicates if the player has been initialized
-  StreamSubscription?
-      _playerSubscription; // Subscription for audio progress updates
-  Duration _totalDuration = Duration.zero; // Total duration of the audio
+  late final FlutterSoundPlayer _player;
+  bool _isAudioPlaying = false;
+  double _progress = 0.0;
+  bool _mPlayerIsInited = false;
+  StreamSubscription? _playerSubscription;
+  StreamSubscription? _progressSubscription;
+  Duration _totalDuration = Duration.zero;
+  bool _isDragging = false;
+
+  // Add listener for external player state
+  StreamSubscription? _handlerSubscription;
 
   @override
   void initState() {
     super.initState();
-    _player.openPlayer().then((value) {
-      setState(() {
-        _mPlayerIsInited = true;
-        if (widget.autoplay ?? false) {
-          _startPlayer();
+    _player = widget.handler?.player ?? FlutterSoundPlayer();
+
+    if (widget.handler == null) {
+      _player.openPlayer().then((value) {
+        setState(() {
+          _mPlayerIsInited = true;
+          if (widget.autoplay ?? false) {
+            _startPlayer();
+          }
+        });
+      });
+    } else {
+      _mPlayerIsInited = true;
+
+      // Listen to external player state changes
+      _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
+        if (mounted) {
+          setState(() {
+            _isAudioPlaying = url == widget.media.mediaUrl;
+            if (!_isAudioPlaying && !_isDragging) {
+              _progress = 0.0;
+            }
+          });
         }
       });
-    });
+
+      // Subscribe to progress updates for this specific audio URL
+      if (widget.media.mediaUrl != null) {
+        _progressSubscription = widget.handler!
+            .getProgressStream(widget.media.mediaUrl!)
+            .listen((progress) {
+          if (mounted && !_isDragging) {
+            setState(() {
+              _totalDuration = progress.duration;
+              if (_totalDuration.inMilliseconds > 0) {
+                _progress = progress.position.inMilliseconds /
+                    _totalDuration.inMilliseconds;
+              }
+            });
+          }
+        });
+      }
+
+      if (widget.autoplay ?? false) {
+        _startPlayer();
+      }
+    }
   }
 
   @override
   void dispose() {
-    _playerSubscription?.cancel(); // Cancel the player subscription
-    _player.closePlayer(); // Close the audio player
+    _playerSubscription?.cancel();
+    _handlerSubscription?.cancel();
+    _progressSubscription?.cancel();
+    if (widget.handler == null) {
+      _player.closePlayer();
+    }
     super.dispose();
   }
 
-  /// Toggles between play and pause states of the audio.
-  void _togglePlayPause() {
-    if (_isAudioPlaying) {
-      _pausePlayer();
-      widget.onPause?.call();
-    } else {
-      if (_player.isPaused) {
-        _resumePlayer();
-      } else {
-        _startPlayer();
-      }
-      widget.onPlay?.call();
-    }
-  }
-
-  /// Starts the audio player and updates the progress.
   Future<void> _startPlayer() async {
-    if (_mPlayerIsInited) {
-      // Reset progress to 0 when starting the player
-      _progress = 0.0;
+    if (_mPlayerIsInited && widget.media.mediaUrl != null) {
+      try {
+        if (widget.handler != null) {
+          await widget.handler!.playAudio(widget.media.mediaUrl!);
+        } else {
+          _progress = 0.0;
+          await _player.startPlayer(
+            fromURI: widget.media.mediaUrl != null
+                ? Uri.parse(widget.media.mediaUrl!).toString()
+                : null,
+            codec: Codec.flac,
+            whenFinished: _stopPlayer,
+          );
 
-      await _player.startPlayer(
-        fromURI: widget.media.mediaUrl != null
-            ? Uri.parse(widget.media.mediaUrl!).toString()
-            : null,
-        codec: Codec.flac, // Adjust codec as needed
-        whenFinished: _stopPlayer,
-      );
+          _player.setSubscriptionDuration(const Duration(milliseconds: 100));
+          _playerSubscription?.cancel();
+          _playerSubscription = _player.onProgress!.listen((e) {
+            if (mounted) {
+              setState(() {
+                _totalDuration = e.duration;
+                _progress =
+                    e.position.inMilliseconds / _totalDuration.inMilliseconds;
+              });
+            }
+          });
 
-      _player.setSubscriptionDuration(const Duration(milliseconds: 100));
-      // Cancel any existing subscription before creating a new one
-      _playerSubscription?.cancel();
-      _playerSubscription = _player.onProgress!.listen((e) {
-        setState(() {
-          _totalDuration = e.duration;
-          _progress = e.position.inMilliseconds / _totalDuration.inMilliseconds;
-        });
-      });
-
-      setState(() {
-        _isAudioPlaying = true;
-      });
+          setState(() {
+            _isAudioPlaying = true;
+          });
+        }
+      } catch (e) {
+        print('Error starting player: $e');
+      }
     }
   }
 
-  /// Pauses the audio playback.
-  Future<void> _pausePlayer() async {
-    if (_isAudioPlaying) {
-      await _player.pausePlayer();
-      setState(() {
-        _isAudioPlaying = false;
-      });
-    }
-  }
-
-  /// Resumes the audio playback.
-  Future<void> _resumePlayer() async {
-    if (!_isAudioPlaying) {
-      await _player.resumePlayer();
-      setState(() {
-        _isAudioPlaying = true;
-      });
-      _player.setSubscriptionDuration(const Duration(milliseconds: 100));
-      _playerSubscription = _player.onProgress!.listen((e) {
-        setState(() {
-          _totalDuration = e.duration;
-          _progress = e.position.inMilliseconds / _totalDuration.inMilliseconds;
-        });
-      });
-    }
-  }
-
-  /// Stops the audio playback and resets the progress.
   Future<void> _stopPlayer() async {
-    if (_isAudioPlaying) {
+    if (widget.handler != null) {
+      await widget.handler!.stopAudio();
+    } else {
       await _player.stopPlayer();
-      setState(() {
-        _isAudioPlaying = false;
-        _progress = 0.0; // Set progress to 0 when stopped
-        _playerSubscription?.cancel(); // Cancel previous subscription
-        _playerSubscription = null; // Reset subscription
-      });
+      if (mounted) {
+        setState(() {
+          _isAudioPlaying = false;
+          _progress = 0.0;
+        });
+      }
+      _playerSubscription?.cancel();
+      _playerSubscription = null;
     }
   }
 
@@ -187,7 +206,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
       width: style.width,
       height: style.height,
       color: style.backgroundColor,
-      padding: style.padding ?? const EdgeInsets.symmetric(horizontal: 8),
+      padding: style.padding ?? const EdgeInsets.only(left: 8),
       child: Row(
         children: [
           LMChatButton(
@@ -214,13 +233,24 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
               onChanged: (value) {
                 setState(() {
                   _progress = value;
-                  _player.seekToPlayer(Duration(
-                      milliseconds:
-                          (_totalDuration.inMilliseconds * value).toInt()));
                 });
               },
-              onChangeEnd: widget.onSlideEnd,
-              onChangeStart: widget.onSlideStart,
+              onChangeStart: (value) {
+                _isDragging = true;
+                widget.onSlideStart?.call(value);
+              },
+              onChangeEnd: (value) {
+                _isDragging = false;
+                final position = Duration(
+                  milliseconds: (_totalDuration.inMilliseconds * value).toInt(),
+                );
+                if (widget.handler != null) {
+                  widget.handler!.seekTo(position);
+                } else {
+                  _player.seekToPlayer(position);
+                }
+                widget.onSlideEnd?.call(value);
+              },
               min: style.sliderMin,
               max: style.sliderMax,
               divisions: style.sliderDivisions,
@@ -236,6 +266,52 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
         ],
       ),
     );
+  }
+
+  /// Toggles between play and pause states of the audio.
+  void _togglePlayPause() {
+    if (_isAudioPlaying) {
+      _pausePlayer();
+      widget.onPause?.call();
+    } else {
+      if (_player.isPaused) {
+        _resumePlayer();
+      } else {
+        _startPlayer();
+      }
+      widget.onPlay?.call();
+    }
+  }
+
+  /// Pauses the audio playback.
+  Future<void> _pausePlayer() async {
+    if (widget.handler != null) {
+      await widget.handler!.pauseAudio();
+    } else {
+      await _player.pausePlayer();
+      setState(() {
+        _isAudioPlaying = false;
+      });
+    }
+  }
+
+  /// Resumes the audio playback.
+  Future<void> _resumePlayer() async {
+    if (widget.handler != null) {
+      await widget.handler!.resumeAudio();
+    } else {
+      await _player.resumePlayer();
+      setState(() {
+        _isAudioPlaying = true;
+      });
+      _player.setSubscriptionDuration(const Duration(milliseconds: 100));
+      _playerSubscription = _player.onProgress!.listen((e) {
+        setState(() {
+          _totalDuration = e.duration;
+          _progress = e.position.inMilliseconds / _totalDuration.inMilliseconds;
+        });
+      });
+    }
   }
 }
 

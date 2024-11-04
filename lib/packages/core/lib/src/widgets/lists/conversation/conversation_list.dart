@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/poll_handler.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMChatConversationList extends StatefulWidget {
@@ -203,6 +201,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       userMeta: userMeta.map((id, user) {
         return MapEntry(id, user!.toUserViewData());
       }),
+      audioHandler: LMChatCoreAudioHandler.instance,
       onTagTap: (tag) {},
       reactions:
           conversationReactionsMeta[conversation.temporaryId.toString()] ??
@@ -437,6 +436,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       userMeta: userMeta.map((id, user) {
         return MapEntry(id, user!.toUserViewData());
       }),
+      audioHandler: LMChatCoreAudioHandler.instance,
       reactions:
           conversationReactionsMeta[conversation.temporaryId.toString()] ??
               conversationReactionsMeta[conversation.id.toString()],
@@ -712,7 +712,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId ||
           state.shouldUpdate) {
-        conversationAttachmentsMeta.addAll(state.attachments ?? {});
+        conversationAttachmentsMeta.addAll(state.attachments);
         addConversationToPagedList(
           state.conversationViewData,
         );
