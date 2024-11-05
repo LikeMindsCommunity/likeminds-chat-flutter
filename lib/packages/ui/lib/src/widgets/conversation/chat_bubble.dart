@@ -528,6 +528,33 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                           LMChatBubbleFooter(
                                             conversation: conversation,
                                             textWidth: finalWidth,
+                                            voiceDuration:
+                                                kAttachmentTypeVoiceNote ==
+                                                        widget.attachments
+                                                            ?.first.type
+                                                    ? LMChatText(
+                                                        formatDuration(
+                                                          int.tryParse(widget
+                                                                      .attachments
+                                                                      ?.first
+                                                                      .meta[
+                                                                          "duration"]
+                                                                      .toString() ??
+                                                                  "0") ??
+                                                              0,
+                                                        ),
+                                                        style: LMChatTextStyle(
+                                                          textStyle: TextStyle(
+                                                            fontSize: 12,
+                                                            color: LMChatTheme
+                                                                .theme
+                                                                .onContainer
+                                                                .withOpacity(
+                                                                    0.6),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : null,
                                           ),
                                         ) ??
                                         LMChatBubbleFooter(
@@ -538,7 +565,16 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                                       widget.attachments?.first
                                                           .type
                                                   ? LMChatText(
-                                                      "00:18",
+                                                      formatDuration(
+                                                        int.tryParse(widget
+                                                                    .attachments
+                                                                    ?.first
+                                                                    .meta[
+                                                                        "duration"]
+                                                                    .toString() ??
+                                                                "0") ??
+                                                            0,
+                                                      ),
                                                       style: LMChatTextStyle(
                                                         textStyle: TextStyle(
                                                           fontSize: 12,
@@ -755,6 +791,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         ),
       ),
     );
+  }
+
+  String formatDuration(int seconds) {
+    final minutes = (seconds / 60).floor();
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }
 
