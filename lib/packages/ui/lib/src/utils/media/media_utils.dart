@@ -123,6 +123,32 @@ Widget getChatItemAttachmentTile(
     IconData iconData = Icons.camera_alt;
     String text = '';
     if (mapStringToMediaType(mediaFiles.first.type!) ==
+        LMChatMediaType.voiceNote) {
+      return const Row(
+        children: [
+          LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.mic,
+            style: LMChatIconStyle(
+              color: LMChatDefaultTheme.greyColor,
+              size: 16,
+            ),
+          ),
+          LMChatDefaultTheme.kHorizontalPaddingSmall,
+          LMChatText(
+            "Voice Message",
+            style: LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (mapStringToMediaType(mediaFiles.first.type!) ==
         LMChatMediaType.document) {
       iconData = Icons.insert_drive_file;
       if (conversation.answer.isEmpty) {
@@ -133,12 +159,12 @@ Widget getChatItemAttachmentTile(
     } else {
       int videoCount = 0;
       int imageCount = 0;
-      int gifCount = 0; // Added for GIF count
+      int gifCount = 0;
       for (LMChatAttachmentViewData media in mediaFiles) {
         if (mapStringToMediaType(media.type!) == LMChatMediaType.video) {
           videoCount++;
         } else if (mapStringToMediaType(media.type!) == LMChatMediaType.gif) {
-          gifCount++; // Count GIFs
+          gifCount++;
         } else {
           imageCount++;
         }
@@ -218,8 +244,8 @@ Widget getChatItemAttachmentTile(
           text = answerText;
         }
       } else if (gifCount > 0) {
-        iconData = Icons.image; // Assuming you have an icon for GIFs
-        text = gifCount > 1 ? "GIFs" : "GIF"; // Set text for GIFs
+        iconData = Icons.image;
+        text = gifCount > 1 ? "GIFs" : "GIF";
       }
     }
     return Row(

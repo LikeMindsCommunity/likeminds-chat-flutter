@@ -56,6 +56,7 @@ postMultimediaConversationEventHandler(
               final response = await LMChatMediaService.uploadFile(
                 media.mediaFile!.readAsBytesSync(),
                 LMChatLocalPreference.instance.getUser().userUniqueId!,
+                fileName: media.mediaFile!.path.split('/').last,
                 chatroomId: event.postConversationRequest.chatroomId,
                 conversationId: postConversationResponse.conversation!.id,
               );
@@ -93,6 +94,8 @@ postMultimediaConversationEventHandler(
                   ..meta({
                     'size': media.size,
                     'number_of_page': media.pageCount,
+                    'file_name': media.mediaFile!.path.split('/').last,
+                    'duration': media.duration,
                   })
                   ..type(attachmentType)
                   ..url(url!)

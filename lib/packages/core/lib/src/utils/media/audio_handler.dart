@@ -33,40 +33,11 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   Stream<double> get recordingLevel => _recordingLevelController.stream;
   String? get currentRecordingPath => _currentRecordingPath;
 
-  // Helper method to generate unique file path for recordings
-  Future<String> _generateRecordingPath() async {
-    final Directory appDir = await getApplicationDocumentsDirectory();
-    final String recordingDir = '${appDir.path}/recordings';
-    await Directory(recordingDir).create(recursive: true);
+  // Add codec constant only for recording
+  static const Codec _recordingCodec = Codec.aacADTS;
 
-    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    return '$recordingDir/recording_$timestamp.flac';
-  }
-
-  // Helper method to clean up old recordings
-  Future<void> _cleanupOldRecordings() async {
-    try {
-      final Directory appDir = await getApplicationDocumentsDirectory();
-      final String recordingDir = '${appDir.path}/recordings';
-      final Directory directory = Directory(recordingDir);
-
-      if (await directory.exists()) {
-        // Delete files older than 24 hours
-        final cutoffDate = DateTime.now().subtract(const Duration(hours: 24));
-
-        await for (final FileSystemEntity file in directory.list()) {
-          if (file is File) {
-            final FileStat stat = await file.stat();
-            if (stat.modified.isBefore(cutoffDate)) {
-              await file.delete();
-            }
-          }
-        }
-      }
-    } catch (e) {
-      print('Error cleaning up recordings: $e');
-    }
-  }
+  // Add this to store the last known duration
+  Duration? _lastKnownDuration;
 
   LMChatCoreAudioHandler._internal();
 
@@ -143,20 +114,11 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
       await _recorder.startRecorder(
         toFile: _currentRecordingPath,
-        codec: Codec.flac,
+        codec: _recordingCodec,
       );
 
       _isRecording = true;
-
-      // Start monitoring recording levels
-      _recorder.setSubscriptionDuration(const Duration(milliseconds: 100));
-      _recorder.onProgress!.listen((event) {
-        if (event.decibels != null) {
-          _recordingLevelController
-              .add(event.decibels! / 120); // Normalize to 0-1
-        }
-      });
-
+      _lastKnownDuration = null; // Reset duration on start
       return _currentRecordingPath;
     } catch (e) {
       print('Error starting recording: $e');
@@ -167,19 +129,34 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   }
 
   /// Stops the current recording and returns the file path
+  /// [recordedDuration] should be provided from the UI timer
   @override
-  Future<String?> stopRecording() async {
+  Future<String?> stopRecording({Duration? recordedDuration}) async {
     if (!_isRecording) return null;
 
     try {
       final String? path = await _recorder.stopRecorder();
       _isRecording = false;
 
-      // Verify the file exists and has content
       if (path != null) {
         final File recordingFile = File(path);
         if (await recordingFile.exists()) {
-          // final int fileSize = await recordingFile.length();
+          // Store the duration provided by the UI timer
+          _lastKnownDuration = recordedDuration;
+
+          // Initialize progress controller with the known duration
+          if (_lastKnownDuration != null) {
+            _progressControllers[path] =
+                StreamController<PlaybackProgress>.broadcast();
+            _updateProgress(
+              path,
+              PlaybackProgress(
+                duration: _lastKnownDuration!,
+                position: Duration.zero,
+              ),
+            );
+          }
+
           return path;
         }
       }
@@ -192,6 +169,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       _isRecording = false;
     }
   }
+
+  /// Get the last known duration of the recording
+  Duration? getLastRecordingDuration() => _lastKnownDuration;
 
   /// Cancels and deletes the current recording
   @override
@@ -259,66 +239,46 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     }
 
     try {
-      // Always stop current playback before starting new one
+      // Stop any current playback before starting new one
       if (_player.isPlaying || _player.isPaused) {
-        // Stop any currently playing or paused audio
-        await _player.stopPlayer();
-
-        // Reset previous audio's progress if it's different from the new one
-        if (_currentlyPlayingUrl != null && _currentlyPlayingUrl != path) {
-          _updateProgress(
-            _currentlyPlayingUrl!,
-            const PlaybackProgress(
-              duration: Duration.zero,
-              position: Duration.zero,
-            ),
-          );
-        }
+        await stopAudio();
       }
 
       _currentlyPlayingUrl = path;
       _currentlyPlayingController.add(path);
 
-      await _player.startPlayer(
-        fromURI: path,
-        codec: Codec.flac,
-        whenFinished: () async {
-          await _player.stopPlayer();
-          _currentlyPlayingUrl = null;
-          _currentlyPlayingController.add('');
-          // Only reset progress when audio completes naturally
-          _updateProgress(
-            path,
-            const PlaybackProgress(
-              duration: Duration.zero,
-              position: Duration.zero,
-            ),
-          );
-          await _currentProgressSubscription?.cancel();
-          _currentProgressSubscription = null;
-        },
-      );
+      // Check if path is a local file or URL
+      bool isLocalFile = path.startsWith('/');
+
+      if (isLocalFile) {
+        // Local file playback (for recordings)
+        final File audioFile = File(path);
+        if (!await audioFile.exists()) {
+          throw Exception('Audio file not found');
+        }
+
+        await _player.startPlayer(
+          fromURI: path,
+          codec: _recordingCodec, // Use recording codec for local files
+          whenFinished: () async {
+            await _onPlaybackComplete(path);
+          },
+        );
+      } else {
+        // URL playback (for voice notes)
+        await _player.startPlayer(
+          fromURI: path,
+          whenFinished: () async {
+            await _onPlaybackComplete(path);
+          },
+        );
+      }
 
       // Set up progress tracking
-      await _currentProgressSubscription?.cancel();
-      _player.setSubscriptionDuration(const Duration(milliseconds: 100));
-      _currentProgressSubscription = _player.onProgress!.listen((e) {
-        if (_currentlyPlayingUrl == path) {
-          _updateProgress(
-            path,
-            PlaybackProgress(
-              duration: e.duration,
-              position: e.position,
-            ),
-          );
-        }
-      });
+      _setupProgressTracking(path);
     } catch (e) {
       print('Error playing audio: $e');
-      _currentlyPlayingUrl = null;
-      _currentlyPlayingController.add('');
-      await _currentProgressSubscription?.cancel();
-      _currentProgressSubscription = null;
+      await _onPlaybackError(path);
     }
   }
 
@@ -431,4 +391,105 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   // @override
   // // TODO: implement playbackProgress
   // Stream<PlaybackProgress> get playbackProgress => throw UnimplementedError();
+
+  Future<void> _onPlaybackComplete(String path) async {
+    await _player.stopPlayer();
+    _currentlyPlayingUrl = null;
+    _currentlyPlayingController.add('');
+    // Reset progress
+    _updateProgress(
+      path,
+      PlaybackProgress(
+        duration: _lastKnownDuration ?? Duration.zero,
+        position: Duration.zero,
+      ),
+    );
+    await _currentProgressSubscription?.cancel();
+    _currentProgressSubscription = null;
+    // Notify completion through the progress stream
+    _progressControllers[path]?.add(
+      PlaybackProgress(
+        duration: _lastKnownDuration ?? Duration.zero,
+        position: Duration.zero,
+        isCompleted: true, // Add this flag to PlaybackProgress
+      ),
+    );
+  }
+
+  Future<void> _onPlaybackError(String path) async {
+    _currentlyPlayingUrl = null;
+    _currentlyPlayingController.add('');
+    await _currentProgressSubscription?.cancel();
+    _currentProgressSubscription = null;
+    _updateProgress(
+      path,
+      const PlaybackProgress(
+        duration: Duration.zero,
+        position: Duration.zero,
+      ),
+    );
+  }
+
+  void _setupProgressTracking(String path) {
+    _currentProgressSubscription?.cancel();
+    _player.setSubscriptionDuration(const Duration(milliseconds: 100));
+
+    // Get the stored duration for this path
+    final Duration storedDuration = _lastKnownDuration ?? Duration.zero;
+
+    _currentProgressSubscription = _player.onProgress!.listen(
+      (e) {
+        if (_currentlyPlayingUrl == path) {
+          _updateProgress(
+            path,
+            PlaybackProgress(
+              // Use stored duration instead of player's duration
+              duration: storedDuration,
+              // Use player's position for tracking
+              position: e.position,
+            ),
+          );
+        }
+      },
+      onError: (error) {
+        print('Progress tracking error: $error');
+        _onPlaybackError(path);
+      },
+    );
+  }
+
+  // Helper method to generate unique file path for recordings
+  Future<String> _generateRecordingPath() async {
+    final Directory appDir = await getApplicationDocumentsDirectory();
+    final String recordingDir = '${appDir.path}/recordings';
+    await Directory(recordingDir).create(recursive: true);
+
+    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    return '$recordingDir/recording_$timestamp.aac';
+  }
+
+  // Helper method to clean up old recordings
+  Future<void> _cleanupOldRecordings() async {
+    try {
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final String recordingDir = '${appDir.path}/recordings';
+      final Directory directory = Directory(recordingDir);
+
+      if (await directory.exists()) {
+        // Delete files older than 24 hours
+        final cutoffDate = DateTime.now().subtract(const Duration(hours: 24));
+
+        await for (final FileSystemEntity file in directory.list()) {
+          if (file is File) {
+            final FileStat stat = await file.stat();
+            if (stat.modified.isBefore(cutoffDate)) {
+              await file.delete();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error cleaning up recordings: $e');
+    }
+  }
 }

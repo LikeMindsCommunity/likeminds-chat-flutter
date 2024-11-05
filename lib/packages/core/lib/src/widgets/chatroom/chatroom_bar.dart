@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
@@ -8,6 +10,7 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
+import 'package:flutter/services.dart';
 
 /// {@template lm_chatroom_bar}
 /// A widget to display the chatroom bar.
@@ -115,6 +118,19 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       ValueNotifier(Duration.zero);
   final ValueNotifier<double> _cancelSlidePosition = ValueNotifier(0.0);
 
+  // Add this variable to track the current recording path
+  String? _currentRecordingPath;
+
+  // Add these variables for recording state management
+  final ValueNotifier<bool> _isReviewingRecording = ValueNotifier<bool>(false);
+  final ValueNotifier<PlaybackProgress> _playbackProgress = ValueNotifier(
+    const PlaybackProgress(duration: Duration.zero, position: Duration.zero),
+  );
+  String? _recordedFilePath;
+
+  // Add isPlaying ValueNotifier
+  final ValueNotifier<bool> _isPlaying = ValueNotifier<bool>(false);
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -166,6 +182,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _recordingTimer?.cancel();
     _recordingDuration.dispose();
     _cancelSlidePosition.dispose();
+    _isReviewingRecording.dispose();
+    _playbackProgress.dispose();
+    _isVoiceButtonHeld.dispose();
+    _isPlaying.dispose(); // Dispose isPlaying notifier
     super.dispose();
   }
 
@@ -196,27 +216,33 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                       ValueListenableBuilder<bool>(
                         valueListenable: _isVoiceButtonHeld,
                         builder: (context, isHeld, child) {
-                          return isHeld
+                          return isHeld || _isReviewingRecording.value
                               ? _defRecordingContainer(context)
                               : _isRespondingAllowed()
                                   ? _defTextField(context)
                                   : _defDisabledTextField(context);
                         },
                       ),
-                      ValueListenableBuilder<String>(
-                        valueListenable: _textInputNotifier,
-                        builder: (context, text, child) {
-                          return text.isEmpty
-                              ? _defVoiceButton(
-                                  context) // Show voice button if empty
-                              : _screenBuilder.sendButton(
-                                  context,
-                                  _textEditingController,
-                                  _onSend,
-                                  _defSendButton(context),
+                      _isRespondingAllowed()
+                          ? ValueListenableBuilder<bool>(
+                              valueListenable: _isReviewingRecording,
+                              builder: (context, isReviewing, child) {
+                                return ValueListenableBuilder<String>(
+                                  valueListenable: _textInputNotifier,
+                                  builder: (context, text, child) {
+                                    return text.trim().isEmpty && !isReviewing
+                                        ? _defVoiceButton(context)
+                                        : _screenBuilder.sendButton(
+                                            context,
+                                            _textEditingController,
+                                            _onSend,
+                                            _defSendButton(context),
+                                          );
+                                  },
                                 );
-                        },
-                      ),
+                              },
+                            )
+                          : const SizedBox.shrink(),
                     ],
                   ),
                 ),
@@ -372,15 +398,27 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   Widget _defRecordingContainer(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isReviewingRecording,
+      builder: (context, isReviewing, child) {
+        return isReviewing
+            ? _buildReviewContainer(context)
+            : _buildRecordingContainer(context);
+      },
+    );
+  }
+
+  Widget _buildRecordingContainer(BuildContext context) {
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
-        // Update slide position
         _cancelSlidePosition.value += details.delta.dx;
-        // If slid left enough, cancel recording
         if (_cancelSlidePosition.value < -100) {
+          HapticFeedback.heavyImpact();
           _isVoiceButtonHeld.value = false;
           _stopRecordingTimer();
           toast("Recording cancelled");
+        } else if (_cancelSlidePosition.value < -50) {
+          HapticFeedback.selectionClick();
         }
       },
       child: Container(
@@ -393,36 +431,28 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Recording indicator and timer
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    height: 10,
-                    width: 10,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
+            Expanded(
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _buildRecordingIndicator(),
                   ),
-                ),
-                ValueListenableBuilder<Duration>(
-                  valueListenable: _recordingDuration,
-                  builder: (context, duration, child) {
-                    return Text(
-                      "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    );
-                  },
-                ),
-              ],
+                  ValueListenableBuilder<Duration>(
+                    valueListenable: _recordingDuration,
+                    builder: (context, duration, child) {
+                      return Text(
+                        "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-
-            // Slide to cancel indicator
             ValueListenableBuilder<double>(
               valueListenable: _cancelSlidePosition,
               builder: (context, position, child) {
@@ -454,6 +484,148 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
+  Widget _buildReviewContainer(BuildContext context) {
+    return Container(
+      width: 80.w,
+      height: 6.h,
+      decoration: BoxDecoration(
+        color: _themeData.container,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          ValueListenableBuilder<bool>(
+            valueListenable: _isPlaying,
+            builder: (context, isPlaying, child) {
+              return IconButton(
+                icon: Icon(
+                  isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                  color: _themeData.onContainer,
+                  size: 28,
+                ),
+                onPressed: () => _handlePlayPause(),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+          ValueListenableBuilder<PlaybackProgress>(
+            valueListenable: _playbackProgress,
+            builder: (context, progress, child) {
+              final position = progress.position;
+              final duration = progress.duration;
+              return Text(
+                "${position.inMinutes.toString().padLeft(2, '0')}:${(position.inSeconds % 60).toString().padLeft(2, '0')} / "
+                "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              );
+            },
+          ),
+          const Spacer(),
+          IconButton(
+            icon: Icon(
+              Icons.cancel_outlined,
+              color: _themeData.inActiveColor,
+            ),
+            onPressed: () => _handleDeleteRecording(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecordingIndicator() {
+    return Container(
+      height: 10,
+      width: 10,
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(5),
+      ),
+    );
+  }
+
+  // Add these methods to handle the review actions
+  void _handlePlayPause() async {
+    if (_recordedFilePath == null) return;
+
+    final audioHandler = LMChatCoreAudioHandler.instance;
+    try {
+      if (_isPlaying.value) {
+        await audioHandler.pauseAudio();
+        _isPlaying.value = false;
+      } else {
+        if (audioHandler.player.isPaused) {
+          await audioHandler.resumeAudio();
+        } else {
+          // Reset position to 0 when starting new playback
+          _playbackProgress.value = PlaybackProgress(
+            duration: _playbackProgress.value.duration,
+            position: Duration.zero,
+          );
+          await audioHandler.playAudio(_recordedFilePath!);
+        }
+        _isPlaying.value = true;
+      }
+    } catch (e) {
+      print('Error handling play/pause: $e');
+      _isPlaying.value = false;
+    }
+  }
+
+  void _handleSeek(Duration position) async {
+    if (_recordedFilePath == null) return;
+    try {
+      await LMChatCoreAudioHandler.instance.seekTo(position);
+    } catch (e) {
+      print('Error seeking: $e');
+    }
+  }
+
+  void _handleSendRecording() {
+    if (_recordedFilePath == null) return;
+    // TODO: Implement sending the recording
+    print("Sending recording: $_recordedFilePath");
+    _resetRecordingState();
+  }
+
+  void _handleDeleteRecording() async {
+    if (_recordedFilePath == null) return;
+
+    try {
+      final audioHandler = LMChatCoreAudioHandler.instance;
+      if (_isPlaying.value) {
+        await audioHandler.stopAudio();
+        _isPlaying.value = false;
+      }
+
+      final file = File(_recordedFilePath!);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      _resetRecordingState();
+    } catch (e) {
+      print('Error deleting recording: $e');
+    }
+  }
+
+  // Also update the reset state method to be more thorough
+  void _resetRecordingState() {
+    _isReviewingRecording.value = false;
+    _isVoiceButtonHeld.value = false;
+    _recordedFilePath = null;
+    _playbackProgress.value = const PlaybackProgress(
+      duration: Duration.zero,
+      position: Duration.zero,
+    );
+    _cancelSlidePosition.value = 0;
+    _recordingDuration.value = Duration.zero;
+    _isPlaying.value = false;
+  }
+
   LMChatButton _defSendButton(BuildContext context) {
     return LMChatButton(
       onTap: _onSend,
@@ -479,21 +651,89 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   LMChatButton _defVoiceButton(BuildContext context) {
     return LMChatButton(
       onTap: () {
+        HapticFeedback.lightImpact();
         toast(
           "Hold to start recording",
           duration: const Duration(milliseconds: 200),
         );
       },
-      onLongPress: () {
-        _isVoiceButtonHeld.value = true;
-        _cancelSlidePosition.value = 0;
-        _startRecordingTimer();
+      onLongPress: () async {
+        final audioHandler = LMChatCoreAudioHandler.instance;
+
+        try {
+          HapticFeedback.heavyImpact();
+          _currentRecordingPath = await audioHandler.startRecording();
+          if (_currentRecordingPath != null) {
+            _isVoiceButtonHeld.value = true;
+            _cancelSlidePosition.value = 0;
+            _startRecordingTimer();
+          } else {
+            toast("Couldn't start recording");
+          }
+        } catch (e) {
+          toast("Error starting recording");
+          print('Recording error: $e');
+        }
       },
-      onLongPressEnd: (details) {
-        _isVoiceButtonHeld.value = false;
-        _stopRecordingTimer();
-        // TODO: Handle the recorded audio
-        print("Recording finished");
+      onLongPressEnd: (details) async {
+        if (!_isVoiceButtonHeld.value) return;
+
+        try {
+          final audioHandler = LMChatCoreAudioHandler.instance;
+          HapticFeedback.mediumImpact();
+
+          // Get the final duration before stopping timer
+          final recordedDuration = _recordingDuration.value;
+          _stopRecordingTimer();
+
+          if (_cancelSlidePosition.value < -100) {
+            await audioHandler.cancelRecording();
+            _resetRecordingState();
+          } else {
+            // Pass the recorded duration when stopping
+            final recordingPath = await audioHandler.stopRecording(
+              recordedDuration: recordedDuration,
+            );
+
+            if (recordingPath != null) {
+              _recordedFilePath = recordingPath;
+              _isReviewingRecording.value = true;
+              _isVoiceButtonHeld.value = false;
+
+              // Initialize playback progress with the actual recorded duration
+              _playbackProgress.value = PlaybackProgress(
+                duration: recordedDuration,
+                position: Duration.zero,
+              );
+
+              // Subscribe to playback progress
+              audioHandler.getProgressStream(recordingPath).listen(
+                (progress) {
+                  // Keep the original duration but update position
+                  _playbackProgress.value = PlaybackProgress(
+                    duration: recordedDuration,
+                    position: progress.position,
+                    isCompleted: progress.isCompleted,
+                  );
+                  // Reset playing state when playback completes
+                  if (progress.isCompleted == true) {
+                    _isPlaying.value = false;
+                  }
+                },
+                onError: (error) {
+                  print('Playback error: $error');
+                  _handleRecordingError();
+                },
+              );
+            } else {
+              toast("Recording too short");
+              _resetRecordingState();
+            }
+          }
+        } catch (e) {
+          print('Recording error: $e');
+          _handleRecordingError();
+        }
       },
       style: LMChatButtonStyle(
         backgroundColor: _themeData.primaryColor,
@@ -942,7 +1182,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   // Handler functions of the LMChatroomBar
   void _onSend() {
     final message = _textEditingController.text.trim();
-    if (message.isEmpty) {
+    if (message.isEmpty && !_isReviewingRecording.value) {
       toast("Text can't be empty");
       return;
     }
@@ -955,6 +1195,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
     if (editConversation != null) {
       _handleEditConversation();
+    } else if (_isReviewingRecording.value) {
+      _handleSendVoiceNote();
     } else {
       _handleNewMessage();
     }
@@ -1182,5 +1424,63 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _recordingTimer?.cancel();
     _recordingTimer = null;
     _recordingDuration.value = Duration.zero;
+  }
+
+  // Add method to handle sending voice note
+  void _handleSendVoiceNote() async {
+    if (_recordedFilePath == null) return;
+
+    try {
+      if (_isPlaying.value) {
+        await LMChatCoreAudioHandler.instance.stopAudio();
+        _isPlaying.value = false;
+      }
+
+      final File audioFile = File(_recordedFilePath!);
+
+      // Send voice note through conversation bloc
+      conversationBloc.add(
+        LMChatPostMultiMediaConversationEvent(
+          (PostConversationRequestBuilder()
+                ..chatroomId(widget.chatroom.id)
+                ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
+                ..replyId(replyToConversation?.id)
+                ..attachmentCount(1)
+                ..hasFiles(true)
+                ..text(result ?? ''))
+              .build(),
+          [
+            LMChatMediaModel(
+              mediaType: LMChatMediaType.voiceNote,
+              mediaFile: audioFile,
+              duration: _playbackProgress.value.duration.inSeconds.toDouble(),
+              size: audioFile.lengthSync(),
+            ),
+          ],
+        ),
+      );
+
+      _resetRecordingState();
+      if (replyToConversation != null) {
+        chatActionBloc.add(LMChatReplyRemoveEvent());
+      }
+      widget.scrollToBottom();
+    } catch (e) {
+      print('Error sending voice note: $e');
+      toast("Error sending voice note");
+    }
+  }
+
+  // Add error recovery method
+  void _handleRecordingError() {
+    _resetRecordingState();
+    _isVoiceButtonHeld.value = false;
+    _isReviewingRecording.value = false;
+    _recordedFilePath = null;
+    _cancelSlidePosition.value = 0;
+    _isPlaying.value = false;
+
+    LMChatCoreAudioHandler.instance.cancelRecording();
+    toast("Recording failed. Please try again.");
   }
 }

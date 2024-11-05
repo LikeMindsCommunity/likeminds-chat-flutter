@@ -4,10 +4,12 @@ import 'package:flutter_sound/flutter_sound.dart';
 class PlaybackProgress {
   final Duration duration;
   final Duration position;
+  final bool isCompleted;
 
   const PlaybackProgress({
     required this.duration,
     required this.position,
+    this.isCompleted = false,
   });
 }
 
@@ -35,7 +37,7 @@ abstract class LMChatAudioHandler {
   Future<String?> startRecording();
 
   /// Stops the current audio recording
-  Future<String?> stopRecording();
+  Future<String?> stopRecording({Duration? recordedDuration});
 
   Future<void> cancelRecording();
 
