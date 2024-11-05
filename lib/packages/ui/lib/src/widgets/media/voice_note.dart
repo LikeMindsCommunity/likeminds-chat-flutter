@@ -71,216 +71,250 @@ class LMChatVoiceNote extends StatefulWidget {
 }
 
 class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
-  late final FlutterSoundPlayer _player;
+  late final FlutterSoundPlayer _localPlayer;
+  late final bool _useExternalHandler;
   bool _isAudioPlaying = false;
   double _progress = 0.0;
-  bool _mPlayerIsInited = false;
-  StreamSubscription? _playerSubscription;
-  StreamSubscription? _progressSubscription;
   Duration _totalDuration = Duration.zero;
   bool _isDragging = false;
 
-  // Add listener for external player state
+  // Subscriptions
+  StreamSubscription? _playerSubscription;
+  StreamSubscription? _progressSubscription;
   StreamSubscription? _handlerSubscription;
-
-  @override
-  void didUpdateWidget(LMChatVoiceNote oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Handle changes in handler
-    if (widget.handler != oldWidget.handler) {
-      _handlerSubscription?.cancel();
-      _progressSubscription?.cancel();
-
-      if (widget.handler != null) {
-        // Listen to new handler's player state changes
-        _handlerSubscription =
-            widget.handler!.currentlyPlayingUrl.listen((url) {
-          if (mounted) {
-            setState(() {
-              _isAudioPlaying = url == widget.media.mediaUrl;
-              if (!_isAudioPlaying && !_isDragging) {
-                _progress = 0.0;
-              }
-            });
-          }
-        });
-
-        // Subscribe to progress updates for this specific audio URL
-        if (widget.media.mediaUrl != null) {
-          _progressSubscription = widget.handler!
-              .getProgressStream(widget.media.mediaUrl!)
-              .listen((progress) {
-            if (mounted && !_isDragging) {
-              setState(() {
-                _totalDuration = progress.duration;
-                if (_totalDuration.inMilliseconds > 0) {
-                  _progress = (progress.position.inMilliseconds /
-                          _totalDuration.inMilliseconds)
-                      .clamp(0.0, 1.0);
-                }
-              });
-            }
-          });
-        }
-      }
-    }
-
-    // Handle changes in media URL
-    if (widget.media.mediaUrl != oldWidget.media.mediaUrl &&
-        widget.handler != null) {
-      _progressSubscription?.cancel();
-
-      if (widget.media.mediaUrl != null) {
-        _progressSubscription = widget.handler!
-            .getProgressStream(widget.media.mediaUrl!)
-            .listen((progress) {
-          if (mounted && !_isDragging) {
-            setState(() {
-              _totalDuration = progress.duration;
-              if (_totalDuration.inMilliseconds > 0) {
-                _progress = (progress.position.inMilliseconds /
-                        _totalDuration.inMilliseconds)
-                    .clamp(0.0, 1.0);
-              }
-            });
-          }
-        });
-      }
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _player = widget.handler?.player ?? FlutterSoundPlayer();
+    _useExternalHandler = widget.handler != null;
+    _initializePlayer();
+  }
 
-    if (widget.handler == null) {
-      _player.openPlayer().then((value) {
-        setState(() {
-          _mPlayerIsInited = true;
-          if (widget.autoplay ?? false) {
-            _startPlayer();
-          }
-        });
-      });
+  void _initializePlayer() async {
+    if (_useExternalHandler) {
+      _initializeWithHandler();
     } else {
-      _mPlayerIsInited = true;
+      _initializeLocalPlayer();
+    }
 
-      // Listen to external player state changes
-      _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
-        if (mounted) {
-          setState(() {
-            _isAudioPlaying = url == widget.media.mediaUrl;
-            if (!_isAudioPlaying && !_isDragging) {
-              _progress = 0.0;
-            }
-          });
+    if (widget.autoplay ?? false) {
+      await _startPlayer();
+    }
+  }
+
+  void _initializeWithHandler() {
+    // Listen to external player state changes
+    _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
+      if (!mounted) return;
+
+      final bool isPlaying = url == widget.media.mediaUrl ||
+          (widget.media.mediaFile != null &&
+              url == widget.media.mediaFile!.path);
+
+      setState(() {
+        _isAudioPlaying = isPlaying;
+        if (!_isAudioPlaying && !_isDragging) {
+          _progress = 0.0;
         }
       });
+    });
 
-      // Subscribe to progress updates for this specific audio URL
-      if (widget.media.mediaUrl != null) {
-        _progressSubscription = widget.handler!
-            .getProgressStream(widget.media.mediaUrl!)
-            .listen((progress) {
-          if (mounted && !_isDragging) {
-            setState(() {
-              _totalDuration = progress.duration;
-              if (_totalDuration.inMilliseconds > 0) {
-                _progress = (progress.position.inMilliseconds /
-                        _totalDuration.inMilliseconds)
-                    .clamp(0.0, 1.0);
-              }
-            });
-          }
-        });
-      }
-
-      if (widget.autoplay ?? false) {
-        _startPlayer();
-      }
+    // Subscribe to progress updates
+    if (widget.media.mediaFile != null) {
+      _subscribeToProgressUpdates(widget.media.mediaFile!.path);
+    } else if (widget.media.mediaUrl != null) {
+      _subscribeToProgressUpdates(widget.media.mediaUrl!);
     }
+  }
+
+  void _initializeLocalPlayer() {
+    _localPlayer = FlutterSoundPlayer();
+    _localPlayer.openPlayer().then((_) {
+      setState(() {
+        if (widget.autoplay ?? false) {
+          _startPlayer();
+        }
+      });
+    });
+  }
+
+  void _handlePlaybackUrlChange(String? url) {
+    if (!mounted) return;
+
+    setState(() {
+      _isAudioPlaying = url == widget.media.mediaUrl;
+      if (!_isAudioPlaying && !_isDragging) {
+        _progress = 0.0;
+      }
+    });
+  }
+
+  void _subscribeToProgressUpdates(String mediaUrl) {
+    _progressSubscription?.cancel();
+    _progressSubscription =
+        widget.handler!.getProgressStream(mediaUrl).listen(_updateProgress);
+  }
+
+  void _updateProgress(PlaybackProgress progress) {
+    if (!mounted || _isDragging) return;
+
+    setState(() {
+      _totalDuration = progress.duration;
+      if (_totalDuration.inMilliseconds > 0) {
+        _progress =
+            (progress.position.inMilliseconds / _totalDuration.inMilliseconds)
+                .clamp(0.0, 1.0);
+      }
+    });
+  }
+
+  Future<void> _startPlayer() async {
+    // Return if neither local file nor URL is available
+    if (widget.media.mediaFile == null && widget.media.mediaUrl == null) return;
+
+    try {
+      if (_useExternalHandler) {
+        await _startWithHandler();
+      } else {
+        await _startWithLocalPlayer();
+      }
+    } catch (e) {
+      print('Error starting player: $e');
+    }
+  }
+
+  Future<void> _startWithHandler() async {
+    await widget.handler!.stopAudio(); // Ensure clean state
+
+    // Prefer local file over URL if available
+    if (widget.media.mediaFile != null) {
+      await widget.handler!.playAudio(widget.media.mediaFile!.path);
+    } else if (widget.media.mediaUrl != null) {
+      await widget.handler!.playAudio(widget.media.mediaUrl!);
+    }
+    widget.onPlay?.call();
+  }
+
+  Future<void> _startWithLocalPlayer() async {
+    try {
+      if (_localPlayer.isPaused || _localPlayer.isPlaying) {
+        await _localPlayer.stopPlayer();
+      }
+
+      _progress = 0.0;
+
+      String? playbackPath;
+      if (widget.media.mediaFile != null) {
+        playbackPath = widget.media.mediaFile!.path;
+      } else if (widget.media.mediaUrl != null) {
+        playbackPath = widget.media.mediaUrl;
+      }
+
+      if (playbackPath != null) {
+        await _localPlayer.startPlayer(
+          fromURI: playbackPath,
+          whenFinished: () {
+            _onPlaybackComplete();
+            widget.onPause?.call();
+          },
+        );
+
+        await _localPlayer
+            .setSubscriptionDuration(const Duration(milliseconds: 100));
+        _setupLocalPlayerProgress();
+
+        setState(() {
+          _isAudioPlaying = true;
+        });
+        widget.onPlay?.call();
+      }
+    } catch (e) {
+      print('Error in _startWithLocalPlayer: $e');
+    }
+  }
+
+  void _onPlaybackComplete() {
+    if (!mounted) return;
+    setState(() {
+      _isAudioPlaying = false;
+      _progress = 0.0;
+    });
+  }
+
+  void _setupLocalPlayerProgress() {
+    _localPlayer.setSubscriptionDuration(const Duration(milliseconds: 100));
+    _playerSubscription?.cancel();
+    _playerSubscription = _localPlayer.onProgress!.listen((e) {
+      if (!mounted || _isDragging) return;
+
+      setState(() {
+        _totalDuration = e.duration;
+        if (_totalDuration.inMilliseconds > 0) {
+          _progress =
+              (e.position.inMilliseconds / _totalDuration.inMilliseconds)
+                  .clamp(0.0, 1.0);
+        }
+      });
+    });
+  }
+
+  Future<void> _togglePlayPause() async {
+    try {
+      if (_isAudioPlaying) {
+        await _pausePlayback();
+      } else {
+        if (_useExternalHandler) {
+          await _startWithHandler();
+        } else {
+          if (_localPlayer.isPaused) {
+            await _resumePlayback();
+          } else {
+            await _startWithLocalPlayer();
+          }
+        }
+      }
+    } catch (e) {
+      print('Error toggling play/pause: $e');
+    }
+  }
+
+  Future<void> _pausePlayback() async {
+    if (_useExternalHandler) {
+      await widget.handler!.pauseAudio();
+    } else {
+      await _localPlayer.pausePlayer();
+      setState(() => _isAudioPlaying = false);
+    }
+    widget.onPause?.call();
+  }
+
+  Future<void> _resumePlayback() async {
+    if (_useExternalHandler) {
+      await widget.handler!.resumeAudio();
+    } else {
+      await _localPlayer.resumePlayer();
+      _setupLocalPlayerProgress();
+      setState(() => _isAudioPlaying = true);
+    }
+    widget.onPlay?.call();
   }
 
   @override
   void dispose() {
-    if (_isAudioPlaying && widget.handler != null) {
-      // Stop playback if this widget is being disposed while playing
+    if (_isAudioPlaying && _useExternalHandler) {
       widget.handler!.stopAudio();
     }
-    _playerSubscription?.cancel();
-    _handlerSubscription?.cancel();
-    _progressSubscription?.cancel();
-    if (widget.handler == null) {
-      _player.closePlayer();
+    _cleanupSubscriptions();
+    if (!_useExternalHandler) {
+      _localPlayer.closePlayer();
     }
     super.dispose();
   }
 
-  Future<void> _startPlayer() async {
-    if (_mPlayerIsInited && widget.media.mediaUrl != null) {
-      try {
-        if (widget.handler != null) {
-          // First stop any existing audio playback
-          await widget.handler!.stopAudio();
-          await widget.handler!.playAudio(widget.media.mediaUrl!);
-        } else {
-          if (_player.isPaused || _player.isPlaying) {
-            await _player.stopPlayer();
-          }
-          _progress = 0.0;
-          await _player.startPlayer(
-            fromURI: widget.media.mediaUrl!,
-            whenFinished: () {
-              if (mounted) {
-                setState(() {
-                  _isAudioPlaying = false;
-                  _progress = 0.0;
-                });
-              }
-            },
-          );
-
-          _player.setSubscriptionDuration(const Duration(milliseconds: 100));
-          _playerSubscription?.cancel();
-          _playerSubscription = _player.onProgress!.listen((e) {
-            if (mounted && !_isDragging) {
-              setState(() {
-                _totalDuration = e.duration;
-                if (_totalDuration.inMilliseconds > 0) {
-                  _progress = (e.position.inMilliseconds /
-                          _totalDuration.inMilliseconds)
-                      .clamp(0.0, 1.0);
-                }
-              });
-            }
-          });
-
-          setState(() {
-            _isAudioPlaying = true;
-          });
-        }
-      } catch (e) {
-        print('Error starting player: $e');
-      }
-    }
-  }
-
-  Future<void> _stopPlayer() async {
-    if (widget.handler != null) {
-      await widget.handler!.stopAudio();
-    } else {
-      await _player.stopPlayer();
-      if (mounted) {
-        setState(() {
-          _isAudioPlaying = false;
-          _progress = 0.0;
-        });
-      }
-      _playerSubscription?.cancel();
-      _playerSubscription = null;
-    }
+  void _cleanupSubscriptions() {
+    _playerSubscription?.cancel();
+    _handlerSubscription?.cancel();
+    _progressSubscription?.cancel();
   }
 
   @override
@@ -318,6 +352,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
                 setState(() {
                   _progress = value;
                 });
+                widget.onSlide?.call(value);
               },
               onChangeStart: (value) {
                 _isDragging = true;
@@ -328,10 +363,10 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
                 final position = Duration(
                   milliseconds: (_totalDuration.inMilliseconds * value).toInt(),
                 );
-                if (widget.handler != null) {
+                if (_useExternalHandler) {
                   widget.handler!.seekTo(position);
                 } else {
-                  _player.seekToPlayer(position);
+                  _localPlayer.seekToPlayer(position);
                 }
                 widget.onSlideEnd?.call(value);
               },
@@ -350,77 +385,6 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
         ],
       ),
     );
-  }
-
-  /// Toggles between play and pause states of the audio.
-  void _togglePlayPause() async {
-    if (widget.handler != null) {
-      try {
-        if (_isAudioPlaying) {
-          // If this voice note is currently playing, pause it
-          await widget.handler!.pauseAudio();
-          widget.onPause?.call();
-        } else {
-          // If this voice note is not playing
-          if (widget.handler!.player.isPlaying ||
-              widget.handler!.player.isPaused) {
-            // If any audio is playing or paused, stop it completely
-            await widget.handler!.stopAudio();
-          }
-          // Start playing this voice note
-          await widget.handler!.playAudio(widget.media.mediaUrl!);
-          widget.onPlay?.call();
-        }
-      } catch (e) {
-        print('Error toggling play/pause: $e');
-      }
-    } else {
-      // Local player fallback logic
-      if (_isAudioPlaying) {
-        await _pausePlayer();
-        widget.onPause?.call();
-      } else {
-        // Always start fresh when playing a new voice note
-        await _stopPlayer();
-        await _startPlayer();
-        widget.onPlay?.call();
-      }
-    }
-  }
-
-  /// Pauses the audio playback.
-  Future<void> _pausePlayer() async {
-    if (widget.handler != null) {
-      await widget.handler!.pauseAudio();
-    } else {
-      await _player.pausePlayer();
-      setState(() {
-        _isAudioPlaying = false;
-      });
-    }
-  }
-
-  /// Resumes the audio playback.
-  Future<void> _resumePlayer() async {
-    if (widget.handler != null) {
-      await widget.handler!.resumeAudio();
-    } else {
-      await _player.resumePlayer();
-      setState(() {
-        _isAudioPlaying = true;
-      });
-      _player.setSubscriptionDuration(const Duration(milliseconds: 100));
-      _playerSubscription = _player.onProgress!.listen((e) {
-        setState(() {
-          _totalDuration = e.duration;
-          if (_totalDuration.inMilliseconds > 0) {
-            _progress =
-                (e.position.inMilliseconds / _totalDuration.inMilliseconds)
-                    .clamp(0.0, 1.0);
-          }
-        });
-      });
-    }
   }
 }
 
