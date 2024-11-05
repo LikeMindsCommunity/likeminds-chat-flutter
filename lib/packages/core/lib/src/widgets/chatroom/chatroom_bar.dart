@@ -109,6 +109,12 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   // Create a ValueNotifier to hold the voice button state
   final ValueNotifier<bool> _isVoiceButtonHeld = ValueNotifier<bool>(false);
 
+  // Add these variables for recording state
+  Timer? _recordingTimer;
+  final ValueNotifier<Duration> _recordingDuration =
+      ValueNotifier(Duration.zero);
+  final ValueNotifier<double> _cancelSlidePosition = ValueNotifier(0.0);
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -157,6 +163,9 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _focusNode.dispose();
     _debounce?.cancel();
     _textInputNotifier.dispose(); // Dispose the ValueNotifier
+    _recordingTimer?.cancel();
+    _recordingDuration.dispose();
+    _cancelSlidePosition.dispose();
     super.dispose();
   }
 
@@ -172,39 +181,43 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           builder: (context, state) {
             return Column(
               children: [
-                SafeArea(
-                  bottom: true,
-                  top: false,
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.only(
-                      left: 2.w,
-                      right: 2.w,
-                      top: 1.5.h,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        _isRespondingAllowed()
-                            ? _defTextField(context)
-                            : _defDisabledTextField(context),
-                        ValueListenableBuilder<String>(
-                          valueListenable: _textInputNotifier,
-                          builder: (context, text, child) {
-                            return text.isEmpty
-                                ? _defVoiceButton(
-                                    context) // Show voice button if empty
-                                : _screenBuilder.sendButton(
-                                    context,
-                                    _textEditingController,
-                                    _onSend,
-                                    _defSendButton(context),
-                                  );
-                          },
-                        ),
-                      ],
-                    ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(
+                    left: 2.w,
+                    right: 2.w,
+                    top: 1.5.h,
+                    bottom: 1.5.h,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _isVoiceButtonHeld,
+                        builder: (context, isHeld, child) {
+                          return isHeld
+                              ? _defRecordingContainer(context)
+                              : _isRespondingAllowed()
+                                  ? _defTextField(context)
+                                  : _defDisabledTextField(context);
+                        },
+                      ),
+                      ValueListenableBuilder<String>(
+                        valueListenable: _textInputNotifier,
+                        builder: (context, text, child) {
+                          return text.isEmpty
+                              ? _defVoiceButton(
+                                  context) // Show voice button if empty
+                              : _screenBuilder.sendButton(
+                                  context,
+                                  _textEditingController,
+                                  _onSend,
+                                  _defSendButton(context),
+                                );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -358,6 +371,89 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
+  Widget _defRecordingContainer(BuildContext context) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        // Update slide position
+        _cancelSlidePosition.value += details.delta.dx;
+        // If slid left enough, cancel recording
+        if (_cancelSlidePosition.value < -100) {
+          _isVoiceButtonHeld.value = false;
+          _stopRecordingTimer();
+          toast("Recording cancelled");
+        }
+      },
+      child: Container(
+        width: 80.w,
+        height: 6.h,
+        decoration: BoxDecoration(
+          color: _themeData.container,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Recording indicator and timer
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    height: 10,
+                    width: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+                ValueListenableBuilder<Duration>(
+                  valueListenable: _recordingDuration,
+                  builder: (context, duration, child) {
+                    return Text(
+                      "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+
+            // Slide to cancel indicator
+            ValueListenableBuilder<double>(
+              valueListenable: _cancelSlidePosition,
+              builder: (context, position, child) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.arrow_back,
+                        size: 16,
+                        color: _themeData.inActiveColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Slide to cancel",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _themeData.inActiveColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   LMChatButton _defSendButton(BuildContext context) {
     return LMChatButton(
       onTap: _onSend,
@@ -374,6 +470,44 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           size: 28,
           boxSize: 28,
           boxPadding: const EdgeInsets.only(left: 2),
+          color: _themeData.container,
+        ),
+      ),
+    );
+  }
+
+  LMChatButton _defVoiceButton(BuildContext context) {
+    return LMChatButton(
+      onTap: () {
+        toast(
+          "Hold to start recording",
+          duration: const Duration(milliseconds: 200),
+        );
+      },
+      onLongPress: () {
+        _isVoiceButtonHeld.value = true;
+        _cancelSlidePosition.value = 0;
+        _startRecordingTimer();
+      },
+      onLongPressEnd: (details) {
+        _isVoiceButtonHeld.value = false;
+        _stopRecordingTimer();
+        // TODO: Handle the recorded audio
+        print("Recording finished");
+      },
+      style: LMChatButtonStyle(
+        backgroundColor: _themeData.primaryColor,
+        borderRadius: 100,
+        height: 6.h,
+        width: 6.h,
+        scaleOnLongPress: 1.6,
+      ),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.mic,
+        style: LMChatIconStyle(
+          size: 28,
+          boxSize: 28,
           color: _themeData.container,
         ),
       ),
@@ -759,43 +893,6 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     );
   }
 
-  // Update the _defVoiceButton function
-  LMChatButton _defVoiceButton(BuildContext context) {
-    return LMChatButton(
-      onTap: () {
-        // TODO: Handle permission and toasting
-        toast(
-          "Hold to start recording",
-          duration: const Duration(milliseconds: 200),
-        );
-      },
-      onLongPress: () {
-        _isVoiceButtonHeld.value = true; // Set the state to show overlay
-      },
-      onLongPressEnd: (p0) {
-        _isVoiceButtonHeld.value = false; // Reset the state
-        // TODO: Handle permission as well as audio
-        print("Long press ended");
-      },
-      style: LMChatButtonStyle(
-        backgroundColor: _themeData.primaryColor,
-        borderRadius: 100,
-        height: 6.h,
-        width: 6.h,
-        scaleOnLongPress: 1.6,
-      ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.mic,
-        style: LMChatIconStyle(
-          size: 28,
-          boxSize: 28,
-          color: _themeData.container,
-        ),
-      ),
-    );
-  }
-
   void _blocListener(context, state) {
     if (state is LMChatEditConversationState) {
       replyToConversation = null;
@@ -1070,5 +1167,20 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       }
       _textEditingController.clear();
     }
+  }
+
+  // Add this method to start recording timer
+  void _startRecordingTimer() {
+    _recordingDuration.value = Duration.zero;
+    _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _recordingDuration.value = Duration(seconds: timer.tick);
+    });
+  }
+
+  // Add this method to stop recording timer
+  void _stopRecordingTimer() {
+    _recordingTimer?.cancel();
+    _recordingTimer = null;
+    _recordingDuration.value = Duration.zero;
   }
 }

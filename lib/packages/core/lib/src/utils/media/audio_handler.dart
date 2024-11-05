@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/permission_handler.dart';
 
 /// A class to manage all audio recording and playing
 class LMChatCoreAudioHandler implements LMChatAudioHandler {
@@ -10,6 +13,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   bool _isPlayerInitialized = false;
   bool _isRecorderInitialized = false;
+  bool _hasRecordingPermission = true;
 
   // Stream controller for currently playing URL
   final _currentlyPlayingController = StreamController<String>.broadcast();
@@ -18,6 +22,51 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   // Map to store progress controllers for each audio URL
   final _progressControllers = <String, StreamController<PlaybackProgress>>{};
   StreamSubscription? _currentProgressSubscription;
+
+  // Add these new variables for recording management
+  String? _currentRecordingPath;
+  bool _isRecording = false;
+  final _recordingLevelController = StreamController<double>.broadcast();
+
+  // Getters for recording state
+  bool get isRecording => _isRecording;
+  Stream<double> get recordingLevel => _recordingLevelController.stream;
+  String? get currentRecordingPath => _currentRecordingPath;
+
+  // Helper method to generate unique file path for recordings
+  Future<String> _generateRecordingPath() async {
+    final Directory appDir = await getApplicationDocumentsDirectory();
+    final String recordingDir = '${appDir.path}/recordings';
+    await Directory(recordingDir).create(recursive: true);
+
+    final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    return '$recordingDir/recording_$timestamp.flac';
+  }
+
+  // Helper method to clean up old recordings
+  Future<void> _cleanupOldRecordings() async {
+    try {
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final String recordingDir = '${appDir.path}/recordings';
+      final Directory directory = Directory(recordingDir);
+
+      if (await directory.exists()) {
+        // Delete files older than 24 hours
+        final cutoffDate = DateTime.now().subtract(const Duration(hours: 24));
+
+        await for (final FileSystemEntity file in directory.list()) {
+          if (file is File) {
+            final FileStat stat = await file.stat();
+            if (stat.modified.isBefore(cutoffDate)) {
+              await file.delete();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error cleaning up recordings: $e');
+    }
+  }
 
   LMChatCoreAudioHandler._internal();
 
@@ -36,16 +85,156 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   @override
   FlutterSoundRecorder get recorder => _recorder;
 
-  /// Initializes the audio player and recorder.
+  /// Returns whether recording permission is granted
+  bool get hasRecordingPermission => _hasRecordingPermission;
+
+  /// Initializes the audio player and recorder with proper permission checks
   @override
   Future<void> init() async {
+    // Initialize player first as it doesn't need permissions
     if (!_isPlayerInitialized) {
       await _player.openPlayer();
       _isPlayerInitialized = true;
     }
-    if (!_isRecorderInitialized) {
+
+    // // Check for microphone permission before initializing recorder
+    // _hasRecordingPermission = await handlePermissions(3); // 3 is for microphone
+
+    if (_hasRecordingPermission && !_isRecorderInitialized) {
       await _recorder.openRecorder();
       _isRecorderInitialized = true;
+    }
+  }
+
+  // Request microphone permission and initialize recorder if not already initialized
+  Future<bool> requestRecordingPermission() async {
+    _hasRecordingPermission = await handlePermissions(3);
+
+    if (_hasRecordingPermission && !_isRecorderInitialized) {
+      try {
+        await _recorder.openRecorder();
+        _isRecorderInitialized = true;
+      } catch (e) {
+        print('Error initializing recorder: $e');
+        _hasRecordingPermission = false;
+      }
+    }
+
+    return _hasRecordingPermission;
+  }
+
+  /// Starts a new recording session
+  @override
+  Future<String?> startRecording() async {
+    if (!_hasRecordingPermission) {
+      final hasPermission = await requestRecordingPermission();
+      if (!hasPermission) {
+        throw Exception('Recording permission not granted');
+      }
+    }
+
+    if (!_isRecorderInitialized) {
+      await init();
+    }
+
+    try {
+      await _cleanupOldRecordings();
+      _currentRecordingPath = await _generateRecordingPath();
+
+      await _recorder.startRecorder(
+        toFile: _currentRecordingPath,
+        codec: Codec.flac,
+      );
+
+      _isRecording = true;
+
+      // Start monitoring recording levels
+      _recorder.setSubscriptionDuration(const Duration(milliseconds: 100));
+      _recorder.onProgress!.listen((event) {
+        if (event.decibels != null) {
+          _recordingLevelController
+              .add(event.decibels! / 120); // Normalize to 0-1
+        }
+      });
+
+      return _currentRecordingPath;
+    } catch (e) {
+      print('Error starting recording: $e');
+      _currentRecordingPath = null;
+      _isRecording = false;
+      return null;
+    }
+  }
+
+  /// Stops the current recording and returns the file path
+  @override
+  Future<String?> stopRecording() async {
+    if (!_isRecording) return null;
+
+    try {
+      final String? path = await _recorder.stopRecorder();
+      _isRecording = false;
+
+      // Verify the file exists and has content
+      if (path != null) {
+        final File recordingFile = File(path);
+        if (await recordingFile.exists()) {
+          // final int fileSize = await recordingFile.length();
+          return path;
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error stopping recording: $e');
+      return null;
+    } finally {
+      _currentRecordingPath = null;
+      _isRecording = false;
+    }
+  }
+
+  /// Cancels and deletes the current recording
+  @override
+  Future<void> cancelRecording() async {
+    if (!_isRecording) return;
+
+    try {
+      await _recorder.stopRecorder();
+      if (_currentRecordingPath != null) {
+        final File recordingFile = File(_currentRecordingPath!);
+        if (await recordingFile.exists()) {
+          await recordingFile.delete();
+        }
+      }
+    } catch (e) {
+      print('Error canceling recording: $e');
+    } finally {
+      _currentRecordingPath = null;
+      _isRecording = false;
+    }
+  }
+
+  /// Checks if a file is a valid audio file
+  Future<bool> isValidAudioFile(String path) async {
+    try {
+      final File file = File(path);
+      if (!await file.exists()) return false;
+
+      final int fileSize = await file.length();
+      if (fileSize < 100) return false; // Arbitrary minimum size
+
+      // Try to get audio duration as validation
+      final Duration? duration = await _player.startPlayer(
+        fromURI: path,
+        codec: Codec.flac,
+      );
+
+      await _player.stopPlayer();
+
+      return duration != null && duration.inMilliseconds > 0;
+    } catch (e) {
+      print('Error validating audio file: $e');
+      return false;
     }
   }
 
@@ -211,24 +400,6 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     _progressControllers[audioUrl]?.add(progress);
   }
 
-  /// Starts recording audio to the specified path
-  @override
-  Stream startRecording(String path) {
-    if (!_isRecorderInitialized) {
-      throw Exception('Recorder not initialized');
-    }
-    return _recorder.startRecorder(toFile: path).asStream();
-  }
-
-  /// Stops the current audio recording
-  @override
-  Future<void> stopRecording() async {
-    if (!_isRecorderInitialized) {
-      throw Exception('Recorder not initialized');
-    }
-    await _recorder.stopRecorder();
-  }
-
   /// Disposes of all resources
   @override
   Future<void> dispose() async {
@@ -252,6 +423,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
     await _currentlyPlayingController.close();
     _currentlyPlayingUrl = null;
+    _hasRecordingPermission = false;
+    await _recordingLevelController.close();
+    await _cleanupOldRecordings();
   }
 
   // @override

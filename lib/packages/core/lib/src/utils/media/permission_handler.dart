@@ -4,6 +4,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+/// Media types:
+/// 1 - Photos
+/// 2 - Videos
+/// 3 - Microphone/Audio
 Future<bool> handlePermissions(int mediaType) async {
   if (Platform.isAndroid) {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -12,7 +16,7 @@ Future<bool> handlePermissions(int mediaType) async {
     if (androidInfo.version.sdkInt >= 33) {
       return await _handleAndroidPermissions(mediaType);
     } else {
-      return await _handleStoragePermission();
+      return await _handleStoragePermission(mediaType);
     }
   } else if (Platform.isIOS) {
     return await _handleIOSPermissions(mediaType);
@@ -22,21 +26,45 @@ Future<bool> handlePermissions(int mediaType) async {
 }
 
 Future<bool> _handleAndroidPermissions(int mediaType) async {
-  Permission permission =
-      mediaType == 1 ? Permission.photos : Permission.videos;
+  Permission permission;
+  switch (mediaType) {
+    case 1:
+      permission = Permission.photos;
+      break;
+    case 2:
+      permission = Permission.videos;
+      break;
+    case 3:
+      permission = Permission.microphone;
+      break;
+    default:
+      permission = Permission.storage;
+  }
   return await _requestPermission(permission);
 }
 
-Future<bool> _handleStoragePermission() async {
+Future<bool> _handleStoragePermission(int mediaType) async {
+  if (mediaType == 3) {
+    return await _requestPermission(Permission.microphone);
+  }
   return await _requestPermission(Permission.storage);
 }
 
 Future<bool> _handleIOSPermissions(int mediaType) async {
-  Permission permission = mediaType == 1
-      ? Permission.photos
-      : mediaType == 2
-          ? Permission.microphone
-          : Permission.videos;
+  Permission permission;
+  switch (mediaType) {
+    case 1:
+      permission = Permission.photos;
+      break;
+    case 2:
+      permission = Permission.videos;
+      break;
+    case 3:
+      permission = Permission.microphone;
+      break;
+    default:
+      permission = Permission.storage;
+  }
   return await _requestPermission(permission);
 }
 

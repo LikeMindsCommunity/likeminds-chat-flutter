@@ -32,10 +32,12 @@ abstract class LMChatAudioHandler {
   Future<void> dispose();
 
   /// Starts recording audio to the specified path
-  Stream startRecording(String path);
+  Future<String?> startRecording();
 
   /// Stops the current audio recording
-  Future<void> stopRecording();
+  Future<String?> stopRecording();
+
+  Future<void> cancelRecording();
 
   /// Plays audio from the specified path
   Future<void> playAudio(String path);

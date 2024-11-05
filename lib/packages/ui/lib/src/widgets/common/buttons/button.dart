@@ -19,6 +19,7 @@ class LMChatButton extends StatefulWidget {
     this.onLongPressStart,
     this.onLongPressEnd,
     this.onLongPressMoveUpdate,
+    this.onVerticalDragUpdate,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -53,6 +54,9 @@ class LMChatButton extends StatefulWidget {
 
   /// Action to perform when there is a drag while holding the button
   final Function(LongPressMoveUpdateDetails)? onLongPressMoveUpdate;
+
+  /// Action to perform when there is a vertical drag while holding the button
+  final Function(DragUpdateDetails)? onVerticalDragUpdate;
 
   @override
   State<LMChatButton> createState() => _LMButtonState();
@@ -105,6 +109,10 @@ class _LMButtonState extends State<LMChatButton>
         _controller.forward();
         widget.onLongPressStart?.call(details);
       },
+      onVerticalDragUpdate: (details) {
+        widget.onVerticalDragUpdate?.call(details);
+      },
+      onLongPress: widget.onLongPress,
       onLongPressEnd: (details) {
         _controller.reverse();
         widget.onLongPressEnd?.call(details);

@@ -84,6 +84,71 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
   StreamSubscription? _handlerSubscription;
 
   @override
+  void didUpdateWidget(LMChatVoiceNote oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Handle changes in handler
+    if (widget.handler != oldWidget.handler) {
+      _handlerSubscription?.cancel();
+      _progressSubscription?.cancel();
+
+      if (widget.handler != null) {
+        // Listen to new handler's player state changes
+        _handlerSubscription =
+            widget.handler!.currentlyPlayingUrl.listen((url) {
+          if (mounted) {
+            setState(() {
+              _isAudioPlaying = url == widget.media.mediaUrl;
+              if (!_isAudioPlaying && !_isDragging) {
+                _progress = 0.0;
+              }
+            });
+          }
+        });
+
+        // Subscribe to progress updates for this specific audio URL
+        if (widget.media.mediaUrl != null) {
+          _progressSubscription = widget.handler!
+              .getProgressStream(widget.media.mediaUrl!)
+              .listen((progress) {
+            if (mounted && !_isDragging) {
+              setState(() {
+                _totalDuration = progress.duration;
+                if (_totalDuration.inMilliseconds > 0) {
+                  _progress = progress.position.inMilliseconds /
+                      _totalDuration.inMilliseconds;
+                }
+              });
+            }
+          });
+        }
+      }
+    }
+
+    // Handle changes in media URL
+    if (widget.media.mediaUrl != oldWidget.media.mediaUrl &&
+        widget.handler != null) {
+      _progressSubscription?.cancel();
+
+      if (widget.media.mediaUrl != null) {
+        _progressSubscription = widget.handler!
+            .getProgressStream(widget.media.mediaUrl!)
+            .listen((progress) {
+          if (mounted && !_isDragging) {
+            setState(() {
+              _totalDuration = progress.duration;
+              if (_totalDuration.inMilliseconds > 0) {
+                _progress = progress.position.inMilliseconds /
+                    _totalDuration.inMilliseconds;
+              }
+            });
+          }
+        });
+      }
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     _player = widget.handler?.player ?? FlutterSoundPlayer();
@@ -150,8 +215,14 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
     if (_mPlayerIsInited && widget.media.mediaUrl != null) {
       try {
         if (widget.handler != null) {
+          // First stop any existing audio playback
+          await widget.handler!.stopAudio();
           await widget.handler!.playAudio(widget.media.mediaUrl!);
         } else {
+          // Stop any existing playback before starting new one
+          if (_player.isPaused || _player.isPlaying) {
+            await _player.stopPlayer();
+          }
           _progress = 0.0;
           await _player.startPlayer(
             fromURI: widget.media.mediaUrl != null
