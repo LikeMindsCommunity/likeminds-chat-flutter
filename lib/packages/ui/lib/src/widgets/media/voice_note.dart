@@ -115,8 +115,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
               setState(() {
                 _totalDuration = progress.duration;
                 if (_totalDuration.inMilliseconds > 0) {
-                  _progress = progress.position.inMilliseconds /
-                      _totalDuration.inMilliseconds;
+                  _progress = (progress.position.inMilliseconds /
+                          _totalDuration.inMilliseconds)
+                      .clamp(0.0, 1.0);
                 }
               });
             }
@@ -138,8 +139,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
             setState(() {
               _totalDuration = progress.duration;
               if (_totalDuration.inMilliseconds > 0) {
-                _progress = progress.position.inMilliseconds /
-                    _totalDuration.inMilliseconds;
+                _progress = (progress.position.inMilliseconds /
+                        _totalDuration.inMilliseconds)
+                    .clamp(0.0, 1.0);
               }
             });
           }
@@ -186,8 +188,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
             setState(() {
               _totalDuration = progress.duration;
               if (_totalDuration.inMilliseconds > 0) {
-                _progress = progress.position.inMilliseconds /
-                    _totalDuration.inMilliseconds;
+                _progress = (progress.position.inMilliseconds /
+                        _totalDuration.inMilliseconds)
+                    .clamp(0.0, 1.0);
               }
             });
           }
@@ -202,6 +205,10 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
 
   @override
   void dispose() {
+    if (_isAudioPlaying && widget.handler != null) {
+      // Stop playback if this widget is being disposed while playing
+      widget.handler!.stopAudio();
+    }
     _playerSubscription?.cancel();
     _handlerSubscription?.cancel();
     _progressSubscription?.cancel();
@@ -219,27 +226,33 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
           await widget.handler!.stopAudio();
           await widget.handler!.playAudio(widget.media.mediaUrl!);
         } else {
-          // Stop any existing playback before starting new one
           if (_player.isPaused || _player.isPlaying) {
             await _player.stopPlayer();
           }
           _progress = 0.0;
           await _player.startPlayer(
-            fromURI: widget.media.mediaUrl != null
-                ? Uri.parse(widget.media.mediaUrl!).toString()
-                : null,
-            codec: Codec.flac,
-            whenFinished: _stopPlayer,
+            fromURI: widget.media.mediaUrl!,
+            whenFinished: () {
+              if (mounted) {
+                setState(() {
+                  _isAudioPlaying = false;
+                  _progress = 0.0;
+                });
+              }
+            },
           );
 
           _player.setSubscriptionDuration(const Duration(milliseconds: 100));
           _playerSubscription?.cancel();
           _playerSubscription = _player.onProgress!.listen((e) {
-            if (mounted) {
+            if (mounted && !_isDragging) {
               setState(() {
                 _totalDuration = e.duration;
-                _progress =
-                    e.position.inMilliseconds / _totalDuration.inMilliseconds;
+                if (_totalDuration.inMilliseconds > 0) {
+                  _progress = (e.position.inMilliseconds /
+                          _totalDuration.inMilliseconds)
+                      .clamp(0.0, 1.0);
+                }
               });
             }
           });
@@ -300,7 +313,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
           ),
           Expanded(
             child: Slider(
-              value: _progress,
+              value: _progress.clamp(0.0, 1.0),
               onChanged: (value) {
                 setState(() {
                   _progress = value;
@@ -340,17 +353,38 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
   }
 
   /// Toggles between play and pause states of the audio.
-  void _togglePlayPause() {
-    if (_isAudioPlaying) {
-      _pausePlayer();
-      widget.onPause?.call();
-    } else {
-      if (_player.isPaused) {
-        _resumePlayer();
-      } else {
-        _startPlayer();
+  void _togglePlayPause() async {
+    if (widget.handler != null) {
+      try {
+        if (_isAudioPlaying) {
+          // If this voice note is currently playing, pause it
+          await widget.handler!.pauseAudio();
+          widget.onPause?.call();
+        } else {
+          // If this voice note is not playing
+          if (widget.handler!.player.isPlaying ||
+              widget.handler!.player.isPaused) {
+            // If any audio is playing or paused, stop it completely
+            await widget.handler!.stopAudio();
+          }
+          // Start playing this voice note
+          await widget.handler!.playAudio(widget.media.mediaUrl!);
+          widget.onPlay?.call();
+        }
+      } catch (e) {
+        print('Error toggling play/pause: $e');
       }
-      widget.onPlay?.call();
+    } else {
+      // Local player fallback logic
+      if (_isAudioPlaying) {
+        await _pausePlayer();
+        widget.onPause?.call();
+      } else {
+        // Always start fresh when playing a new voice note
+        await _stopPlayer();
+        await _startPlayer();
+        widget.onPlay?.call();
+      }
     }
   }
 
@@ -379,7 +413,11 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
       _playerSubscription = _player.onProgress!.listen((e) {
         setState(() {
           _totalDuration = e.duration;
-          _progress = e.position.inMilliseconds / _totalDuration.inMilliseconds;
+          if (_totalDuration.inMilliseconds > 0) {
+            _progress =
+                (e.position.inMilliseconds / _totalDuration.inMilliseconds)
+                    .clamp(0.0, 1.0);
+          }
         });
       });
     }
