@@ -81,6 +81,9 @@ class LMChatThemeData {
   /// Style for GIFs in the chat
   final LMChatGIFStyle gifStyle;
 
+  /// Style for voice notes in the chat
+  final LMChatVoiceNoteStyle voiceNoteStyle;
+
   /// Style for bubbles in the chat
   final LMChatBubbleStyle bubbleStyle;
 
@@ -92,6 +95,8 @@ class LMChatThemeData {
 
   /// Style for bubble content in the chat
   final LMChatBubbleContentStyle contentStyle;
+
+  /// Style for polls in the chat
   final LMChatPollStyle pollStyle;
 
   /// Style for bubble reactions in the chat
@@ -175,6 +180,7 @@ class LMChatThemeData {
     required this.videoStyle,
     required this.documentStyle,
     required this.gifStyle,
+    required this.voiceNoteStyle,
     required this.bubbleStyle,
     required this.replyStyle,
     required this.contentStyle,
@@ -232,6 +238,7 @@ class LMChatThemeData {
     LMChatVideoStyle? videoStyle,
     LMChatDocumentStyle? documentStyle,
     LMChatGIFStyle? gifStyle,
+    LMChatVoiceNoteStyle? voiceNoteStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
@@ -277,6 +284,7 @@ class LMChatThemeData {
         videoStyle: videoStyle ?? LMChatVideoStyle.basic(),
         documentStyle: documentStyle ?? LMChatDocumentStyle.basic(),
         gifStyle: gifStyle ?? LMChatGIFStyle.basic(),
+        voiceNoteStyle: voiceNoteStyle ?? LMChatVoiceNoteStyle.basic(),
         replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
         bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
         contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
@@ -284,13 +292,13 @@ class LMChatThemeData {
         stateBubbleStyle:
             stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
         appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
-      pollStyle: pollStyle ??
-          LMChatPollStyle.basic(
-            primaryColor: primaryColor,
-            containerColor: container,
-            onContainer: onContainer,
-            inActiveColor: inActiveColor,
-          ),
+        pollStyle: pollStyle ??
+            LMChatPollStyle.basic(
+              primaryColor: primaryColor,
+              containerColor: container,
+              onContainer: onContainer,
+              inActiveColor: inActiveColor,
+            ),
         reactionBarStyle: reactionBarStyle ?? LMChatReactionBarStyle.basic(),
         reactionBottomSheetStyle:
             reactionBottomSheetStyle ?? LMChatReactionBottomSheetStyle.basic(),
@@ -328,6 +336,7 @@ class LMChatThemeData {
     LMChatVideoStyle? videoStyle,
     LMChatDocumentStyle? documentStyle,
     LMChatGIFStyle? gifStyle,
+    LMChatVoiceNoteStyle? voiceNoteStyle,
     LMChatBubbleReplyStyle? replyStyle,
     LMChatBubbleStyle? bubbleStyle,
     LMChatBubbleContentStyle? contentStyle,
@@ -367,6 +376,7 @@ class LMChatThemeData {
       videoStyle: videoStyle ?? this.videoStyle,
       documentStyle: documentStyle ?? this.documentStyle,
       gifStyle: gifStyle ?? this.gifStyle,
+      voiceNoteStyle: voiceNoteStyle ?? this.voiceNoteStyle,
       replyStyle: replyStyle ?? this.replyStyle,
       bubbleStyle: bubbleStyle ?? this.bubbleStyle,
       contentStyle: contentStyle ?? this.contentStyle,
