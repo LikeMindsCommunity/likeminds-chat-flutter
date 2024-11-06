@@ -78,10 +78,6 @@ class _LMButtonState extends State<LMChatButton>
   late Animation<double> _scaleAnimation;
   Offset _dragOffset = Offset.zero;
 
-  // Different max distances for horizontal and vertical drags
-  static const double maxHorizontalDrag = 160.0;
-  static const double maxVerticalDrag = 80.0;
-
   bool? _isHorizontalDrag;
   Offset? _dragStartOffset;
 
@@ -89,8 +85,9 @@ class _LMButtonState extends State<LMChatButton>
   void initState() {
     super.initState();
     _active = widget.isActive;
+    final inStyle = widget.style ?? LMChatButtonStyle.basic();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: inStyle.animationDuration,
       vsync: this,
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(_controller);
@@ -138,6 +135,8 @@ class _LMButtonState extends State<LMChatButton>
       onLongPressMoveUpdate: widget.gesturesEnabled
           ? (details) {
               if (_isLongPressed) {
+                final inStyle = widget.style ?? LMChatButtonStyle.basic();
+
                 if (_dragStartOffset == null) {
                   _dragStartOffset = details.globalPosition;
                   return;
@@ -146,12 +145,8 @@ class _LMButtonState extends State<LMChatButton>
                 // Determine drag direction if not yet determined
                 if (_isHorizontalDrag == null) {
                   final dragDelta = details.globalPosition - _dragStartOffset!;
-                  if (dragDelta.distance > 10) {
-                    // Small threshold for intentional drag
+                  if (dragDelta.distance > inStyle.dragDirectionThreshold) {
                     _isHorizontalDrag = dragDelta.dx.abs() > dragDelta.dy.abs();
-                    // Debug initial direction
-                    debugPrint(
-                        'Drag direction locked to: ${_isHorizontalDrag! ? 'horizontal' : 'vertical'}');
                   } else {
                     return;
                   }
@@ -161,14 +156,14 @@ class _LMButtonState extends State<LMChatButton>
                 double constrainedX = 0.0;
                 double constrainedY = 0.0;
 
-                // Apply different constraints based on direction
                 if (_isHorizontalDrag!) {
-                  constrainedX = newOffset.dx.clamp(-maxHorizontalDrag, 0.0);
+                  constrainedX =
+                      newOffset.dx.clamp(-inStyle.maxHorizontalDrag, 0.0);
 
-                  // Add toast notifications at specific thresholds
-                  if (constrainedX <= -50 && constrainedX > -51) {
+                  if (constrainedX <= -inStyle.horizontalCancelThreshold &&
+                      constrainedX > -(inStyle.horizontalCancelThreshold + 1)) {
                     debugPrint('Crossed cancel threshold');
-                  } else if (constrainedX <= -150) {
+                  } else if (constrainedX <= -inStyle.maxHorizontalDrag) {
                     debugPrint('Near maximum horizontal drag');
                     widget.onHorizontalDragUpdate?.call(
                       DragUpdateDetails(
@@ -178,12 +173,13 @@ class _LMButtonState extends State<LMChatButton>
                     );
                   }
                 } else {
-                  constrainedY = newOffset.dy.clamp(-maxVerticalDrag, 0.0);
+                  constrainedY =
+                      newOffset.dy.clamp(-inStyle.maxVerticalDrag, 0.0);
 
-                  // Add toast notifications for vertical drag
-                  if (constrainedY <= -50 && constrainedY > -51) {
+                  if (constrainedY <= -inStyle.verticalLockThreshold &&
+                      constrainedY > -(inStyle.verticalLockThreshold + 1)) {
                     debugPrint('Crossed lock threshold');
-                  } else if (constrainedY <= -75) {
+                  } else if (constrainedY <= -inStyle.maxVerticalDrag) {
                     debugPrint('Near maximum vertical drag');
                     widget.onVerticalDragUpdate?.call(
                       DragUpdateDetails(
@@ -197,13 +193,6 @@ class _LMButtonState extends State<LMChatButton>
                 setState(() {
                   _dragOffset = Offset(constrainedX, constrainedY);
                 });
-
-                // // Call appropriate callbacks based on locked direction
-                // if (_isHorizontalDrag!) {
-
-                // } else {
-
-                // }
 
                 widget.onLongPressMoveUpdate?.call(details);
               }
@@ -354,6 +343,24 @@ class LMChatButtonStyle {
   /// Scale factor for the button when long pressed
   final double? scaleOnLongPress;
 
+  /// Duration for the scale animation
+  final Duration animationDuration;
+
+  /// Maximum horizontal drag distance allowed
+  final double maxHorizontalDrag;
+
+  /// Maximum vertical drag distance allowed
+  final double maxVerticalDrag;
+
+  /// Minimum drag distance to determine drag direction
+  final double dragDirectionThreshold;
+
+  /// Threshold for horizontal cancel action
+  final double horizontalCancelThreshold;
+
+  /// Threshold for vertical lock action
+  final double verticalLockThreshold;
+
   /// {@macro lm_chat_button_style}
   const LMChatButtonStyle({
     this.padding,
@@ -371,6 +378,12 @@ class LMChatButtonStyle {
     this.activeIcon,
     this.textPadding,
     this.scaleOnLongPress,
+    this.animationDuration = const Duration(milliseconds: 200),
+    this.maxHorizontalDrag = 160.0,
+    this.maxVerticalDrag = 80.0,
+    this.dragDirectionThreshold = 10.0,
+    this.horizontalCancelThreshold = 50.0,
+    this.verticalLockThreshold = 50.0,
   });
 
   /// Basic style factory constructor; used as default style
@@ -382,6 +395,12 @@ class LMChatButtonStyle {
       height: 28,
       spacing: 4,
       textPadding: EdgeInsets.zero,
+      animationDuration: Duration(milliseconds: 200),
+      maxHorizontalDrag: 160.0,
+      maxVerticalDrag: 80.0,
+      dragDirectionThreshold: 10.0,
+      horizontalCancelThreshold: 50.0,
+      verticalLockThreshold: 50.0,
     );
   }
 
@@ -402,6 +421,12 @@ class LMChatButtonStyle {
     LMChatIcon? activeIcon,
     EdgeInsets? textPadding,
     double? scaleOnLongPress,
+    Duration? animationDuration,
+    double? maxHorizontalDrag,
+    double? maxVerticalDrag,
+    double? dragDirectionThreshold,
+    double? horizontalCancelThreshold,
+    double? verticalLockThreshold,
   }) {
     return LMChatButtonStyle(
       padding: padding ?? this.padding,
@@ -419,6 +444,15 @@ class LMChatButtonStyle {
       activeIcon: activeIcon ?? this.activeIcon,
       textPadding: textPadding ?? this.textPadding,
       scaleOnLongPress: scaleOnLongPress ?? this.scaleOnLongPress,
+      animationDuration: animationDuration ?? this.animationDuration,
+      maxHorizontalDrag: maxHorizontalDrag ?? this.maxHorizontalDrag,
+      maxVerticalDrag: maxVerticalDrag ?? this.maxVerticalDrag,
+      dragDirectionThreshold:
+          dragDirectionThreshold ?? this.dragDirectionThreshold,
+      horizontalCancelThreshold:
+          horizontalCancelThreshold ?? this.horizontalCancelThreshold,
+      verticalLockThreshold:
+          verticalLockThreshold ?? this.verticalLockThreshold,
     );
   }
 }
