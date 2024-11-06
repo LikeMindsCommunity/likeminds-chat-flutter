@@ -609,6 +609,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       _resetRecordingState();
     } catch (e) {
       print('Error deleting recording: $e');
+      _resetRecordingState(); // Ensure state is reset even if error occurs
     }
   }
 
@@ -624,6 +625,11 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _cancelSlidePosition.value = 0;
     _recordingDuration.value = Duration.zero;
     _isPlaying.value = false;
+
+    // Force rebuild to show text field
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   LMChatButton _defSendButton(BuildContext context) {
@@ -1455,6 +1461,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
               mediaFile: audioFile,
               duration: _playbackProgress.value.duration.inSeconds.toDouble(),
               size: audioFile.lengthSync(),
+              meta: {
+                'duration': _playbackProgress.value.duration.inSeconds,
+                'file_name': audioFile.path.split('/').last,
+              },
             ),
           ],
         ),
@@ -1468,6 +1478,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     } catch (e) {
       print('Error sending voice note: $e');
       toast("Error sending voice note");
+      _resetRecordingState(); // Ensure state is reset even if error occurs
     }
   }
 
