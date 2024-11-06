@@ -1,11 +1,10 @@
-import 'dart:typed_data';
-
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
+/// Extension to convert [PollOption] to [LMChatPollOptionViewData]
 extension PollOptionViewDataConvertor on PollOption {
+  /// Converts [PollOption] to [LMChatPollOptionViewData]
   LMChatPollOptionViewData toPollOptionViewData({
     Map<int, User>? userMeta,
   }) {
@@ -27,7 +26,9 @@ extension PollOptionViewDataConvertor on PollOption {
   }
 }
 
+/// Extension to convert [LMChatPollOptionViewData] to [PollOption]
 extension PollOptionConvertor on LMChatPollOptionViewData {
+  /// Converts [LMChatPollOptionViewData] to [PollOption]
   PollOption toPollOption() {
     return PollOption(
       id: id,
