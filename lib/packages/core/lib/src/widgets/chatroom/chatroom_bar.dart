@@ -794,6 +794,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             );
           },
           onLongPress: () async {
+            toast(
+              "Swipe up to lock recording",
+              duration: const Duration(milliseconds: 200),
+            );
             final audioHandler = LMChatCoreAudioHandler.instance;
             try {
               HapticFeedback.mediumImpact();

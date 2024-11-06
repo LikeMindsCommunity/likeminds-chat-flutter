@@ -39,6 +39,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   // Add this to store the last known duration
   Duration? _lastKnownDuration;
 
+  // Add a map to store durations for each audio path
+  final Map<String, Duration> _audioDurations = {};
+
   LMChatCoreAudioHandler._internal();
 
   /// Returns the singleton instance of [LMChatAudioHandler].
@@ -97,6 +100,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   /// Starts a new recording session
   @override
   Future<String?> startRecording() async {
+    // Stop any playing audio before starting recording
+    await stopAudio();
+
     if (!_hasRecordingPermission) {
       final hasPermission = await requestRecordingPermission();
       if (!hasPermission) {
@@ -233,25 +239,17 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       await init();
     }
 
-    // If same audio is playing, do nothing
-    if (_currentlyPlayingUrl == path && _player.isPlaying) {
-      return;
-    }
-
     try {
-      // Stop any current playback before starting new one
-      if (_player.isPlaying || _player.isPaused) {
-        await stopAudio();
-      }
+      // Stop any current playback and clear state
+      await stopAudio();
 
       _currentlyPlayingUrl = path;
       _currentlyPlayingController.add(path);
 
-      // Check if path is a local file or URL
       bool isLocalFile = path.startsWith('/');
 
+      // Store duration for this specific path
       if (isLocalFile) {
-        // Local file playback (for recordings)
         final File audioFile = File(path);
         if (!await audioFile.exists()) {
           throw Exception('Audio file not found');
@@ -259,13 +257,12 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
         await _player.startPlayer(
           fromURI: path,
-          codec: _recordingCodec, // Use recording codec for local files
+          codec: _recordingCodec,
           whenFinished: () async {
             await _onPlaybackComplete(path);
           },
         );
       } else {
-        // URL playback (for voice notes)
         await _player.startPlayer(
           fromURI: path,
           whenFinished: () async {
@@ -274,7 +271,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
         );
       }
 
-      // Set up progress tracking
+      // Set up progress tracking for this specific path
       _setupProgressTracking(path);
     } catch (e) {
       print('Error playing audio: $e');
@@ -324,17 +321,18 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
         await _player.stopPlayer();
 
         if (_currentlyPlayingUrl != null) {
-          // Reset progress only when stopping
+          // Reset progress for the current URL
           _updateProgress(
             _currentlyPlayingUrl!,
-            const PlaybackProgress(
-              duration: Duration.zero,
+            PlaybackProgress(
+              duration: _audioDurations[_currentlyPlayingUrl!] ?? Duration.zero,
               position: Duration.zero,
             ),
           );
         }
       }
 
+      // Clear current playback state
       _currentlyPlayingUrl = null;
       _currentlyPlayingController.add('');
       await _currentProgressSubscription?.cancel();
@@ -376,6 +374,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       _isRecorderInitialized = false;
     }
 
+    // Clear all stored state
+    _audioDurations.clear();
     for (final controller in _progressControllers.values) {
       await controller.close();
     }
@@ -394,26 +394,26 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
   Future<void> _onPlaybackComplete(String path) async {
     await _player.stopPlayer();
+
+    // Store final duration before clearing state
+    final duration = _audioDurations[path] ?? Duration.zero;
+
+    // Clear state for this path
     _currentlyPlayingUrl = null;
     _currentlyPlayingController.add('');
-    // Reset progress
+
+    // Reset progress with the stored duration
     _updateProgress(
       path,
       PlaybackProgress(
-        duration: _lastKnownDuration ?? Duration.zero,
+        duration: duration,
         position: Duration.zero,
+        isCompleted: true,
       ),
     );
+
     await _currentProgressSubscription?.cancel();
     _currentProgressSubscription = null;
-    // Notify completion through the progress stream
-    _progressControllers[path]?.add(
-      PlaybackProgress(
-        duration: _lastKnownDuration ?? Duration.zero,
-        position: Duration.zero,
-        isCompleted: true, // Add this flag to PlaybackProgress
-      ),
-    );
   }
 
   Future<void> _onPlaybackError(String path) async {
@@ -434,18 +434,16 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     _currentProgressSubscription?.cancel();
     _player.setSubscriptionDuration(const Duration(milliseconds: 100));
 
-    // Get the stored duration for this path
-    final Duration storedDuration = _lastKnownDuration ?? Duration.zero;
-
     _currentProgressSubscription = _player.onProgress!.listen(
       (e) {
         if (_currentlyPlayingUrl == path) {
+          // Store duration for this path
+          _audioDurations[path] = e.duration;
+
           _updateProgress(
             path,
             PlaybackProgress(
-              // Use stored duration instead of player's duration
-              duration: storedDuration,
-              // Use player's position for tracking
+              duration: e.duration,
               position: e.position,
             ),
           );

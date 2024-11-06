@@ -152,21 +152,23 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
 
   void _subscribeToProgressUpdates(String mediaUrl) {
     _progressSubscription?.cancel();
-    _progressSubscription =
-        widget.handler!.getProgressStream(mediaUrl).listen(_updateProgress);
-  }
+    _progressSubscription = widget.handler!.getProgressStream(mediaUrl).listen(
+      (progress) {
+        if (!mounted || _isDragging) return;
 
-  void _updateProgress(PlaybackProgress progress) {
-    if (!mounted || _isDragging) return;
-
-    setState(() {
-      _totalDuration = progress.duration;
-      if (_totalDuration.inMilliseconds > 0) {
-        _progress =
-            (progress.position.inMilliseconds / _totalDuration.inMilliseconds)
+        setState(() {
+          _totalDuration = progress.duration;
+          if (_totalDuration.inMilliseconds > 0) {
+            _progress = (progress.position.inMilliseconds /
+                    _totalDuration.inMilliseconds)
                 .clamp(0.0, 1.0);
-      }
-    });
+          }
+        });
+      },
+      onError: (error) {
+        print('Error in progress stream: $error');
+      },
+    );
   }
 
   Future<void> _startPlayer() async {
@@ -185,14 +187,24 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
   }
 
   Future<void> _startWithHandler() async {
-    await widget.handler!.stopAudio(); // Ensure clean state
+    await widget.handler!.stopAudio();
+    setState(() {
+      _progress = 0.0;
+    });
 
-    // Prefer local file over URL if available
+    String mediaPath = '';
     if (widget.media.mediaFile != null) {
-      await widget.handler!.playAudio(widget.media.mediaFile!.path);
+      mediaPath = widget.media.mediaFile!.path;
+      await widget.handler!.playAudio(mediaPath);
     } else if (widget.media.mediaUrl != null) {
-      await widget.handler!.playAudio(widget.media.mediaUrl!);
+      mediaPath = widget.media.mediaUrl!;
+      await widget.handler!.playAudio(mediaPath);
     }
+
+    _subscribeToProgressUpdates(mediaPath);
+    setState(() {
+      _isAudioPlaying = true;
+    });
     widget.onPlay?.call();
   }
 
@@ -240,23 +252,37 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
       _isAudioPlaying = false;
       _progress = 0.0;
     });
+    if (_useExternalHandler) {
+      widget.handler!.stopAudio();
+    } else {
+      _localPlayer.stopPlayer();
+    }
+    widget.onPause?.call();
   }
 
   void _setupLocalPlayerProgress() {
-    _localPlayer.setSubscriptionDuration(const Duration(milliseconds: 100));
     _playerSubscription?.cancel();
-    _playerSubscription = _localPlayer.onProgress!.listen((e) {
-      if (!mounted || _isDragging) return;
+    _playerSubscription = _localPlayer.onProgress!.listen(
+      (e) {
+        if (!mounted || _isDragging) return;
 
-      setState(() {
-        _totalDuration = e.duration;
-        if (_totalDuration.inMilliseconds > 0) {
-          _progress =
-              (e.position.inMilliseconds / _totalDuration.inMilliseconds)
-                  .clamp(0.0, 1.0);
-        }
-      });
-    });
+        setState(() {
+          _totalDuration = e.duration;
+          if (_totalDuration.inMilliseconds > 0) {
+            _progress =
+                (e.position.inMilliseconds / _totalDuration.inMilliseconds)
+                    .clamp(0.0, 1.0);
+
+            if (_progress >= 0.99) {
+              _onPlaybackComplete();
+            }
+          }
+        });
+      },
+      onError: (error) {
+        print('Error in local player progress: $error');
+      },
+    );
   }
 
   Future<void> _togglePlayPause() async {
@@ -359,15 +385,27 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
                 _isDragging = true;
                 widget.onSlideStart?.call(value);
               },
-              onChangeEnd: (value) {
+              onChangeEnd: (value) async {
                 _isDragging = false;
-                final position = Duration(
-                  milliseconds: (_totalDuration.inMilliseconds * value).toInt(),
-                );
-                if (_useExternalHandler) {
-                  widget.handler!.seekTo(position);
+                if (value >= 0.99) {
+                  _onPlaybackComplete();
                 } else {
-                  _localPlayer.seekToPlayer(position);
+                  final position = Duration(
+                    milliseconds:
+                        (_totalDuration.inMilliseconds * value).toInt(),
+                  );
+                  if (_useExternalHandler) {
+                    await widget.handler!.seekTo(position);
+                  } else {
+                    await _localPlayer.seekToPlayer(position);
+                  }
+                  if (_isAudioPlaying) {
+                    if (_useExternalHandler) {
+                      await widget.handler!.resumeAudio();
+                    } else {
+                      await _localPlayer.resumePlayer();
+                    }
+                  }
                 }
                 widget.onSlideEnd?.call(value);
               },
