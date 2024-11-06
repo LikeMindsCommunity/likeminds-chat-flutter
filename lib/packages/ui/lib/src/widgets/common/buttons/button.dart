@@ -85,11 +85,6 @@ class _LMButtonState extends State<LMChatButton>
   bool? _isHorizontalDrag;
   Offset? _dragStartOffset;
 
-  // Add debug info
-  void _debugDragInfo(String direction, double distance) {
-    debugPrint('Dragging $direction: ${distance.toStringAsFixed(2)} pixels');
-  }
-
   @override
   void initState() {
     super.initState();
@@ -169,7 +164,6 @@ class _LMButtonState extends State<LMChatButton>
                 // Apply different constraints based on direction
                 if (_isHorizontalDrag!) {
                   constrainedX = newOffset.dx.clamp(-maxHorizontalDrag, 0.0);
-                  _debugDragInfo('horizontal', constrainedX.abs());
 
                   // Add toast notifications at specific thresholds
                   if (constrainedX <= -50 && constrainedX > -51) {
@@ -185,7 +179,6 @@ class _LMButtonState extends State<LMChatButton>
                   }
                 } else {
                   constrainedY = newOffset.dy.clamp(-maxVerticalDrag, 0.0);
-                  _debugDragInfo('vertical', constrainedY.abs());
 
                   // Add toast notifications for vertical drag
                   if (constrainedY <= -50 && constrainedY > -51) {

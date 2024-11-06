@@ -328,13 +328,23 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
 
   @override
   void dispose() {
-    if (_isAudioPlaying && _useExternalHandler) {
-      widget.handler!.stopAudio();
+    // Stop playback before disposing
+    if (_isAudioPlaying) {
+      if (_useExternalHandler) {
+        widget.handler!.stopAudio();
+      } else {
+        _localPlayer.stopPlayer();
+      }
     }
+
+    // Clean up all subscriptions
     _cleanupSubscriptions();
-    if (!_useExternalHandler) {
+
+    // Close local player if using one
+    if (!_useExternalHandler && _localPlayer.isOpen()) {
       _localPlayer.closePlayer();
     }
+
     super.dispose();
   }
 

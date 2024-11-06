@@ -103,11 +103,10 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     // Stop any playing audio before starting recording
     await stopAudio();
 
+    // Check and request permissions first
+    _hasRecordingPermission = await handlePermissions(3); // 3 for microphone
     if (!_hasRecordingPermission) {
-      final hasPermission = await requestRecordingPermission();
-      if (!hasPermission) {
-        throw Exception('Recording permission not granted');
-      }
+      throw Exception('Recording permission not granted');
     }
 
     if (!_isRecorderInitialized) {
@@ -361,31 +360,43 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   /// Disposes of all resources
   @override
   Future<void> dispose() async {
-    await stopAudio();
-    await _currentProgressSubscription?.cancel();
+    try {
+      // Stop any ongoing playback or recording
+      if (_isRecording) {
+        await cancelRecording();
+      }
+      await stopAudio();
 
-    if (_isPlayerInitialized) {
-      await _player.closePlayer();
-      _isPlayerInitialized = false;
+      // Clean up player resources
+      await _currentProgressSubscription?.cancel();
+      if (_isPlayerInitialized) {
+        await _player.closePlayer();
+        _isPlayerInitialized = false;
+      }
+
+      // Clean up recorder resources
+      if (_isRecorderInitialized) {
+        await _recorder.closeRecorder();
+        _isRecorderInitialized = false;
+      }
+
+      // Clear all stored state and controllers
+      _audioDurations.clear();
+      for (final controller in _progressControllers.values) {
+        await controller.close();
+      }
+      _progressControllers.clear();
+
+      await _currentlyPlayingController.close();
+      _currentlyPlayingUrl = null;
+      _hasRecordingPermission = false;
+      await _recordingLevelController.close();
+
+      // Clean up any temporary files
+      await _cleanupOldRecordings();
+    } catch (e) {
+      print('Error in dispose: $e');
     }
-
-    if (_isRecorderInitialized) {
-      await _recorder.closeRecorder();
-      _isRecorderInitialized = false;
-    }
-
-    // Clear all stored state
-    _audioDurations.clear();
-    for (final controller in _progressControllers.values) {
-      await controller.close();
-    }
-    _progressControllers.clear();
-
-    await _currentlyPlayingController.close();
-    _currentlyPlayingUrl = null;
-    _hasRecordingPermission = false;
-    await _recordingLevelController.close();
-    await _cleanupOldRecordings();
   }
 
   // @override

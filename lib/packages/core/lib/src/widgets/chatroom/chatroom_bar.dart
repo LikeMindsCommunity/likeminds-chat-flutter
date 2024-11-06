@@ -196,22 +196,27 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   @override
   void dispose() {
+    // Clean up recording related resources
+    _stopRecordingTimer();
+    if (_isRecordingLocked.value || _isReviewingRecording.value) {
+      LMChatCoreAudioHandler.instance.cancelRecording();
+    }
+
+    // Clean up all controllers and subscriptions
     _popupMenuController.dispose();
-    _textEditingController.removeListener(() {
-      _onTextChanged(_textEditingController.text); // Clean up listener
-    });
     _textEditingController.dispose();
     _focusNode.dispose();
     _debounce?.cancel();
-    _textInputNotifier.dispose(); // Dispose the ValueNotifier
+    _textInputNotifier.dispose();
     _recordingTimer?.cancel();
     _recordingDuration.dispose();
     _isReviewingRecording.dispose();
     _playbackProgress.dispose();
     _isVoiceButtonHeld.dispose();
-    _isPlaying.dispose(); // Dispose isPlaying notifier
-    _breathingController.dispose(); // Add this line
-    _isRecordingLocked.dispose(); // Add this line
+    _isPlaying.dispose();
+    _breathingController.dispose();
+    _isRecordingLocked.dispose();
+
     super.dispose();
   }
 
@@ -793,33 +798,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
               duration: const Duration(milliseconds: 300),
             );
           },
-          onLongPress: () async {
-            toast(
-              "Swipe up to lock recording",
-              duration: const Duration(milliseconds: 200),
-            );
-            final audioHandler = LMChatCoreAudioHandler.instance;
-            try {
-              HapticFeedback.mediumImpact();
-              _currentRecordingPath = await audioHandler.startRecording();
-              if (_currentRecordingPath != null) {
-                _isVoiceButtonHeld.value = true;
-                _startRecordingTimer();
-              } else {
-                toast(
-                  "Couldn't start recording",
-                  duration: const Duration(milliseconds: 300),
-                );
-              }
-            } catch (e) {
-              toast(
-                "Error starting recording",
-                duration: const Duration(milliseconds: 300),
-              );
-              debugPrint('Voice recording error: $e');
-              _resetRecordingState();
-            }
-          },
+          onLongPress: _startRecording,
           onHorizontalDragUpdate: (details) {
             if (_isVoiceButtonHeld.value) {
               if (details.delta.dx < -155) {
@@ -1658,5 +1637,51 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Add error recovery method
   void _handleRecordingError() {
     _resetRecordingState();
+  }
+
+  // Add permission check before starting recording
+  Future<void> _startRecording() async {
+    try {
+      final audioHandler = LMChatCoreAudioHandler.instance;
+
+      // Request permissions first
+      final hasPermission = await handlePermissions(3); // 3 for microphone
+      if (!hasPermission) {
+        toast(
+          "Microphone permission is required for voice recording",
+          duration: const Duration(milliseconds: 1500),
+        );
+        return;
+      }
+
+      toast(
+        "Swipe up to lock recording",
+        duration: const Duration(milliseconds: 300),
+      );
+      _currentRecordingPath = await audioHandler.startRecording();
+      if (_currentRecordingPath != null) {
+        _isVoiceButtonHeld.value = true;
+        _startRecordingTimer();
+      } else {
+        toast(
+          "Couldn't start recording",
+          duration: const Duration(milliseconds: 300),
+        );
+      }
+    } catch (e) {
+      if (e.toString().contains('permission')) {
+        toast(
+          "Please grant microphone permission in settings to record voice notes",
+          duration: const Duration(milliseconds: 1500),
+        );
+      } else {
+        toast(
+          "Error starting recording",
+          duration: const Duration(milliseconds: 300),
+        );
+      }
+      debugPrint('Voice recording error: $e');
+      _resetRecordingState();
+    }
   }
 }
