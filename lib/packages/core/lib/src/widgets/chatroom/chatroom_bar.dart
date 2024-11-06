@@ -62,7 +62,8 @@ class LMChatroomBar extends StatefulWidget {
   State<LMChatroomBar> createState() => _LMChatroomBarState();
 }
 
-class _LMChatroomBarState extends State<LMChatroomBar> {
+class _LMChatroomBarState extends State<LMChatroomBar>
+    with SingleTickerProviderStateMixin {
   LMChatConversationViewData? replyToConversation;
   List<LMChatAttachmentViewData>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
@@ -131,6 +132,10 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   // Add isPlaying ValueNotifier
   final ValueNotifier<bool> _isPlaying = ValueNotifier<bool>(false);
 
+  // Add this near the top of the _LMChatroomBarState class
+  late final AnimationController _breathingController;
+  late final Animation<Color?> _breathingAnimation;
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -167,6 +172,20 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _textEditingController.addListener(() {
       _onTextChanged(_textEditingController.text); // Notify on text change
     });
+
+    // Setup breathing animation with continuous looping
+    _breathingController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _breathingAnimation = ColorTween(
+      begin: Colors.red,
+      end: _themeData.onContainer,
+    ).animate(CurvedAnimation(
+      parent: _breathingController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -186,6 +205,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _playbackProgress.dispose();
     _isVoiceButtonHeld.dispose();
     _isPlaying.dispose(); // Dispose isPlaying notifier
+    _breathingController.dispose(); // Add this line
     super.dispose();
   }
 
@@ -488,6 +508,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     return Container(
       width: 80.w,
       height: 6.h,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: _themeData.container,
         borderRadius: BorderRadius.circular(24),
@@ -497,13 +518,21 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           ValueListenableBuilder<bool>(
             valueListenable: _isPlaying,
             builder: (context, isPlaying, child) {
-              return IconButton(
-                icon: Icon(
-                  isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                  color: _themeData.onContainer,
-                  size: 28,
+              return LMChatButton(
+                onTap: () => _handlePlayPause(),
+                style: LMChatButtonStyle(
+                  height: 28,
+                  width: 28,
+                  backgroundColor: _themeData.container,
                 ),
-                onPressed: () => _handlePlayPause(),
+                icon: LMChatIcon(
+                  type: LMChatIconType.icon,
+                  icon: isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                  style: LMChatIconStyle(
+                    color: _themeData.onContainer,
+                    size: 28,
+                  ),
+                ),
               );
             },
           ),
@@ -524,12 +553,21 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
             },
           ),
           const Spacer(),
-          IconButton(
-            icon: Icon(
-              Icons.cancel_outlined,
-              color: _themeData.inActiveColor,
+          LMChatButton(
+            onTap: () => _handleDeleteRecording(),
+            style: LMChatButtonStyle(
+              height: 28,
+              width: 28,
+              backgroundColor: _themeData.container,
             ),
-            onPressed: () => _handleDeleteRecording(),
+            icon: LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: Icons.cancel_outlined,
+              style: LMChatIconStyle(
+                size: 28,
+                color: _themeData.inActiveColor,
+              ),
+            ),
           ),
         ],
       ),
@@ -537,13 +575,26 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
   }
 
   Widget _buildRecordingIndicator() {
-    return Container(
-      height: 10,
-      width: 10,
-      decoration: BoxDecoration(
-        color: Colors.red,
-        borderRadius: BorderRadius.circular(5),
-      ),
+    return AnimatedBuilder(
+      animation: _breathingAnimation,
+      builder: (context, child) {
+        return Container(
+          height: 28, // Increased container size
+          width: 28, // Increased container size
+          decoration: BoxDecoration(
+            color: _themeData.container,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.mic,
+            style: LMChatIconStyle(
+              size: 18, // Increased icon size
+              color: _breathingAnimation.value,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -570,7 +621,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
         _isPlaying.value = true;
       }
     } catch (e) {
-      print('Error handling play/pause: $e');
+      debugPrint('Error handling play/pause: $e');
       _isPlaying.value = false;
     }
   }
@@ -580,14 +631,14 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     try {
       await LMChatCoreAudioHandler.instance.seekTo(position);
     } catch (e) {
-      print('Error seeking: $e');
+      debugPrint('Error seeking: $e');
     }
   }
 
   void _handleSendRecording() {
     if (_recordedFilePath == null) return;
     // TODO: Implement sending the recording
-    print("Sending recording: $_recordedFilePath");
+    debugPrint("Sending recording: $_recordedFilePath");
     _resetRecordingState();
   }
 
@@ -608,7 +659,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
 
       _resetRecordingState();
     } catch (e) {
-      print('Error deleting recording: $e');
+      debugPrint('Error deleting recording: $e');
       _resetRecordingState(); // Ensure state is reset even if error occurs
     }
   }
@@ -678,7 +729,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
           }
         } catch (e) {
           toast("Error starting recording");
-          print('Recording error: $e');
+          debugPrint('Recording error: $e');
         }
       },
       onLongPressEnd: (details) async {
@@ -727,7 +778,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
                   }
                 },
                 onError: (error) {
-                  print('Playback error: $error');
+                  debugPrint('Playback error: $error');
                   _handleRecordingError();
                 },
               );
@@ -737,7 +788,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
             }
           }
         } catch (e) {
-          print('Recording error: $e');
+          debugPrint('Recording error: $e');
           _handleRecordingError();
         }
       },
@@ -1423,6 +1474,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _recordingDuration.value = Duration(seconds: timer.tick);
     });
+    // Start continuous animation
+    _breathingController.repeat(reverse: true);
   }
 
   // Add this method to stop recording timer
@@ -1430,6 +1483,8 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
     _recordingTimer?.cancel();
     _recordingTimer = null;
     _recordingDuration.value = Duration.zero;
+    _breathingController.stop();
+    _breathingController.reset();
   }
 
   // Add method to handle sending voice note
@@ -1476,7 +1531,7 @@ class _LMChatroomBarState extends State<LMChatroomBar> {
       }
       widget.scrollToBottom();
     } catch (e) {
-      print('Error sending voice note: $e');
+      debugPrint('Error sending voice note: $e');
       toast("Error sending voice note");
       _resetRecordingState(); // Ensure state is reset even if error occurs
     }
