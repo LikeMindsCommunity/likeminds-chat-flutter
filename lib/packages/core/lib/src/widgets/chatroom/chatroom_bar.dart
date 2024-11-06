@@ -121,7 +121,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   Timer? _recordingTimer;
   final ValueNotifier<Duration> _recordingDuration =
       ValueNotifier(Duration.zero);
-  final ValueNotifier<double> _cancelSlidePosition = ValueNotifier(0.0);
 
   // Add this variable to track the current recording path
   String? _currentRecordingPath;
@@ -204,7 +203,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     _textInputNotifier.dispose(); // Dispose the ValueNotifier
     _recordingTimer?.cancel();
     _recordingDuration.dispose();
-    _cancelSlidePosition.dispose();
     _isReviewingRecording.dispose();
     _playbackProgress.dispose();
     _isVoiceButtonHeld.dispose();
@@ -433,77 +431,59 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _buildRecordingContainer(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        _cancelSlidePosition.value += details.delta.dx;
-        if (_cancelSlidePosition.value < -100) {
-          HapticFeedback.heavyImpact();
-          _isVoiceButtonHeld.value = false;
-          _stopRecordingTimer();
-          toast("Recording cancelled");
-        } else if (_cancelSlidePosition.value < -50) {
-          HapticFeedback.selectionClick();
-        }
-      },
-      child: Container(
-        width: 80.w,
-        height: 6.h,
-        decoration: BoxDecoration(
-          color: _themeData.container,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildRecordingIndicator(),
-                  ),
-                  ValueListenableBuilder<Duration>(
-                    valueListenable: _recordingDuration,
-                    builder: (context, duration, child) {
-                      return Text(
-                        "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            ValueListenableBuilder<double>(
-              valueListenable: _cancelSlidePosition,
-              builder: (context, position, child) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_back,
-                        size: 16,
-                        color: _themeData.inActiveColor,
+    return Container(
+      width: 80.w,
+      height: 6.h,
+      decoration: BoxDecoration(
+        color: _themeData.container,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildRecordingIndicator(),
+                ),
+                ValueListenableBuilder<Duration>(
+                  valueListenable: _recordingDuration,
+                  builder: (context, duration, child) {
+                    return Text(
+                      "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "Slide to cancel",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: _themeData.inActiveColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.arrow_back,
+                  size: 16,
+                  color: _themeData.inActiveColor,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  "Slide to cancel",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _themeData.inActiveColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -631,37 +611,50 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   void _handleDeleteRecording() async {
-    if (_recordedFilePath == null) return;
-
     try {
       final audioHandler = LMChatCoreAudioHandler.instance;
+
+      // Stop recording timer first
+      _stopRecordingTimer();
+
+      // Stop any ongoing playback
       if (_isPlaying.value) {
         await audioHandler.stopAudio();
         _isPlaying.value = false;
       }
 
-      final file = File(_recordedFilePath!);
-      if (await file.exists()) {
-        await file.delete();
+      // Cancel any ongoing recording
+      if (_isVoiceButtonHeld.value) {
+        await audioHandler.cancelRecording();
+      }
+      // Delete the recorded file if it exists
+      else if (_recordedFilePath != null) {
+        final file = File(_recordedFilePath!);
+        if (await file.exists()) {
+          await file.delete();
+        }
       }
 
       _resetRecordingState();
     } catch (e) {
-      debugPrint('Error deleting recording: $e');
+      debugPrint('Error handling recording deletion: $e');
       _resetRecordingState(); // Ensure state is reset even if error occurs
     }
   }
 
-  // Also update the reset state method to be more thorough
   void _resetRecordingState() {
+    // Stop timer if it's running
+    _stopRecordingTimer();
+
+    // Reset all state variables
     _isReviewingRecording.value = false;
     _isVoiceButtonHeld.value = false;
     _recordedFilePath = null;
+    _currentRecordingPath = null;
     _playbackProgress.value = const PlaybackProgress(
       duration: Duration.zero,
       position: Duration.zero,
     );
-    _cancelSlidePosition.value = 0;
     _recordingDuration.value = Duration.zero;
     _isPlaying.value = false;
 
@@ -693,109 +686,130 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     );
   }
 
-  LMChatButton _defVoiceButton(BuildContext context) {
-    return LMChatButton(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        toast(
-          "Hold to start recording",
-          duration: const Duration(milliseconds: 200),
-        );
-      },
-      onLongPress: () async {
-        final audioHandler = LMChatCoreAudioHandler.instance;
-
-        try {
-          HapticFeedback.heavyImpact();
-          _currentRecordingPath = await audioHandler.startRecording();
-          if (_currentRecordingPath != null) {
-            _isVoiceButtonHeld.value = true;
-            _cancelSlidePosition.value = 0;
-            _startRecordingTimer();
-          } else {
-            toast("Couldn't start recording");
-          }
-        } catch (e) {
-          toast("Error starting recording");
-          debugPrint('Recording error: $e');
-        }
-      },
-      onLongPressEnd: (details) async {
-        if (!_isVoiceButtonHeld.value) return;
-
-        try {
-          final audioHandler = LMChatCoreAudioHandler.instance;
-          HapticFeedback.mediumImpact();
-
-          // Get the final duration before stopping timer
-          final recordedDuration = _recordingDuration.value;
-          _stopRecordingTimer();
-
-          if (_cancelSlidePosition.value < -100) {
-            await audioHandler.cancelRecording();
-            _resetRecordingState();
-          } else {
-            // Pass the recorded duration when stopping
-            final recordingPath = await audioHandler.stopRecording(
-              recordedDuration: recordedDuration,
+  Widget _defVoiceButton(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isVoiceButtonHeld,
+      builder: (context, isHeld, child) {
+        return LMChatButton(
+          gesturesEnabled: true,
+          onTap: () {
+            HapticFeedback.lightImpact();
+            toast(
+              "Hold to start recording",
+              duration: const Duration(milliseconds: 200),
             );
-
-            if (recordingPath != null) {
-              _recordedFilePath = recordingPath;
-              _isReviewingRecording.value = true;
-              _isVoiceButtonHeld.value = false;
-
-              // Initialize playback progress with the actual recorded duration
-              _playbackProgress.value = PlaybackProgress(
-                duration: recordedDuration,
-                position: Duration.zero,
-              );
-
-              // Subscribe to playback progress
-              audioHandler.getProgressStream(recordingPath).listen(
-                (progress) {
-                  // Keep the original duration but update position
-                  _playbackProgress.value = PlaybackProgress(
-                    duration: recordedDuration,
-                    position: progress.position,
-                    isCompleted: progress.isCompleted,
-                  );
-                  // Reset playing state when playback completes
-                  if (progress.isCompleted == true) {
-                    _isPlaying.value = false;
-                  }
-                },
-                onError: (error) {
-                  debugPrint('Playback error: $error');
-                  _handleRecordingError();
-                },
-              );
-            } else {
-              toast("Recording too short");
+          },
+          onLongPress: () async {
+            final audioHandler = LMChatCoreAudioHandler.instance;
+            try {
+              HapticFeedback.mediumImpact();
+              _currentRecordingPath = await audioHandler.startRecording();
+              if (_currentRecordingPath != null) {
+                _isVoiceButtonHeld.value = true;
+                _startRecordingTimer();
+              } else {
+                toast("Couldn't start recording");
+              }
+            } catch (e) {
+              toast("Error starting recording");
+              debugPrint('Recording error: $e');
               _resetRecordingState();
             }
-          }
-        } catch (e) {
-          debugPrint('Recording error: $e');
-          _handleRecordingError();
-        }
+          },
+          onHorizontalDragUpdate: (details) {
+            if (_isVoiceButtonHeld.value) {
+              if (details.delta.dx < -155) {
+                HapticFeedback.lightImpact();
+                _stopRecordingTimer(); // Stop timer before handling deletion
+                _handleDeleteRecording();
+                toast(
+                  "Recording cancelled",
+                  duration: const Duration(milliseconds: 300),
+                );
+              }
+            }
+          },
+          onVerticalDragUpdate: (details) {
+            if (_isVoiceButtonHeld.value && details.delta.dy < -75) {
+              HapticFeedback.mediumImpact();
+              toast("Recording locked");
+              // Lock recording logic here
+              // _isVoiceButtonHeld.value = false;
+              // _cancelSlidePosition.value = 0;
+            }
+          },
+          onLongPressEnd: (details) async {
+            if (!_isVoiceButtonHeld.value) return;
+
+            try {
+              final audioHandler = LMChatCoreAudioHandler.instance;
+              HapticFeedback.mediumImpact();
+
+              final recordedDuration = _recordingDuration.value;
+              _stopRecordingTimer();
+
+              final recordingPath = await audioHandler.stopRecording(
+                recordedDuration: recordedDuration,
+              );
+
+              if (recordingPath != null) {
+                if (recordedDuration.inSeconds < 1) {
+                  toast("Recording too short");
+                  _handleDeleteRecording();
+                  return;
+                }
+
+                _recordedFilePath = recordingPath;
+                _isReviewingRecording.value = true;
+                _isVoiceButtonHeld.value = false;
+
+                _playbackProgress.value = PlaybackProgress(
+                  duration: recordedDuration,
+                  position: Duration.zero,
+                );
+
+                audioHandler.getProgressStream(recordingPath).listen(
+                  (progress) {
+                    _playbackProgress.value = PlaybackProgress(
+                      duration: recordedDuration,
+                      position: progress.position,
+                      isCompleted: progress.isCompleted,
+                    );
+                    if (progress.isCompleted == true) {
+                      _isPlaying.value = false;
+                    }
+                  },
+                  onError: (error) {
+                    debugPrint('Playback error: $error');
+                    _handleRecordingError();
+                  },
+                );
+              } else {
+                _resetRecordingState();
+              }
+            } catch (e) {
+              debugPrint('Recording error: $e');
+              _handleRecordingError();
+            }
+          },
+          style: LMChatButtonStyle(
+            backgroundColor: _themeData.primaryColor,
+            borderRadius: 100,
+            height: 6.h,
+            width: 6.h,
+            scaleOnLongPress: 1.6,
+          ),
+          icon: LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.mic,
+            style: LMChatIconStyle(
+              size: 28,
+              boxSize: 28,
+              color: _themeData.container,
+            ),
+          ),
+        );
       },
-      style: LMChatButtonStyle(
-        backgroundColor: _themeData.primaryColor,
-        borderRadius: 100,
-        height: 6.h,
-        width: 6.h,
-        scaleOnLongPress: 1.6,
-      ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.mic,
-        style: LMChatIconStyle(
-          size: 28,
-          boxSize: 28,
-          color: _themeData.container,
-        ),
-      ),
     );
   }
 
@@ -1458,11 +1472,15 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   // Add this method to start recording timer
   void _startRecordingTimer() {
+    _stopRecordingTimer(); // Ensure any existing timer is stopped
     _recordingDuration.value = Duration.zero;
     _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _recordingDuration.value = Duration(seconds: timer.tick);
+      if (_isVoiceButtonHeld.value) {
+        _recordingDuration.value = Duration(seconds: timer.tick);
+      } else {
+        _stopRecordingTimer();
+      }
     });
-    // Start continuous animation
     _breathingController.repeat(reverse: true);
   }
 
@@ -1470,7 +1488,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   void _stopRecordingTimer() {
     _recordingTimer?.cancel();
     _recordingTimer = null;
-    _recordingDuration.value = Duration.zero;
     _breathingController.stop();
     _breathingController.reset();
   }
@@ -1528,13 +1545,5 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Add error recovery method
   void _handleRecordingError() {
     _resetRecordingState();
-    _isVoiceButtonHeld.value = false;
-    _isReviewingRecording.value = false;
-    _recordedFilePath = null;
-    _cancelSlidePosition.value = 0;
-    _isPlaying.value = false;
-
-    LMChatCoreAudioHandler.instance.cancelRecording();
-    toast("Recording failed. Please try again.");
   }
 }

@@ -20,10 +20,15 @@ class LMChatButton extends StatefulWidget {
     this.onLongPressEnd,
     this.onLongPressMoveUpdate,
     this.onVerticalDragUpdate,
+    this.onHorizontalDragUpdate,
+    this.gesturesEnabled = false,
   });
 
   /// Required parameter, defines whether the button is active or disabled
   final bool isActive;
+
+  /// Controls whether gestures (long press, drags) are enabled
+  final bool gesturesEnabled;
 
   /// style class to customise the look and feel of the button
   final LMChatButtonStyle? style;
@@ -58,6 +63,9 @@ class LMChatButton extends StatefulWidget {
   /// Action to perform when there is a vertical drag while holding the button
   final Function(DragUpdateDetails)? onVerticalDragUpdate;
 
+  /// Action to perform when dragging horizontally
+  final Function(DragUpdateDetails)? onHorizontalDragUpdate;
+
   @override
   State<LMChatButton> createState() => _LMButtonState();
 }
@@ -65,8 +73,22 @@ class LMChatButton extends StatefulWidget {
 class _LMButtonState extends State<LMChatButton>
     with SingleTickerProviderStateMixin {
   bool _active = false;
+  bool _isLongPressed = false;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  Offset _dragOffset = Offset.zero;
+
+  // Different max distances for horizontal and vertical drags
+  static const double maxHorizontalDrag = 160.0;
+  static const double maxVerticalDrag = 80.0;
+
+  bool? _isHorizontalDrag;
+  Offset? _dragStartOffset;
+
+  // Add debug info
+  void _debugDragInfo(String direction, double distance) {
+    debugPrint('Dragging $direction: ${distance.toStringAsFixed(2)} pixels');
+  }
 
   @override
   void initState() {
@@ -105,32 +127,121 @@ class _LMButtonState extends State<LMChatButton>
         });
         widget.onTap?.call();
       },
-      onLongPressStart: (details) {
-        _controller.forward();
-        widget.onLongPressStart?.call(details);
-      },
-      onVerticalDragUpdate: (details) {
-        widget.onVerticalDragUpdate?.call(details);
-      },
-      onLongPress: widget.onLongPress,
-      onLongPressEnd: (details) {
-        _controller.reverse();
-        widget.onLongPressEnd?.call(details);
-      },
-      onLongPressMoveUpdate: (details) {
-        widget.onLongPressMoveUpdate?.call(details);
-      },
+      onLongPressStart: widget.gesturesEnabled
+          ? (details) {
+              setState(() {
+                _isLongPressed = true;
+                _dragOffset = Offset.zero;
+                _dragStartOffset = details.globalPosition;
+                _isHorizontalDrag = null;
+              });
+              _controller.forward();
+              widget.onLongPressStart?.call(details);
+            }
+          : null,
+      onLongPress: widget.gesturesEnabled ? widget.onLongPress : null,
+      onLongPressMoveUpdate: widget.gesturesEnabled
+          ? (details) {
+              if (_isLongPressed) {
+                if (_dragStartOffset == null) {
+                  _dragStartOffset = details.globalPosition;
+                  return;
+                }
+
+                // Determine drag direction if not yet determined
+                if (_isHorizontalDrag == null) {
+                  final dragDelta = details.globalPosition - _dragStartOffset!;
+                  if (dragDelta.distance > 10) {
+                    // Small threshold for intentional drag
+                    _isHorizontalDrag = dragDelta.dx.abs() > dragDelta.dy.abs();
+                    // Debug initial direction
+                    debugPrint(
+                        'Drag direction locked to: ${_isHorizontalDrag! ? 'horizontal' : 'vertical'}');
+                  } else {
+                    return;
+                  }
+                }
+
+                final newOffset = details.offsetFromOrigin;
+                double constrainedX = 0.0;
+                double constrainedY = 0.0;
+
+                // Apply different constraints based on direction
+                if (_isHorizontalDrag!) {
+                  constrainedX = newOffset.dx.clamp(-maxHorizontalDrag, 0.0);
+                  _debugDragInfo('horizontal', constrainedX.abs());
+
+                  // Add toast notifications at specific thresholds
+                  if (constrainedX <= -50 && constrainedX > -51) {
+                    debugPrint('Crossed cancel threshold');
+                  } else if (constrainedX <= -150) {
+                    debugPrint('Near maximum horizontal drag');
+                    widget.onHorizontalDragUpdate?.call(
+                      DragUpdateDetails(
+                        globalPosition: details.globalPosition,
+                        delta: Offset(constrainedX, 0),
+                      ),
+                    );
+                  }
+                } else {
+                  constrainedY = newOffset.dy.clamp(-maxVerticalDrag, 0.0);
+                  _debugDragInfo('vertical', constrainedY.abs());
+
+                  // Add toast notifications for vertical drag
+                  if (constrainedY <= -50 && constrainedY > -51) {
+                    debugPrint('Crossed lock threshold');
+                  } else if (constrainedY <= -75) {
+                    debugPrint('Near maximum vertical drag');
+                    widget.onVerticalDragUpdate?.call(
+                      DragUpdateDetails(
+                        globalPosition: details.globalPosition,
+                        delta: Offset(0, constrainedY),
+                      ),
+                    );
+                  }
+                }
+
+                setState(() {
+                  _dragOffset = Offset(constrainedX, constrainedY);
+                });
+
+                // // Call appropriate callbacks based on locked direction
+                // if (_isHorizontalDrag!) {
+
+                // } else {
+
+                // }
+
+                widget.onLongPressMoveUpdate?.call(details);
+              }
+            }
+          : null,
+      onLongPressEnd: widget.gesturesEnabled
+          ? (details) {
+              setState(() {
+                _isLongPressed = false;
+                _dragOffset = Offset.zero;
+                _dragStartOffset = null;
+                _isHorizontalDrag = null;
+              });
+              _controller.reverse();
+              widget.onLongPressEnd?.call(details);
+              debugPrint('Long press ended, drag reset');
+            }
+          : null,
       behavior: HitTestBehavior.opaque,
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
+          return Transform.translate(
+            offset: _dragOffset,
+            child: Transform.scale(
+              scale: _scaleAnimation.value,
+              child: child,
+            ),
           );
         },
-        child: AnimatedContainer(
-          duration: const Duration(seconds: 1),
+        child: Container(
           height: inStyle.height,
           width: inStyle.width,
           margin: inStyle.margin,
