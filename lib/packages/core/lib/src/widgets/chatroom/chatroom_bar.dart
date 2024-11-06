@@ -48,6 +48,8 @@ class LMChatroomBar extends StatefulWidget {
   LMChatroomBar copyWith(
       {LMChatRoomViewData? chatroom,
       VoidCallback? scrollToBottom,
+      TextEditingController? controller,
+      bool? enableTagging,
       Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
           createPollWidgetBuilder}) {
     return LMChatroomBar(
@@ -55,6 +57,8 @@ class LMChatroomBar extends StatefulWidget {
       scrollToBottom: scrollToBottom ?? this.scrollToBottom,
       createPollWidgetBuilder:
           createPollWidgetBuilder ?? this.createPollWidgetBuilder,
+      controller: controller ?? this.controller,
+      enableTagging: enableTagging ?? this.enableTagging,
     );
   }
 
@@ -604,11 +608,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
     final audioHandler = LMChatCoreAudioHandler.instance;
     try {
-      if (_isPlaying.value) {
+      if (_isPlaying.value || audioHandler.player.isPlaying) {
         await audioHandler.pauseAudio();
         _isPlaying.value = false;
       } else {
-        if (audioHandler.player.isPaused) {
+        if (audioHandler.player.isPaused || audioHandler.player.isPlaying) {
           await audioHandler.resumeAudio();
         } else {
           // Reset position to 0 when starting new playback
@@ -624,22 +628,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       debugPrint('Error handling play/pause: $e');
       _isPlaying.value = false;
     }
-  }
-
-  void _handleSeek(Duration position) async {
-    if (_recordedFilePath == null) return;
-    try {
-      await LMChatCoreAudioHandler.instance.seekTo(position);
-    } catch (e) {
-      debugPrint('Error seeking: $e');
-    }
-  }
-
-  void _handleSendRecording() {
-    if (_recordedFilePath == null) return;
-    // TODO: Implement sending the recording
-    debugPrint("Sending recording: $_recordedFilePath");
-    _resetRecordingState();
   }
 
   void _handleDeleteRecording() async {

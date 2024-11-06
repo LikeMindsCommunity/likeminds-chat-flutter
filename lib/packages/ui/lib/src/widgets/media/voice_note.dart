@@ -29,13 +29,25 @@ class LMChatVoiceNote extends StatefulWidget {
   /// If the new values are null, then the old values are used.
   LMChatVoiceNote copyWith({
     LMChatMediaModel? media,
-    LMChatAudioStyle? style,
+    LMChatVoiceNoteStyle? style,
     bool? autoplay,
+    Function()? onPlay,
+    Function()? onPause,
+    Function(double)? onSlide,
+    Function(double)? onSlideStart,
+    Function(double)? onSlideEnd,
+    LMChatAudioHandler? handler,
   }) {
     return LMChatVoiceNote(
       media: media ?? this.media,
       style: style ?? this.style,
       autoplay: autoplay ?? this.autoplay,
+      onPlay: onPlay ?? this.onPlay,
+      onPause: onPause ?? this.onPause,
+      onSlide: onSlide ?? this.onSlide,
+      onSlideStart: onSlideStart ?? this.onSlideStart,
+      onSlideEnd: onSlideEnd ?? this.onSlideEnd,
+      handler: handler ?? this.handler,
     );
   }
 
@@ -43,7 +55,7 @@ class LMChatVoiceNote extends StatefulWidget {
   final LMChatMediaModel media;
 
   /// The style configuration for the audio widget.
-  final LMChatAudioStyle? style;
+  final LMChatVoiceNoteStyle? style;
 
   /// The bool to control whether audio autoplays or not.
   final bool? autoplay;
@@ -135,17 +147,6 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
           _startPlayer();
         }
       });
-    });
-  }
-
-  void _handlePlaybackUrlChange(String? url) {
-    if (!mounted) return;
-
-    setState(() {
-      _isAudioPlaying = url == widget.media.mediaUrl;
-      if (!_isAudioPlaying && !_isDragging) {
-        _progress = 0.0;
-      }
     });
   }
 
@@ -319,7 +320,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
 
   @override
   Widget build(BuildContext context) {
-    final style = widget.style ?? const LMChatAudioStyle();
+    final style = widget.style ?? const LMChatVoiceNoteStyle();
     return Container(
       width: style.width,
       height: style.height,
@@ -389,7 +390,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
 }
 
 /// Defines the style properties for the LMChatAudio widget.
-class LMChatAudioStyle {
+class LMChatVoiceNoteStyle {
   /// The width of the audio container.
   final double? width;
 
@@ -423,8 +424,8 @@ class LMChatAudioStyle {
   /// The color of the slider's thumb.
   final Color? sliderThumbColor;
 
-  /// Creates an instance of [LMChatAudioStyle].
-  const LMChatAudioStyle({
+  /// Creates an instance of [LMChatVoiceNoteStyle].
+  const LMChatVoiceNoteStyle({
     this.width,
     this.height,
     this.backgroundColor,
@@ -438,13 +439,13 @@ class LMChatAudioStyle {
     this.sliderThumbColor,
   });
 
-  /// Creates a basic instance of [LMChatAudioStyle].
-  factory LMChatAudioStyle.basic() {
-    return const LMChatAudioStyle();
+  /// Creates a basic instance of [LMChatVoiceNoteStyle].
+  factory LMChatVoiceNoteStyle.basic() {
+    return const LMChatVoiceNoteStyle();
   }
 
-  /// Creates a copy of this [LMChatAudioStyle] but with the given fields replaced with the new values.
-  LMChatAudioStyle copyWith({
+  /// Creates a copy of this [LMChatVoiceNoteStyle] but with the given fields replaced with the new values.
+  LMChatVoiceNoteStyle copyWith({
     double? width,
     double? height,
     Color? backgroundColor,
@@ -457,7 +458,7 @@ class LMChatAudioStyle {
     Color? sliderInactiveColor,
     Color? sliderThumbColor,
   }) {
-    return LMChatAudioStyle(
+    return LMChatVoiceNoteStyle(
       width: width ?? this.width,
       height: height ?? this.height,
       backgroundColor: backgroundColor ?? this.backgroundColor,

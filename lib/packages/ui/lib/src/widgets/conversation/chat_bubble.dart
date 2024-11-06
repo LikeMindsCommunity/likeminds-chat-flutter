@@ -39,6 +39,7 @@ class LMChatBubble extends StatefulWidget {
   /// The list of attachments for this chat bubble
   final List<LMChatReactionViewData>? reactions;
 
+  /// The user meta for this chat bubble
   final Map<int, LMChatUserViewData>? userMeta;
 
   /// is the message sent by the current user.
