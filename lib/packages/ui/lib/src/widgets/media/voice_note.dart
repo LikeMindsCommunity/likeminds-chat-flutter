@@ -212,17 +212,29 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   }
 
   Future<void> _stopAllOtherPlayers() async {
-    if (_useExternalHandler) {
-      // Ensure we fully stop any playing or paused audio
-      if (widget.handler!.player.isPlaying || widget.handler!.player.isPaused) {
-        await widget.handler!.stopAudio();
-        // Small delay to ensure audio is fully stopped
-        await Future.delayed(const Duration(milliseconds: 50));
+    try {
+      if (_useExternalHandler) {
+        // First stop any playing audio
+        if (widget.handler!.player.isPlaying ||
+            widget.handler!.player.isPaused) {
+          await widget.handler!.stopAudio();
+
+          // Cancel any existing subscriptions to ensure clean state
+          _progressSubscription?.cancel();
+          _progressSubscription = null;
+
+          // Add a small delay to ensure complete cleanup
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+      } else {
+        if (_localPlayer?.isPlaying ?? false) {
+          await _localPlayer!.stopPlayer();
+          _playerSubscription?.cancel();
+          _playerSubscription = null;
+        }
       }
-    } else {
-      if (_localPlayer?.isPlaying ?? false) {
-        await _localPlayer!.stopPlayer();
-      }
+    } catch (e) {
+      print('Error stopping other players: $e');
     }
   }
 
@@ -230,19 +242,36 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     if (_currentMediaPath == null) return;
 
     try {
+      // First ensure complete cleanup of any existing playback
       await _stopAllOtherPlayers();
 
-      if (!(_useExternalHandler && widget.handler!.player.isPaused) &&
-          _initialSeekPosition == null) {
-        setState(() {
-          _progress = 0.0;
-          _totalDuration = Duration.zero;
-        });
-      }
+      // Reset all state to ensure fresh start
+      _progressSubscription?.cancel();
+      _playerSubscription?.cancel();
+
+      // Only preserve initial seek position if it was explicitly set
+      final preservedSeekPosition = _initialSeekPosition;
+
+      setState(() {
+        _progress = 0.0;
+        _totalDuration = Duration.zero;
+        _isAudioPlaying = false; // Ensure we start from a clean state
+      });
+
+      // Restore initial seek position if it existed
+      _initialSeekPosition = preservedSeekPosition;
 
       if (_useExternalHandler) {
+        // Ensure handler is in a clean state
+        await widget.handler!.stopAudio();
+        await Future.delayed(const Duration(milliseconds: 50));
         await _startWithHandler();
       } else {
+        // For local player, close and reinitialize to ensure clean state
+        if (_localPlayer != null) {
+          await _localPlayer!.closePlayer();
+          _localPlayer = null;
+        }
         await _initializeLocalPlayer();
         await _startWithLocalPlayer();
       }
@@ -451,17 +480,8 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
       if (_isAudioPlaying) {
         await _pausePlayback();
       } else {
-        if (_useExternalHandler && widget.handler!.player.isPaused) {
-          // Resume from current position for external handler
-          await _resumePlayback();
-        } else if (!_useExternalHandler && (_localPlayer?.isPaused ?? false)) {
-          // Resume from current position for local player
-          await _resumePlayback();
-        } else {
-          // Start fresh playback
-          await _stopAllOtherPlayers();
-          await _startPlayer();
-        }
+        // Always start fresh when playing new audio
+        await _startPlayer();
       }
     } catch (e) {
       print('Error toggling play/pause: $e');
