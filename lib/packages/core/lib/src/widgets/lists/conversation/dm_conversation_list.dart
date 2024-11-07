@@ -567,8 +567,20 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       }
       List<LMChatConversationViewData>? conversationData = state
               .getConversationResponse.conversationData
-              ?.map((e) => e.toConversationViewData())
-              .toList() ??
+              ?.map((e) {
+            final conv = e.toConversationViewData(
+              conversationPollsMeta:
+                  state.getConversationResponse.conversationPollsMeta,
+              userMeta: state.getConversationResponse.userMeta,
+            );
+            // Add attachments to the conversation object explicitly
+            if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
+              return conv.copyWith(
+                attachments: conversationAttachmentsMeta[conv.id.toString()],
+              );
+            }
+            return conv;
+          }).toList() ??
           [];
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,
@@ -643,10 +655,18 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
 
-      result =
-          conversation.copyWith(replyConversationObject: replyConversation);
+      result = conversation.copyWith(
+        replyConversationObject: replyConversation,
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
+    } else {
+      result = conversation.copyWith(
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
     }
-    conversationList.insert(0, result ?? conversation);
+    conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
     }
@@ -676,8 +696,16 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
 
-      result =
-          conversation.copyWith(replyConversationObject: replyConversation);
+      result = conversation.copyWith(
+        replyConversationObject: replyConversation,
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
+    } else {
+      result = conversation.copyWith(
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
     }
     if (index != -1) {
       conversationList[index] = conversation;
@@ -703,7 +731,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           ).toConversationViewData(),
         );
       }
-      conversationList.insert(0, result ?? conversation);
+      conversationList.insert(0, result);
       if (conversationList.length >= 500) {
         conversationList.removeLast();
       }

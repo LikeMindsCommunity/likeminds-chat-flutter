@@ -665,7 +665,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               state.getConversationResponse.conversationPollsMeta,
           userMeta: state.getConversationResponse.userMeta,
         );
-        // Add attachments to the conversation object
+        // Add attachments to the conversation object explicitly
         if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
           return conv.copyWith(
             attachments: conversationAttachmentsMeta[conv.id.toString()],
@@ -697,6 +697,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     if (state is LMChatMultiMediaConversationLoadingState) {
       LMChatConversationViewData conv =
           state.postConversation.toConversationViewData();
+
+      // Add reply conversation object if exists
+      conv = conv.copyWith(
+          replyConversationObject: conversationMeta[conv.replyId.toString()]
+              ?.toConversationViewData());
 
       if (!userMeta.containsKey(user.id)) {
         userMeta[user.id] = user;
@@ -757,8 +762,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
-
-    conversationList.insert(0, result ?? conversation);
+    conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
     }
@@ -777,7 +781,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
     int index = conversationList.indexWhere(
         (element) => element.temporaryId == conversation.temporaryId);
-
     if (pagedListController.itemList != null &&
         (conversation.replyId != null ||
             conversation.replyConversation != null) &&
@@ -800,9 +803,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
-
     if (index != -1) {
-      conversationList[index] = result ?? conversation;
+      conversationList[index] = result;
     } else if (conversationList.isNotEmpty) {
       if (conversationList.first.date != conversation.date) {
         conversationList.insert(
@@ -825,7 +827,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           ).toConversationViewData(),
         );
       }
-      conversationList.insert(0, result ?? conversation);
+      conversationList.insert(0, result);
       if (conversationList.length >= 500) {
         conversationList.removeLast();
       }
