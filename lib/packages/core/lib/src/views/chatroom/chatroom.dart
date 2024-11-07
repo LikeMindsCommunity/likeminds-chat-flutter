@@ -426,6 +426,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     bool haveEditPermission =
         LMChatMemberRightUtil.checkEditPermissions(conversationViewData!) &&
             chatroom.chatRequestState != 2;
+
+    // Check if the message is a voice note
+    bool isVoiceNote = conversationViewData.attachments
+            ?.any((attachment) => attachment.type == 'voice_note') ??
+        false;
+
     return [
       // Reply button
       if (_selectedIds.length == 1 && _isRespondingAllowed()) ...[
@@ -435,7 +441,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             conversationViewData,
             LMChatButton(
               onTap: () {
-                // add reply event
                 _convActionBloc.add(
                   LMChatReplyConversationEvent(
                     conversationId: conversationViewData.id,
@@ -459,8 +464,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               ),
             )),
       ],
-      // Copy button
-      ...[
+      // Copy button - Only show if not a voice note
+      if (!isVoiceNote) ...[
         const SizedBox(width: 8),
         _screenBuilder.copyButton(
           context,
@@ -518,8 +523,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           ),
         ),
       ],
-      // Edit button
-      if (haveEditPermission && _selectedIds.length == 1) ...[
+      // Edit button - Only show if not a voice note
+      if (haveEditPermission && _selectedIds.length == 1 && !isVoiceNote) ...[
         const SizedBox(width: 8),
         _screenBuilder.editButton(
           context,
