@@ -126,6 +126,7 @@ class LMChatBubbleFooter extends StatelessWidget {
     LMChatIcon? pendingTimer,
     LMChatBubbleFooterStyle? style,
     double? textWidth,
+    Widget? voiceDuration,
   }) {
     return LMChatBubbleFooter(
       conversation: conversation ?? this.conversation,
@@ -133,6 +134,7 @@ class LMChatBubbleFooter extends StatelessWidget {
       pendingTimer: pendingTimer ?? this.pendingTimer,
       style: style ?? this.style,
       textWidth: textWidth ?? this.textWidth,
+      voiceDuration: voiceDuration ?? this.voiceDuration,
     );
   }
 }

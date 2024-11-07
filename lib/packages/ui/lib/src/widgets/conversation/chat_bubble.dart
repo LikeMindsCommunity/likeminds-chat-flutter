@@ -512,20 +512,44 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         widget.onMediaTap?.call();
                                       }
                                     },
-                                    child: LMChatBubbleMedia(
-                                      audioHandler: widget.audioHandler,
-                                      conversation: conversation,
-                                      attachments: widget.attachments ?? [],
-                                      count: conversation.attachmentCount ?? 0,
-                                      attachmentUploaded:
-                                          conversation.attachmentsUploaded ??
+                                    child: widget.mediaBuilder?.call(
+                                          context,
+                                          widget.attachments ?? [],
+                                          LMChatBubbleMedia(
+                                            audioHandler: widget.audioHandler,
+                                            conversation: conversation,
+                                            attachments:
+                                                widget.attachments ?? [],
+                                            count:
+                                                conversation.attachmentCount ??
+                                                    0,
+                                            attachmentUploaded: conversation
+                                                    .attachmentsUploaded ??
+                                                false,
+                                            onVoiceNoteDurationUpdate:
+                                                kAttachmentTypeVoiceNote ==
+                                                        widget.attachments
+                                                            ?.first.type
+                                                    ? _handleVoiceNoteDurationUpdate
+                                                    : null,
+                                          ),
+                                        ) ??
+                                        LMChatBubbleMedia(
+                                          audioHandler: widget.audioHandler,
+                                          conversation: conversation,
+                                          attachments: widget.attachments ?? [],
+                                          count:
+                                              conversation.attachmentCount ?? 0,
+                                          attachmentUploaded: conversation
+                                                  .attachmentsUploaded ??
                                               false,
-                                      onVoiceNoteDurationUpdate:
-                                          kAttachmentTypeVoiceNote ==
-                                                  widget.attachments?.first.type
-                                              ? _handleVoiceNoteDurationUpdate
-                                              : null,
-                                    ),
+                                          onVoiceNoteDurationUpdate:
+                                              kAttachmentTypeVoiceNote ==
+                                                      widget.attachments?.first
+                                                          .type
+                                                  ? _handleVoiceNoteDurationUpdate
+                                                  : null,
+                                        ),
                                   ),
                                 ),
                                 _isDeleted

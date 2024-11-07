@@ -9,7 +9,7 @@ class LMChatBubbleMedia extends StatelessWidget {
   final LMChatImageBuilder? imageBuilder;
   final LMChatVideoBuilder? videoBuilder;
   final LMChatGIFBuilder? gifBuilder;
-  final LMChatVoiceNoteBuilder? audioBuilder; // Add audio builder
+  final LMChatVoiceNoteBuilder? voiceNoteBuilder; // Add audio builder
 
   final LMChatDocumentThumbnailBuilder? documentThumbnailBuilder;
   final LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder;
@@ -29,7 +29,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     this.imageBuilder,
     this.videoBuilder,
     this.gifBuilder,
-    this.audioBuilder, // Add audio builder
+    this.voiceNoteBuilder, // Add audio builder
     this.documentThumbnailBuilder,
     this.documentTilePreviewBuilder,
     this.onVoiceNoteDurationUpdate,
@@ -43,7 +43,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     LMChatImageBuilder? imageBuilder,
     LMChatVideoBuilder? videoBuilder,
     LMChatGIFBuilder? gifBuilder,
-    LMChatVoiceNoteBuilder? audioBuilder, // Add audio builder
+    LMChatVoiceNoteBuilder? voiceNoteBuilder, // Add audio builder
     LMChatDocumentThumbnailBuilder? documentThumbnailBuilder,
     LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder,
     Function(Duration)? onVoiceNoteDurationUpdate,
@@ -56,7 +56,8 @@ class LMChatBubbleMedia extends StatelessWidget {
       imageBuilder: imageBuilder ?? this.imageBuilder,
       videoBuilder: videoBuilder ?? this.videoBuilder,
       gifBuilder: gifBuilder ?? this.gifBuilder,
-      audioBuilder: audioBuilder ?? this.audioBuilder, // Add audio builder
+      voiceNoteBuilder:
+          voiceNoteBuilder ?? this.voiceNoteBuilder, // Add audio builder
       documentThumbnailBuilder:
           documentThumbnailBuilder ?? this.documentThumbnailBuilder,
       documentTilePreviewBuilder:
@@ -114,11 +115,20 @@ class LMChatBubbleMedia extends StatelessWidget {
         mediaWidget = LMChatGIF(media: attachments.first.toMediaModel());
       } else if (attachments.first.type ==
           mapMediaTypeToString(LMChatMediaType.voiceNote)) {
-        mediaWidget = LMChatVoiceNote(
-          media: attachments.first.toMediaModel(),
-          handler: audioHandler,
-          onDurationUpdate: onVoiceNoteDurationUpdate,
-        );
+        mediaWidget = voiceNoteBuilder?.call(
+              context,
+              attachments.first,
+              LMChatVoiceNote(
+                media: attachments.first.toMediaModel(),
+                handler: audioHandler,
+                onDurationUpdate: onVoiceNoteDurationUpdate,
+              ),
+            ) ??
+            LMChatVoiceNote(
+              media: attachments.first.toMediaModel(),
+              handler: audioHandler,
+              onDurationUpdate: onVoiceNoteDurationUpdate,
+            );
       } else {
         mediaWidget = null;
       }

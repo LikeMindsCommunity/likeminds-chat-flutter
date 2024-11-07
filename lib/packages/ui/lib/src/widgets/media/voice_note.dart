@@ -566,7 +566,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
               style: LMChatIconStyle(
                 size: 28,
                 boxSize: 32,
-                color: LMChatTheme.theme.onPrimary,
+                color: style.iconColor ?? LMChatTheme.theme.onPrimary,
               ),
             ),
             onTap: _togglePlayPause,
@@ -574,7 +574,8 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
               height: 36,
               width: 36,
               borderRadius: 18,
-              backgroundColor: LMChatTheme.theme.secondaryColor,
+              backgroundColor:
+                  style.buttonColor ?? LMChatTheme.theme.secondaryColor,
             ),
           ),
           Expanded(
@@ -705,6 +706,9 @@ class LMChatVoiceNoteStyle {
   /// The color of the slider's thumb.
   final Color? sliderThumbColor;
 
+  /// The color of the button.
+  final Color? buttonColor;
+
   /// Creates an instance of [LMChatVoiceNoteStyle].
   const LMChatVoiceNoteStyle({
     this.width,
@@ -718,6 +722,7 @@ class LMChatVoiceNoteStyle {
     this.sliderActiveColor,
     this.sliderInactiveColor,
     this.sliderThumbColor,
+    this.buttonColor,
   });
 
   /// Creates a basic instance of [LMChatVoiceNoteStyle].
@@ -738,6 +743,7 @@ class LMChatVoiceNoteStyle {
     Color? sliderActiveColor,
     Color? sliderInactiveColor,
     Color? sliderThumbColor,
+    Color? buttonColor,
   }) {
     return LMChatVoiceNoteStyle(
       width: width ?? this.width,
@@ -751,6 +757,7 @@ class LMChatVoiceNoteStyle {
       sliderActiveColor: sliderActiveColor ?? this.sliderActiveColor,
       sliderInactiveColor: sliderInactiveColor ?? this.sliderInactiveColor,
       sliderThumbColor: sliderThumbColor ?? this.sliderThumbColor,
+      buttonColor: buttonColor ?? this.buttonColor,
     );
   }
 }
