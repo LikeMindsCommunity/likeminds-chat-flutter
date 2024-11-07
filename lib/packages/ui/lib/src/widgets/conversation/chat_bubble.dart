@@ -9,6 +9,7 @@ import 'package:likeminds_chat_flutter_ui/src/widgets/media/voice_note.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:collection/collection.dart';
 
 part 'chat_bubble_content.dart';
 part 'chat_bubble_footer.dart';
@@ -291,14 +292,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     reactions = widget.reactions;
 
     // Initialize voice note duration from metadata if available
+    final voiceNoteAttachment = widget.attachments?.firstWhereOrNull(
+        (attachment) => attachment.type == kAttachmentTypeVoiceNote);
+
     final initialDuration = Duration(
       seconds: int.tryParse(
-            widget.attachments
-                    ?.firstWhere((attachment) =>
-                        attachment.type == kAttachmentTypeVoiceNote)
-                    .meta["duration"]
-                    ?.toString() ??
-                "0",
+            voiceNoteAttachment?.meta["duration"]?.toString() ?? "0",
           ) ??
           0,
     );
