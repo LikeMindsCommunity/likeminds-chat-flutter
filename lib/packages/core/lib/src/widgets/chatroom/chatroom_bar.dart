@@ -11,6 +11,8 @@ import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_right
 import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/animation.dart';
+import 'dart:math' as math;
 
 /// {@template lm_chatroom_bar}
 /// A widget to display the chatroom bar.
@@ -67,7 +69,7 @@ class LMChatroomBar extends StatefulWidget {
 }
 
 class _LMChatroomBarState extends State<LMChatroomBar>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   LMChatConversationViewData? replyToConversation;
   List<LMChatAttachmentViewData>? replyConversationAttachments;
   LMChatConversationViewData? editConversation;
@@ -142,6 +144,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Add a new ValueNotifier for recording lock state
   final ValueNotifier<bool> _isRecordingLocked = ValueNotifier<bool>(false);
 
+  final OverlayPortalController _overlayPortalController =
+      OverlayPortalController();
+
+  late final AnimationController _lockSlideController;
+  late final Animation<double> _lockSlideAnimation;
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -192,6 +200,20 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       parent: _breathingController,
       curve: Curves.easeInOut,
     ));
+
+    // Initialize lock slide animation controller
+    _lockSlideController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _lockSlideAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _lockSlideController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -216,6 +238,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     _isPlaying.dispose();
     _breathingController.dispose();
     _isRecordingLocked.dispose();
+    _lockSlideController.dispose();
 
     super.dispose();
   }
@@ -224,6 +247,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // OverlayPortal(
+        //   controller: _overlayPortalController,
+        //   overlayChildBuilder: (context) => _defVoiceOverlayLayout(context),
+        // ),
         // Existing UI components
         BlocConsumer<LMChatConversationActionBloc,
             LMChatConversationActionState>(
@@ -280,7 +307,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                                                 _onSend,
                                                 _defSendButton(context),
                                               )
-                                            : _defVoiceButton(context);
+                                            : _defVoiceOverlayLayout(context);
                                       },
                                     );
                                   },
@@ -296,6 +323,78 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           },
         ),
         // Show overlay when button is held
+      ],
+    );
+  }
+
+  Widget _defaultLockRecordingOverlay() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isVoiceButtonHeld,
+      builder: (context, isHeld, child) {
+        return Visibility(
+          visible: isHeld,
+          child: Positioned(
+            bottom: 50,
+            child: AnimatedBuilder(
+              animation: _lockSlideAnimation,
+              builder: (context, child) {
+                return Container(
+                  height: 100,
+                  width: 48,
+                  decoration: BoxDecoration(
+                    color: _themeData.container,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          _lockSlideAnimation.value > 0.7
+                              ? Icons.lock_outline
+                              : Icons.lock_open_outlined,
+                          key: ValueKey(_lockSlideAnimation.value > 0.7),
+                          color: _themeData.onContainer.withOpacity(
+                            0.3 + (_lockSlideAnimation.value * 0.7),
+                          ),
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 48,
+                        width: 2,
+                        decoration: BoxDecoration(
+                          color: _themeData.onContainer.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _defVoiceOverlayLayout(BuildContext context) {
+    return Stack(
+      fit: StackFit.passthrough,
+      clipBehavior: Clip.none,
+      children: [
+        _defaultLockRecordingOverlay(),
+        _defVoiceButton(context),
       ],
     );
   }
@@ -827,16 +926,26 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             }
           },
           onVerticalDragUpdate: (details) {
-            if (_isVoiceButtonHeld.value && details.delta.dy < -75) {
-              HapticFeedback.lightImpact();
-              _isRecordingLocked.value = true;
-              toast(
-                "Voice recording locked",
-                duration: const Duration(milliseconds: 300),
-              );
+            if (_isVoiceButtonHeld.value) {
+              // Calculate the progress based on drag distance
+              // Assuming 75 is the threshold for locking
+              final progress = math.min(1.0, -details.delta.dy / 75);
+              _lockSlideController.value = progress;
+
+              if (details.delta.dy < -75) {
+                HapticFeedback.lightImpact();
+                _isRecordingLocked.value = true;
+                toast(
+                  "Voice recording locked",
+                  duration: const Duration(milliseconds: 300),
+                );
+                _overlayPortalController.hide();
+              }
             }
           },
           onLongPressEnd: (details) async {
+            _overlayPortalController.hide();
+            _lockSlideController.value = 0.0; // Reset the animation
             // If recording is locked, don't stop recording
             if (_isRecordingLocked.value) {
               return;
@@ -1656,6 +1765,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   // Add permission check before starting recording
   Future<void> _startRecording() async {
+    _overlayPortalController.show();
     try {
       final audioHandler = LMChatCoreAudioHandler.instance;
 
