@@ -114,40 +114,102 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
     }
   }
 
-  void _initializeWithHandler() {
-    // Listen to external player state changes
-    _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
-      if (!mounted) return;
+  void _initializeWithHandler() async {
+    try {
+      // Get initial duration for the audio file
+      String mediaPath =
+          widget.media.mediaFile?.path ?? widget.media.mediaUrl ?? '';
+      if (mediaPath.isNotEmpty) {
+        // Initialize player temporarily to get duration
+        FlutterSoundPlayer tempPlayer = FlutterSoundPlayer();
+        await tempPlayer.openPlayer();
 
-      final bool isPlaying = url == widget.media.mediaUrl ||
-          (widget.media.mediaFile != null &&
-              url == widget.media.mediaFile!.path);
-
-      setState(() {
-        _isAudioPlaying = isPlaying;
-        if (!_isAudioPlaying && !_isDragging) {
-          _progress = 0.0;
+        Duration? duration;
+        try {
+          duration = await tempPlayer.startPlayer(
+            fromURI: mediaPath,
+            whenFinished: () async {
+              await tempPlayer.stopPlayer();
+            },
+          );
+          await tempPlayer.stopPlayer();
+        } catch (e) {
+          print('Error getting initial duration: $e');
+        } finally {
+          await tempPlayer.closePlayer();
         }
-      });
-    });
 
-    // Subscribe to progress updates
-    if (widget.media.mediaFile != null) {
-      _subscribeToProgressUpdates(widget.media.mediaFile!.path);
-    } else if (widget.media.mediaUrl != null) {
-      _subscribeToProgressUpdates(widget.media.mediaUrl!);
+        if (duration != null && mounted) {
+          setState(() {
+            _totalDuration = duration!;
+          });
+        }
+      }
+
+      // Listen to external player state changes
+      _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
+        if (!mounted) return;
+
+        final bool isPlaying = url == widget.media.mediaUrl ||
+            (widget.media.mediaFile != null &&
+                url == widget.media.mediaFile!.path);
+
+        setState(() {
+          _isAudioPlaying = isPlaying;
+        });
+      });
+
+      // Subscribe to progress updates
+      if (widget.media.mediaFile != null) {
+        _subscribeToProgressUpdates(widget.media.mediaFile!.path);
+      } else if (widget.media.mediaUrl != null) {
+        _subscribeToProgressUpdates(widget.media.mediaUrl!);
+      }
+    } catch (e) {
+      print('Error initializing handler: $e');
     }
   }
 
-  void _initializeLocalPlayer() {
-    _localPlayer = FlutterSoundPlayer();
-    _localPlayer.openPlayer().then((_) {
-      setState(() {
-        if (widget.autoplay ?? false) {
-          _startPlayer();
+  void _initializeLocalPlayer() async {
+    try {
+      _localPlayer = FlutterSoundPlayer();
+      await _localPlayer.openPlayer();
+
+      // Get initial duration
+      String? playbackPath;
+      if (widget.media.mediaFile != null) {
+        playbackPath = widget.media.mediaFile!.path;
+      } else if (widget.media.mediaUrl != null) {
+        playbackPath = widget.media.mediaUrl;
+      }
+
+      if (playbackPath != null) {
+        Duration? duration;
+        try {
+          duration = await _localPlayer.startPlayer(
+            fromURI: playbackPath,
+            whenFinished: () async {
+              await _localPlayer.stopPlayer();
+            },
+          );
+          await _localPlayer.stopPlayer();
+        } catch (e) {
+          print('Error getting initial duration: $e');
         }
-      });
-    });
+
+        if (duration != null && mounted) {
+          setState(() {
+            _totalDuration = duration!;
+          });
+        }
+      }
+
+      if (widget.autoplay ?? false) {
+        await _startPlayer();
+      }
+    } catch (e) {
+      print('Error initializing local player: $e');
+    }
   }
 
   void _subscribeToProgressUpdates(String mediaUrl) {
@@ -188,17 +250,30 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
 
   Future<void> _startWithHandler() async {
     await widget.handler!.stopAudio();
-    setState(() {
-      _progress = 0.0;
-    });
 
     String mediaPath = '';
     if (widget.media.mediaFile != null) {
       mediaPath = widget.media.mediaFile!.path;
-      await widget.handler!.playAudio(mediaPath);
+      if (_progress > 0) {
+        final position = Duration(
+          milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+        );
+        await widget.handler!.playAudio(mediaPath);
+        await widget.handler!.seekTo(position);
+      } else {
+        await widget.handler!.playAudio(mediaPath);
+      }
     } else if (widget.media.mediaUrl != null) {
       mediaPath = widget.media.mediaUrl!;
-      await widget.handler!.playAudio(mediaPath);
+      if (_progress > 0) {
+        final position = Duration(
+          milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+        );
+        await widget.handler!.playAudio(mediaPath);
+        await widget.handler!.seekTo(position);
+      } else {
+        await widget.handler!.playAudio(mediaPath);
+      }
     }
 
     _subscribeToProgressUpdates(mediaPath);
@@ -213,8 +288,6 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
       if (_localPlayer.isPaused || _localPlayer.isPlaying) {
         await _localPlayer.stopPlayer();
       }
-
-      _progress = 0.0;
 
       String? playbackPath;
       if (widget.media.mediaFile != null) {
@@ -231,6 +304,13 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
             widget.onPause?.call();
           },
         );
+
+        if (_progress > 0) {
+          final position = Duration(
+            milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+          );
+          await _localPlayer.seekToPlayer(position);
+        }
 
         await _localPlayer
             .setSubscriptionDuration(const Duration(milliseconds: 100));
@@ -250,7 +330,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
     if (!mounted) return;
     setState(() {
       _isAudioPlaying = false;
-      _progress = 0.0;
+      if (_progress >= 0.99) {
+        _progress = 0.0;
+      }
     });
     if (_useExternalHandler) {
       widget.handler!.stopAudio();
@@ -291,7 +373,11 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
         await _pausePlayback();
       } else {
         if (_useExternalHandler) {
-          await _startWithHandler();
+          if (widget.handler!.player.isPaused) {
+            await _resumePlayback();
+          } else {
+            await _startWithHandler();
+          }
         } else {
           if (_localPlayer.isPaused) {
             await _resumePlayback();
@@ -308,6 +394,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
   Future<void> _pausePlayback() async {
     if (_useExternalHandler) {
       await widget.handler!.pauseAudio();
+      setState(() => _isAudioPlaying = false);
     } else {
       await _localPlayer.pausePlayer();
       setState(() => _isAudioPlaying = false);
@@ -397,24 +484,23 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote> {
               },
               onChangeEnd: (value) async {
                 _isDragging = false;
-                if (value >= 0.99) {
-                  _onPlaybackComplete();
-                } else {
+                if (_totalDuration.inMilliseconds > 0) {
                   final position = Duration(
                     milliseconds:
                         (_totalDuration.inMilliseconds * value).toInt(),
                   );
+
                   if (_useExternalHandler) {
+                    // If not playing, start playback from the selected position
+                    if (!_isAudioPlaying) {
+                      await _startWithHandler();
+                    }
                     await widget.handler!.seekTo(position);
                   } else {
-                    await _localPlayer.seekToPlayer(position);
-                  }
-                  if (_isAudioPlaying) {
-                    if (_useExternalHandler) {
-                      await widget.handler!.resumeAudio();
-                    } else {
-                      await _localPlayer.resumePlayer();
+                    if (!_isAudioPlaying) {
+                      await _startWithLocalPlayer();
                     }
+                    await _localPlayer.seekToPlayer(position);
                   }
                 }
                 widget.onSlideEnd?.call(value);

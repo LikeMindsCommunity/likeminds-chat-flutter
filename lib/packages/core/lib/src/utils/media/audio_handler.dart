@@ -286,8 +286,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     try {
       if (_player.isPlaying) {
         await _player.pausePlayer();
-        // Just notify that playback is paused, don't change the URL or progress
+        // Don't clear the currentlyPlayingUrl, just send empty string to indicate pause
         _currentlyPlayingController.add('');
+        // Keep the progress subscription active to maintain position
       }
     } catch (e) {
       print('Error pausing audio: $e');
@@ -302,8 +303,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     try {
       if (_player.isPaused) {
         await _player.resumePlayer();
-        // Restore the current URL to indicate playback
         _currentlyPlayingController.add(_currentlyPlayingUrl!);
+        // Progress tracking should continue automatically
       }
     } catch (e) {
       print('Error resuming audio: $e');
@@ -447,7 +448,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
     _currentProgressSubscription = _player.onProgress!.listen(
       (e) {
-        if (_currentlyPlayingUrl == path) {
+        if (path == _currentlyPlayingUrl || _player.isPaused) {
           // Store duration for this path
           _audioDurations[path] = e.duration;
 
