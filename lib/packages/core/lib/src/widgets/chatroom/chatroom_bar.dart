@@ -256,19 +256,33 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                       ),
                       _isRespondingAllowed()
                           ? ValueListenableBuilder<bool>(
-                              valueListenable: _isReviewingRecording,
-                              builder: (context, isReviewing, child) {
-                                return ValueListenableBuilder<String>(
-                                  valueListenable: _textInputNotifier,
-                                  builder: (context, text, child) {
-                                    return text.trim().isEmpty && !isReviewing
-                                        ? _defVoiceButton(context)
-                                        : _screenBuilder.sendButton(
-                                            context,
-                                            _textEditingController,
-                                            _onSend,
-                                            _defSendButton(context),
-                                          );
+                              valueListenable: _isRecordingLocked,
+                              builder: (context, isLocked, child) {
+                                return ValueListenableBuilder<bool>(
+                                  valueListenable: _isReviewingRecording,
+                                  builder: (context, isReviewing, child) {
+                                    return ValueListenableBuilder<String>(
+                                      valueListenable: _textInputNotifier,
+                                      builder: (context, text, child) {
+                                        // Show send button if:
+                                        // 1. There is text to send
+                                        // 2. Recording is being reviewed
+                                        // 3. Recording is locked
+                                        final shouldShowSendButton =
+                                            text.trim().isNotEmpty ||
+                                                isReviewing ||
+                                                isLocked;
+
+                                        return shouldShowSendButton
+                                            ? _screenBuilder.sendButton(
+                                                context,
+                                                _textEditingController,
+                                                _onSend,
+                                                _defSendButton(context),
+                                              )
+                                            : _defVoiceButton(context);
+                                      },
+                                    );
                                   },
                                 );
                               },
@@ -1330,7 +1344,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Handler functions of the LMChatroomBar
   void _onSend() {
     final message = _textEditingController.text.trim();
-    if (message.isEmpty && !_isReviewingRecording.value) {
+    if (message.isEmpty &&
+        !_isReviewingRecording.value &&
+        !_isRecordingLocked.value) {
       toast("Text can't be empty");
       return;
     }
@@ -1344,6 +1360,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (editConversation != null) {
       _handleEditConversation();
     } else if (_isReviewingRecording.value) {
+      _handleSendVoiceNote();
+    } else if (_isRecordingLocked.value) {
       _handleSendVoiceNote();
     } else {
       _handleNewMessage();
@@ -1626,11 +1644,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       widget.scrollToBottom();
     } catch (e) {
       debugPrint('Error sending voice note: $e');
-      toast(
-        "Error sending voice note",
-        duration: const Duration(milliseconds: 300),
-      );
-      _resetRecordingState(); // Ensure state is reset even if error occurs
+      toast("Error sending voice note");
+      _resetRecordingState();
     }
   }
 

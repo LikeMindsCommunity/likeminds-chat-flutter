@@ -34,7 +34,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   String? get currentRecordingPath => _currentRecordingPath;
 
   // Add codec constant only for recording
-  static const Codec _recordingCodec = Codec.aacADTS;
+  static const Codec _recordingCodec = Codec.defaultCodec;
 
   // Add this to store the last known duration
   Duration? _lastKnownDuration;
@@ -221,7 +221,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       // Try to get audio duration as validation
       final Duration? duration = await _player.startPlayer(
         fromURI: path,
-        codec: Codec.flac,
+        codec: Codec.defaultCodec,
       );
 
       await _player.stopPlayer();
@@ -256,8 +256,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       _currentlyPlayingController.add(path);
 
       bool isLocalFile = path.startsWith('/');
+      Codec codec = isLocalFile ? _recordingCodec : Codec.defaultCodec;
 
-      // Store duration for this specific path
       if (isLocalFile) {
         final File audioFile = File(path);
         if (!await audioFile.exists()) {
@@ -266,7 +266,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
         await _player.startPlayer(
           fromURI: path,
-          codec: _recordingCodec,
+          codec: codec,
           whenFinished: () async {
             await _onPlaybackComplete(path);
           },
@@ -274,6 +274,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       } else {
         await _player.startPlayer(
           fromURI: path,
+          codec: codec,
           whenFinished: () async {
             await _onPlaybackComplete(path);
           },

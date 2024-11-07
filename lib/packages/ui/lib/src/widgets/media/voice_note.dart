@@ -171,14 +171,19 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     final newMediaPath = widget.media.mediaFile?.path ?? widget.media.mediaUrl;
 
     if (_currentMediaPath != newMediaPath) {
-      // Clean up old resources
-      if (_isAudioPlaying) {
+      // Clean up old resources and reset state
+      if (_isAudioPlaying ||
+          (_useExternalHandler && (widget.handler?.player.isPaused ?? false))) {
         _pausePlayback();
+        _progress = 0.0;
+        _totalDuration = Duration.zero;
       }
       _cleanupPlayer();
 
       // Update path and reinitialize if needed
       _currentMediaPath = newMediaPath;
+
+      // If autoplay is enabled for the new media, start playing it
       if (widget.autoplay ?? false) {
         _startPlayer();
       }
@@ -206,11 +211,13 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
   Future<void> _stopAllOtherPlayers() async {
     if (_useExternalHandler) {
-      // Stop any other audio playing through the handler
-      await widget.handler!.stopAudio();
+      // Ensure we fully stop any playing or paused audio
+      if (widget.handler!.player.isPlaying || widget.handler!.player.isPaused) {
+        await widget.handler!.stopAudio();
+        // Small delay to ensure audio is fully stopped
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
     } else {
-      // You might want to implement a static method to track and stop other local players
-      // For now, we just ensure our local player is stopped
       if (_localPlayer?.isPlaying ?? false) {
         await _localPlayer!.stopPlayer();
       }
@@ -221,12 +228,28 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     if (_currentMediaPath == null) return;
 
     try {
-      // Stop any other audio playing first
+      // Always stop any currently playing audio first
       await _stopAllOtherPlayers();
 
+      // Only reset progress if we're starting fresh, not resuming
+      if (!(_useExternalHandler && widget.handler!.player.isPaused)) {
+        setState(() {
+          _progress = 0.0;
+          _totalDuration = Duration.zero;
+        });
+      }
+
       if (_useExternalHandler) {
+        // Ensure any paused audio is fully stopped
+        if (widget.handler!.player.isPaused) {
+          await widget.handler!.stopAudio();
+        }
         await _startWithHandler();
       } else {
+        // For local player, ensure clean state
+        if (_localPlayer != null) {
+          await _localPlayer!.stopPlayer();
+        }
         await _initializeLocalPlayer();
         await _startWithLocalPlayer();
       }
@@ -249,9 +272,21 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     // Listen to external player state changes
     _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
       if (!mounted) return;
-      setState(() {
-        _isAudioPlaying = url == _currentMediaPath;
-      });
+
+      // If a different URL is playing, ensure this widget shows as paused
+      if (url != _currentMediaPath && _isAudioPlaying) {
+        setState(() {
+          _isAudioPlaying = false;
+          _progress = 0.0;
+        });
+        widget.onPause?.call();
+      } else if (url == _currentMediaPath && !_isAudioPlaying) {
+        // If this URL started playing, update state
+        setState(() {
+          _isAudioPlaying = true;
+        });
+        widget.onPlay?.call();
+      }
     });
   }
 
@@ -421,18 +456,16 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
       if (_isAudioPlaying) {
         await _pausePlayback();
       } else {
-        if (_useExternalHandler) {
-          if (widget.handler!.player.isPaused) {
-            await _resumePlayback();
-          } else {
-            await _startWithHandler();
-          }
+        if (_useExternalHandler && widget.handler!.player.isPaused) {
+          // Resume from current position for external handler
+          await _resumePlayback();
+        } else if (!_useExternalHandler && (_localPlayer?.isPaused ?? false)) {
+          // Resume from current position for local player
+          await _resumePlayback();
         } else {
-          if (_localPlayer?.isPaused ?? false) {
-            await _resumePlayback();
-          } else {
-            await _startWithLocalPlayer();
-          }
+          // Start fresh playback
+          await _stopAllOtherPlayers();
+          await _startPlayer();
         }
       }
     } catch (e) {
@@ -444,9 +477,13 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     try {
       if (_useExternalHandler) {
         await widget.handler!.pauseAudio();
+        // Don't reset progress here
+        _progressSubscription
+            ?.cancel(); // Stop listening to progress updates while paused
       } else {
         if (_localPlayer?.isPlaying ?? false) {
           await _localPlayer!.pausePlayer();
+          // Don't reset progress here
         }
       }
       setState(() => _isAudioPlaying = false);
@@ -460,6 +497,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     try {
       if (_useExternalHandler) {
         await widget.handler!.resumeAudio();
+        _subscribeToProgressUpdates(); // Resubscribe to progress updates
       } else {
         if (_localPlayer == null) {
           await _startWithLocalPlayer();
@@ -468,8 +506,8 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
         await _localPlayer!.resumePlayer();
         _setupLocalPlayerProgress();
-        setState(() => _isAudioPlaying = true);
       }
+      setState(() => _isAudioPlaying = true);
       widget.onPlay?.call();
     } catch (e) {
       print('Error resuming playback: $e');
