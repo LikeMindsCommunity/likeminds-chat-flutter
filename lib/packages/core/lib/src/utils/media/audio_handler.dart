@@ -42,6 +42,16 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   // Add a map to store durations for each audio path
   final Map<String, Duration> _audioDurations = {};
 
+  // Add new stream controller for duration updates
+  final _durationController =
+      StreamController<Map<String, Duration>>.broadcast();
+
+  // Add getter for the duration stream
+  @override
+  Stream<Duration> getDurationStream(String path) => _durationController.stream
+      .where((map) => map.containsKey(path))
+      .map((map) => map[path]!);
+
   LMChatCoreAudioHandler._internal();
 
   /// Returns the singleton instance of [LMChatAudioHandler].
@@ -395,6 +405,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
       // Clean up any temporary files
       await _cleanupOldRecordings();
+
+      // Clean up duration controller
+      await _durationController.close();
     } catch (e) {
       print('Error in dispose: $e');
     }
@@ -500,6 +513,46 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       }
     } catch (e) {
       print('Error cleaning up recordings: $e');
+    }
+  }
+
+  /// Gets the duration of an audio file without playing it
+  @override
+  Future<Duration?> getDuration(String path) async {
+    if (!_isPlayerInitialized) {
+      await init();
+    }
+
+    // Return cached duration if available
+    if (_audioDurations.containsKey(path)) {
+      _durationController.add({path: _audioDurations[path]!});
+      return _audioDurations[path];
+    }
+
+    try {
+      // Create a temporary player for duration check
+      final tempPlayer = FlutterSoundPlayer();
+      await tempPlayer.openPlayer();
+
+      Duration? duration = await tempPlayer.startPlayer(
+        fromURI: path,
+        whenFinished: () async {
+          await tempPlayer.stopPlayer();
+        },
+      );
+
+      await tempPlayer.stopPlayer();
+      await tempPlayer.closePlayer();
+
+      if (duration != null && duration.inMilliseconds > 0) {
+        _audioDurations[path] = duration;
+        _durationController.add({path: duration});
+      }
+
+      return duration;
+    } catch (e) {
+      print('Error getting audio duration: $e');
+      return null;
     }
   }
 }

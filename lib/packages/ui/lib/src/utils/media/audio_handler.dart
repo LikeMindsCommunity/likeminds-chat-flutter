@@ -24,9 +24,6 @@ abstract class LMChatAudioHandler {
   /// Stream of currently playing audio URL
   Stream<String> get currentlyPlayingUrl;
 
-  /// Stream of playback progress updates
-  // Stream<PlaybackProgress> get playbackProgress;
-
   /// Initializes the audio handler
   Future<void> init();
 
@@ -39,6 +36,7 @@ abstract class LMChatAudioHandler {
   /// Stops the current audio recording
   Future<String?> stopRecording({Duration? recordedDuration});
 
+  /// Cancels the current recording
   Future<void> cancelRecording();
 
   /// Plays audio from the specified path
@@ -58,4 +56,10 @@ abstract class LMChatAudioHandler {
 
   /// Get progress stream for specific audio URL
   Stream<PlaybackProgress> getProgressStream(String audioUrl);
+
+  /// Gets the duration of an audio file without playing it
+  Future<Duration?> getDuration(String path);
+
+  /// Get duration updates stream for specific audio path
+  Stream<Duration> getDurationStream(String path);
 }

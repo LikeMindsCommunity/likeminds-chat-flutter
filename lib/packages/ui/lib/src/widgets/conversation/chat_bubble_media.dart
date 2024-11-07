@@ -16,6 +16,9 @@ class LMChatBubbleMedia extends StatelessWidget {
 
   final LMChatAudioHandler? audioHandler;
 
+  /// Callback for voice note duration updates
+  final Function(Duration)? onVoiceNoteDurationUpdate;
+
   const LMChatBubbleMedia({
     super.key,
     required this.conversation,
@@ -29,6 +32,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     this.audioBuilder, // Add audio builder
     this.documentThumbnailBuilder,
     this.documentTilePreviewBuilder,
+    this.onVoiceNoteDurationUpdate,
   });
 
   LMChatBubbleMedia copyWith({
@@ -42,6 +46,7 @@ class LMChatBubbleMedia extends StatelessWidget {
     LMChatVoiceNoteBuilder? audioBuilder, // Add audio builder
     LMChatDocumentThumbnailBuilder? documentThumbnailBuilder,
     LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder,
+    Function(Duration)? onVoiceNoteDurationUpdate,
   }) {
     return LMChatBubbleMedia(
       conversation: conversation ?? this.conversation,
@@ -56,6 +61,8 @@ class LMChatBubbleMedia extends StatelessWidget {
           documentThumbnailBuilder ?? this.documentThumbnailBuilder,
       documentTilePreviewBuilder:
           documentTilePreviewBuilder ?? this.documentTilePreviewBuilder,
+      onVoiceNoteDurationUpdate:
+          onVoiceNoteDurationUpdate ?? this.onVoiceNoteDurationUpdate,
     );
   }
 
@@ -110,6 +117,7 @@ class LMChatBubbleMedia extends StatelessWidget {
         mediaWidget = LMChatVoiceNote(
           media: attachments.first.toMediaModel(),
           handler: audioHandler,
+          onDurationUpdate: onVoiceNoteDurationUpdate,
         );
       } else {
         mediaWidget = null;

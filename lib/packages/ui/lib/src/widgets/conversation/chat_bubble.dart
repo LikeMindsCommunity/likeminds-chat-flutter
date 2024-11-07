@@ -275,6 +275,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   final LMChatThemeData theme = LMChatTheme.theme;
   List<LMChatReactionViewData>? reactions = [];
 
+  // Add ValueNotifier for voice note duration
+  late final ValueNotifier<Duration> _voiceNoteDurationNotifier;
+
   @override
   void initState() {
     super.initState();
@@ -286,6 +289,20 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     _isDeleted = conversation.deletedByUserId != null;
     _chatBubbleKey = GlobalObjectKey(conversation.id);
     reactions = widget.reactions;
+
+    // Initialize voice note duration from metadata if available
+    final initialDuration = Duration(
+      seconds: int.tryParse(
+            widget.attachments
+                    ?.firstWhere((attachment) =>
+                        attachment.type == kAttachmentTypeVoiceNote)
+                    .meta["duration"]
+                    ?.toString() ??
+                "0",
+          ) ??
+          0,
+    );
+    _voiceNoteDurationNotifier = ValueNotifier(initialDuration);
   }
 
   @override
@@ -298,6 +315,23 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     _isSelected = widget.isSelected;
     _isDeleted = conversation.deletedByUserId != null;
     reactions = widget.reactions;
+
+    // Update duration notifier if attachments change
+    if (widget.attachments?.first.meta["duration"] !=
+        old.attachments?.first.meta["duration"]) {
+      _voiceNoteDurationNotifier.value = Duration(
+        seconds: int.tryParse(
+              widget.attachments?.first.meta["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _voiceNoteDurationNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -487,6 +521,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                       attachmentUploaded:
                                           conversation.attachmentsUploaded ??
                                               false,
+                                      onVoiceNoteDurationUpdate:
+                                          kAttachmentTypeVoiceNote ==
+                                                  widget.attachments?.first.type
+                                              ? _handleVoiceNoteDurationUpdate
+                                              : null,
                                     ),
                                   ),
                                 ),
@@ -524,69 +563,48 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                     inStyle.showFooter == true)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 2.0),
-                                    child: widget.footerBuilder?.call(
-                                          context,
-                                          LMChatBubbleFooter(
-                                            conversation: conversation,
-                                            textWidth: finalWidth,
-                                            voiceDuration:
-                                                kAttachmentTypeVoiceNote ==
-                                                        widget.attachments
-                                                            ?.first.type
-                                                    ? LMChatText(
-                                                        formatDuration(
-                                                          int.tryParse(widget
-                                                                      .attachments
-                                                                      ?.first
-                                                                      .meta[
-                                                                          "duration"]
-                                                                      .toString() ??
-                                                                  "0") ??
-                                                              0,
-                                                        ),
-                                                        style: LMChatTextStyle(
-                                                          textStyle: TextStyle(
-                                                            fontSize: 12,
-                                                            color: LMChatTheme
-                                                                .theme
-                                                                .onContainer
-                                                                .withOpacity(
-                                                                    0.6),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : null,
-                                          ),
-                                        ) ??
-                                        LMChatBubbleFooter(
-                                          conversation: conversation,
-                                          textWidth: finalWidth,
-                                          voiceDuration:
-                                              kAttachmentTypeVoiceNote ==
-                                                      widget.attachments?.first
-                                                          .type
-                                                  ? LMChatText(
-                                                      formatDuration(
-                                                        int.tryParse(widget
-                                                                    .attachments
-                                                                    ?.first
-                                                                    .meta[
-                                                                        "duration"]
-                                                                    .toString() ??
-                                                                "0") ??
-                                                            0,
-                                                      ),
-                                                      style: LMChatTextStyle(
-                                                        textStyle: TextStyle(
-                                                          fontSize: 12,
-                                                          color: LMChatTheme
-                                                              .theme.onContainer
-                                                              .withOpacity(0.6),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : null,
-                                        ),
+                                    child: kAttachmentTypeVoiceNote ==
+                                            widget.attachments?.first.type
+                                        ? ValueListenableBuilder<Duration>(
+                                            valueListenable:
+                                                _voiceNoteDurationNotifier,
+                                            builder: (context, duration, _) {
+                                              final footerWidget =
+                                                  LMChatBubbleFooter(
+                                                conversation: conversation,
+                                                textWidth: finalWidth,
+                                                voiceDuration: LMChatText(
+                                                  formatDuration(
+                                                      duration.inSeconds),
+                                                  style: LMChatTextStyle(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color: LMChatTheme
+                                                          .theme.onContainer
+                                                          .withOpacity(0.6),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+
+                                              return widget.footerBuilder?.call(
+                                                    context,
+                                                    footerWidget,
+                                                  ) ??
+                                                  footerWidget;
+                                            },
+                                          )
+                                        : widget.footerBuilder?.call(
+                                              context,
+                                              LMChatBubbleFooter(
+                                                conversation: conversation,
+                                                textWidth: finalWidth,
+                                              ),
+                                            ) ??
+                                            LMChatBubbleFooter(
+                                              conversation: conversation,
+                                              textWidth: finalWidth,
+                                            ),
                                   ),
                               ],
                             ),
@@ -798,6 +816,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     final minutes = (seconds / 60).floor();
     final remainingSeconds = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  // Update the duration handler to use ValueNotifier
+  void _handleVoiceNoteDurationUpdate(Duration duration) {
+    // Only update if the duration is greater than zero to avoid resetting to 0
+    if (duration.inSeconds > 0) {
+      _voiceNoteDurationNotifier.value = duration;
+    }
   }
 }
 
