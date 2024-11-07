@@ -59,7 +59,11 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
   /// Stream of currently playing audio URL
   @override
-  Stream<String> get currentlyPlayingUrl => _currentlyPlayingController.stream;
+  String? get currentlyPlayingUrl => _currentlyPlayingUrl;
+
+  @override
+  Stream<String> get currentlyPlayingStream =>
+      _currentlyPlayingController.stream;
 
   /// Returns the instance of [FlutterSoundPlayer] player
   @override

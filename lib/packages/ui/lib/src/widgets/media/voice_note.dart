@@ -107,6 +107,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
   Duration? _initialSeekPosition;
 
+  // Add new state variable to track last played position
+  Duration _lastPlayedPosition = Duration.zero;
+
   @override
   void initState() {
     super.initState();
@@ -173,6 +176,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     final newMediaPath = widget.media.mediaFile?.path ?? widget.media.mediaUrl;
 
     if (_currentMediaPath != newMediaPath) {
+      // Reset last played position when media changes
+      _lastPlayedPosition = Duration.zero;
+
       // Clean up old resources and reset state
       if (_isAudioPlaying ||
           (_useExternalHandler && (widget.handler?.player.isPaused ?? false))) {
@@ -195,9 +201,26 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     if (oldWidget.handler != widget.handler) {
       _cleanupSubscriptions();
       _useExternalHandler = widget.handler != null;
-      if (_useExternalHandler) {
-        _initializeHandlerSubscriptions();
-      }
+
+      // // Reset state when handler changes
+      // _progress = 0.0;
+      // _lastPlayedPosition = Duration.zero;
+      // _totalDuration = Duration.zero;
+      // widget.onDurationUpdate?.call(Duration.zero);
+
+      // if (_useExternalHandler) {
+      //   _initializeHandlerSubscriptions();
+
+      //   // Set up duration subscription for new handler
+      //   if (_currentMediaPath != null) {
+      //     _durationSubscription?.cancel();
+      //     _durationSubscription = widget.handler!
+      //         .getDurationStream(_currentMediaPath!)
+      //         .listen((duration) {
+      //       widget.onDurationUpdate?.call(duration);
+      //     });
+      //   }
+      // }
     }
   }
 
@@ -214,16 +237,12 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   Future<void> _stopAllOtherPlayers() async {
     try {
       if (_useExternalHandler) {
-        // First stop any playing audio
-        if (widget.handler!.player.isPlaying ||
-            widget.handler!.player.isPaused) {
+        // First check if any audio is playing and if it's different from current
+        String? currentPlayingUrl = widget.handler!.currentlyPlayingUrl;
+        if (currentPlayingUrl != null &&
+            currentPlayingUrl.isNotEmpty &&
+            currentPlayingUrl != _currentMediaPath) {
           await widget.handler!.stopAudio();
-
-          // Cancel any existing subscriptions to ensure clean state
-          _progressSubscription?.cancel();
-          _progressSubscription = null;
-
-          // Add a small delay to ensure complete cleanup
           await Future.delayed(const Duration(milliseconds: 100));
         }
       } else {
@@ -292,7 +311,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
   void _initializeHandlerSubscriptions() {
     // Listen to external player state changes
-    _handlerSubscription = widget.handler!.currentlyPlayingUrl.listen((url) {
+    _handlerSubscription = widget.handler!.currentlyPlayingStream.listen((url) {
       if (!mounted) return;
 
       // If a different URL is playing, ensure this widget shows as paused
@@ -433,9 +452,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     if (!mounted) return;
     setState(() {
       _isAudioPlaying = false;
-      if (_progress >= 0.99) {
-        _progress = 0.0;
-      }
+      _progress = 0.0;
+      // Reset last played position on completion
+      _lastPlayedPosition = Duration.zero;
     });
     if (_useExternalHandler) {
       widget.handler!.stopAudio();
@@ -477,11 +496,39 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
         await _initializeAndGetDuration();
       }
 
-      if (_isAudioPlaying) {
-        await _pausePlayback();
+      if (_useExternalHandler) {
+        // Check current playing URL first
+        String? currentPlayingUrl = widget.handler!.currentlyPlayingUrl;
+
+        if (_isAudioPlaying) {
+          // Only pause if this voice note is currently playing
+          if (currentPlayingUrl == _currentMediaPath) {
+            await _pausePlayback();
+          } else {
+            // If different voice note is playing, start this one
+            await _startPlayer();
+          }
+        } else {
+          // If nothing is playing or different voice note is paused, start fresh
+          if (currentPlayingUrl == null ||
+              currentPlayingUrl != _currentMediaPath) {
+            await _startPlayer();
+          } else {
+            // Resume this voice note if it was paused
+            await _resumePlayback();
+          }
+        }
       } else {
-        // Always start fresh when playing new audio
-        await _startPlayer();
+        // Local player logic remains the same
+        if (_isAudioPlaying) {
+          await _pausePlayback();
+        } else {
+          if (_lastPlayedPosition > Duration.zero) {
+            await _resumePlayback();
+          } else {
+            await _startPlayer();
+          }
+        }
       }
     } catch (e) {
       print('Error toggling play/pause: $e');
@@ -491,14 +538,24 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   Future<void> _pausePlayback() async {
     try {
       if (_useExternalHandler) {
-        await widget.handler!.pauseAudio();
-        // Don't reset progress here
-        _progressSubscription
-            ?.cancel(); // Stop listening to progress updates while paused
+        // Verify this voice note is actually playing before pausing
+        String? currentPlayingUrl = widget.handler!.currentlyPlayingUrl;
+        if (currentPlayingUrl == _currentMediaPath) {
+          // Store the current position before pausing
+          if (_totalDuration.inMilliseconds > 0) {
+            _lastPlayedPosition = Duration(
+              milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+            );
+          }
+          await widget.handler!.pauseAudio();
+          _progressSubscription?.cancel();
+        }
       } else {
         if (_localPlayer?.isPlaying ?? false) {
+          _lastPlayedPosition = Duration(
+            milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+          );
           await _localPlayer!.pausePlayer();
-          // Don't reset progress here
         }
       }
       setState(() => _isAudioPlaying = false);
@@ -511,17 +568,58 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   Future<void> _resumePlayback() async {
     try {
       if (_useExternalHandler) {
+        // Check if this voice note was the last one playing
+        String? currentPlayingUrl = widget.handler!.currentlyPlayingUrl;
+        if (currentPlayingUrl == null ||
+            currentPlayingUrl != _currentMediaPath) {
+          // If different or no voice note was playing, start fresh
+          await _startPlayer();
+          return;
+        }
+
         await widget.handler!.resumeAudio();
-        _subscribeToProgressUpdates(); // Resubscribe to progress updates
+
+        // Calculate position based on current progress if slider was moved
+        Duration targetPosition;
+        if (_progress > 0 && _totalDuration.inMilliseconds > 0) {
+          targetPosition = Duration(
+            milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+          );
+        } else {
+          targetPosition = _lastPlayedPosition;
+        }
+
+        // Seek to target position if it's valid
+        if (targetPosition > Duration.zero) {
+          await widget.handler!.seekTo(targetPosition);
+        }
+
+        _subscribeToProgressUpdates();
       } else {
+        // Local player logic remains the same
         if (_localPlayer == null) {
           await _startWithLocalPlayer();
           return;
         }
 
         await _localPlayer!.resumePlayer();
+
+        Duration targetPosition;
+        if (_progress > 0 && _totalDuration.inMilliseconds > 0) {
+          targetPosition = Duration(
+            milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
+          );
+        } else {
+          targetPosition = _lastPlayedPosition;
+        }
+
+        if (targetPosition > Duration.zero) {
+          await _localPlayer!.seekToPlayer(targetPosition);
+        }
+
         _setupLocalPlayerProgress();
       }
+
       setState(() => _isAudioPlaying = true);
       widget.onPlay?.call();
     } catch (e) {

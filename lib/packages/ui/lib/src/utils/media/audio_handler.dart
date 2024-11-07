@@ -22,7 +22,10 @@ abstract class LMChatAudioHandler {
   FlutterSoundRecorder get recorder;
 
   /// Stream of currently playing audio URL
-  Stream<String> get currentlyPlayingUrl;
+  Stream<String> get currentlyPlayingStream;
+
+  /// Currently playing URL
+  String? get currentlyPlayingUrl;
 
   /// Initializes the audio handler
   Future<void> init();
