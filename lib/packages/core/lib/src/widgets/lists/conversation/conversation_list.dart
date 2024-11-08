@@ -733,6 +733,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           state.conversationViewData,
         );
         lastConversationId = state.conversationViewData.id;
+        LMChatroomActionBloc.instance.add(
+          LMChatMarkReadChatroomEvent(
+            chatroomId: widget.chatroomId,
+          ),
+        );
       }
     }
   }
