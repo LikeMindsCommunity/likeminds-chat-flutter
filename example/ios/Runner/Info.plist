@@ -40,7 +40,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We require camera access to take pictures for uploading</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We require microphone access for recording videos</string>
+	<string>This app needs access to microphone for voice messages</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We require access to your photo library to upload files</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -69,5 +69,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs access to documents for saving voice messages</string>
 </dict>
 </plist>

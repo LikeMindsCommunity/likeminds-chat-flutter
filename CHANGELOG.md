@@ -38,3 +38,7 @@
 
 - Added support for poll
 - Fixed Deleted text and link preview ui
+
+### 0.10.0
+
+- Added support for voice notes
