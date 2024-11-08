@@ -127,6 +127,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       onPopInvoked: (p) {
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
         _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
           chatroomId: chatroom.id,
         ));
