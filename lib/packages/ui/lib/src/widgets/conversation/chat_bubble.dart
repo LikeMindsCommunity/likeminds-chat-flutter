@@ -292,15 +292,20 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     reactions = widget.reactions;
 
     // Initialize voice note duration from metadata if available
-    final voiceNoteAttachment = widget.attachments?.firstWhereOrNull(
-        (attachment) => attachment.type == kAttachmentTypeVoiceNote);
+    final Duration initialDuration;
+    if (!_isDeleted) {
+      final voiceNoteAttachment = widget.attachments?.firstWhereOrNull(
+          (attachment) => attachment.type == kAttachmentTypeVoiceNote);
 
-    final initialDuration = Duration(
-      seconds: int.tryParse(
-            voiceNoteAttachment?.meta["duration"]?.toString() ?? "0",
-          ) ??
-          0,
-    );
+      initialDuration = Duration(
+        seconds: int.tryParse(
+              voiceNoteAttachment?.meta?["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+    } else {
+      initialDuration = Duration.zero;
+    }
     _voiceNoteDurationNotifier = ValueNotifier(initialDuration);
   }
 
@@ -316,8 +321,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     reactions = widget.reactions;
 
     // Update duration notifier if attachments change
-    if (widget.attachments?.first.meta["duration"] !=
-        old.attachments?.first.meta["duration"]) {
+    if (!_isDeleted &&
+        widget.attachments?.first.meta?["duration"] !=
+            old.attachments?.first.meta?["duration"]) {
       _voiceNoteDurationNotifier.value = Duration(
         seconds: int.tryParse(
               widget.attachments?.first.meta["duration"]?.toString() ?? "0",
@@ -512,44 +518,49 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         widget.onMediaTap?.call();
                                       }
                                     },
-                                    child: widget.mediaBuilder?.call(
-                                          context,
-                                          widget.attachments ?? [],
-                                          LMChatBubbleMedia(
-                                            audioHandler: widget.audioHandler,
-                                            conversation: conversation,
-                                            attachments:
-                                                widget.attachments ?? [],
-                                            count:
-                                                conversation.attachmentCount ??
+                                    child: _isDeleted
+                                        ? widget.mediaBuilder?.call(
+                                              context,
+                                              widget.attachments ?? [],
+                                              LMChatBubbleMedia(
+                                                audioHandler:
+                                                    widget.audioHandler,
+                                                conversation: conversation,
+                                                attachments:
+                                                    widget.attachments ?? [],
+                                                count: conversation
+                                                        .attachmentCount ??
                                                     0,
-                                            attachmentUploaded: conversation
-                                                    .attachmentsUploaded ??
-                                                false,
-                                            onVoiceNoteDurationUpdate:
-                                                kAttachmentTypeVoiceNote ==
-                                                        widget.attachments
-                                                            ?.first.type
-                                                    ? _handleVoiceNoteDurationUpdate
-                                                    : null,
-                                          ),
-                                        ) ??
-                                        LMChatBubbleMedia(
-                                          audioHandler: widget.audioHandler,
-                                          conversation: conversation,
-                                          attachments: widget.attachments ?? [],
-                                          count:
-                                              conversation.attachmentCount ?? 0,
-                                          attachmentUploaded: conversation
-                                                  .attachmentsUploaded ??
-                                              false,
-                                          onVoiceNoteDurationUpdate:
-                                              kAttachmentTypeVoiceNote ==
-                                                      widget.attachments?.first
-                                                          .type
-                                                  ? _handleVoiceNoteDurationUpdate
-                                                  : null,
-                                        ),
+                                                attachmentUploaded: conversation
+                                                        .attachmentsUploaded ??
+                                                    false,
+                                                onVoiceNoteDurationUpdate:
+                                                    kAttachmentTypeVoiceNote ==
+                                                            widget.attachments
+                                                                ?.first.type
+                                                        ? _handleVoiceNoteDurationUpdate
+                                                        : null,
+                                              ),
+                                            ) ??
+                                            LMChatBubbleMedia(
+                                              audioHandler: widget.audioHandler,
+                                              conversation: conversation,
+                                              attachments:
+                                                  widget.attachments ?? [],
+                                              count: conversation
+                                                      .attachmentCount ??
+                                                  0,
+                                              attachmentUploaded: conversation
+                                                      .attachmentsUploaded ??
+                                                  false,
+                                              onVoiceNoteDurationUpdate:
+                                                  kAttachmentTypeVoiceNote ==
+                                                          widget.attachments
+                                                              ?.first.type
+                                                      ? _handleVoiceNoteDurationUpdate
+                                                      : null,
+                                            )
+                                        : null,
                                   ),
                                 ),
                                 _isDeleted
