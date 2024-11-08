@@ -54,6 +54,17 @@ Widget getChatItemAttachmentTile(
     return Row(
       children: [
         LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
+        LMChatText(
           message,
           style: const LMChatTextStyle(
             maxLines: 1,
@@ -78,6 +89,17 @@ Widget getChatItemAttachmentTile(
   if (conversation.state == 10) {
     return Row(
       children: [
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
         LMChatText(message),
         const LMChatIcon(
           type: LMChatIconType.svg,
@@ -110,16 +132,31 @@ Widget getChatItemAttachmentTile(
   if (mediaFiles.isEmpty && conversation.answer.isEmpty) {
     return const SizedBox();
   } else if (mediaFiles.isEmpty) {
-    return LMChatText(
-      answerText,
-      style: const LMChatTextStyle(
-        maxLines: 1,
-        textStyle: TextStyle(
-          overflow: TextOverflow.ellipsis,
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
+    return Row(
+      children: [
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
         ),
-      ),
+        LMChatText(
+          answerText,
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
+      ],
     );
   } else {
     IconData iconData = Icons.camera_alt;

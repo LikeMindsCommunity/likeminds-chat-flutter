@@ -841,10 +841,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                     opacity: _binFadeAnimation.value,
                     child: Transform.scale(
                       scale: _binScaleAnimation.value,
-                      child: const Icon(
+                      child: Icon(
                         Icons.delete_outline,
                         size: 28, // Match mic icon size
-                        color: Colors.red,
+                        color: _themeData.onContainer,
                       ),
                     ),
                   );
