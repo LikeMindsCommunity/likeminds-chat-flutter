@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/poll_handler.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMChatConversationList extends StatefulWidget {
@@ -203,6 +201,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       userMeta: userMeta.map((id, user) {
         return MapEntry(id, user!.toUserViewData());
       }),
+      audioHandler: LMChatCoreAudioHandler.instance,
       onTagTap: (tag) {},
       reactions:
           conversationReactionsMeta[conversation.temporaryId.toString()] ??
@@ -295,6 +294,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       onMediaTap: () {
         LMChatMediaHandler.instance.addPickedMedia(
             conversationAttachmentsMeta[conversation.id.toString()]);
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -437,6 +438,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       userMeta: userMeta.map((id, user) {
         return MapEntry(id, user!.toUserViewData());
       }),
+      audioHandler: LMChatCoreAudioHandler.instance,
       reactions:
           conversationReactionsMeta[conversation.temporaryId.toString()] ??
               conversationReactionsMeta[conversation.id.toString()],
@@ -561,6 +563,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       onMediaTap: () {
         LMChatMediaHandler.instance.addPickedMedia(
             conversationAttachmentsMeta[conversation.id.toString()]);
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -659,13 +663,20 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
       List<LMChatConversationViewData>? conversationData =
-          state.getConversationResponse.conversationData
-              ?.map((e) => e.toConversationViewData(
-                    conversationPollsMeta:
-                        state.getConversationResponse.conversationPollsMeta,
-                    userMeta: state.getConversationResponse.userMeta,
-                  ))
-              .toList();
+          state.getConversationResponse.conversationData?.map((e) {
+        final conv = e.toConversationViewData(
+          conversationPollsMeta:
+              state.getConversationResponse.conversationPollsMeta,
+          userMeta: state.getConversationResponse.userMeta,
+        );
+        // Add attachments to the conversation object explicitly
+        if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
+          return conv.copyWith(
+            attachments: conversationAttachmentsMeta[conv.id.toString()],
+          );
+        }
+        return conv;
+      }).toList();
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,
           LMChatLocalPreference.instance.getCommunityData()!.id);
@@ -691,6 +702,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatConversationViewData conv =
           state.postConversation.toConversationViewData();
 
+      // Add reply conversation object if exists
+      conv = conv.copyWith(
+          replyConversationObject: conversationMeta[conv.replyId.toString()]
+              ?.toConversationViewData());
+
       if (!userMeta.containsKey(user.id)) {
         userMeta[user.id] = user;
       }
@@ -712,11 +728,16 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId ||
           state.shouldUpdate) {
-        conversationAttachmentsMeta.addAll(state.attachments ?? {});
+        conversationAttachmentsMeta.addAll(state.attachments);
         addConversationToPagedList(
           state.conversationViewData,
         );
         lastConversationId = state.conversationViewData.id;
+        LMChatroomActionBloc.instance.add(
+          LMChatMarkReadChatroomEvent(
+            chatroomId: widget.chatroomId,
+          ),
+        );
       }
     }
   }
@@ -739,10 +760,18 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
 
-      result =
-          conversation.copyWith(replyConversationObject: replyConversation);
+      result = conversation.copyWith(
+        replyConversationObject: replyConversation,
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
+    } else {
+      result = conversation.copyWith(
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
     }
-    conversationList.insert(0, result ?? conversation);
+    conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
     }
@@ -772,11 +801,19 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
 
-      result =
-          conversation.copyWith(replyConversationObject: replyConversation);
+      result = conversation.copyWith(
+        replyConversationObject: replyConversation,
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
+    } else {
+      result = conversation.copyWith(
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
     }
     if (index != -1) {
-      conversationList[index] = conversation;
+      conversationList[index] = result;
     } else if (conversationList.isNotEmpty) {
       if (conversationList.first.date != conversation.date) {
         conversationList.insert(
@@ -799,7 +836,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           ).toConversationViewData(),
         );
       }
-      conversationList.insert(0, result ?? conversation);
+      conversationList.insert(0, result);
       if (conversationList.length >= 500) {
         conversationList.removeLast();
       }
@@ -807,6 +844,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         userMeta[user.id] = user;
       }
     }
+
     pagedListController.itemList = conversationList;
     rebuildConversationList.value = !rebuildConversationList.value;
   }

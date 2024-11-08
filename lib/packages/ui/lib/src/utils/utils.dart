@@ -12,6 +12,7 @@ export 'helpers/text_helper.dart';
 export 'conversation/conversation_utils.dart';
 
 export 'media/media_utils.dart';
+export 'media/audio_handler.dart';
 
 /// Returns the initials of a given name.
 ///

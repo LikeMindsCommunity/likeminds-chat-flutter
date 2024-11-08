@@ -1,7 +1,4 @@
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/builder.dart';
-import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/setting.dart';
-import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/style.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/builder.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/setting.dart';
 
