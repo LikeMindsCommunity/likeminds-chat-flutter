@@ -531,7 +531,15 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
               currentPlayingUrl != _currentMediaPath) {
             await _startPlayer();
           } else {
-            // Resume this voice note if it was paused
+            // If slider was moved, use that position instead of last played position
+            if (_progress !=
+                _lastPlayedPosition.inMilliseconds /
+                    _totalDuration.inMilliseconds) {
+              _lastPlayedPosition = Duration(
+                milliseconds:
+                    (_totalDuration.inMilliseconds * _progress).toInt(),
+              );
+            }
             await _resumePlayback();
           }
         }
@@ -596,24 +604,17 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
         await widget.handler!.resumeAudio();
 
-        // Calculate position based on current progress if slider was moved
-        Duration targetPosition;
-        if (_progress > 0 && _totalDuration.inMilliseconds > 0) {
-          targetPosition = Duration(
+        // Always use the current progress position instead of last played position
+        if (_totalDuration.inMilliseconds > 0) {
+          final targetPosition = Duration(
             milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
           );
-        } else {
-          targetPosition = _lastPlayedPosition;
-        }
-
-        // Seek to target position if it's valid
-        if (targetPosition > Duration.zero) {
           await widget.handler!.seekTo(targetPosition);
         }
 
         _subscribeToProgressUpdates();
       } else {
-        // Local player logic remains the same
+        // Local player logic
         if (_localPlayer == null) {
           await _startWithLocalPlayer();
           return;
@@ -621,16 +622,11 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
         await _localPlayer!.resumePlayer();
 
-        Duration targetPosition;
-        if (_progress > 0 && _totalDuration.inMilliseconds > 0) {
-          targetPosition = Duration(
+        // Always use the current progress position
+        if (_totalDuration.inMilliseconds > 0) {
+          final targetPosition = Duration(
             milliseconds: (_totalDuration.inMilliseconds * _progress).toInt(),
           );
-        } else {
-          targetPosition = _lastPlayedPosition;
-        }
-
-        if (targetPosition > Duration.zero) {
           await _localPlayer!.seekToPlayer(targetPosition);
         }
 
