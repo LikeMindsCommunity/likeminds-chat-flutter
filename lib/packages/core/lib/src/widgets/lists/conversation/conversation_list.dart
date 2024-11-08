@@ -294,6 +294,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       onMediaTap: () {
         LMChatMediaHandler.instance.addPickedMedia(
             conversationAttachmentsMeta[conversation.id.toString()]);
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -561,6 +563,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       onMediaTap: () {
         LMChatMediaHandler.instance.addPickedMedia(
             conversationAttachmentsMeta[conversation.id.toString()]);
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
         Navigator.push(
           context,
           MaterialPageRoute(
