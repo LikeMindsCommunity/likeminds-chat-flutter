@@ -306,7 +306,7 @@ class _LMChatMediaForwardingScreenState
   /// [LMChatConversationBloc] with the selected media and the chatroom id.
   /// It also pops the current route.
   void _onSend() {
-    if (_textEditingController.text.trim().isEmpty || mediaList.isEmpty) {
+    if (_textEditingController.text.trim().isEmpty && mediaList.isEmpty) {
       toast("Text or Media can't be empty");
       return;
     }

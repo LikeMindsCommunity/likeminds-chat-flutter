@@ -124,6 +124,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     // Check and request permissions first
     _hasRecordingPermission = await handlePermissions(3); // 3 for microphone
     if (!_hasRecordingPermission) {
+      print('Recording permission not granted');
       throw Exception('Recording permission not granted');
     }
 
@@ -135,6 +136,12 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       await _cleanupOldRecordings();
       _currentRecordingPath = await _generateRecordingPath();
 
+      // Verify the directory exists and is writable
+      final Directory dir = Directory(File(_currentRecordingPath!).parent.path);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+
       await _recorder.startRecorder(
         toFile: _currentRecordingPath,
         codec: _recordingCodec,
@@ -145,6 +152,11 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       return _currentRecordingPath;
     } catch (e) {
       print('Error starting recording: $e');
+      if (e is FileSystemException) {
+        print('File system error: ${e.message}');
+        print('Path: ${e.path}');
+        print('OS Error: ${e.osError}');
+      }
       _currentRecordingPath = null;
       _isRecording = false;
       return null;
@@ -499,8 +511,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
   // Helper method to generate unique file path for recordings
   Future<String> _generateRecordingPath() async {
-    final Directory appDir = await getApplicationDocumentsDirectory();
-    final String recordingDir = '${appDir.path}/recordings';
+    // On iOS, we should use the temporary directory for recording files
+    final Directory tempDir = await getTemporaryDirectory();
+    final String recordingDir = '${tempDir.path}/recordings';
     await Directory(recordingDir).create(recursive: true);
 
     final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
@@ -510,8 +523,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   // Helper method to clean up old recordings
   Future<void> _cleanupOldRecordings() async {
     try {
-      final Directory appDir = await getApplicationDocumentsDirectory();
-      final String recordingDir = '${appDir.path}/recordings';
+      final Directory tempDir = await getTemporaryDirectory();
+      final String recordingDir = '${tempDir.path}/recordings';
       final Directory directory = Directory(recordingDir);
 
       if (await directory.exists()) {
