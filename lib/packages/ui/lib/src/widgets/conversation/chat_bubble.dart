@@ -739,19 +739,29 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   double calculateFinalWidth() {
     // if the conversation is a poll, return the max width
     if (conversation.state == 10) return double.infinity;
-    // Measure the text width
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: LMChatTaggingHelper.convertRouteToTag(widget.conversation.answer)!
-            .split('\n')
-            .first, // Only take the first line
-        style: const TextStyle(fontSize: 14), // Use the appropriate style
-      ),
-      maxLines: 1, // Limit to one line
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    double textWidth = textPainter.width + 1;
+
+    // Get all lines of text
+    final lines =
+        LMChatTaggingHelper.convertRouteToTag(widget.conversation.answer)!
+            .split('\n');
+
+    // Measure width for each line
+    double maxTextWidth = 0;
+    for (String line in lines) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: line,
+          style: const TextStyle(fontSize: 14),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      if (textPainter.width > maxTextWidth) {
+        maxTextWidth = textPainter.width;
+      }
+    }
+    maxTextWidth += 1; // Add padding
 
     // Determine the width to use
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
@@ -765,7 +775,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     }
 
     if (widget.isDM == true) {
-      return textWidth; // Only consider text width for DM
+      return maxTextWidth; // Only consider text width for DM
     } else {
       // Measure the header width if a header is present and not a DM
       final headerPainter = TextPainter(
@@ -774,7 +784,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-          ), // Use the appropriate style
+          ),
         ),
         maxLines: 1,
         textDirection: TextDirection.ltr,
@@ -783,7 +793,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       double headerWidth =
           conversation.memberId == currentUser.id ? 0 : headerPainter.width;
 
-      return textWidth > headerWidth ? textWidth : headerWidth;
+      return maxTextWidth > headerWidth ? maxTextWidth : headerWidth;
     }
   }
 
