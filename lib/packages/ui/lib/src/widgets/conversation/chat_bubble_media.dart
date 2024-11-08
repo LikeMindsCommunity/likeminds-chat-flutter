@@ -9,9 +9,15 @@ class LMChatBubbleMedia extends StatelessWidget {
   final LMChatImageBuilder? imageBuilder;
   final LMChatVideoBuilder? videoBuilder;
   final LMChatGIFBuilder? gifBuilder;
+  final LMChatVoiceNoteBuilder? voiceNoteBuilder; // Add audio builder
 
   final LMChatDocumentThumbnailBuilder? documentThumbnailBuilder;
   final LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder;
+
+  final LMChatAudioHandler? audioHandler;
+
+  /// Callback for voice note duration updates
+  final Function(Duration)? onVoiceNoteDurationUpdate;
 
   const LMChatBubbleMedia({
     super.key,
@@ -19,11 +25,14 @@ class LMChatBubbleMedia extends StatelessWidget {
     required this.attachments,
     required this.count,
     required this.attachmentUploaded,
+    this.audioHandler,
     this.imageBuilder,
     this.videoBuilder,
     this.gifBuilder,
+    this.voiceNoteBuilder, // Add audio builder
     this.documentThumbnailBuilder,
     this.documentTilePreviewBuilder,
+    this.onVoiceNoteDurationUpdate,
   });
 
   LMChatBubbleMedia copyWith({
@@ -34,8 +43,10 @@ class LMChatBubbleMedia extends StatelessWidget {
     LMChatImageBuilder? imageBuilder,
     LMChatVideoBuilder? videoBuilder,
     LMChatGIFBuilder? gifBuilder,
+    LMChatVoiceNoteBuilder? voiceNoteBuilder, // Add audio builder
     LMChatDocumentThumbnailBuilder? documentThumbnailBuilder,
     LMChatDocumentTilePreviewBuilder? documentTilePreviewBuilder,
+    Function(Duration)? onVoiceNoteDurationUpdate,
   }) {
     return LMChatBubbleMedia(
       conversation: conversation ?? this.conversation,
@@ -45,10 +56,14 @@ class LMChatBubbleMedia extends StatelessWidget {
       imageBuilder: imageBuilder ?? this.imageBuilder,
       videoBuilder: videoBuilder ?? this.videoBuilder,
       gifBuilder: gifBuilder ?? this.gifBuilder,
+      voiceNoteBuilder:
+          voiceNoteBuilder ?? this.voiceNoteBuilder, // Add audio builder
       documentThumbnailBuilder:
           documentThumbnailBuilder ?? this.documentThumbnailBuilder,
       documentTilePreviewBuilder:
           documentTilePreviewBuilder ?? this.documentTilePreviewBuilder,
+      onVoiceNoteDurationUpdate:
+          onVoiceNoteDurationUpdate ?? this.onVoiceNoteDurationUpdate,
     );
   }
 
@@ -65,8 +80,6 @@ class LMChatBubbleMedia extends StatelessWidget {
   }
 
   Widget? getContent(BuildContext context) {
-    // If conversation has media but not uploaded yet
-    // show local files
     Widget? mediaWidget;
     if (count > 0 &&
         conversation.deletedByUserId == null &&
@@ -100,6 +113,22 @@ class LMChatBubbleMedia extends StatelessWidget {
       } else if (attachments.first.type ==
           mapMediaTypeToString(LMChatMediaType.gif)) {
         mediaWidget = LMChatGIF(media: attachments.first.toMediaModel());
+      } else if (attachments.first.type ==
+          mapMediaTypeToString(LMChatMediaType.voiceNote)) {
+        mediaWidget = voiceNoteBuilder?.call(
+              context,
+              attachments.first,
+              LMChatVoiceNote(
+                media: attachments.first.toMediaModel(),
+                handler: audioHandler,
+                onDurationUpdate: onVoiceNoteDurationUpdate,
+              ),
+            ) ??
+            LMChatVoiceNote(
+              media: attachments.first.toMediaModel(),
+              handler: audioHandler,
+              onDurationUpdate: onVoiceNoteDurationUpdate,
+            );
       } else {
         mediaWidget = null;
       }

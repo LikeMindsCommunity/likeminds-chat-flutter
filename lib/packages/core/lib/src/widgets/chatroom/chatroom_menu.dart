@@ -3,6 +3,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/participants.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -170,6 +171,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
         },
       ),
     );
+    LMChatCoreAudioHandler.instance.stopAudio();
+    LMChatCoreAudioHandler.instance.stopRecording();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return LMChatroomParticipantsPage(
         chatroomViewData: widget.chatroom.toChatRoomViewData(),

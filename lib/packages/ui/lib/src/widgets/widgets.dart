@@ -30,6 +30,7 @@ export 'media/gif.dart';
 export 'media/error.dart';
 export 'media/link_preview_bar.dart';
 export 'media/link_preview.dart';
+export 'media/voice_note.dart';
 
 export 'conversation/chat_bubble.dart';
 

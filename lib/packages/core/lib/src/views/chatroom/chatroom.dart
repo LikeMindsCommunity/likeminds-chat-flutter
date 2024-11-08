@@ -10,6 +10,7 @@ import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
@@ -126,6 +127,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       onPopInvoked: (p) {
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
         _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
           chatroomId: chatroom.id,
         ));
@@ -319,6 +322,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             rebuildAppBar.value = !rebuildAppBar.value;
             rebuildConversationList.value = !rebuildConversationList.value;
           } else {
+            LMChatCoreAudioHandler.instance.stopAudio();
+            LMChatCoreAudioHandler.instance.stopRecording();
             Navigator.of(context).pop();
             _chatroomActionBloc.add(
               LMChatMarkReadChatroomEvent(
@@ -426,6 +431,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     bool haveEditPermission =
         LMChatMemberRightUtil.checkEditPermissions(conversationViewData!) &&
             chatroom.chatRequestState != 2;
+
+    // Check if the message is a voice note
+    bool isVoiceNote = conversationViewData.attachments
+            ?.any((attachment) => attachment.type == 'voice_note') ??
+        false;
+
     return [
       // Reply button
       if (_selectedIds.length == 1 && _isRespondingAllowed()) ...[
@@ -435,7 +446,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             conversationViewData,
             LMChatButton(
               onTap: () {
-                // add reply event
                 _convActionBloc.add(
                   LMChatReplyConversationEvent(
                     conversationId: conversationViewData.id,
@@ -459,8 +469,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               ),
             )),
       ],
-      // Copy button
-      ...[
+      // Copy button - Only show if not a voice note
+      if (!isVoiceNote) ...[
         const SizedBox(width: 8),
         _screenBuilder.copyButton(
           context,
@@ -518,8 +528,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           ),
         ),
       ],
-      // Edit button
-      if (haveEditPermission && _selectedIds.length == 1) ...[
+      // Edit button - Only show if not a voice note
+      if (haveEditPermission && _selectedIds.length == 1 && !isVoiceNote) ...[
         const SizedBox(width: 8),
         _screenBuilder.editButton(
           context,
@@ -557,6 +567,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           conversationViewData,
           LMChatButton(
             onTap: () {
+              LMChatCoreAudioHandler.instance.stopAudio();
+              LMChatCoreAudioHandler.instance.stopRecording();
               showDialog(
                 context: context,
                 builder: (context) {
@@ -627,6 +639,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                           rebuildConversationList.value =
                               !rebuildConversationList.value;
                           Navigator.of(context).pop();
+                          LMChatCoreAudioHandler.instance.stopAudio();
+                          LMChatCoreAudioHandler.instance.stopRecording();
                         }),
                       ),
                     ],

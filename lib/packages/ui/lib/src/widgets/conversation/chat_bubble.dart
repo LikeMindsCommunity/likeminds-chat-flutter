@@ -5,9 +5,11 @@ import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/media/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/conversation/chat_bubble_clipper.dart';
+import 'package:likeminds_chat_flutter_ui/src/widgets/media/voice_note.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 import 'package:swipe_to_action/swipe_to_action.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:collection/collection.dart';
 
 part 'chat_bubble_content.dart';
 part 'chat_bubble_footer.dart';
@@ -38,6 +40,7 @@ class LMChatBubble extends StatefulWidget {
   /// The list of attachments for this chat bubble
   final List<LMChatReactionViewData>? reactions;
 
+  /// The user meta for this chat bubble
   final Map<int, LMChatUserViewData>? userMeta;
 
   /// is the message sent by the current user.
@@ -134,6 +137,9 @@ class LMChatBubble extends StatefulWidget {
   /// Poll Widget builder
   final LMChatPollBuilder? pollBuilder;
 
+  /// Instance of [LMChatAudioHandler] to manage audio playback seamlessly
+  final LMChatAudioHandler? audioHandler;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -142,6 +148,7 @@ class LMChatBubble extends StatefulWidget {
     required this.currentUser,
     required this.conversationUser,
     required this.onTagTap,
+    this.audioHandler,
     this.reactions,
     this.userMeta,
     this.onRemoveReaction,
@@ -269,6 +276,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   final LMChatThemeData theme = LMChatTheme.theme;
   List<LMChatReactionViewData>? reactions = [];
 
+  // Add ValueNotifier for voice note duration
+  late final ValueNotifier<Duration> _voiceNoteDurationNotifier;
+
   @override
   void initState() {
     super.initState();
@@ -280,6 +290,23 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     _isDeleted = conversation.deletedByUserId != null;
     _chatBubbleKey = GlobalObjectKey(conversation.id);
     reactions = widget.reactions;
+
+    // Initialize voice note duration from metadata if available
+    final Duration initialDuration;
+    if (!_isDeleted) {
+      final voiceNoteAttachment = widget.attachments?.firstWhereOrNull(
+          (attachment) => attachment.type == kAttachmentTypeVoiceNote);
+
+      initialDuration = Duration(
+        seconds: int.tryParse(
+              voiceNoteAttachment?.meta?["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+    } else {
+      initialDuration = Duration.zero;
+    }
+    _voiceNoteDurationNotifier = ValueNotifier(initialDuration);
   }
 
   @override
@@ -292,6 +319,24 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     _isSelected = widget.isSelected;
     _isDeleted = conversation.deletedByUserId != null;
     reactions = widget.reactions;
+
+    // Update duration notifier if attachments change
+    if (!_isDeleted &&
+        widget.attachments?.first.meta?["duration"] !=
+            old.attachments?.first.meta?["duration"]) {
+      _voiceNoteDurationNotifier.value = Duration(
+        seconds: int.tryParse(
+              widget.attachments?.first.meta["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _voiceNoteDurationNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -392,8 +437,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           maxWidth: (widget.attachments != null &&
                                   widget.attachments!.isNotEmpty)
                               ? 60.w
-                      : conversation.state == 10
-                          ? 70.w
+                              : conversation.state == 10
+                                  ? 70.w
                                   : 65.w,
                         ),
                         child: PhysicalShape(
@@ -430,21 +475,22 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         conversationUser:
                                             widget.conversationUser,
                                       ),
-                        // poll widget
-                        if (conversation.state == 10 && !_isDeleted) ...[
-                          widget.pollBuilder?.call(
-                                context,
-                                widget.poll ??
-                                    LMChatPoll(
-                                      pollData: conversation,
-                                    ),
-                                conversation,
-                              ) ??
-                              widget.poll ??
-                              LMChatPoll(
-                                pollData: conversation,
-                              ),
-                        ],
+                                // poll widget
+                                if (conversation.state == 10 &&
+                                    !_isDeleted) ...[
+                                  widget.pollBuilder?.call(
+                                        context,
+                                        widget.poll ??
+                                            LMChatPoll(
+                                              pollData: conversation,
+                                            ),
+                                        conversation,
+                                      ) ??
+                                      widget.poll ??
+                                      LMChatPoll(
+                                        pollData: conversation,
+                                      ),
+                                ],
                                 // link preview widget
                                 if (conversation.ogTags != null &&
                                     conversation.deletedByUserId == null)
@@ -472,14 +518,49 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         widget.onMediaTap?.call();
                                       }
                                     },
-                                    child: LMChatBubbleMedia(
-                                      conversation: conversation,
-                                      attachments: widget.attachments ?? [],
-                                      count: conversation.attachmentCount ?? 0,
-                                      attachmentUploaded:
-                                          conversation.attachmentsUploaded ??
-                                              false,
-                                    ),
+                                    child: !_isDeleted
+                                        ? widget.mediaBuilder?.call(
+                                              context,
+                                              widget.attachments ?? [],
+                                              LMChatBubbleMedia(
+                                                audioHandler:
+                                                    widget.audioHandler,
+                                                conversation: conversation,
+                                                attachments:
+                                                    widget.attachments ?? [],
+                                                count: conversation
+                                                        .attachmentCount ??
+                                                    0,
+                                                attachmentUploaded: conversation
+                                                        .attachmentsUploaded ??
+                                                    false,
+                                                onVoiceNoteDurationUpdate:
+                                                    kAttachmentTypeVoiceNote ==
+                                                            widget.attachments
+                                                                ?.first.type
+                                                        ? _handleVoiceNoteDurationUpdate
+                                                        : null,
+                                              ),
+                                            ) ??
+                                            LMChatBubbleMedia(
+                                              audioHandler: widget.audioHandler,
+                                              conversation: conversation,
+                                              attachments:
+                                                  widget.attachments ?? [],
+                                              count: conversation
+                                                      .attachmentCount ??
+                                                  0,
+                                              attachmentUploaded: conversation
+                                                      .attachmentsUploaded ??
+                                                  false,
+                                              onVoiceNoteDurationUpdate:
+                                                  kAttachmentTypeVoiceNote ==
+                                                          widget.attachments
+                                                              ?.first.type
+                                                      ? _handleVoiceNoteDurationUpdate
+                                                      : null,
+                                            )
+                                        : const SizedBox.shrink(),
                                   ),
                                 ),
                                 _isDeleted
@@ -489,15 +570,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                           _defDeletedWidget(),
                                         ) ??
                                         _defDeletedWidget()
-                            : conversation.state == 10
-                                ? const SizedBox.shrink()
+                                    : conversation.state == 10
+                                        ? const SizedBox.shrink()
                                         : widget.contentBuilder?.call(
                                               context,
                                               LMChatBubbleContent(
                                                 conversation: widget.attachments
                                                             ?.first.type ==
-                                                   
-                                                    "gif"
+                                                        "gif"
                                                     ? conversation.copyWith(
                                                         answer: _getGIFText())
                                                     : conversation,
@@ -505,30 +585,60 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                               ),
                                             ) ??
                                             LMChatBubbleContent(
-                                              conversation:
-                                                  widget.attachments?.first.type ==
-                                                 
+                                              conversation: widget.attachments
+                                                          ?.first.type ==
                                                       "gif"
-                                                      ? conversation.copyWith(
-                                                          answer: _getGIFText())
-                                                      : conversation,
+                                                  ? conversation.copyWith(
+                                                      answer: _getGIFText())
+                                                  : conversation,
                                               onTagTap: widget.onTagTap,
                                             ),
                                 if (conversation.deletedByUserId == null &&
                                     inStyle.showFooter == true)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 2.0),
-                                    child: widget.footerBuilder?.call(
-                                          context,
-                                          LMChatBubbleFooter(
-                                            conversation: conversation,
-                                            textWidth: finalWidth,
-                                          ),
-                                        ) ??
-                                        LMChatBubbleFooter(
-                                          conversation: conversation,
-                                          textWidth: finalWidth,
-                                        ),
+                                    child: kAttachmentTypeVoiceNote ==
+                                            widget.attachments?.first.type
+                                        ? ValueListenableBuilder<Duration>(
+                                            valueListenable:
+                                                _voiceNoteDurationNotifier,
+                                            builder: (context, duration, _) {
+                                              final footerWidget =
+                                                  LMChatBubbleFooter(
+                                                conversation: conversation,
+                                                textWidth: finalWidth,
+                                                voiceDuration: LMChatText(
+                                                  formatDuration(
+                                                      duration.inSeconds),
+                                                  style: LMChatTextStyle(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 12,
+                                                      color: LMChatTheme
+                                                          .theme.onContainer
+                                                          .withOpacity(0.6),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+
+                                              return widget.footerBuilder?.call(
+                                                    context,
+                                                    footerWidget,
+                                                  ) ??
+                                                  footerWidget;
+                                            },
+                                          )
+                                        : widget.footerBuilder?.call(
+                                              context,
+                                              LMChatBubbleFooter(
+                                                conversation: conversation,
+                                                textWidth: finalWidth,
+                                              ),
+                                            ) ??
+                                            LMChatBubbleFooter(
+                                              conversation: conversation,
+                                              textWidth: finalWidth,
+                                            ),
                                   ),
                               ],
                             ),
@@ -640,19 +750,29 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   double calculateFinalWidth() {
     // if the conversation is a poll, return the max width
     if (conversation.state == 10) return double.infinity;
-    // Measure the text width
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: LMChatTaggingHelper.convertRouteToTag(widget.conversation.answer)!
-            .split('\n')
-            .first, // Only take the first line
-        style: const TextStyle(fontSize: 14), // Use the appropriate style
-      ),
-      maxLines: 1, // Limit to one line
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    double textWidth = textPainter.width + 1;
+
+    // Get all lines of text
+    final lines =
+        LMChatTaggingHelper.convertRouteToTag(widget.conversation.answer)!
+            .split('\n');
+
+    // Measure width for each line
+    double maxTextWidth = 0;
+    for (String line in lines) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: line,
+          style: const TextStyle(fontSize: 14),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      if (textPainter.width > maxTextWidth) {
+        maxTextWidth = textPainter.width;
+      }
+    }
+    maxTextWidth += 1; // Add padding
 
     // Determine the width to use
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
@@ -666,7 +786,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     }
 
     if (widget.isDM == true) {
-      return textWidth; // Only consider text width for DM
+      return maxTextWidth; // Only consider text width for DM
     } else {
       // Measure the header width if a header is present and not a DM
       final headerPainter = TextPainter(
@@ -675,7 +795,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-          ), // Use the appropriate style
+          ),
         ),
         maxLines: 1,
         textDirection: TextDirection.ltr,
@@ -684,7 +804,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       double headerWidth =
           conversation.memberId == currentUser.id ? 0 : headerPainter.width;
 
-      return textWidth > headerWidth ? textWidth : headerWidth;
+      return maxTextWidth > headerWidth ? maxTextWidth : headerWidth;
     }
   }
 
@@ -734,6 +854,20 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         ),
       ),
     );
+  }
+
+  String formatDuration(int seconds) {
+    final minutes = (seconds / 60).floor();
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  // Update the duration handler to use ValueNotifier
+  void _handleVoiceNoteDurationUpdate(Duration duration) {
+    // Only update if the duration is greater than zero to avoid resetting to 0
+    if (duration.inSeconds > 0) {
+      _voiceNoteDurationNotifier.value = duration;
+    }
   }
 }
 
