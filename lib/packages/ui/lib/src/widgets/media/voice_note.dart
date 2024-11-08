@@ -110,6 +110,9 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   // Add new state variable to track last played position
   Duration _lastPlayedPosition = Duration.zero;
 
+  // Add this field at the top with other state variables
+  Duration _initialDuration = Duration.zero;
+
   @override
   void initState() {
     super.initState();
@@ -117,13 +120,27 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     _useExternalHandler = widget.handler != null;
     _currentMediaPath = widget.media.mediaFile?.path ?? widget.media.mediaUrl;
 
+    // Parse initial duration from metadata if available
+    _initialDuration = Duration(
+      seconds: int.tryParse(
+            widget.media.meta?["duration"]?.toString() ?? "0",
+          ) ??
+          0,
+    );
+    if (_initialDuration > Duration.zero) {
+      _totalDuration = _initialDuration;
+    }
+
     if (_useExternalHandler) {
       _initializeHandlerSubscriptions();
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeAndGetDuration();
-    });
+    // Only fetch duration if not available from metadata
+    if (_initialDuration == Duration.zero) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeAndGetDuration();
+      });
+    }
 
     if (widget.autoplay ?? false) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -754,6 +771,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     );
   }
 
+  // Update _initializeAndGetDuration to avoid unnecessary player initialization
   Future<void> _initializeAndGetDuration() async {
     if (_totalDuration != Duration.zero || _currentMediaPath == null) return;
 
@@ -765,29 +783,27 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
           widget.onDurationUpdate?.call(duration);
         }
       } else {
-        // Initialize local player if needed
-        if (_localPlayer == null) {
-          _localPlayer = FlutterSoundPlayer();
-          await _localPlayer!.openPlayer();
-        }
+        // Create a temporary player just for getting duration
+        final tempPlayer = FlutterSoundPlayer();
+        await tempPlayer.openPlayer();
 
-        // Get duration using startPlayer and immediately stop
-        Duration? duration = await _localPlayer!.startPlayer(
+        Duration? duration = await tempPlayer.startPlayer(
           fromURI: _currentMediaPath,
           whenFinished: () async {
-            await _localPlayer!.stopPlayer();
+            await tempPlayer.stopPlayer();
           },
         );
+
+        await tempPlayer.stopPlayer();
+        await tempPlayer.closePlayer();
 
         if (duration != null && mounted) {
           setState(() => _totalDuration = duration);
           widget.onDurationUpdate?.call(duration);
         }
-        await _localPlayer!.stopPlayer();
       }
     } catch (e) {
       print('Error getting duration: $e');
-      // Set a default duration or handle the error as needed
       if (mounted) {
         setState(() => _totalDuration = Duration.zero);
       }
