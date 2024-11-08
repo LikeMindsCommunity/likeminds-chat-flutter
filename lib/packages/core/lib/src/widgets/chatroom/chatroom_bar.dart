@@ -13,6 +13,7 @@ import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_he
 import 'package:flutter/services.dart';
 import 'package:flutter/animation.dart';
 import 'dart:math' as math;
+import 'package:flutter_sound/flutter_sound.dart';
 
 /// {@template lm_chatroom_bar}
 /// A widget to display the chatroom bar.
@@ -160,6 +161,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   // Add this near other state variables in _LMChatroomBarState
   StreamSubscription<LMChatAudioState>? _audioStateSubscription;
+
+  // Add near the top of _LMChatroomBarState class
+  late final FlutterSoundPlayer _localPlayer;
+  bool _isLocalPlayerInitialized = false;
 
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
@@ -310,6 +315,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         _resetRecordingState();
       }
     });
+
+    _localPlayer = FlutterSoundPlayer();
+    _initLocalPlayer();
   }
 
   @override
@@ -320,7 +328,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       LMChatCoreAudioHandler.instance.cancelRecording();
     }
     if (_isPlaying.value) {
-      LMChatCoreAudioHandler.instance.stopAudio();
+      _stopLocalPlayback();
+    }
+    if (_isLocalPlayerInitialized) {
+      _localPlayer.closePlayer();
     }
 
     // Clean up all controllers and subscriptions
@@ -955,23 +966,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   void _handlePlayPause() async {
     if (_recordedFilePath == null) return;
 
-    final audioHandler = LMChatCoreAudioHandler.instance;
     try {
-      if (_isPlaying.value || audioHandler.player.isPlaying) {
-        await audioHandler.pauseAudio();
-        _isPlaying.value = false;
+      if (_isPlaying.value) {
+        await _stopLocalPlayback();
       } else {
-        if (audioHandler.player.isPaused || audioHandler.player.isPlaying) {
-          await audioHandler.resumeAudio();
-        } else {
-          // Reset position to 0 when starting new playback
-          _playbackProgress.value = PlaybackProgress(
-            duration: _playbackProgress.value.duration,
-            position: Duration.zero,
-          );
-          await audioHandler.playAudio(_recordedFilePath!);
-        }
-        _isPlaying.value = true;
+        await _handleLocalPlayback();
       }
     } catch (e) {
       debugPrint('Error handling play/pause: $e');
@@ -981,20 +980,17 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   void _handleDeleteRecording() async {
     try {
-      final audioHandler = LMChatCoreAudioHandler.instance;
-
       // Stop recording timer first
       _stopRecordingTimer();
 
       // Stop any ongoing playback
       if (_isPlaying.value) {
-        await audioHandler.stopAudio();
-        _isPlaying.value = false;
+        await _stopLocalPlayback();
       }
 
       // Cancel any ongoing recording
       if (_isVoiceButtonHeld.value) {
-        await audioHandler.cancelRecording();
+        await LMChatCoreAudioHandler.instance.cancelRecording();
       }
       // Delete the recorded file if it exists
       else if (_recordedFilePath != null) {
@@ -2045,6 +2041,77 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       }
       debugPrint('Voice recording error: $e');
       _resetRecordingState();
+    }
+  }
+
+  // Add method to initialize local player
+  Future<void> _initLocalPlayer() async {
+    if (!_isLocalPlayerInitialized) {
+      try {
+        await _localPlayer.openPlayer();
+        _isLocalPlayerInitialized = true;
+      } catch (e) {
+        debugPrint('Error initializing local player: $e');
+      }
+    }
+  }
+
+  // Add method to handle local playback
+  Future<void> _handleLocalPlayback() async {
+    if (_recordedFilePath == null) return;
+
+    try {
+      if (_isPlaying.value) {
+        await _stopLocalPlayback();
+      } else {
+        if (!_isLocalPlayerInitialized) {
+          await _initLocalPlayer();
+        }
+
+        await _localPlayer.startPlayer(
+          fromURI: _recordedFilePath!,
+          codec: Codec.defaultCodec,
+          whenFinished: () {
+            _isPlaying.value = false;
+            _playbackProgress.value = PlaybackProgress(
+              duration: _playbackProgress.value.duration,
+              position: _playbackProgress.value.duration,
+              isCompleted: true,
+            );
+          },
+        );
+
+        _isPlaying.value = true;
+
+        // Setup progress tracking
+        _localPlayer.setSubscriptionDuration(const Duration(milliseconds: 100));
+        _localPlayer.onProgress!.listen(
+          (e) {
+            if (_isPlaying.value) {
+              _playbackProgress.value = PlaybackProgress(
+                duration: e.duration,
+                position: e.position,
+              );
+            }
+          },
+          onError: (error) {
+            debugPrint('Local playback error: $error');
+            _stopLocalPlayback();
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint('Error in local playback: $e');
+      _stopLocalPlayback();
+    }
+  }
+
+  // Add method to stop local playback
+  Future<void> _stopLocalPlayback() async {
+    if (_isLocalPlayerInitialized &&
+        (_localPlayer.isPlaying || _localPlayer.isPaused)) {
+      await _localPlayer.stopPlayer();
+      _isPlaying.value = false;
     }
   }
 }
