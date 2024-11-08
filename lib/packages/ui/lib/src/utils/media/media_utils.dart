@@ -42,9 +42,11 @@ const List<String> mediaExtentions = [
 ///
 /// Returns a [Widget] that represents the attachment tile.
 Widget getChatItemAttachmentTile(
-    String message,
-    List<LMChatAttachmentViewData> mediaFiles,
-    LMChatConversationViewData conversation) {
+  String message,
+  List<LMChatAttachmentViewData> mediaFiles,
+  LMChatConversationViewData conversation, {
+  String? prefix,
+}) {
   String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
           withTilde: false) ??
       '';
@@ -124,9 +126,20 @@ Widget getChatItemAttachmentTile(
     String text = '';
     if (mapStringToMediaType(mediaFiles.first.type!) ==
         LMChatMediaType.voiceNote) {
-      return const Row(
+      return Row(
         children: [
-          LMChatIcon(
+          LMChatText(
+            prefix ?? '',
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+          const LMChatIcon(
             type: LMChatIconType.icon,
             icon: Icons.mic,
             style: LMChatIconStyle(
@@ -135,7 +148,7 @@ Widget getChatItemAttachmentTile(
             ),
           ),
           LMChatDefaultTheme.kHorizontalPaddingSmall,
-          LMChatText(
+          const LMChatText(
             "Voice Message",
             style: LMChatTextStyle(
               maxLines: 1,
@@ -172,6 +185,17 @@ Widget getChatItemAttachmentTile(
       if (videoCount != 0 && imageCount != 0) {
         return Row(
           children: <Widget>[
+            LMChatText(
+              prefix ?? '',
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
             LMChatText(
               videoCount.toString(),
               style: const LMChatTextStyle(
@@ -250,6 +274,17 @@ Widget getChatItemAttachmentTile(
     }
     return Row(
       children: <Widget>[
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
         mediaFiles.length > 1
             ? LMChatText(
                 '${mediaFiles.length}',

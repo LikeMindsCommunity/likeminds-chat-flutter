@@ -12,6 +12,37 @@ List<int> getChatroomTypes(LMChatroomType type) {
   return chatrooms;
 }
 
+String getUserHomePrefixPreviewMessage(
+  LMChatConversationViewData conversation,
+) {
+  String personLabel = "";
+  final user = LMChatLocalPreference.instance.getUser();
+  bool isByCurrentUser = conversation.member!.id == user.id;
+  personLabel = isByCurrentUser
+      ? 'You: '
+      : '${conversation.member!.name.split(' ').first}: ';
+  return personLabel;
+}
+
+String getUserDMPrefixPreviewMessage(
+  LMChatConversationViewData conversation,
+  LMChatUserViewData conversationUser,
+  LMChatUserViewData chatroomUser,
+  LMChatUserViewData chatroomWithUser,
+) {
+  String personLabel = "";
+  final user = LMChatLocalPreference.instance.getUser();
+  bool a = conversationUser.id == chatroomWithUser.id &&
+      user.id == chatroomWithUser.id;
+  bool b = conversationUser.id == chatroomUser.id && user.id == chatroomUser.id;
+  personLabel = a
+      ? 'You: '
+      : b
+          ? 'You: '
+          : '';
+  return personLabel;
+}
+
 String getDMChatroomPreviewMessage(
   LMChatConversationViewData conversation,
   LMChatUserViewData conversationUser,
