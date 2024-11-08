@@ -46,6 +46,10 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
   final _durationController =
       StreamController<Map<String, Duration>>.broadcast();
 
+  /// Stream controller and stream for audio state changes
+  final StreamController<LMChatAudioState> _audioStateController =
+      StreamController<LMChatAudioState>.broadcast();
+
   // Add getter for the duration stream
   @override
   Stream<Duration> getDurationStream(String path) => _durationController.stream
@@ -156,6 +160,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     try {
       final String? path = await _recorder.stopRecorder();
       _isRecording = false;
+      _audioStateController.add(LMChatAudioState.stopped);
 
       if (path != null) {
         final File recordingFile = File(path);
@@ -199,6 +204,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
     try {
       await _recorder.stopRecorder();
+      _audioStateController.add(LMChatAudioState.stopped);
+
       if (_currentRecordingPath != null) {
         final File recordingFile = File(_currentRecordingPath!);
         if (await recordingFile.exists()) {
@@ -253,11 +260,11 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     }
 
     try {
-      // Stop any current playback and clear state
       await stopAudio();
 
       _currentlyPlayingUrl = path;
       _currentlyPlayingController.add(path);
+      _audioStateController.add(LMChatAudioState.playing);
 
       bool isLocalFile = path.startsWith('/');
       Codec codec = isLocalFile ? _recordingCodec : Codec.defaultCodec;
@@ -301,9 +308,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     try {
       if (_player.isPlaying) {
         await _player.pausePlayer();
-        // Don't clear the currentlyPlayingUrl, just send empty string to indicate pause
+        _audioStateController.add(LMChatAudioState.paused);
         _currentlyPlayingController.add('');
-        // Keep the progress subscription active to maintain position
       }
     } catch (e) {
       print('Error pausing audio: $e');
@@ -318,8 +324,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     try {
       if (_player.isPaused) {
         await _player.resumePlayer();
+        _audioStateController.add(LMChatAudioState.playing);
         _currentlyPlayingController.add(_currentlyPlayingUrl!);
-        // Progress tracking should continue automatically
       }
     } catch (e) {
       print('Error resuming audio: $e');
@@ -334,6 +340,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
     try {
       if (_player.isPlaying || _player.isPaused) {
         await _player.stopPlayer();
+        _audioStateController.add(LMChatAudioState.stopped);
 
         if (_currentlyPlayingUrl != null) {
           // Reset progress for the current URL
@@ -413,6 +420,9 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
       // Clean up duration controller
       await _durationController.close();
+
+      // Add cleanup of audio state controller
+      await _audioStateController.close();
     } catch (e) {
       print('Error in dispose: $e');
     }
@@ -424,6 +434,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
   Future<void> _onPlaybackComplete(String path) async {
     await _player.stopPlayer();
+    _audioStateController.add(LMChatAudioState.stopped);
 
     // Store final duration before clearing state
     final duration = _audioDurations[path] ?? Duration.zero;
@@ -560,4 +571,7 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       return null;
     }
   }
+
+  @override
+  Stream<LMChatAudioState> get audioStateStream => _audioStateController.stream;
 }

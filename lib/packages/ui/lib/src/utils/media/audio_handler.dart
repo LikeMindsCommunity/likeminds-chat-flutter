@@ -1,4 +1,8 @@
+import 'dart:async';
 import 'package:flutter_sound/flutter_sound.dart';
+
+/// Enum to represent audio states
+enum LMChatAudioState { stopped, recording, playing, paused }
 
 /// Class to hold playback progress information
 class PlaybackProgress {
@@ -27,6 +31,9 @@ abstract class LMChatAudioHandler {
   /// Currently playing URL
   String? get currentlyPlayingUrl;
 
+  /// Stream of audio state changes
+  Stream<LMChatAudioState> get audioStateStream;
+
   /// Initializes the audio handler
   Future<void> init();
 
@@ -36,16 +43,16 @@ abstract class LMChatAudioHandler {
   /// Starts recording audio to the specified path
   Future<String?> startRecording();
 
-  /// Stops the current audio recording
+  /// Stops the current audio recording and notifies state change
   Future<String?> stopRecording({Duration? recordedDuration});
 
-  /// Cancels the current recording
+  /// Cancels the current recording and notifies state change
   Future<void> cancelRecording();
 
   /// Plays audio from the specified path
   Future<void> playAudio(String path);
 
-  /// Stops the currently playing audio
+  /// Stops the currently playing audio and notifies state change
   Future<void> stopAudio();
 
   /// Pauses the currently playing audio

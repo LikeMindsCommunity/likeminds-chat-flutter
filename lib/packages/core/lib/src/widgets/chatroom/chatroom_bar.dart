@@ -158,6 +158,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   late final Animation<double> _binFadeAnimation;
   late final Animation<double> _micFadeAnimation;
 
+  // Add this near other state variables in _LMChatroomBarState
+  StreamSubscription<LMChatAudioState>? _audioStateSubscription;
+
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -299,6 +302,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       parent: _cancelAnimationController,
       curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
     ));
+
+    // Subscribe to audio state changes
+    _audioStateSubscription =
+        LMChatCoreAudioHandler.instance.audioStateStream.listen((state) {
+      if (state == LMChatAudioState.stopped) {
+        _resetRecordingState();
+      }
+    });
   }
 
   @override
@@ -325,6 +336,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     _isRecordingLocked.dispose();
     _lockSlideController.dispose();
     _cancelAnimationController.dispose();
+    _audioStateSubscription?.cancel();
 
     super.dispose();
   }
@@ -997,6 +1009,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   void _resetRecordingState() {
+    if (!mounted) return;
+
     _stopRecordingTimer();
     _isReviewingRecording.value = false;
     _isVoiceButtonHeld.value = false;
@@ -1808,6 +1822,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   void _navigateToForwarding() async {
     _popupMenuController.hideMenu();
+    LMChatCoreAudioHandler.instance.stopAudio();
+    LMChatCoreAudioHandler.instance.stopRecording();
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
