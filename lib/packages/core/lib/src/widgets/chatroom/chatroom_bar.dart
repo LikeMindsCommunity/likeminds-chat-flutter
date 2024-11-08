@@ -717,56 +717,47 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                             final recordedDuration = _recordingDuration.value;
                             _stopRecordingTimer();
 
-                            try {
-                              final recordingPath =
-                                  await audioHandler.stopRecording(
-                                recordedDuration: recordedDuration,
+                            final recordingPath =
+                                await audioHandler.stopRecording(
+                              recordedDuration: recordedDuration,
+                            );
+
+                            if (recordingPath != null) {
+                              if (recordedDuration.inSeconds < 1) {
+                                toast("Voice recording too short");
+                                _handleDeleteRecording();
+                                return;
+                              }
+
+                              _recordedFilePath = recordingPath;
+                              _isReviewingRecording.value = true;
+                              _isVoiceButtonHeld.value = false;
+                              _isRecordingLocked.value = false;
+
+                              _playbackProgress.value = PlaybackProgress(
+                                duration: recordedDuration,
+                                position: Duration.zero,
                               );
 
-                              if (recordingPath != null) {
-                                if (recordedDuration.inSeconds < 1) {
-                                  toast("Voice recording too short");
-                                  _handleDeleteRecording();
-                                  return;
-                                }
-
-                                _recordedFilePath = recordingPath;
-                                _isVoiceButtonHeld.value = false;
-                                _isRecordingLocked.value = false;
-                                _isReviewingRecording.value = true;
-
-                                _playbackProgress.value = PlaybackProgress(
-                                  duration: recordedDuration,
-                                  position: Duration.zero,
-                                );
-
-                                // Setup playback progress listener
-                                audioHandler
-                                    .getProgressStream(recordingPath)
-                                    .listen(
-                                  (progress) {
-                                    _playbackProgress.value = PlaybackProgress(
-                                      duration: recordedDuration,
-                                      position: progress.position,
-                                      isCompleted: progress.isCompleted,
-                                    );
-                                    if (progress.isCompleted == true) {
-                                      _isPlaying.value = false;
-                                    }
-                                  },
-                                  onError: (error) {
-                                    debugPrint('Playback error: $error');
-                                    _handleRecordingError();
-                                  },
-                                );
-                              } else {
-                                toast("Error saving recording");
-                                _handleDeleteRecording();
-                              }
-                            } catch (e) {
-                              debugPrint('Error stopping recording: $e');
-                              toast("Error saving recording");
-                              _handleDeleteRecording();
+                              // Setup playback progress listener
+                              audioHandler
+                                  .getProgressStream(recordingPath)
+                                  .listen(
+                                (progress) {
+                                  _playbackProgress.value = PlaybackProgress(
+                                    duration: recordedDuration,
+                                    position: progress.position,
+                                    isCompleted: progress.isCompleted,
+                                  );
+                                  if (progress.isCompleted == true) {
+                                    _isPlaying.value = false;
+                                  }
+                                },
+                                onError: (error) {
+                                  debugPrint('Playback error: $error');
+                                  _handleRecordingError();
+                                },
+                              );
                             }
                           },
                           style: LMChatButtonStyle(
@@ -850,10 +841,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                     opacity: _binFadeAnimation.value,
                     child: Transform.scale(
                       scale: _binScaleAnimation.value,
-                      child: Icon(
+                      child: const Icon(
                         Icons.delete_outline,
                         size: 28, // Match mic icon size
-                        color: _themeData.onContainer,
+                        color: Colors.red,
                       ),
                     ),
                   );
@@ -1024,6 +1015,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (!mounted) return;
 
     _stopRecordingTimer();
+    _isReviewingRecording.value = false;
     _isVoiceButtonHeld.value = false;
     _isRecordingLocked.value = false;
     _isReviewingRecording.value = false;
@@ -1154,8 +1146,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                 }
 
                 _recordedFilePath = recordingPath;
-                _isVoiceButtonHeld.value = false;
                 _isReviewingRecording.value = true;
+                _isVoiceButtonHeld.value = false;
 
                 _playbackProgress.value = PlaybackProgress(
                   duration: recordedDuration,
