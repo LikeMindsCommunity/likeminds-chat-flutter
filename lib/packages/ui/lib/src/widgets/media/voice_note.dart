@@ -647,24 +647,8 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   }
 
   @override
-  void deactivate() {
-    if (_isAudioPlaying) {
-      _pausePlayback();
-    }
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-
-    if (_isAudioPlaying) {
-      if (_useExternalHandler) {
-        widget.handler!.stopAudio();
-      } else {
-        _localPlayer?.stopPlayer();
-      }
-    }
 
     _cleanupSubscriptions();
     _cleanupPlayer();
