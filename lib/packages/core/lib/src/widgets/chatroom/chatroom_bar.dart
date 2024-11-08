@@ -319,6 +319,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (_isRecordingLocked.value || _isReviewingRecording.value) {
       LMChatCoreAudioHandler.instance.cancelRecording();
     }
+    if (_isPlaying.value) {
+      LMChatCoreAudioHandler.instance.stopAudio();
+    }
 
     // Clean up all controllers and subscriptions
     _popupMenuController.dispose();
@@ -1024,6 +1027,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     _isVoiceButtonHeld.value = false;
     _isRecordingLocked.value = false;
     _isReviewingRecording.value = false;
+    _isPlaying.value = false;
     _recordedFilePath = null;
     _currentRecordingPath = null;
     _playbackProgress.value = const PlaybackProgress(
@@ -1031,7 +1035,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       position: Duration.zero,
     );
     _recordingDuration.value = Duration.zero;
-    _isPlaying.value = false;
+    _lockSlideController.value = 0.0;
+    _cancelAnimationController.reset();
+
+    // Reset breathing animation
+    _breathingController.stop();
+    _breathingController.reset();
 
     if (mounted) {
       setState(() {});
@@ -1888,14 +1897,22 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (_recordedFilePath == null) return;
 
     try {
+      // Stop any ongoing playback
       if (_isPlaying.value) {
         await LMChatCoreAudioHandler.instance.stopAudio();
         _isPlaying.value = false;
       }
 
       final File audioFile = File(_recordedFilePath!);
+      if (!await audioFile.exists()) {
+        toast("Error: Recording file not found");
+        _resetRecordingState();
+        return;
+      }
 
-      // Send voice note through conversation bloc
+      // Store duration before resetting state
+      final duration = _playbackProgress.value.duration;
+
       conversationBloc.add(
         LMChatPostMultiMediaConversationEvent(
           (PostConversationRequestBuilder()
@@ -1910,10 +1927,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             LMChatMediaModel(
               mediaType: LMChatMediaType.voiceNote,
               mediaFile: audioFile,
-              duration: _playbackProgress.value.duration.inSeconds.toDouble(),
+              duration: duration.inSeconds.toDouble(),
               size: audioFile.lengthSync(),
               meta: {
-                'duration': _playbackProgress.value.duration.inSeconds,
+                'duration': duration.inSeconds.toDouble(),
                 'file_name': audioFile.path.split('/').last,
               },
             ),
@@ -1935,7 +1952,16 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   // Add error recovery method
   void _handleRecordingError() {
+    // Current implementation only calls _resetRecordingState()
+    // We should properly cleanup audio resources first
+    if (_isPlaying.value) {
+      LMChatCoreAudioHandler.instance.stopAudio();
+    }
+    if (_isVoiceButtonHeld.value || _isRecordingLocked.value) {
+      LMChatCoreAudioHandler.instance.cancelRecording();
+    }
     _resetRecordingState();
+    toast("Error recording audio");
   }
 
   // Add permission check before starting recording
@@ -1944,8 +1970,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     try {
       final audioHandler = LMChatCoreAudioHandler.instance;
 
-      // Request permissions first
-      final hasPermission = await handlePermissions(3); // 3 for microphone
+      // Reset any existing recording state first
+      if (_isPlaying.value || _isReviewingRecording.value) {
+        await audioHandler.stopAudio();
+        _resetRecordingState();
+      }
+
+      // Request permissions
+      final hasPermission = await handlePermissions(3);
       if (!hasPermission) {
         toast(
           "Microphone permission is required for voice recording",
@@ -1958,6 +1990,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         "Swipe up to lock recording",
         duration: const Duration(milliseconds: 300),
       );
+
       _currentRecordingPath = await audioHandler.startRecording();
       if (_currentRecordingPath != null) {
         _isVoiceButtonHeld.value = true;
@@ -1967,6 +2000,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           "Couldn't start recording",
           duration: const Duration(milliseconds: 300),
         );
+        _resetRecordingState();
       }
     } catch (e) {
       if (e.toString().contains('permission')) {
