@@ -1629,8 +1629,39 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   // Handler functions of the LMChatroomBar
-  void _onSend() {
+  void _onSend() async {
     final message = _textEditingController.text.trim();
+
+    // If recording is locked, stop recording first and then send
+    if (_isRecordingLocked.value) {
+      try {
+        final audioHandler = LMChatCoreAudioHandler.instance;
+        final recordedDuration = _recordingDuration.value;
+        _stopRecordingTimer();
+
+        final recordingPath = await audioHandler.stopRecording(
+          recordedDuration: recordedDuration,
+        );
+
+        if (recordingPath != null) {
+          if (recordedDuration.inSeconds < 1) {
+            toast("Voice recording too short");
+            _handleDeleteRecording();
+            return;
+          }
+          _recordedFilePath = recordingPath;
+          _isReviewingRecording.value = true;
+          _isVoiceButtonHeld.value = false;
+          _isRecordingLocked.value = false;
+        }
+      } catch (e) {
+        debugPrint('Error stopping recording: $e');
+        toast("Error stopping recording");
+        _resetRecordingState();
+        return;
+      }
+    }
+
     if (message.isEmpty &&
         !_isReviewingRecording.value &&
         !_isRecordingLocked.value) {
@@ -1647,8 +1678,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (editConversation != null) {
       _handleEditConversation();
     } else if (_isReviewingRecording.value) {
-      _handleSendVoiceNote();
-    } else if (_isRecordingLocked.value) {
       _handleSendVoiceNote();
     } else {
       _handleNewMessage();
