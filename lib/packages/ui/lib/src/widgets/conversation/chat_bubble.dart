@@ -518,7 +518,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                         widget.onMediaTap?.call();
                                       }
                                     },
-                                    child: _isDeleted
+                                    child: !_isDeleted
                                         ? widget.mediaBuilder?.call(
                                               context,
                                               widget.attachments ?? [],
@@ -560,7 +560,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                                       ? _handleVoiceNoteDurationUpdate
                                                       : null,
                                             )
-                                        : null,
+                                        : const SizedBox.shrink(),
                                   ),
                                 ),
                                 _isDeleted
