@@ -1074,7 +1074,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
               duration: const Duration(milliseconds: 300),
             );
           },
-          onLongPress: _startRecording,
+          onLongPress: () {
+            // Set held state before starting recording
+            _isVoiceButtonHeld.value = true;
+            _startRecording();
+          },
           onHorizontalDragUpdate: (details) {
             if (_isVoiceButtonHeld.value) {
               if (details.delta.dx < -120) {
@@ -1968,7 +1972,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         _resetRecordingState();
       }
 
-      // Request permissions
+      // Request permissions before setting button state
       final hasPermission = await handlePermissions(3);
       if (!hasPermission) {
         toast(
@@ -1978,6 +1982,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         return;
       }
 
+      // Check if the button is still being held after permission check
+      if (!_isVoiceButtonHeld.value) {
+        return; // Exit if button is not held anymore
+      }
+
       toast(
         "Swipe up to lock recording",
         duration: const Duration(milliseconds: 300),
@@ -1985,7 +1994,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
       _currentRecordingPath = await audioHandler.startRecording();
       if (_currentRecordingPath != null) {
-        _isVoiceButtonHeld.value = true;
         _startRecordingTimer();
       } else {
         toast(
