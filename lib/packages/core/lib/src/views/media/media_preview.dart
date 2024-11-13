@@ -129,8 +129,13 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       subtitle: ValueListenableBuilder(
         valueListenable: rebuildCurr,
         builder: (c, x, s) {
+          final DateTime now = DateTime.now();
+          final String formattedDate =
+              "${now.day.toString().padLeft(2, '0')} ${_getMonth(now.month)} ${now.year}, "
+              "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+
           return LMChatText(
-            "${currPosition + 1} of ${mediaList.length} attachments",
+            "${currPosition + 1} of ${mediaList.length} attachments • $formattedDate",
             style: LMChatTextStyle(
               maxLines: 1,
               textStyle: Theme.of(context).textTheme.bodySmall,
@@ -139,6 +144,24 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         },
       ),
     );
+  }
+
+  String _getMonth(int month) {
+    const List<String> months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return months[month - 1];
   }
 
   Widget getMediaPreview() {
