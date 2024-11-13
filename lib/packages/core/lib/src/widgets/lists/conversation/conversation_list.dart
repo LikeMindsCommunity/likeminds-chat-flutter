@@ -750,6 +750,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
+    // Handle reply conversation logic
     if (pagedListController.itemList != null &&
         conversation.replyId != null &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
@@ -771,6 +772,33 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
+
+    // Check if we need to add a timestamp message
+    if (conversationList.isNotEmpty &&
+        conversationList.first.date != conversation.date) {
+      // Add timestamp message before the new conversation
+      conversationList.insert(
+        0,
+        Conversation(
+          isTimeStamp: true,
+          id: 1,
+          hasFiles: false,
+          attachmentCount: 0,
+          attachmentsUploaded: false,
+          createdEpoch: conversation.createdEpoch,
+          chatroomId: widget.chatroomId,
+          date: conversation.date,
+          memberId: conversation.memberId,
+          temporaryId: conversation.temporaryId,
+          answer: conversation.date ?? '',
+          communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
+          createdAt: conversation.createdAt,
+          header: conversation.header,
+        ).toConversationViewData(),
+      );
+    }
+
+    // Add the actual conversation
     conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();

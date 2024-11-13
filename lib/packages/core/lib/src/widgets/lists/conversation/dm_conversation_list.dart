@@ -670,6 +670,30 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
+
+    if (conversationList.isNotEmpty &&
+        conversationList.first.date != conversation.date) {
+      conversationList.insert(
+        0,
+        Conversation(
+          isTimeStamp: true,
+          id: 1,
+          hasFiles: false,
+          attachmentCount: 0,
+          attachmentsUploaded: false,
+          createdEpoch: conversation.createdEpoch,
+          chatroomId: widget.chatroomId,
+          date: conversation.date,
+          memberId: conversation.memberId,
+          temporaryId: conversation.temporaryId,
+          answer: conversation.date ?? '',
+          communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
+          createdAt: conversation.createdAt,
+          header: conversation.header,
+        ).toConversationViewData(),
+      );
+    }
+
     conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
