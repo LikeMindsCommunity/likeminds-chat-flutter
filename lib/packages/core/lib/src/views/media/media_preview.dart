@@ -17,10 +17,14 @@ class LMChatMediaPreviewScreen extends StatefulWidget {
   /// required conversation object to fetch media and title
   final LMChatConversationViewData? conversation;
 
+  /// Controls whether to show the preview bar at the bottom
+  final bool showPreview;
+
   /// {@macro lm_chat_media_preview_screen}
   const LMChatMediaPreviewScreen({
     super.key,
     this.conversation,
+    this.showPreview = false,
   });
 
   @override
@@ -74,19 +78,21 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           return getMediaPreview();
         },
       ),
-      bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: rebuildCurr,
-        builder: (context, _, __) {
-          return (mediaList.isNotEmpty)
-              ? _screenBuilder.mediaPreviewBuilder(
-                  context,
-                  LMChatMediaHandler.instance.pickedMedia.copy(),
-                  currPosition,
-                  _defPreviewBar(),
-                )
-              : const SizedBox.shrink();
-        },
-      ),
+      bottomNavigationBar: widget.showPreview
+          ? ValueListenableBuilder(
+              valueListenable: rebuildCurr,
+              builder: (context, _, __) {
+                return (mediaList.isNotEmpty)
+                    ? _screenBuilder.mediaPreviewBuilder(
+                        context,
+                        LMChatMediaHandler.instance.pickedMedia.copy(),
+                        currPosition,
+                        _defPreviewBar(),
+                      )
+                    : const SizedBox.shrink();
+              },
+            )
+          : null,
     );
   }
 
@@ -104,7 +110,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         },
         icon: const LMChatIcon(
           type: LMChatIconType.icon,
-          icon: Icons.cancel_outlined,
+          icon: Icons.arrow_back,
         ),
       ),
       title: LMChatText(
