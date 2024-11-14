@@ -596,7 +596,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 if (conversation.deletedByUserId == null &&
                                     inStyle.showFooter == true)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 2.0),
+                                    padding: const EdgeInsets.only(top: 4.0),
                                     child: kAttachmentTypeVoiceNote ==
                                             widget.attachments?.first.type
                                         ? ValueListenableBuilder<Duration>(
