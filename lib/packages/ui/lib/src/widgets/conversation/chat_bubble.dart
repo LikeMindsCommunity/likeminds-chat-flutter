@@ -864,8 +864,16 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   // Update the duration handler to use ValueNotifier
   void _handleVoiceNoteDurationUpdate(Duration duration) {
-    // Only update if the duration is greater than zero to avoid resetting to 0
-    if (duration.inSeconds > 0) {
+    // If duration is 0, reset to initial duration from metadata
+    if (duration.inSeconds == 0) {
+      final initialDuration = Duration(
+        seconds: int.tryParse(
+              widget.attachments?.first.meta?["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+      _voiceNoteDurationNotifier.value = initialDuration;
+    } else {
       _voiceNoteDurationNotifier.value = duration;
     }
   }

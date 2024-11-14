@@ -113,12 +113,22 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
   // Add this field at the top with other state variables
   Duration _initialDuration = Duration.zero;
 
+  // Add this near other state variables in _LMChatVoiceNoteState
+  StreamSubscription? _audioStateSubscription;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _useExternalHandler = widget.handler != null;
     _currentMediaPath = widget.media.mediaFile?.path ?? widget.media.mediaUrl;
+
+    // Add audio state subscription
+    _audioStateSubscription = widget.handler?.audioStateStream.listen((state) {
+      if (state == LMChatAudioState.stopped && mounted) {
+        _resetPlayback();
+      }
+    });
 
     // Parse initial duration from metadata if available
     _initialDuration = Duration(
@@ -467,18 +477,12 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
 
   void _onPlaybackComplete() {
     if (!mounted) return;
-    setState(() {
-      _isAudioPlaying = false;
-      _progress = 0.0;
-      // Reset last played position on completion
-      _lastPlayedPosition = Duration.zero;
-    });
+    _resetPlayback();
     if (_useExternalHandler) {
       widget.handler!.stopAudio();
     } else {
       _localPlayer?.stopPlayer();
     }
-    widget.onPause?.call();
   }
 
   void _setupLocalPlayerProgress() {
@@ -587,6 +591,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
       widget.onPause?.call();
     } catch (e) {
       print('Error pausing playback: $e');
+      _resetPlayback();
     }
   }
 
@@ -649,6 +654,7 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
     _cleanupSubscriptions();
     _cleanupPlayer();
     _durationSubscription?.cancel();
+    _audioStateSubscription?.cancel();
 
     super.dispose();
   }
@@ -788,6 +794,17 @@ class _LMChatVoiceNoteState extends State<LMChatVoiceNote>
         setState(() => _totalDuration = Duration.zero);
       }
     }
+  }
+
+  // Add method to reset playback state
+  void _resetPlayback() {
+    setState(() {
+      _isAudioPlaying = false;
+      _progress = 0.0;
+      _lastPlayedPosition = Duration.zero;
+      widget.onDurationUpdate?.call(Duration.zero);
+    });
+    widget.onPause?.call();
   }
 }
 
