@@ -669,11 +669,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       valueListenable: _isRecordingLocked,
       builder: (context, isLocked, child) {
         return Stack(
-          clipBehavior: Clip.none, // Allow overflow for animations
+          clipBehavior: Clip.none,
           children: [
             Container(
               width: 80.w,
-              height: 6.h,
+              height: 6.2.h,
               decoration: BoxDecoration(
                 color: _themeData.container,
                 borderRadius: BorderRadius.circular(24),
@@ -871,7 +871,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   Widget _buildReviewContainer(BuildContext context) {
     return Container(
       width: 80.w,
-      height: 6.h,
+      height: 6.2.h,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: _themeData.container,
