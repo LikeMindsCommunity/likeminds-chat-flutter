@@ -115,12 +115,12 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
                   vertical: kPaddingXSmall,
                 ),
                 child: Container(
-                  height: style.height ?? 72,
+                  height: style.height ?? 60,
                   width: style.width ?? 60.w,
                   decoration: BoxDecoration(
                     border: Border.all(color: LMChatDefaultTheme.greyColor),
                     borderRadius: BorderRadius.circular(kBorderRadiusMedium),
-                    color: LMChatTheme.theme.container.withOpacity(0.8),
+                    color: LMChatTheme.theme.container,
                   ),
                   child: Padding(
                     padding: style.padding ??
@@ -248,14 +248,14 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
 
   LMChatIcon _defaultDocumentIcon() {
     return LMChatIcon(
-      type: LMChatIconType.icon,
-      icon: Icons.picture_as_pdf_outlined,
+      type: LMChatIconType.svg,
+      assetPath: kDocumentIcon,
       style: style.iconStyle ??
           LMChatIconStyle(
             size: 28,
             boxSize: 32,
             boxPadding: EdgeInsets.zero,
-            color: style.iconColor ?? LMChatDefaultTheme.greyColor,
+            color: style.iconColor,
           ),
     );
   }

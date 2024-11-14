@@ -109,13 +109,15 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                   widget.showOverlay
                       ? widget.overlay ??
                           Positioned(
-                            bottom: 0,
+                            bottom: -2,
                             child: LMChatDocumentTile(
                               media: widget.media,
                               style: style?.overlayStyle ??
                                   LMChatDocumentTileStyle(
                                     padding: EdgeInsets.zero,
                                     width: 54.w,
+                                    backgroundColor:
+                                        LMChatTheme.theme.container,
                                   ),
                             ),
                           )
