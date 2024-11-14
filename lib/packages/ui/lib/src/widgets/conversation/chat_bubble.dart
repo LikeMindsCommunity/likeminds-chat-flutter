@@ -390,21 +390,30 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     return GestureDetector(
       onLongPress: () {
         if (_isDeleted) return;
-        _isSelected = !_isSelected;
-        widget.onLongPress?.call(_isSelected, this);
-        reactionBarController.showMenu();
+        // Only handle long press if not already selected
+        if (!_isSelected) {
+          setState(() {
+            _isSelected = true;
+          });
+          widget.onLongPress?.call(_isSelected, this);
+          reactionBarController.showMenu();
+        }
       },
       onTap: () {
         if (_isDeleted) return;
-        if (_isSelected) {
-          _isSelected = false;
-          widget.onTap?.call(_isSelected, this);
-        } else {
-          if (widget.isSelectableOnTap?.call() ?? false) {
-            _isSelected = !_isSelected;
+
+        setState(() {
+          if (_isSelected) {
+            _isSelected = false;
             widget.onTap?.call(_isSelected, this);
+          } else {
+            // Only allow selection on tap if explicitly enabled
+            if (widget.isSelectableOnTap?.call() ?? false) {
+              _isSelected = true;
+              widget.onTap?.call(_isSelected, this);
+            }
           }
-        }
+        });
       },
       child: Stack(
         children: [
