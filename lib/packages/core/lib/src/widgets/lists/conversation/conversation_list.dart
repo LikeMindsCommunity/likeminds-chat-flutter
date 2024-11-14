@@ -102,7 +102,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           bloc: _convActionBloc,
           listener: (context, state) {
             if (state is LMChatConversationDelete) {
-              _updateDeletedConversation(state.conversations.first);
+              for (LMChatConversationViewData conversation
+                  in state.conversations) {
+                _updateDeletedConversation(conversation);
+              }
             }
             if (state is LMChatConversationEdited) {
               _updateEditedConversation(state.conversationViewData);
@@ -880,6 +883,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   void _updateDeletedConversation(LMChatConversationViewData conversation) {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
+
+    // Update the deleted conversation
     int index =
         conversationList.indexWhere((element) => element.id == conversation.id);
     if (index != -1) {
@@ -887,10 +892,24 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         deletedByUserId: user.id,
       );
     }
+
+    // Update conversations replying to the deleted conversation
+    for (int i = 0; i < conversationList.length; i++) {
+      if (conversationList[i].replyId == conversation.id ||
+          conversationList[i].replyConversation == conversation.id) {
+        conversationList[i] = conversationList[i].copyWith(
+          replyConversationObject: conversation.copyWith(
+            deletedByUserId: user.id,
+          ),
+        );
+      }
+    }
+
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(conversation.id.toString())) {
       conversationMeta[conversation.id.toString()]!.deletedByUserId = user.id;
     }
+
     pagedListController.itemList = conversationList;
     scrollController.animateTo(
       scrollController.position.pixels + 10,

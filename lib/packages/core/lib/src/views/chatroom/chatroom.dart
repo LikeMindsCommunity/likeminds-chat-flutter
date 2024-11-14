@@ -560,7 +560,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         ),
       ],
       // Delete button
-      if (haveDeletePermission && _selectedIds.length == 1) ...[
+      if (haveDeletePermission) ...[
         const SizedBox(width: 8),
         _screenBuilder.deleteButton(
           context,
