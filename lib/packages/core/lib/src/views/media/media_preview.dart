@@ -3,6 +3,7 @@ import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 /// {@template lm_chat_media_preview_screen}
 /// A screen to preview media before adding attachments to a conversation
@@ -35,6 +36,7 @@ class LMChatMediaPreviewScreen extends StatefulWidget {
 class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   int currPosition = 0;
   List<LMChatMediaModel> mediaList = [];
+  late CarouselSliderController _carouselController;
 
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
 
@@ -45,6 +47,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   void initState() {
     super.initState();
     mediaList = LMChatMediaHandler.instance.pickedMedia;
+    _carouselController = CarouselSliderController();
   }
 
   @override
@@ -165,29 +168,44 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   }
 
   Widget getMediaPreview() {
-    // Updated to handle single attachment preview
-    if (mediaList.isNotEmpty) {
-      if (mediaList.first.mediaType == LMChatMediaType.image ||
-          mediaList.first.mediaType == LMChatMediaType.video) {
+    if (mediaList.isEmpty) {
+      return const SizedBox();
+    }
+
+    return CarouselSlider.builder(
+      carouselController: _carouselController,
+      itemCount: mediaList.length,
+      options: CarouselOptions(
+        height: MediaQuery.of(context).size.height,
+        viewportFraction: 1.0,
+        enlargeCenterPage: false,
+        enableInfiniteScroll: false,
+        onPageChanged: (index, reason) {
+          setState(() {
+            currPosition = index;
+            rebuildCurr.value = !rebuildCurr.value;
+          });
+        },
+      ),
+      itemBuilder: (context, index, realIndex) {
+        currPosition = index;
+        final media = mediaList[index];
+
         return Center(
-          child: mediaList[currPosition].mediaType == LMChatMediaType.image
+          child: media.mediaType == LMChatMediaType.image
               ? _screenBuilder.image(
                   context,
                   _defImage(),
-                  mediaList[currPosition],
+                  media,
                 )
-              : Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2.h),
-                  child: _screenBuilder.video(
-                    context,
-                    _defVideo(),
-                    mediaList[currPosition],
-                  ),
+              : _screenBuilder.video(
+                  context,
+                  _defVideo(),
+                  media,
                 ),
         );
-      }
-    }
-    return const SizedBox();
+      },
+    );
   }
 
   Container _defPreviewBar() {
@@ -220,8 +238,11 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) => GestureDetector(
         onTap: () {
-          currPosition = index;
-          rebuildCurr.value = !rebuildCurr.value;
+          _carouselController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
         },
         child: Container(
           margin: const EdgeInsets.symmetric(
@@ -229,14 +250,15 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           ),
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              border: currPosition == index
-                  ? Border.all(
-                      color: LMChatTheme.theme.secondaryColor,
-                      width: 2.0,
-                      strokeAlign: BorderSide.strokeAlignOutside,
-                    )
-                  : null),
+            borderRadius: BorderRadius.circular(12.0),
+            border: currPosition == index
+                ? Border.all(
+                    color: LMChatTheme.theme.secondaryColor,
+                    width: 2.0,
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                  )
+                : null,
+          ),
           width: 15.w,
           height: 15.w,
           child: mediaList[index].mediaType == LMChatMediaType.image
