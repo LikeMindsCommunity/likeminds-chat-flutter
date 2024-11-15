@@ -24,6 +24,7 @@ postMultimediaConversationEventHandler(
       id: 1,
       memberId: user.id,
       ogTags: event.postConversationRequest.ogTags,
+      createdEpoch: dateTime.millisecondsSinceEpoch,
     );
 
     emit(

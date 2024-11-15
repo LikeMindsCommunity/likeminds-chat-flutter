@@ -23,6 +23,7 @@ postConversationEventHandler(
               ..hasFiles(event.hasFiles)
               ..member(user.toUserViewData())
               ..temporaryId(tempId)
+              ..createdEpoch(dateTime.millisecondsSinceEpoch)
               ..id(1))
             .build();
 

@@ -9,6 +9,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:intl/intl.dart';
 
 class LMChatDMConversationList extends StatefulWidget {
   final int chatroomId;
@@ -689,7 +690,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           date: conversation.date,
           memberId: conversation.memberId,
           temporaryId: conversation.temporaryId,
-          answer: conversation.date ?? '',
+          answer: DateFormat('dd MMM yyyy').format(
+              DateTime.fromMillisecondsSinceEpoch(
+                  conversation.createdEpoch ?? 0)),
           communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
           createdAt: conversation.createdAt,
           header: conversation.header,
@@ -755,7 +758,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             date: conversation.date,
             memberId: conversation.memberId,
             temporaryId: conversation.temporaryId,
-            answer: conversation.date ?? '',
+            answer: DateFormat('dd MMM yyyy').format(
+                DateTime.fromMillisecondsSinceEpoch(
+                    conversation.createdEpoch ?? 0)),
             communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
             createdAt: conversation.createdAt,
             header: conversation.header,
