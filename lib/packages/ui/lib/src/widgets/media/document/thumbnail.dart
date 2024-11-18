@@ -98,7 +98,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
               onTap: () async {
                 if (widget.media.mediaUrl != null) {
                   Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                  launchUrl(fileUrl, mode: LaunchMode.externalApplication);
+                  launchUrl(fileUrl, mode: LaunchMode.inAppBrowserView);
                 }
               },
               child: Stack(

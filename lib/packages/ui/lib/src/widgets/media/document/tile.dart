@@ -107,7 +107,7 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
                   OpenFilex.open(widget.media.mediaFile!.path);
                 } else {
                   Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                  launchUrl(fileUrl, mode: LaunchMode.externalApplication);
+                  launchUrl(fileUrl, mode: LaunchMode.inAppBrowserView);
                 }
               },
               child: Padding(
