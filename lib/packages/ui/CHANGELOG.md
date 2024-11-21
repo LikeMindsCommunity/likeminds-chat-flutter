@@ -27,3 +27,19 @@
 ## 0.7.5
 
 - Added support for Link Preview
+
+## 0.8.0
+
+- Added support for Tagging
+- Added support for Reactions
+- Added retry mechanism
+- Added Analytics support
+
+### 0.9.0
+
+- Added support for poll
+- Fixed Deleted text and link preview ui
+
+### 0.10.0
+
+- Added support for voice notes

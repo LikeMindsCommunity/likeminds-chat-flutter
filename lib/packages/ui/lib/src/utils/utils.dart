@@ -4,13 +4,15 @@ export 'typedefs.dart';
 export 'time_ago/time_ago.dart';
 export 'time_ago/time_ago_message.dart';
 export 'constants/constants.dart';
+export 'constants/assets.dart';
 
 export 'helpers/tagging_helper.dart';
 export 'helpers/text_helper.dart';
 
-export 'media_provider/media_provider.dart';
+export 'conversation/conversation_utils.dart';
 
 export 'media/media_utils.dart';
+export 'media/audio_handler.dart';
 
 /// Returns the initials of a given name.
 ///

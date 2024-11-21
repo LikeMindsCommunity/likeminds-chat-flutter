@@ -93,6 +93,20 @@ Future<void> addOption(
   ValueNotifier<bool> rebuildChatWidget,
   LMChatWidgetSource source,
 ) async {
+  String optionText = option.trim();
+  // check if the answer is empty
+  if (optionText.isEmpty) {
+    toast(
+      "Option can not be empty",
+    );
+    return;
+  }
+  // check if the option already exists
+  if (conversationData.poll!.any((element) => element.text == optionText)) {
+    toast('Options should be unique');
+    return;
+  }
+
   AddPollOptionRequest request = (AddPollOptionRequestBuilder()
         ..conversationId(conversationData.id)
         ..poll(option))
@@ -117,24 +131,29 @@ void onVoteTextTap(BuildContext context,
   if (conversationData.isAnonymous ?? false) {
     showDialog(
       context: context,
-      builder: (context) => const SimpleDialog(
-        surfaceTintColor: Colors.transparent,
-        contentPadding: EdgeInsets.symmetric(
-          vertical: 30,
-          horizontal: 8,
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(
+          useMaterial3: false,
         ),
-        children: [
-          LMChatText(
-            'This being an anonymous poll, the names of the voters can not be disclosed.',
-            style: LMChatTextStyle(
-              maxLines: 3,
-              textAlign: TextAlign.center,
-              textStyle: TextStyle(
-                fontSize: 16,
+        child: const SimpleDialog(
+          surfaceTintColor: Colors.transparent,
+          contentPadding: EdgeInsets.symmetric(
+            vertical: 30,
+            horizontal: 8,
+          ),
+          children: [
+            LMChatText(
+              'This being an anonymous poll, the names of the voters can not be disclosed.',
+              style: LMChatTextStyle(
+                maxLines: 3,
+                textAlign: TextAlign.center,
+                textStyle: TextStyle(
+                  fontSize: 16,
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   } else if (conversationData.toShowResults! ||

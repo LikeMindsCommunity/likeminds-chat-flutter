@@ -1,4 +1,5 @@
 part of './poll.dart';
+
 /// {@template lm_chat_poll_utils}
 /// Utility class for poll related operations.
 /// {@endtemplate}
@@ -158,5 +159,12 @@ class LMChatPollUtils {
     } else {
       return "Just Now";
     }
+  }
+
+  /// checks if vote text should be shown
+  static bool showVoteText(
+    LMChatConversationViewData conversationData,
+  ) {
+    return conversationData.toShowResults ?? false;
   }
 }

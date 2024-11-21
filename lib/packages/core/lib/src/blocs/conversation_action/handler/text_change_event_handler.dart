@@ -37,17 +37,19 @@ Future<(LMChatOGTagsViewData?, String?)> _extractOgTagFromText(
         await LMChatCore.client.decodeUrl(request);
     if (response.success == true) {
       OgTags? ogTags = response.data!.ogTags;
-      LMAnalytics.get().track(
-        AnalyticsKeys.attachmentsUploaded,
-        {
-          'link': link,
-        },
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.attachmentUploaded,
+          eventProperties: {
+            'link': link,
+          },
+        ),
       );
       return (ogTags?.toLMChatOGTagViewData(), link);
     }
   }
   // if no link is found, remove the previous link
-  if(previousLink.isNotEmpty) {
+  if (previousLink.isNotEmpty) {
     emit(LMChatLinkRemovedState());
   }
 

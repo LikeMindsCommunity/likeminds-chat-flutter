@@ -10,6 +10,7 @@ import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
@@ -135,7 +136,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
       onPopInvoked: (p) {
-        _chatroomActionBloc.add(MarkReadChatroomEvent(
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
+        _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
           chatroomId: chatroom.id,
         ));
       },
@@ -166,19 +169,26 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 chatroomId: chatroom.id,
                 conversationId: lastConversationId,
               ));
-              _chatroomActionBloc.add(MarkReadChatroomEvent(
+              _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
                 chatroomId: chatroom.id,
               ));
-              LMAnalytics.get().track(
-                AnalyticsKeys.syncComplete,
-                {'sync_complete': true},
+              LMChatAnalyticsBloc.instance.add(
+                const LMChatFireAnalyticsEvent(
+                  eventName: LMChatAnalyticsKeys.syncComplete,
+                  eventProperties: {'sync_complete': true},
+                ),
               );
-              LMAnalytics.get().track(AnalyticsKeys.chatroomOpened, {
-                'chatroom_id': chatroom.id,
-                'community_id': chatroom.communityId,
-                'chatroom_type': chatroom.type,
-                'source': 'home_feed',
-              });
+              LMChatAnalyticsBloc.instance.add(
+                LMChatFireAnalyticsEvent(
+                  eventName: LMChatAnalyticsKeys.chatroomOpened,
+                  eventProperties: {
+                    'chatroom_id': chatroom.id,
+                    'community_id': chatroom.communityId,
+                    'chatroom_type': chatroom.type,
+                    'source': 'home_feed',
+                  },
+                ),
+              );
             }
           },
           builder: (chatroomContext, chatroomState) {
@@ -212,13 +222,47 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                       },
                     ),
                   ),
-                  _screenBuilder.chatBarBuilder(
-                    context,
-                    LMChatroomBar(
-                      chatroom: chatroom.toChatRoomViewData(),
-                      scrollToBottom: _scrollToBottom,
-                    ),
-                  ),
+                  BlocBuilder(
+                      bloc: _chatroomActionBloc,
+                      builder: (context, state) {
+                        if (state is LMChatShowEmojiKeyboardState) {
+                          return SafeArea(
+                            child: LMChatReactionKeyboard(
+                              onEmojiSelected: (reaction) {
+                                LMChatAnalyticsBloc.instance.add(
+                                  LMChatFireAnalyticsEvent(
+                                    eventName:
+                                        LMChatAnalyticsKeys.reactionAdded,
+                                    eventProperties: {
+                                      'reaction': reaction,
+                                      'from': 'keyboard',
+                                      'message_id': state.conversationId,
+                                      'chatroom_id': chatroom.id,
+                                    },
+                                  ),
+                                );
+                                _convActionBloc.add(
+                                  LMChatPutReaction(
+                                    conversationId: state.conversationId,
+                                    reaction: reaction,
+                                  ),
+                                );
+                                _chatroomActionBloc.add(
+                                  LMChatHideEmojiKeyboardEvent(),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        return _screenBuilder.chatBarBuilder(
+                          context,
+                          LMChatroomBar(
+                            chatroom: chatroom.toChatRoomViewData(),
+                            scrollToBottom: _scrollToBottom,
+                            enableTagging: chatroom.type != 10,
+                          ),
+                        );
+                      }),
                 ],
               );
             }
@@ -287,9 +331,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             rebuildAppBar.value = !rebuildAppBar.value;
             rebuildConversationList.value = !rebuildConversationList.value;
           } else {
+            LMChatCoreAudioHandler.instance.stopAudio();
+            LMChatCoreAudioHandler.instance.stopRecording();
             Navigator.of(context).pop();
             _chatroomActionBloc.add(
-              MarkReadChatroomEvent(
+              LMChatMarkReadChatroomEvent(
                 chatroomId: widget.chatroomId,
               ),
             );
@@ -394,6 +440,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     bool haveEditPermission =
         LMChatMemberRightUtil.checkEditPermissions(conversationViewData!) &&
             chatroom.chatRequestState != 2;
+
+    // Check if the message is a voice note
+    bool isVoiceNote = conversationViewData.attachments
+            ?.any((attachment) => attachment.type == 'voice_note') ??
+        false;
+
     return [
       // Reply button
       if (_selectedIds.length == 1 && _isRespondingAllowed()) ...[
@@ -403,7 +455,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             conversationViewData,
             LMChatButton(
               onTap: () {
-                // add reply event
                 _convActionBloc.add(
                   LMChatReplyConversationEvent(
                     conversationId: conversationViewData.id,
@@ -427,8 +478,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               ),
             )),
       ],
-      // Copy button
-      ...[
+      // Copy button - Only show if not a voice note
+      if (!isVoiceNote) ...[
         const SizedBox(width: 8),
         _screenBuilder.copyButton(
           context,
@@ -459,6 +510,15 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               Clipboard.setData(
                 ClipboardData(text: copiedMessage),
               ).then((data) {
+                LMChatAnalyticsBloc.instance.add(
+                  LMChatFireAnalyticsEvent(
+                    eventName: LMChatAnalyticsKeys.messageCopied,
+                    eventProperties: {
+                      'type': 'text',
+                      'chatroom_id': chatroom.id,
+                    },
+                  ),
+                );
                 toast("Copied to clipboard");
                 _selectedIds.clear();
                 rebuildAppBar.value = !rebuildAppBar.value;
@@ -477,8 +537,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           ),
         ),
       ],
-      // Edit button
-      if (haveEditPermission && _selectedIds.length == 1) ...[
+      // Edit button - Only show if not a voice note
+      if (haveEditPermission && _selectedIds.length == 1 && !isVoiceNote) ...[
         const SizedBox(width: 8),
         _screenBuilder.editButton(
           context,
@@ -516,6 +576,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           conversationViewData,
           LMChatButton(
             onTap: () {
+              LMChatCoreAudioHandler.instance.stopAudio();
+              LMChatCoreAudioHandler.instance.stopRecording();
               showDialog(
                 context: context,
                 builder: (context) {
@@ -572,11 +634,22 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                               reason: "Delete",
                             ),
                           );
+                          LMChatAnalyticsBloc.instance.add(
+                            LMChatFireAnalyticsEvent(
+                              eventName: LMChatAnalyticsKeys.messageDeleted,
+                              eventProperties: {
+                                'type': 'text',
+                                'chatroom_id': chatroom.id,
+                              },
+                            ),
+                          );
                           _selectedIds.clear();
                           rebuildAppBar.value = !rebuildAppBar.value;
                           rebuildConversationList.value =
                               !rebuildConversationList.value;
                           Navigator.of(context).pop();
+                          LMChatCoreAudioHandler.instance.stopAudio();
+                          LMChatCoreAudioHandler.instance.stopRecording();
                         }),
                       ),
                     ],

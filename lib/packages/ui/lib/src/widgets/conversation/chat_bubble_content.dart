@@ -123,7 +123,7 @@ class LMChatBubbleContentStyle {
           color: onContainer ?? LMChatDefaultTheme.blackColor,
           fontSize: 14,
           fontFamily: 'Roboto',
-          fontWeight: FontWeight.w300,
+          fontWeight: FontWeight.w400,
         ),
       );
 }

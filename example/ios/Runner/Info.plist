@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -26,11 +28,11 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsLocalNetworking</key>
+		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 		<key>NSAllowsArbitraryLoadsForMedia</key>
 		<true/>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>NSAllowsLocalNetworking</key>
 		<true/>
 		<key>NSExceptionAllowsInsecureHTTPLoads</key>
 		<true/>
@@ -38,7 +40,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>We require camera access to take pictures for uploading</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We require microphone access for recording videos</string>
+	<string>This app needs access to microphone for voice messages</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We require access to your photo library to upload files</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -47,6 +49,8 @@
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
+		<string>processing</string>
+		<string>audio</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -65,7 +69,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs access to documents for saving voice messages</string>
 </dict>
 </plist>

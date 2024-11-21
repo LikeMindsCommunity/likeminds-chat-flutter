@@ -30,8 +30,11 @@ export 'media/gif.dart';
 export 'media/error.dart';
 export 'media/link_preview_bar.dart';
 export 'media/link_preview.dart';
+export 'media/voice_note.dart';
 
 export 'conversation/chat_bubble.dart';
+
+export 'reaction/reaction.dart';
 
 export 'common/menu/menu.dart';
 export 'common/menu/menu_item.dart';
@@ -40,6 +43,7 @@ export 'common/dialog/dialog.dart';
 export 'poll/poll.dart';
 export 'poll/poll_style.dart';
 export 'poll/poll_option.dart';
+
 
 export 'paginated_list/dual_side_paginated_list.dart';
 export 'paginated_list/pagination_controller.dart';

@@ -359,6 +359,12 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         pinnedChatroom = !pinnedChatroom;
         rebuildPin.value = !rebuildPin.value;
         _refreshExploreFeed();
+        LMChatAnalyticsBloc.instance.add(
+          const LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.pinnedChatroomsViewed,
+            eventProperties: {'source': 'banner'},
+          ),
+        );
         debugPrint("Pin button tapped");
       },
       icon: const LMChatIcon(

@@ -42,15 +42,28 @@ const List<String> mediaExtentions = [
 ///
 /// Returns a [Widget] that represents the attachment tile.
 Widget getChatItemAttachmentTile(
-    String message,
-    List<LMChatAttachmentViewData> mediaFiles,
-    LMChatConversationViewData conversation) {
+  String message,
+  List<LMChatAttachmentViewData> mediaFiles,
+  LMChatConversationViewData conversation, {
+  String? prefix,
+}) {
   String answerText = LMChatTaggingHelper.convertRouteToTag(conversation.answer,
           withTilde: false) ??
       '';
   if (conversation.ogTags != null) {
     return Row(
       children: [
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
         LMChatText(
           message,
           style: const LMChatTextStyle(
@@ -76,14 +89,60 @@ Widget getChatItemAttachmentTile(
   if (conversation.state == 10) {
     return Row(
       children: [
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
         LMChatText(message),
         const LMChatIcon(
-          type: LMChatIconType.icon,
-          icon: Icons.poll,
+          type: LMChatIconType.svg,
+          assetPath: kPollIcon,
           style: LMChatIconStyle(
+            size: 14,
             color: LMChatDefaultTheme.greyColor,
-            size: 16,
-            margin: EdgeInsets.only(right: 4),
+            boxPadding: EdgeInsets.only(
+              right: 4,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 42.w,
+          child: LMChatText(
+            answerText,
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  if (mediaFiles.isEmpty && conversation.answer.isEmpty) {
+    return const SizedBox();
+  } else if (mediaFiles.isEmpty) {
+    return Row(
+      children: [
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
           ),
         ),
         LMChatText(
@@ -99,25 +158,47 @@ Widget getChatItemAttachmentTile(
         ),
       ],
     );
-  }
-  if (mediaFiles.isEmpty && conversation.answer.isEmpty) {
-    return const SizedBox();
-  } else if (mediaFiles.isEmpty) {
-    return LMChatText(
-      answerText,
-      style: const LMChatTextStyle(
-        maxLines: 1,
-        textStyle: TextStyle(
-          overflow: TextOverflow.ellipsis,
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-        ),
-      ),
-    );
   } else {
     IconData iconData = Icons.camera_alt;
     String text = '';
     if (mapStringToMediaType(mediaFiles.first.type!) ==
+        LMChatMediaType.voiceNote) {
+      return Row(
+        children: [
+          LMChatText(
+            prefix ?? '',
+            style: const LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+          const LMChatIcon(
+            type: LMChatIconType.icon,
+            icon: Icons.mic,
+            style: LMChatIconStyle(
+              color: LMChatDefaultTheme.greyColor,
+              size: 16,
+            ),
+          ),
+          LMChatDefaultTheme.kHorizontalPaddingSmall,
+          const LMChatText(
+            "Voice Message",
+            style: LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (mapStringToMediaType(mediaFiles.first.type!) ==
         LMChatMediaType.document) {
       iconData = Icons.insert_drive_file;
       if (conversation.answer.isEmpty) {
@@ -128,12 +209,12 @@ Widget getChatItemAttachmentTile(
     } else {
       int videoCount = 0;
       int imageCount = 0;
-      int gifCount = 0; // Added for GIF count
+      int gifCount = 0;
       for (LMChatAttachmentViewData media in mediaFiles) {
         if (mapStringToMediaType(media.type!) == LMChatMediaType.video) {
           videoCount++;
         } else if (mapStringToMediaType(media.type!) == LMChatMediaType.gif) {
-          gifCount++; // Count GIFs
+          gifCount++;
         } else {
           imageCount++;
         }
@@ -141,6 +222,17 @@ Widget getChatItemAttachmentTile(
       if (videoCount != 0 && imageCount != 0) {
         return Row(
           children: <Widget>[
+            LMChatText(
+              prefix ?? '',
+              style: const LMChatTextStyle(
+                maxLines: 1,
+                textStyle: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
             LMChatText(
               videoCount.toString(),
               style: const LMChatTextStyle(
@@ -213,13 +305,23 @@ Widget getChatItemAttachmentTile(
           text = answerText;
         }
       } else if (gifCount > 0) {
-        iconData = Icons.image; // Assuming you have an icon for GIFs
-        text = gifCount > 1 ? "GIFs" : "GIF"; // Set text for GIFs
+        iconData = Icons.image;
+        text = gifCount > 1 ? "GIFs" : "GIF";
       }
     }
     return Row(
       children: <Widget>[
-        LMChatText(message),
+        LMChatText(
+          prefix ?? '',
+          style: const LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
         mediaFiles.length > 1
             ? LMChatText(
                 '${mediaFiles.length}',

@@ -1,11 +1,10 @@
 export 'constants/strings.dart';
 export 'constants/enums.dart';
+export 'constants/analytics.dart';
 
 export 'preferences/preferences.dart';
 
 export 'conversation/conversation_utils.dart';
-
-export 'analytics/analytics.dart';
 
 export 'notifications/notification_handler.dart';
 

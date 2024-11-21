@@ -190,6 +190,21 @@ typedef LMChatGIFBuilder = Widget Function(
   LMChatGIF oldWidget,
 );
 
+/// {@template lm_chat_voice_note_widget_builder}
+/// The voice note widget builder function for the chat screen.
+/// This function is called to build the voice note widget for the chat screen.
+/// The [LMChatVoiceNoteBuilder] function takes three parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatAttachmentViewData] attachment: The voice note attachment.
+/// - [LMChatVoiceNote] oldWidget: The old audio widget.
+/// The function returns an [Widget].
+/// {@endtemplate}
+typedef LMChatVoiceNoteBuilder = Widget Function(
+  BuildContext context,
+  LMChatAttachmentViewData attachment,
+  LMChatVoiceNote oldWidget,
+);
+
 /// {@template lm_chat_document_widget_builder}
 /// The document widget builder function for the chat screen.
 /// This function is called to build the document widget for the chat screen.
@@ -276,4 +291,17 @@ typedef LMChatPollBuilder = Widget Function(
   BuildContext context,
   LMChatPoll poll,
   LMChatConversationViewData conversation,
+);
+
+/// {@template lm_chat_icon_builder}
+/// The icon builder function for the chat screen.
+/// This function is called to build the icon for the chat screen.
+/// The [LMChatIconBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatIcon] icon: The icon.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatIconBuilder = Widget Function(
+  BuildContext context,
+  LMChatIcon icon,
 );

@@ -56,6 +56,7 @@ postMultimediaConversationEventHandler(
               final response = await LMChatMediaService.uploadFile(
                 media.mediaFile!.readAsBytesSync(),
                 LMChatLocalPreference.instance.getUser().userUniqueId!,
+                fileName: media.mediaFile!.path.split('/').last,
                 chatroomId: event.postConversationRequest.chatroomId,
                 conversationId: postConversationResponse.conversation!.id,
               );
@@ -93,6 +94,8 @@ postMultimediaConversationEventHandler(
                   ..meta({
                     'size': media.size,
                     'number_of_page': media.pageCount,
+                    'file_name': media.mediaFile!.path.split('/').last,
+                    'duration': media.duration,
                   })
                   ..type(attachmentType)
                   ..url(url!)
@@ -101,6 +104,7 @@ postMultimediaConversationEventHandler(
             LMResponse<PutMediaResponse> uploadFileResponse =
                 await LMChatCore.client.putMultimedia(putMediaRequest);
             if (!uploadFileResponse.success) {
+              _callAnalyticEvent(event);
               emit(
                 LMChatMultiMediaConversationErrorState(
                   uploadFileResponse.errorMessage!,
@@ -109,6 +113,7 @@ postMultimediaConversationEventHandler(
               );
             }
           } on Exception catch (e) {
+            _callAnalyticEvent(event);
             emit(
               LMChatMultiMediaConversationErrorState(
                 e.toString(),
@@ -125,10 +130,21 @@ postMultimediaConversationEventHandler(
             mediaList,
           ),
         );
-
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.chatroomResponded,
+            eventProperties: {
+              'chatroom_id': event.postConversationRequest.chatroomId,
+              'chatroom_type': 'normal',
+              'community_id':
+                  LMChatLocalPreference.instance.getCommunityData()?.id,
+            },
+          ),
+        );
         LMChatMediaHandler.instance.clearPickedMedia();
       }
     } else {
+      _callAnalyticEvent(event);
       emit(
         LMChatMultiMediaConversationErrorState(
           response.errorMessage!,
@@ -138,6 +154,7 @@ postMultimediaConversationEventHandler(
       return false;
     }
   } catch (e) {
+    _callAnalyticEvent(event);
     emit(
       LMChatConversationErrorState(
         "An error occurred",
@@ -146,4 +163,16 @@ postMultimediaConversationEventHandler(
     );
     return false;
   }
+}
+
+void _callAnalyticEvent(event) {
+  LMChatAnalyticsBloc.instance.add(
+    LMChatFireAnalyticsEvent(
+      eventName: LMChatAnalyticsKeys.attachmentUploadedError,
+      eventProperties: {
+        'chatroom_id': event.postConversationRequest.chatroomId,
+        'chatroom_type': 'normal',
+      },
+    ),
+  );
 }

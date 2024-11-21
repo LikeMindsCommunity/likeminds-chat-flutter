@@ -152,8 +152,10 @@ class LMChatLinkPreviewBar extends StatelessWidget {
   }
 
   LMChatText _defLinkText() {
+    // convert link text in lower case to avoid case sensitivity
+    String link = ogTags.url?.toLowerCase() ?? "";
     return LMChatText(
-      ogTags.url ?? "",
+      link,
       style: style?.linkTextStyle ??
           LMChatTextStyle(
             padding: EdgeInsets.symmetric(horizontal: 1.w),
@@ -173,6 +175,9 @@ class LMChatLinkPreviewBar extends StatelessWidget {
       imageUrl: ogTags.imageUrl,
       style: style?.leadingStyle ??
           const LMChatImageStyle(
+            borderRadius: BorderRadius.all(
+              Radius.circular(2),
+            ),
             height: 80,
             width: 80,
             boxFit: BoxFit.fill,
@@ -346,6 +351,9 @@ class LMChatLinkPreviewBarStyle {
         maxLines: 1,
       ),
       leadingStyle: const LMChatImageStyle(
+        borderRadius: BorderRadius.all(
+          Radius.circular(4),
+        ),
         height: 80,
         width: 80,
         boxFit: BoxFit.fill,

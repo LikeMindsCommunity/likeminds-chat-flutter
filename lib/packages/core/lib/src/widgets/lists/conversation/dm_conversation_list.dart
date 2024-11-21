@@ -6,6 +6,7 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -50,6 +51,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   Map<String, Conversation> conversationMeta = <String, Conversation>{};
   Map<String, List<LMChatAttachmentViewData>> conversationAttachmentsMeta =
       <String, List<LMChatAttachmentViewData>>{};
+  Map<String, List<LMChatReactionViewData>> conversationReactionsMeta =
+      <String, List<LMChatReactionViewData>>{};
   Map<int, User?> userMeta = <int, User?>{};
   List<int> _selectedIds = [];
 
@@ -109,6 +112,12 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             }
             if (state is LMChatConversationEdited) {
               updateEditedConversation(state.conversationViewData);
+            }
+            if (state is LMChatPutReactionState ||
+                state is LMChatPutReactionError ||
+                state is LMChatDeleteReactionState ||
+                state is LMChatDeleteReactionError) {
+              _updateReactions(state);
             }
           },
         ),
@@ -198,6 +207,48 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
               conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
+      userMeta: userMeta.map((id, user) {
+        return MapEntry(id, user!.toUserViewData());
+      }),
+      audioHandler: LMChatCoreAudioHandler.instance,
+      reactions:
+          conversationReactionsMeta[conversation.temporaryId.toString()] ??
+              conversationReactionsMeta[conversation.id.toString()],
+      onReaction: (r) {
+        onReaction(r, conversation.id);
+        setState(() {});
+      },
+      onRemoveReaction: (r) {
+        onRemoveReaction(r, conversation.id);
+        setState(() {});
+      },
+      replyBuilder: (reply, oldWidget) {
+        String message = getGIFText(reply);
+        return oldWidget.copyWith(
+          subtitle: ((reply.attachmentsUploaded ?? false) &&
+                  reply.deletedByUserId == null)
+              ? getChatItemAttachmentTile(message,
+                  conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
+              : LMChatText(
+                  reply.state != 0
+                      ? LMChatTaggingHelper.extractStateMessage(message)
+                      : LMChatTaggingHelper.convertRouteToTag(
+                            message,
+                            withTilde: false,
+                          ) ??
+                          "Replying to Conversation",
+                  style: LMChatTextStyle(
+                    maxLines: 1,
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      color: LMChatTheme.theme.onContainer,
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+        );
+      },
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -223,18 +274,71 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageSelected,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.emoticonTrayOpened,
+            eventProperties: {
+              'from': 'long press',
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
       },
       isSelectableOnTap: () {
         return _selectedIds.isNotEmpty;
       },
+      onReactionsTap: () {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.reactionListOpened,
+            eventProperties: {
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+      },
       onTap: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);
+          LMChatAnalyticsBloc.instance.add(
+            LMChatFireAnalyticsEvent(
+              eventName: LMChatAnalyticsKeys.messageSelected,
+              eventProperties: {
+                'type': 'text',
+                'chatroom_id': widget.chatroomId,
+              },
+            ),
+          );
         } else {
           _selectedIds.remove(conversation.id);
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+      },
+      onMediaTap: () {
+        LMChatMediaHandler.instance.addPickedMedia(
+            conversationAttachmentsMeta[conversation.id.toString()]);
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMChatMediaPreviewScreen(
+              conversation: conversation,
+            ),
+          ),
+        );
       },
     );
   }
@@ -246,6 +350,21 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       attachments: conversationAttachmentsMeta[conversation.id.toString()],
       currentUser: LMChatLocalPreference.instance.getUser().toUserViewData(),
       conversationUser: conversation.member!,
+      userMeta: userMeta.map((id, user) {
+        return MapEntry(id, user!.toUserViewData());
+      }),
+      audioHandler: LMChatCoreAudioHandler.instance,
+      reactions:
+          conversationReactionsMeta[conversation.temporaryId.toString()] ??
+              conversationReactionsMeta[conversation.id.toString()],
+      onReaction: (r) {
+        onReaction(r, conversation.id);
+        setState(() {});
+      },
+      onRemoveReaction: (r) {
+        onRemoveReaction(r, conversation.id);
+        setState(() {});
+      },
       onTagTap: (tag) {},
       onReply: (conversation) {
         _convActionBloc.add(
@@ -258,10 +377,48 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           ),
         );
       },
+      replyBuilder: (reply, oldWidget) {
+        String message = getGIFText(reply);
+        return oldWidget.copyWith(
+          subtitle: ((reply.attachmentsUploaded ?? false) &&
+                  reply.deletedByUserId == null)
+              ? getChatItemAttachmentTile(message,
+                  conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
+              : LMChatText(
+                  reply.state != 0
+                      ? LMChatTaggingHelper.extractStateMessage(message)
+                      : LMChatTaggingHelper.convertRouteToTag(
+                            message,
+                            withTilde: false,
+                          ) ??
+                          "Replying to Conversation",
+                  style: LMChatTextStyle(
+                    maxLines: 1,
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      color: LMChatTheme.theme.onContainer,
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+        );
+      },
       isSent: false,
       isDM: true,
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       isSelected: _selectedIds.contains(conversation.id),
+      onReactionsTap: () {
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.reactionListOpened,
+            eventProperties: {
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+      },
       onLongPress: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);
@@ -270,6 +427,25 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.messageSelected,
+            eventProperties: {
+              'type': 'text',
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
+        LMChatAnalyticsBloc.instance.add(
+          LMChatFireAnalyticsEvent(
+            eventName: LMChatAnalyticsKeys.emoticonTrayOpened,
+            eventProperties: {
+              'from': 'long press',
+              'message_id': conversation.id,
+              'chatroom_id': widget.chatroomId,
+            },
+          ),
+        );
       },
       isSelectableOnTap: () {
         return _selectedIds.isNotEmpty;
@@ -277,11 +453,34 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       onTap: (value, state) {
         if (value) {
           _selectedIds.add(conversation.id);
+          LMChatAnalyticsBloc.instance.add(
+            LMChatFireAnalyticsEvent(
+              eventName: LMChatAnalyticsKeys.messageSelected,
+              eventProperties: {
+                'type': 'text',
+                'chatroom_id': widget.chatroomId,
+              },
+            ),
+          );
         } else {
           _selectedIds.remove(conversation.id);
         }
         rebuildAppBar.value = !rebuildAppBar.value;
         state.setState(() {});
+      },
+      onMediaTap: () {
+        LMChatMediaHandler.instance.addPickedMedia(
+            conversationAttachmentsMeta[conversation.id.toString()]);
+        LMChatCoreAudioHandler.instance.stopAudio();
+        LMChatCoreAudioHandler.instance.stopRecording();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMChatMediaPreviewScreen(
+              conversation: conversation,
+            ),
+          ),
+        );
       },
     );
   }
@@ -352,13 +551,40 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         });
         conversationAttachmentsMeta.addAll(getConversationAttachmentData);
       }
+      if (state.getConversationResponse.conversationReactionMeta != null &&
+          state.getConversationResponse.conversationReactionMeta!.isNotEmpty) {
+        Map<String, List<LMChatReactionViewData>> getConversationReactionsData =
+            state.getConversationResponse.conversationReactionMeta!
+                .map((key, value) {
+          return MapEntry(
+            key,
+            (value as List<Reaction>?)
+                    ?.map((e) => e.toReactionViewData())
+                    .toList() ??
+                [],
+          );
+        });
+        conversationReactionsMeta.addAll(getConversationReactionsData);
+      }
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
       List<LMChatConversationViewData>? conversationData = state
               .getConversationResponse.conversationData
-              ?.map((e) => e.toConversationViewData())
-              .toList() ??
+              ?.map((e) {
+            final conv = e.toConversationViewData(
+              conversationPollsMeta:
+                  state.getConversationResponse.conversationPollsMeta,
+              userMeta: state.getConversationResponse.userMeta,
+            );
+            // Add attachments to the conversation object explicitly
+            if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
+              return conv.copyWith(
+                attachments: conversationAttachmentsMeta[conv.id.toString()],
+              );
+            }
+            return conv;
+          }).toList() ??
           [];
       // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(conversationData,
@@ -408,7 +634,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
     if (state is LMChatConversationUpdatedState) {
       if (state.conversationViewData.id != lastConversationId) {
-        conversationAttachmentsMeta.addAll(state.attachments ?? {});
+        conversationAttachmentsMeta.addAll(state.attachments);
         addConversationToPagedList(
           state.conversationViewData,
         );
@@ -433,10 +659,18 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
 
-      result =
-          conversation.copyWith(replyConversationObject: replyConversation);
+      result = conversation.copyWith(
+        replyConversationObject: replyConversation,
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
+    } else {
+      result = conversation.copyWith(
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
     }
-    conversationList.insert(0, result ?? conversation);
+    conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
     }
@@ -466,8 +700,16 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       conversationMeta[conversation.replyId.toString()] =
           replyConversation.toConversation();
 
-      result =
-          conversation.copyWith(replyConversationObject: replyConversation);
+      result = conversation.copyWith(
+        replyConversationObject: replyConversation,
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
+    } else {
+      result = conversation.copyWith(
+        attachments: conversationAttachmentsMeta[conversation.temporaryId] ??
+            conversationAttachmentsMeta[conversation.id.toString()],
+      );
     }
     if (index != -1) {
       conversationList[index] = conversation;
@@ -493,7 +735,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           ).toConversationViewData(),
         );
       }
-      conversationList.insert(0, result ?? conversation);
+      conversationList.insert(0, result);
       if (conversationList.length >= 500) {
         conversationList.removeLast();
       }
@@ -543,6 +785,147 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           editedConversation.toConversation();
     }
     pagedListController.itemList = conversationList;
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  onReaction(
+    String reaction,
+    int conversationId,
+  ) {
+    if (reaction == 'Add') {
+      LMChatroomActionBloc.instance.add(
+        LMChatShowEmojiKeyboardEvent(
+          conversationId: conversationId,
+        ),
+      );
+    } else {
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.reactionAdded,
+          eventProperties: {
+            'reaction': reaction,
+            'from': 'long_press',
+            'message_id': conversationId,
+            'chatroom_id': widget.chatroomId,
+          },
+        ),
+      );
+      _convActionBloc.add(LMChatPutReaction(
+        conversationId: conversationId,
+        reaction: reaction,
+      ));
+      _selectedIds.remove(conversationId);
+      rebuildAppBar.value = !rebuildAppBar.value;
+    }
+  }
+
+  onRemoveReaction(String reaction, int conversationId) {
+    LMChatAnalyticsBloc.instance.add(
+      LMChatFireAnalyticsEvent(
+        eventName: LMChatAnalyticsKeys.reactionRemoved,
+        eventProperties: {
+          'message_id': conversationId,
+          'chatroom_id': widget.chatroomId,
+        },
+      ),
+    );
+    _convActionBloc.add(LMChatDeleteReaction(
+      conversationId: conversationId,
+      reaction: reaction,
+    ));
+    Navigator.pop(context);
+  }
+
+  void _updateReactions(LMChatConversationActionState state) {
+    if (state is LMChatPutReactionState) {
+      LMChatReactionViewData addedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      if (!userMeta.containsKey(user.id)) {
+        userMeta[user.id] = user;
+      }
+      _addReaction(addedReaction, state.conversationId);
+    }
+    if (state is LMChatPutReactionError) {
+      toast(state.errorMessage);
+      LMChatReactionViewData addedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      _removeReaction(addedReaction);
+    }
+    if (state is LMChatDeleteReactionState) {
+      LMChatReactionViewData deletedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      _removeReaction(deletedReaction);
+    }
+    if (state is LMChatDeleteReactionError) {
+      toast(state.errorMessage);
+      LMChatReactionViewData deletedReaction = Reaction(
+        chatroomId: widget.chatroomId,
+        conversationId: state.conversationId,
+        reaction: state.reaction,
+        userId: user.id,
+      ).toReactionViewData();
+      _addReaction(deletedReaction, state.conversationId);
+    }
+  }
+
+  void _addReaction(LMChatReactionViewData reaction, int conversationId) {
+    String conversationIdStr = conversationId.toString();
+    if (conversationReactionsMeta.containsKey(conversationIdStr)) {
+      final existingReactions = conversationReactionsMeta[conversationIdStr]!;
+      final existingReactionIndex =
+          existingReactions.indexWhere((r) => r.userId == reaction.userId);
+      if (existingReactionIndex != -1) {
+        existingReactions[existingReactionIndex] =
+            reaction; // Update existing reaction
+      } else {
+        existingReactions.add(reaction); // Add new reaction
+      }
+    } else {
+      conversationReactionsMeta[conversationIdStr] = [reaction];
+    }
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
+    int index =
+        conversationList.indexWhere((element) => element.id == conversationId);
+    if (index != -1) {
+      conversationList[index] =
+          conversationList[index].copyWith(hasReactions: true);
+    }
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  void _removeReaction(LMChatReactionViewData reaction) {
+    String conversationIdStr = reaction.conversationId.toString();
+    if (conversationReactionsMeta.containsKey(conversationIdStr)) {
+      final existingReactions = conversationReactionsMeta[conversationIdStr]!;
+      final existingReactionIndex =
+          existingReactions.indexWhere((r) => r.userId == reaction.userId);
+      if (existingReactionIndex != -1) {
+        existingReactions
+            .removeAt(existingReactionIndex); // Remove existing reaction
+      }
+    }
+    List<LMChatConversationViewData> conversationList =
+        pagedListController.itemList ?? <LMChatConversationViewData>[];
+    int index = conversationList
+        .indexWhere((element) => element.id == reaction.conversationId);
+    if (index != -1) {
+      conversationList[index] = conversationList[index].copyWith(
+          hasReactions:
+              conversationReactionsMeta[conversationIdStr]!.isNotEmpty);
+    }
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 }
