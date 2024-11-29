@@ -128,11 +128,14 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     return _screenBuilder.scaffold(
       resizeToAvoidBottomInset: true,
       onPopInvoked: (p) {
-        LMChatCoreAudioHandler.instance.stopAudio();
-        LMChatCoreAudioHandler.instance.stopRecording();
         _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
           chatroomId: chatroom.id,
         ));
+        if (LMChatCoreAudioHandler.instance.player.isPlaying ||
+            LMChatCoreAudioHandler.instance.recorder.isRecording) {
+          LMChatCoreAudioHandler.instance.stopAudio();
+          LMChatCoreAudioHandler.instance.stopRecording();
+        }
       },
       backgroundColor: LMChatTheme.theme.backgroundColor,
       floatingActionButton: ValueListenableBuilder(
