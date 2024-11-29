@@ -1,170 +1,156 @@
 part of '../conversation_bloc.dart';
 
-/// Handler for managing post conversation event
+/// Handler for managing post multimedia conversation event
 postMultimediaConversationEventHandler(
   LMChatPostMultiMediaConversationEvent event,
   Emitter<LMChatConversationState> emit,
 ) async {
-  // final mediaService = LMChatMediaService.instance;
   final List<LMChatMediaModel> mediaList = event.mediaFiles.copy();
   try {
+    // Generate thumbnails for videos before creating temporary conversation
+    for (LMChatMediaModel media in mediaList) {
+      if (media.mediaType == LMChatMediaType.video) {
+        media.thumbnailFile ??= await getVideoThumbnail(media);
+      }
+    }
+
+    // Create temporary conversation
     DateTime dateTime = DateTime.now();
     User user = LMChatLocalPreference.instance.getUser();
-    Conversation conversation = Conversation(
+    String temporaryId = "-${event.postConversationRequest.temporaryId}";
+
+    // Create temporary conversation object
+    Conversation temporaryConversation = Conversation(
       answer: event.postConversationRequest.text,
       chatroomId: event.postConversationRequest.chatroomId,
       createdAt: "",
       header: "",
-      date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
+      date: DateFormat('dd MMM yyyy').format(dateTime),
       replyId: event.postConversationRequest.replyId,
-      attachmentCount: event.postConversationRequest.attachmentCount,
       hasFiles: event.postConversationRequest.hasFiles,
       member: user,
-      temporaryId: event.postConversationRequest.temporaryId,
-      id: 1,
+      temporaryId: temporaryId,
+      id: 1, // Temporary ID for local handling
       memberId: user.id,
       ogTags: event.postConversationRequest.ogTags,
       createdEpoch: dateTime.millisecondsSinceEpoch,
+      attachments: mediaList
+          .map((media) => media.toAttachmentViewData().toAttachment())
+          .toList(),
     );
 
-    emit(
-      LMChatMultiMediaConversationLoadingState(
-        conversation,
-        mediaList,
-      ),
-    );
-    LMResponse<PostConversationResponse> response =
-        await LMChatCore.client.postConversation(event.postConversationRequest);
+    // Emit loading state with temporary conversation
+    emit(LMChatMultiMediaConversationLoadingState(
+      temporaryConversation,
+      mediaList,
+    ));
 
-    if (response.success) {
-      PostConversationResponse postConversationResponse = response.data!;
-      if (event.mediaFiles.length == 1 &&
-          event.mediaFiles.first.mediaType == LMChatMediaType.link) {
-        emit(
-          LMChatMultiMediaConversationPostedState(
-            postConversationResponse,
-            mediaList,
-          ),
-        );
-      } else {
-        int length = event.mediaFiles.length;
-        for (int i = 0; i < length; i++) {
-          LMChatMediaModel media = event.mediaFiles[i];
+    // Handle file uploads
+    List<Attachment> uploadedAttachments = [];
+    for (int index = 0; index < mediaList.length; index++) {
+      LMChatMediaModel media = mediaList[index];
+      try {
+        // Upload main file
+        String? url;
+        if (media.mediaFile != null) {
+          final response = await LMChatMediaService.uploadFile(
+            media.mediaFile!.readAsBytesSync(),
+            user.sdkClientInfo?.uuid ?? user.userUniqueId!,
+            fileName: media.mediaFile!.path.split('/').last,
+            chatroomId: event.postConversationRequest.chatroomId,
+          );
 
-          try {
-            String? url;
-            if (media.mediaFile != null) {
-              final response = await LMChatMediaService.uploadFile(
-                media.mediaFile!.readAsBytesSync(),
-                LMChatLocalPreference.instance.getUser().userUniqueId!,
-                fileName: media.mediaFile!.path.split('/').last,
-                chatroomId: event.postConversationRequest.chatroomId,
-                conversationId: postConversationResponse.conversation!.id,
-              );
+          if (response.success) {
+            url = response.data;
+            media.mediaUrl = url;
+          }
+        } else {
+          url = media.mediaUrl;
+        }
 
-              if (response.success) {
-                url = response.data;
-              }
-            } else {
-              url = media.mediaUrl;
-            }
+        // Handle video thumbnail
+        String? thumbnailUrl;
+        if (media.mediaType == LMChatMediaType.video) {
+          final response = await LMChatMediaService.uploadFile(
+            media.thumbnailFile!.readAsBytesSync(),
+            user.userUniqueId!,
+            fileName: media.thumbnailFile!.path.split('/').last,
+            chatroomId: event.postConversationRequest.chatroomId,
+          );
 
-            String? thumbnailUrl;
-            if (media.mediaType == LMChatMediaType.video) {
-              File? thumbnailFile;
-              // If the thumbnail file is not present in media object
-              // then generate the thumbnail and upload it to the server
-              if (media.thumbnailFile == null) {
-                thumbnailFile = await getVideoThumbnail(media);
-                media.thumbnailFile = thumbnailFile;
-              }
-              final response = await LMChatMediaService.uploadFile(
-                media.thumbnailFile!.readAsBytesSync(),
-                LMChatLocalPreference.instance.getUser().userUniqueId!,
-                chatroomId: event.postConversationRequest.chatroomId,
-                conversationId: postConversationResponse.conversation!.id,
-              );
-              thumbnailUrl = response.data;
-            }
-
-            String attachmentType = mapMediaTypeToString(media.mediaType);
-            PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
-                  ..conversationId(postConversationResponse.conversation!.id)
-                  ..filesCount(length)
-                  ..index(i)
-                  ..height(media.height)
-                  ..width(media.width)
-                  ..meta({
-                    'size': media.size,
-                    'number_of_page': media.pageCount,
-                    'file_name': media.mediaFile!.path.split('/').last,
-                    'duration': media.duration,
-                  })
-                  ..type(attachmentType)
-                  ..url(url!)
-                  ..thumbnailUrl(thumbnailUrl))
-                .build();
-            LMResponse<PutMediaResponse> uploadFileResponse =
-                await LMChatCore.client.putMultimedia(putMediaRequest);
-            if (!uploadFileResponse.success) {
-              _callAnalyticEvent(event);
-              emit(
-                LMChatMultiMediaConversationErrorState(
-                  uploadFileResponse.errorMessage!,
-                  event.postConversationRequest.temporaryId,
-                ),
-              );
-            }
-          } on Exception catch (e) {
-            _callAnalyticEvent(event);
-            emit(
-              LMChatMultiMediaConversationErrorState(
-                e.toString(),
-                event.postConversationRequest.temporaryId,
-              ),
-            );
+          if (response.success) {
+            thumbnailUrl = response.data;
+            media.thumbnailUrl = thumbnailUrl;
           }
         }
-        LMChatConversationBloc.instance.lastConversationId =
-            response.data!.conversation!.id;
-        emit(
-          LMChatMultiMediaConversationPostedState(
-            postConversationResponse,
-            mediaList,
-          ),
-        );
-        LMChatAnalyticsBloc.instance.add(
-          LMChatFireAnalyticsEvent(
-            eventName: LMChatAnalyticsKeys.chatroomResponded,
-            eventProperties: {
-              'chatroom_id': event.postConversationRequest.chatroomId,
-              'chatroom_type': 'normal',
-              'community_id':
-                  LMChatLocalPreference.instance.getCommunityData()?.id,
-            },
-          ),
-        );
-        LMChatMediaHandler.instance.clearPickedMedia();
+
+        // Create attachment model
+        uploadedAttachments.add(media
+            .copyWith(
+              mediaUrl: url,
+              thumbnailUrl: thumbnailUrl,
+              mediaFile: null,
+              thumbnailFile: null,
+            )
+            .toAttachmentViewData()
+            .copyWith(index: index)
+            .toAttachment());
+      } catch (e) {
+        _callAnalyticEvent(event);
+        emit(LMChatMultiMediaConversationErrorState(
+          e.toString(),
+          temporaryId,
+        ));
+        return;
       }
-    } else {
-      _callAnalyticEvent(event);
-      emit(
-        LMChatMultiMediaConversationErrorState(
-          response.errorMessage!,
-          event.postConversationRequest.temporaryId,
+    }
+
+    // Post conversation to server
+    final response = await LMChatCore.client.postConversation(
+      (PostConversationRequestBuilder()
+            ..attachments(uploadedAttachments)
+            ..temporaryId(temporaryId)
+            ..text(event.postConversationRequest.text)
+            ..chatroomId(event.postConversationRequest.chatroomId)
+            ..hasFiles(event.postConversationRequest.hasFiles)
+            ..replyId(event.postConversationRequest.replyId))
+          .build(),
+    );
+    debugPrint(response.toString());
+    if (response.success) {
+      emit(LMChatMultiMediaConversationPostedState(
+        response.data!,
+        mediaList,
+      ));
+
+      // Fire analytics event
+      LMChatAnalyticsBloc.instance.add(
+        LMChatFireAnalyticsEvent(
+          eventName: LMChatAnalyticsKeys.chatroomResponded,
+          eventProperties: {
+            'chatroom_id': event.postConversationRequest.chatroomId,
+            'chatroom_type': 'normal',
+            'community_id':
+                LMChatLocalPreference.instance.getCommunityData()?.id,
+          },
         ),
       );
-      return false;
+
+      LMChatMediaHandler.instance.clearPickedMedia();
+      LMChatConversationBloc.instance.lastConversationId = response.data!.id;
+    } else {
+      _callAnalyticEvent(event);
+      emit(LMChatMultiMediaConversationErrorState(
+        response.errorMessage!,
+        temporaryId,
+      ));
     }
   } catch (e) {
     _callAnalyticEvent(event);
-    emit(
-      LMChatConversationErrorState(
-        "An error occurred",
-        event.postConversationRequest.temporaryId,
-      ),
-    );
-    return false;
+    emit(LMChatConversationErrorState(
+      "An error occurred",
+      event.postConversationRequest.temporaryId,
+    ));
   }
 }
 
