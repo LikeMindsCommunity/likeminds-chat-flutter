@@ -1,6 +1,13 @@
 import 'package:likeminds_chat_flutter_ui/src/models/sdk/sdk_client_info_view_data.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/widget/widget_view_data.dart';
 
+/// Enum representing different roles a user can have
+enum LMUserRole {
+  chatbot,
+  member,
+  admin,
+}
+
 /// {@template lm_user_view_data}
 /// A view data class to hold the user data.
 /// {@endtemplate}
@@ -22,6 +29,9 @@ class LMChatUserViewData {
 
   /// uuid is a unique identifier of the user
   String uuid;
+
+  /// roles is a list of roles assigned to the user
+  List<LMUserRole>? roles;
 
   /// organisationName is the name of the organisation to which the user belongs
   String? organisationName;
@@ -82,6 +92,7 @@ class LMChatUserViewData {
     this.createdAt,
     this.isDeleted,
     this.widget,
+    this.roles,
   });
 
   /// copyWith method is used to create a new instance of `LMChatUserViewData` with the updated values.
@@ -104,6 +115,7 @@ class LMChatUserViewData {
     int? communityId,
     int? createdAt,
     LMChatWidgetViewData? widget,
+    List<LMUserRole>? roles,
   }) {
     return LMChatUserViewData._(
       id: id ?? this.id,
@@ -123,6 +135,7 @@ class LMChatUserViewData {
       createdAt: createdAt ?? this.createdAt,
       isDeleted: isDeleted ?? this.isDeleted,
       widget: widget ?? this.widget,
+      roles: roles ?? this.roles,
     );
   }
 }
@@ -148,6 +161,7 @@ class LMChatUserViewDataBuilder {
   int? _communityId;
   int? _createdAt;
   LMChatWidgetViewData? _widget;
+  List<LMUserRole>? _roles;
 
   /// Sets the id of the user
   void id(int? id) {
@@ -234,6 +248,11 @@ class LMChatUserViewDataBuilder {
     _widget = widget;
   }
 
+  /// Sets the roles of the user
+  void roles(List<LMUserRole>? roles) {
+    _roles = roles;
+  }
+
   /// Builds and returns an instance of [LMChatUserViewData]
   LMChatUserViewData build() {
     if (_id == null) {
@@ -264,6 +283,7 @@ class LMChatUserViewDataBuilder {
       createdAt: _createdAt,
       isDeleted: _isDeleted,
       widget: _widget,
+      roles: _roles,
     );
   }
 }

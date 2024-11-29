@@ -118,3 +118,21 @@ String getTime(String time) {
   }
   return DateFormat('kk:mm').format(messageTime);
 }
+
+/// Checks if the other user in a DM chatroom is an AI Chatbot
+bool isOtherUserAIChatbot(LMChatRoomViewData chatroom) {
+  // Get logged in user's UUID
+  final String loggedInUserUUID =
+      LMChatLocalPreference.instance.getUser().sdkClientInfo?.uuid ?? '';
+
+  // Determine the other member based on UUID comparison
+  LMChatUserViewData? otherMember;
+  if (loggedInUserUUID == chatroom.member?.sdkClientInfo?.uuid) {
+    otherMember = chatroom.chatroomWithUser;
+  } else {
+    otherMember = chatroom.member;
+  }
+
+  // Check if the other member has the chatbot role
+  return otherMember?.roles?.contains(LMUserRole.chatbot) ?? false;
+}
