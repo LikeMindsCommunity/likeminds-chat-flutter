@@ -1940,7 +1940,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                 ..chatroomId(widget.chatroom.id)
                 ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
                 ..replyId(replyToConversation?.id)
-                ..attachmentCount(1)
                 ..hasFiles(true)
                 ..text(result ?? ''))
               .build(),

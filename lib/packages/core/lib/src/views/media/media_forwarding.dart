@@ -321,7 +321,6 @@ class _LMChatMediaForwardingScreenState
       LMChatPostMultiMediaConversationEvent(
         (PostConversationRequestBuilder()
               ..replyId(replyConversation?.id)
-              ..attachmentCount(mediaList.length)
               ..chatroomId(widget.chatroomId)
               ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
               ..text(result)
