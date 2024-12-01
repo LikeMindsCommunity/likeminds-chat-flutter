@@ -1279,7 +1279,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                             onTap: () async {
                               _popupMenuController.hideMenu();
                               final res =
-                                  await LMChatMediaHandler.instance.pickMedia();
+                                  await LMChatMediaHandler.instance.pickMedia(
+                                mediaCount: widget.chatroom.type == 10 &&
+                                        isOtherUserAIChatbot(widget.chatroom)
+                                    ? 1
+                                    : 10,
+                              );
                               if (res.data != null) {
                                 _navigateToForwarding();
                               } else if (res.errorMessage != null) {
@@ -1313,47 +1318,53 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          LMChatButton(
-                            onTap: () async {
-                              _popupMenuController.hideMenu();
-                              final res = await LMChatMediaHandler.instance
-                                  .pickDocuments();
-                              if (res.data != null) {
-                                _navigateToForwarding();
-                              } else if (res.errorMessage != null) {
-                                toast(res.errorMessage!);
-                              }
-                            },
-                            icon: LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.insert_drive_file_outlined,
-                              style: LMChatIconStyle(
-                                color: LMChatTheme.theme.container,
-                                size: 30,
-                                boxSize: 48,
-                                boxPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            style: LMChatButtonStyle(
-                              height: 48,
-                              width: 48,
-                              borderRadius: 24,
-                              backgroundColor: LMChatTheme.theme.secondaryColor,
+                    widget.chatroom.type == 10 &&
+                            isOtherUserAIChatbot(widget.chatroom)
+                        ? const Spacer()
+                        : Expanded(
+                            child: Column(
+                              children: [
+                                LMChatButton(
+                                  onTap: () async {
+                                    _popupMenuController.hideMenu();
+                                    final res = await LMChatMediaHandler
+                                        .instance
+                                        .pickDocuments();
+                                    if (res.data != null) {
+                                      _navigateToForwarding();
+                                    } else if (res.errorMessage != null) {
+                                      toast(res.errorMessage!);
+                                    }
+                                  },
+                                  icon: LMChatIcon(
+                                    type: LMChatIconType.icon,
+                                    icon: Icons.insert_drive_file_outlined,
+                                    style: LMChatIconStyle(
+                                      color: LMChatTheme.theme.container,
+                                      size: 30,
+                                      boxSize: 48,
+                                      boxPadding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                  style: LMChatButtonStyle(
+                                    height: 48,
+                                    width: 48,
+                                    borderRadius: 24,
+                                    backgroundColor:
+                                        LMChatTheme.theme.secondaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                LMChatText(
+                                  'Documents',
+                                  style: LMChatTextStyle(
+                                    textStyle:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          LMChatText(
-                            'Documents',
-                            style: LMChatTextStyle(
-                              textStyle: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
                 SizedBox(height: 2.h),
@@ -1736,6 +1747,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                 ..chatroomId(widget.chatroom.id)
                 ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
                 ..text(result!)
+                ..triggerBot(widget.chatroom.type == 10 &&
+                    isOtherUserAIChatbot(widget.chatroom))
                 ..replyId(replyToConversation?.id)
                 ..ogTags(linkModel!.ogTags!.toOGTag())
                 ..shareLink(linkModel!.link!))
@@ -1762,6 +1775,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           replyId: replyToConversation?.id,
           repliedTo: replyToConversation,
           shareLink: extractedLink,
+          triggerBot: widget.chatroom.type == 10 &&
+              isOtherUserAIChatbot(widget.chatroom),
         ),
       );
       _updateLinkPreviewState();
@@ -1871,6 +1886,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           chatroomName: widget.chatroom.header,
           replyConversation: replyToConversation,
           textFieldText: _textEditingController.text,
+          triggerBot: widget.chatroom.type == 10 &&
+              isOtherUserAIChatbot(widget.chatroom),
         ),
       ),
     );
