@@ -637,12 +637,18 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       );
     }
     if (state is LMChatConversationUpdatedState) {
-      if (state.conversationViewData.id != lastConversationId) {
+      if (state.conversationViewData.id != lastConversationId ||
+          state.shouldUpdate) {
         conversationAttachmentsMeta.addAll(state.attachments);
         addConversationToPagedList(
           state.conversationViewData,
         );
         lastConversationId = state.conversationViewData.id;
+        LMChatroomActionBloc.instance.add(
+          LMChatMarkReadChatroomEvent(
+            chatroomId: widget.chatroomId,
+          ),
+        );
       }
     }
   }
@@ -717,8 +723,12 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
-    int index = conversationList.indexWhere(
-        (element) => element.temporaryId == conversation.temporaryId);
+    int index = conversationList.indexWhere((element) {
+      if (conversation.temporaryId == null || element.temporaryId == null) {
+        return element.id == conversation.id;
+      }
+      return element.temporaryId == conversation.temporaryId;
+    });
     if (pagedListController.itemList != null &&
         (conversation.replyId != null ||
             conversation.replyConversation != null) &&
