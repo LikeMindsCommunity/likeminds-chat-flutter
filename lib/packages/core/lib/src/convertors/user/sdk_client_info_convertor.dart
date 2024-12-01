@@ -6,9 +6,9 @@ extension SdkClientInfoConvertor on SDKClientInfo {
   /// Converts SDKClientInfo to LMChatSDKClientInfoViewData
   LMChatSDKClientInfoViewData toSDKClientInfoViewdata() {
     LMSDKClientInfoViewDataBuilder builder = LMSDKClientInfoViewDataBuilder()
-      ..community(community!)
-      ..user(user!)
-      ..uuid(uuid!);
+      ..community(community ?? 0)
+      ..user(user ?? 0)
+      ..uuid(uuid ?? '');
     return builder.build();
   }
 }
