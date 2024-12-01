@@ -113,10 +113,10 @@ postMultimediaConversationEventHandler(
             ..text(event.postConversationRequest.text)
             ..chatroomId(event.postConversationRequest.chatroomId)
             ..hasFiles(event.postConversationRequest.hasFiles)
-            ..replyId(event.postConversationRequest.replyId))
+            ..replyId(event.postConversationRequest.replyId)
+            ..triggerBot(event.postConversationRequest.triggerBot ?? false))
           .build(),
     );
-    debugPrint(response.toString());
     if (response.success) {
       emit(LMChatMultiMediaConversationPostedState(
         response.data!,

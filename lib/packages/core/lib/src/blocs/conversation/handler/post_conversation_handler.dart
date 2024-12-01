@@ -34,6 +34,7 @@ postConversationEventHandler(
           ..chatroomId(event.chatroomId)
           ..text(event.text)
           ..replyId(event.replyId)
+          ..triggerBot(event.triggerBot ?? false)
           ..hasFiles(event.hasFiles ?? false)
           ..temporaryId(tempId);
     if (event.replyId == null &&
