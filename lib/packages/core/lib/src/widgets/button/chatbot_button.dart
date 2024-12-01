@@ -131,13 +131,13 @@ class LMChatAIButton extends StatelessWidget {
       final chatroomId =
           LMChatLocalPreference.instance.getChatroomIdWithAIChatbot();
       if (chatroomId != null) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => LMChatroomScreen(chatroomId: chatroomId)),
         );
       } else {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => const LMChatAIBotInitiationScreen()),
@@ -183,13 +183,13 @@ class LMChatAIButton extends StatelessWidget {
       final chatroomId =
           LMChatLocalPreference.instance.getChatroomIdWithAIChatbot();
       if (chatroomId != null) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => LMChatroomScreen(chatroomId: chatroomId)),
         );
       } else {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => const LMChatAIBotInitiationScreen()),
