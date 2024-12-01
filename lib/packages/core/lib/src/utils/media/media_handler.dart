@@ -27,6 +27,10 @@ class LMChatMediaHandler {
   /// Returns a [LMChatMediaHandler] object.
   static LMChatMediaHandler get instance => _instance;
 
+  /// List of media items that have been picked/selected
+  ///
+  /// This list stores [LMChatMediaModel] objects representing images, videos,
+  /// documents or GIFs that have been selected by the user
   final List<LMChatMediaModel> pickedMedia = [];
 
   /// Adds one or more media items to the pickedMedia list
@@ -216,6 +220,11 @@ class LMChatMediaHandler {
     }
   }
 
+  /// Picks media files from the device storage
+  ///
+  /// [mediaCount] is the current number of media items already selected
+  /// Returns an [LMResponse] containing a list of [LMChatMediaModel] for the selected media
+  /// Enforces a maximum of 10 total attachments
   Future<LMResponse<List<LMChatMediaModel>>> pickMedia(
       {int mediaCount = 10}) async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
@@ -334,10 +343,35 @@ class LMChatMediaHandler {
     }
   }
 
+  /// A constant list of file extensions that are considered as photo/image files
+  static const List<String> photoExtentions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'webp'
+  ];
+
+  /// Calculates and returns the file size in megabytes (MB) from bytes
+  ///
+  /// [bytes] The size in bytes to convert
+  /// Returns the size as a double representing megabytes
+  double getFileSizeInDouble(int bytes) {
+    return bytes / (1024 * 1024);
+  }
+
+  /// Checks if the given file is an image based on its extension
+  ///
+  /// [file] The PlatformFile to check
+  /// Returns true if the file extension matches known image formats
   bool checkFileType(PlatformFile file) {
     return photoExtentions.contains(file.extension);
   }
 
+  /// Picks a GIF using the GIPHY picker interface
+  ///
+  /// [context] The BuildContext required to show the GIPHY picker
+  /// Returns an [LMResponse] containing the selected GIF as [LMChatMediaModel]
   Future<LMResponse<LMChatMediaModel>> pickGIF(BuildContext context) async {
     try {
       GiphyGif? gif = await GiphyGet.getGif(
