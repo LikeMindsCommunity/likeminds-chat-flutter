@@ -8,3 +8,5 @@ const secretLockIcon =
     'packages/likeminds_chat_flutter_core/assets/icons/secret_lock.svg';
 const emptyViewImage =
     'packages/likeminds_chat_flutter_core/assets/images/empty_view.png';
+const aiChatbotLoadingAnimation =
+    'packages/likeminds_chat_flutter_core/assets/animations/chatbot_loading.json';
