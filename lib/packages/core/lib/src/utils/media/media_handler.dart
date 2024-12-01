@@ -217,10 +217,10 @@ class LMChatMediaHandler {
   }
 
   Future<LMResponse<List<LMChatMediaModel>>> pickMedia(
-      {int mediaCount = 0}) async {
+      {int mediaCount = 10}) async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
-      type: FileType.media,
+      allowMultiple: mediaCount == 1 ? false : true,
+      type: mediaCount == 1 ? FileType.image : FileType.media,
     );
 
     List<LMChatMediaModel> attachedMedia = [];
