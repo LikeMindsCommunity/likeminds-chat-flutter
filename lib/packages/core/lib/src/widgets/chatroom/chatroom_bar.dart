@@ -359,11 +359,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // OverlayPortal(
-        //   controller: _overlayPortalController,
-        //   overlayChildBuilder: (context) => _defVoiceOverlayLayout(context),
-        // ),
-        // Existing UI components
         BlocConsumer<LMChatConversationActionBloc,
             LMChatConversationActionState>(
           bloc: chatActionBloc,
@@ -403,14 +398,13 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                                     return ValueListenableBuilder<String>(
                                       valueListenable: _textInputNotifier,
                                       builder: (context, text, child) {
-                                        // Show send button if:
-                                        // 1. There is text to send
-                                        // 2. Recording is being reviewed
-                                        // 3. Recording is locked
                                         final shouldShowSendButton =
                                             text.trim().isNotEmpty ||
                                                 isReviewing ||
-                                                isLocked;
+                                                isLocked ||
+                                                (widget.chatroom.type == 10 &&
+                                                    isOtherUserAIChatbot(
+                                                        widget.chatroom));
 
                                         return shouldShowSendButton
                                             ? _screenBuilder.sendButton(
@@ -434,7 +428,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             );
           },
         ),
-        // Show overlay when button is held
       ],
     );
   }
@@ -501,6 +494,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _defVoiceOverlayLayout(BuildContext context) {
+    if (widget.chatroom.type == 10 && isOtherUserAIChatbot(widget.chatroom)) {
+      return const SizedBox.shrink();
+    }
+
     return Stack(
       fit: StackFit.passthrough,
       clipBehavior: Clip.none,
