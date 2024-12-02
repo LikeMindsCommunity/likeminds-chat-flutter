@@ -24,6 +24,7 @@ postMultimediaConversationEventHandler(
       id: 1,
       memberId: user.id,
       ogTags: event.postConversationRequest.ogTags,
+      createdEpoch: dateTime.millisecondsSinceEpoch,
     );
 
     emit(
@@ -70,10 +71,12 @@ postMultimediaConversationEventHandler(
 
             String? thumbnailUrl;
             if (media.mediaType == LMChatMediaType.video) {
+              File? thumbnailFile;
               // If the thumbnail file is not present in media object
               // then generate the thumbnail and upload it to the server
               if (media.thumbnailFile == null) {
-                await getVideoThumbnail(media);
+                thumbnailFile = await getVideoThumbnail(media);
+                media.thumbnailFile = thumbnailFile;
               }
               final response = await LMChatMediaService.uploadFile(
                 media.thumbnailFile!.readAsBytesSync(),

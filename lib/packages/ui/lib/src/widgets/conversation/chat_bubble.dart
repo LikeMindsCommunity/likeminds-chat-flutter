@@ -390,21 +390,30 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     return GestureDetector(
       onLongPress: () {
         if (_isDeleted) return;
-        _isSelected = !_isSelected;
-        widget.onLongPress?.call(_isSelected, this);
-        reactionBarController.showMenu();
+        // Only handle long press if not already selected
+        if (!_isSelected) {
+          setState(() {
+            _isSelected = true;
+          });
+          widget.onLongPress?.call(_isSelected, this);
+          reactionBarController.showMenu();
+        }
       },
       onTap: () {
         if (_isDeleted) return;
-        if (_isSelected) {
-          _isSelected = false;
-          widget.onTap?.call(_isSelected, this);
-        } else {
-          if (widget.isSelectableOnTap?.call() ?? false) {
-            _isSelected = !_isSelected;
+
+        setState(() {
+          if (_isSelected) {
+            _isSelected = false;
             widget.onTap?.call(_isSelected, this);
+          } else {
+            // Only allow selection on tap if explicitly enabled
+            if (widget.isSelectableOnTap?.call() ?? false) {
+              _isSelected = true;
+              widget.onTap?.call(_isSelected, this);
+            }
           }
-        }
+        });
       },
       child: Stack(
         children: [
@@ -596,7 +605,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 if (conversation.deletedByUserId == null &&
                                     inStyle.showFooter == true)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 2.0),
+                                    padding: const EdgeInsets.only(top: 4.0),
                                     child: kAttachmentTypeVoiceNote ==
                                             widget.attachments?.first.type
                                         ? ValueListenableBuilder<Duration>(
@@ -864,8 +873,16 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   // Update the duration handler to use ValueNotifier
   void _handleVoiceNoteDurationUpdate(Duration duration) {
-    // Only update if the duration is greater than zero to avoid resetting to 0
-    if (duration.inSeconds > 0) {
+    // If duration is 0, reset to initial duration from metadata
+    if (duration.inSeconds == 0) {
+      final initialDuration = Duration(
+        seconds: int.tryParse(
+              widget.attachments?.first.meta?["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+      _voiceNoteDurationNotifier.value = initialDuration;
+    } else {
       _voiceNoteDurationNotifier.value = duration;
     }
   }

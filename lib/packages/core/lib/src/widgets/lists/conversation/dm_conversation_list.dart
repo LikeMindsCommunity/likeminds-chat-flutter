@@ -9,6 +9,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:intl/intl.dart';
 
 class LMChatDMConversationList extends StatefulWidget {
   final int chatroomId;
@@ -108,7 +109,10 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           bloc: _convActionBloc,
           listener: (context, state) {
             if (state is LMChatConversationDelete) {
-              _updateDeletedConversation(state.conversations.first);
+              for (LMChatConversationViewData conversation
+                  in state.conversations) {
+                _updateDeletedConversation(conversation);
+              }
             }
             if (state is LMChatConversationEdited) {
               updateEditedConversation(state.conversationViewData);
@@ -670,6 +674,32 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
+
+    if (conversationList.isNotEmpty &&
+        conversationList.first.date != conversation.date) {
+      conversationList.insert(
+        0,
+        Conversation(
+          isTimeStamp: true,
+          id: 1,
+          hasFiles: false,
+          attachmentCount: 0,
+          attachmentsUploaded: false,
+          createdEpoch: conversation.createdEpoch,
+          chatroomId: widget.chatroomId,
+          date: conversation.date,
+          memberId: conversation.memberId,
+          temporaryId: conversation.temporaryId,
+          answer: DateFormat('dd MMM yyyy').format(
+              DateTime.fromMillisecondsSinceEpoch(
+                  conversation.createdEpoch ?? 0)),
+          communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
+          createdAt: conversation.createdAt,
+          header: conversation.header,
+        ).toConversationViewData(),
+      );
+    }
+
     conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
@@ -728,7 +758,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             date: conversation.date,
             memberId: conversation.memberId,
             temporaryId: conversation.temporaryId,
-            answer: conversation.date ?? '',
+            answer: DateFormat('dd MMM yyyy').format(
+                DateTime.fromMillisecondsSinceEpoch(
+                    conversation.createdEpoch ?? 0)),
             communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
             createdAt: conversation.createdAt,
             header: conversation.header,
@@ -750,6 +782,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   void _updateDeletedConversation(LMChatConversationViewData conversation) {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
+
+    // Update the deleted conversation
     int index =
         conversationList.indexWhere((element) => element.id == conversation.id);
     if (index != -1) {
@@ -757,10 +791,24 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         deletedByUserId: user.id,
       );
     }
+
+    // Update conversations replying to the deleted conversation
+    for (int i = 0; i < conversationList.length; i++) {
+      if (conversationList[i].replyId == conversation.id ||
+          conversationList[i].replyConversation == conversation.id) {
+        conversationList[i] = conversationList[i].copyWith(
+          replyConversationObject: conversation.copyWith(
+            deletedByUserId: user.id,
+          ),
+        );
+      }
+    }
+
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(conversation.id.toString())) {
-      conversationMeta[conversation.id..toString()]!.deletedByUserId = user.id;
+      conversationMeta[conversation.id.toString()]!.deletedByUserId = user.id;
     }
+
     pagedListController.itemList = conversationList;
     scrollController.animateTo(
       scrollController.position.pixels + 10,
