@@ -44,6 +44,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   late User user;
   int _page = 1;
   int lastConversationId = 0;
+  bool isOtherUserChatbot = false;
 
   ValueNotifier showConversationActions = ValueNotifier(false);
   ValueNotifier rebuildConversationList = ValueNotifier(false);
@@ -75,6 +76,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     scrollController = widget.scrollController ?? ScrollController();
     pagedListController = widget.listController ??
         PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
+    isOtherUserChatbot = widget.chatroomId ==
+        LMChatLocalPreference.instance.getChatroomIdWithAIChatbot();
     _addPaginationListener();
   }
 
@@ -163,6 +166,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
                 const LMChatLoader(),
               ),
               itemBuilder: (context, item, index) {
+                if (item.id == -1) {
+                  return _getChatBotShimmer();
+                }
                 if (item.isTimeStamp != null && item.isTimeStamp! ||
                     item.state != 0 && item.state != null) {
                   final stateMessage = item.state == 1
@@ -410,6 +416,16 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       },
       isSent: false,
       isDM: true,
+      avatar: isOtherUserChatbot
+          ? LMChatProfilePicture(
+              fallbackText: conversation.member!.name,
+              imageUrl: conversation.member!.imageUrl,
+              style: const LMChatProfilePictureStyle(
+                size: 39,
+                boxShape: BoxShape.circle,
+              ),
+            )
+          : null,
       style: LMChatBubbleStyle.basic().copyWith(showHeader: false),
       isSelected: _selectedIds.contains(conversation.id),
       onReactionsTap: () {
@@ -513,6 +529,23 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         )
       ],
     ));
+  }
+
+  Widget _getChatBotShimmer() {
+    return const Padding(
+      padding: EdgeInsets.only(left: 12.0),
+      child: LMChatSkeletonChatBubble(
+        isSent: false,
+      ),
+    );
+  }
+
+  LMChatConversationViewData _getChatBotShimmerConversation() {
+    return (LMChatConversationViewDataBuilder()
+          ..id(-1)
+          ..answer('invisible')
+          ..createdAt(DateFormat('dd MMM yyyy').format(DateTime.now())))
+        .build();
   }
 
   _addPaginationListener() {
@@ -707,6 +740,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
 
     conversationList.insert(0, result);
+    if (isOtherUserChatbot) {
+      conversationList.insert(0, _getChatBotShimmerConversation());
+    }
     if (conversationList.length >= 500) {
       conversationList.removeLast();
     }
@@ -722,6 +758,11 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
+
+    bool isSelf = conversation.memberId == user.id;
+    if (conversationList.first.id == -1 && !isSelf && isOtherUserChatbot) {
+      conversationList.removeAt(0);
+    }
 
     int index = conversationList.indexWhere((element) {
       if (conversation.temporaryId == null || element.temporaryId == null) {
