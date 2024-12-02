@@ -103,29 +103,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     );
   }
 
-  LMChatButton _floatingActionButton() {
-    return LMChatButton(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LMChatExplorePage(),
-          ),
-        );
-      },
-      style: LMChatButtonStyle(
-        backgroundColor: LMChatTheme.theme.backgroundColor,
-        height: 48,
-        width: 48,
-        borderRadius: 12,
-      ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.message,
-        style: LMChatIconStyle(
-          color: LMChatTheme.theme.primaryColor,
-        ),
-      ),
-    );
+  LMChatAIButton _floatingActionButton() {
+    return const LMChatAIButton();
   }
 }

@@ -256,8 +256,9 @@ class LMChatAIButton extends StatelessWidget {
         ),
       ),
       icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: icon ?? Icons.android,
+        type: icon == null ? LMChatIconType.svg : LMChatIconType.icon,
+        icon: icon,
+        assetPath: kChatbotIcon,
         style: LMChatIconStyle(
           color: textColor,
         ),
