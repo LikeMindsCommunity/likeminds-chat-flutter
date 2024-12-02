@@ -135,5 +135,5 @@ bool isOtherUserAIChatbot(LMChatRoomViewData chatroom) {
   }
 
   // Check if the other member has the chatbot role
-  return otherMember?.roles?.contains(LMUserRole.chatbot) ?? false;
+  return otherMember?.roles?.contains(LMChatUserRole.chatbot) ?? false;
 }

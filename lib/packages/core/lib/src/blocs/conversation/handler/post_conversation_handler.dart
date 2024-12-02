@@ -6,7 +6,7 @@ postConversationEventHandler(
   Emitter<LMChatConversationState> emit,
 ) async {
   final DateTime dateTime = DateTime.now();
-  final tempId = "-${DateTime.now().millisecondsSinceEpoch.toString()}";
+  final tempId = "-${dateTime.millisecondsSinceEpoch.toString()}";
   try {
     User user = LMChatLocalPreference.instance.getUser();
     LMChatConversationViewData conversationViewData =

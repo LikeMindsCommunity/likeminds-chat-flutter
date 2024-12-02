@@ -2,17 +2,17 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/sdk_client_info_convertor.dart';
 
-/// Extension to convert between UserRole and LMUserRole
+/// Extension to convert between UserRole and LMChatUserRole
 extension UserRoleConvertor on UserRole {
-  /// Converts UserRole to LMUserRole
-  LMUserRole toLMUserRole() {
-    return LMUserRole.values[index];
+  /// Converts UserRole to LMChatUserRole
+  LMChatUserRole toLMChatUserRole() {
+    return LMChatUserRole.values[index];
   }
 }
 
-/// Extension to convert between LMUserRole and UserRole
-extension LMUserRoleConvertor on LMUserRole {
-  /// Converts LMUserRole to UserRole
+/// Extension to convert between LMChatUserRole and UserRole
+extension LMChatUserRoleConvertor on LMChatUserRole {
+  /// Converts LMChatUserRole to UserRole
   UserRole toUserRole() {
     return UserRole.values[index];
   }
@@ -38,7 +38,7 @@ extension UserViewDataConvertor on User {
       ..state(state)
       ..communityId(communityId)
       ..createdAt(createdAt)
-      ..roles(roles?.map((role) => role.toLMUserRole()).toList());
+      ..roles(roles?.map((role) => role.toLMChatUserRole()).toList());
     return userBuilder.build();
   }
 }

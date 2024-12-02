@@ -2,9 +2,14 @@ import 'package:likeminds_chat_flutter_ui/src/models/sdk/sdk_client_info_view_da
 import 'package:likeminds_chat_flutter_ui/src/models/widget/widget_view_data.dart';
 
 /// Enum representing different roles a user can have
-enum LMUserRole {
+enum LMChatUserRole {
+  /// Represents a chatbot user role
   chatbot,
+
+  /// Represents a regular member user role
   member,
+
+  /// Represents an administrator user role with elevated privileges
   admin,
 }
 
@@ -31,7 +36,7 @@ class LMChatUserViewData {
   String uuid;
 
   /// roles is a list of roles assigned to the user
-  List<LMUserRole>? roles;
+  List<LMChatUserRole>? roles;
 
   /// organisationName is the name of the organisation to which the user belongs
   String? organisationName;
@@ -115,7 +120,7 @@ class LMChatUserViewData {
     int? communityId,
     int? createdAt,
     LMChatWidgetViewData? widget,
-    List<LMUserRole>? roles,
+    List<LMChatUserRole>? roles,
   }) {
     return LMChatUserViewData._(
       id: id ?? this.id,
@@ -161,7 +166,7 @@ class LMChatUserViewDataBuilder {
   int? _communityId;
   int? _createdAt;
   LMChatWidgetViewData? _widget;
-  List<LMUserRole>? _roles;
+  List<LMChatUserRole>? _roles;
 
   /// Sets the id of the user
   void id(int? id) {
@@ -249,7 +254,7 @@ class LMChatUserViewDataBuilder {
   }
 
   /// Sets the roles of the user
-  void roles(List<LMUserRole>? roles) {
+  void roles(List<LMChatUserRole>? roles) {
     _roles = roles;
   }
 
