@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/builder.dart';
@@ -144,8 +145,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       builder: (context, position, _) {
         final DateTime now = DateTime.now();
         final String formattedDate =
-            "${now.day.toString().padLeft(2, '0')} ${_getMonth(now.month)} ${now.year}, "
-            "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+            DateFormat('dd MMM yyyy, HH:mm').format(now);
 
         return LMChatText(
           "${position + 1} of ${mediaList.length} attachments • $formattedDate",
@@ -185,7 +185,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       carouselController: _carouselController,
       itemCount: mediaList.length,
       options: CarouselOptions(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.sizeOf(context).height,
         viewportFraction: 1.0,
         enlargeCenterPage: false,
         enableInfiniteScroll: false,
