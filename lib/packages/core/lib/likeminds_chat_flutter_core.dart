@@ -7,5 +7,6 @@ export 'src/core/configurations/chat_config.dart';
 export 'src/core/configurations/chat_builder.dart';
 export 'src/core/configurations/widget_source.dart';
 export 'src/utils/utils.dart';
+export 'src/widgets/widgets.dart';
 
 const bool isDebug = bool.fromEnvironment('LM_DEBUG_ENV');

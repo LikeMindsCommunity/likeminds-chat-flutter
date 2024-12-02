@@ -46,6 +46,15 @@ class LMChatAIButtonProps {
     this.accessToken,
     this.refreshToken,
   });
+
+  /// Checks if the props are empty.
+  bool isEmpty() {
+    return (apiKey == null || apiKey!.isEmpty) &&
+        (uuid == null || uuid!.isEmpty) &&
+        (userName == null || userName!.isEmpty) &&
+        (imageUrl == null || imageUrl!.isEmpty) &&
+        isGuest == null;
+  }
 }
 
 /// A button widget that provides direct access to AI chatroom functionality.
