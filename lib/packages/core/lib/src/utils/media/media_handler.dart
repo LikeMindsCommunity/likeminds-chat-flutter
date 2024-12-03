@@ -231,16 +231,17 @@ class LMChatMediaHandler {
       allowMultiple: mediaCount == 1 ? false : true,
       type: mediaCount == 1 ? FileType.image : FileType.media,
     );
+    final pickedFiles = list?.files;
 
     List<LMChatMediaModel> attachedMedia = [];
-    if (list != null && list.files.isNotEmpty) {
-      if (mediaCount + pickedMedia.length + list.files.length > 10) {
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      if (pickedFiles.length > 10) {
         return LMResponse(
             success: false,
             errorMessage:
                 'A total of 10 attachments can be added to a message');
       }
-      for (PlatformFile file in list.files) {
+      for (PlatformFile file in pickedFiles) {
         if (checkFileType(file)) {
           // image case
           const double sizeLimit = 5;
