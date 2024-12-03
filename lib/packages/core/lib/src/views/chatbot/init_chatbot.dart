@@ -6,11 +6,11 @@ import 'package:lottie/lottie.dart';
 /// A screen that handles the initialization of an AI chatbot
 /// and navigates to the appropriate chatroom once setup is complete.
 class LMChatAIBotInitiationScreen extends StatefulWidget {
-  /// Custom animation asset path to show during initialization
+  /// Custom Lottie animation JSON asset path to show during initialization
   final String? animationToShow;
 
   /// Text to display during initialization
-  final LMChatText? previewText;
+  final LMChatTextBuilder? previewText;
 
   /// Creates an AI chatbot initialization screen with optional custom animation and preview text
   const LMChatAIBotInitiationScreen({
@@ -118,12 +118,12 @@ class _LMChatAIBotInitiationScreenState
   }
 
   void _navigateToChatroom(int chatroomId) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LMChatroomScreen(chatroomId: chatroomId),
-      ),
-    );
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => LMChatroomScreen(chatroomId: chatroomId),
+    //   ),
+    // );
   }
 
   void _handleError(String? message) {
@@ -151,7 +151,12 @@ class _LMChatAIBotInitiationScreenState
                 widget.animationToShow ?? aiChatbotLoadingAnimation,
               ),
             ),
-            widget.previewText ??
+            widget.previewText?.call(
+                  context,
+                  const LMChatText(
+                    "Setting up AI Chatbot...",
+                  ),
+                ) ??
                 const LMChatText(
                   "Setting up AI Chatbot...",
                 ),
