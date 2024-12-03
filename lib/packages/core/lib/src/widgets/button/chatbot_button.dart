@@ -57,11 +57,8 @@ class LMChatAIButtonProps {
   }
 }
 
-/// A button widget that provides direct access to AI chatroom functionality.
-///
-/// This widget can be configured to use either token-based or API key-based authentication
-/// through the [props] parameter.
-class LMChatAIButton extends StatelessWidget {
+/// Style class for customizing the appearance of [LMChatAIButton]
+class LMChatAIButtonStyle {
   /// The text to be displayed on the button.
   /// Defaults to 'AI Bot' if not provided.
   final String? text;
@@ -90,6 +87,64 @@ class LMChatAIButton extends StatelessWidget {
   /// Defaults to LMChatIconButtonPlacement.start.
   final LMChatIconButtonPlacement iconPlacement;
 
+  const LMChatAIButtonStyle({
+    this.text,
+    this.textSize,
+    this.textColor,
+    this.backgroundColor,
+    this.borderRadius,
+    this.icon,
+    this.iconPlacement = LMChatIconButtonPlacement.start,
+  });
+
+  /// Basic style factory constructor; used as default style
+  factory LMChatAIButtonStyle.basic() {
+    return const LMChatAIButtonStyle(
+      text: 'AI Bot',
+      textSize: 14,
+      textColor: Color(0xFFFFFFFF),
+      backgroundColor: Color(0xFF020D42),
+      borderRadius: 28,
+      iconPlacement: LMChatIconButtonPlacement.start,
+    );
+  }
+
+  /// Creates a copy of this style with the given fields replaced with new values
+  LMChatAIButtonStyle copyWith({
+    String? text,
+    double? textSize,
+    Color? textColor,
+    Color? backgroundColor,
+    double? borderRadius,
+    IconData? icon,
+    LMChatIconButtonPlacement? iconPlacement,
+  }) {
+    return LMChatAIButtonStyle(
+      text: text ?? this.text,
+      textSize: textSize ?? this.textSize,
+      textColor: textColor ?? this.textColor,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      icon: icon ?? this.icon,
+      iconPlacement: iconPlacement ?? this.iconPlacement,
+    );
+  }
+}
+
+/// A button widget that provides direct access to AI chatroom functionality.
+///
+/// This widget can be configured to use either token-based or API key-based authentication
+/// through the [props] parameter.
+class LMChatAIButton extends StatelessWidget {
+  /// The text widget of the button
+  final LMChatText? text;
+
+  /// The icon widget of the button
+  final LMChatIcon? icon;
+
+  /// Style configuration for the button's appearance
+  final LMChatAIButtonStyle? style;
+
   /// Configuration properties for the AI chatbot initialization.
   /// Contains authentication and user information.
   final LMChatAIButtonProps? props;
@@ -100,19 +155,11 @@ class LMChatAIButton extends StatelessWidget {
   /// Callback function that is called when the button is long-pressed.
   final VoidCallback? onLongPress;
 
-  /// Creates a new instance of [LMChatAIButton].
-  ///
-  /// The button can be customized using various style parameters and
-  /// configured for different authentication methods using [props].
   const LMChatAIButton({
     super.key,
-    this.text = 'AI Bot',
-    this.textSize = 14,
-    this.textColor = const Color(0xFFFFFFFF),
-    this.backgroundColor = const Color(0xFF020D42),
-    this.borderRadius = 28,
+    this.text,
     this.icon,
-    this.iconPlacement = LMChatIconButtonPlacement.start,
+    this.style,
     this.props,
     this.onTap,
     this.onLongPress,
@@ -213,6 +260,8 @@ class LMChatAIButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inStyle = style ?? LMChatAIButtonStyle.basic();
+
     return LMChatButton(
       onTap: () async {
         onTap?.call();
@@ -254,30 +303,33 @@ class LMChatAIButton extends StatelessWidget {
         }
       },
       onLongPress: onLongPress,
-      text: LMChatText(
-        text ?? 'AI Bot',
-        style: LMChatTextStyle(
-          textStyle: TextStyle(
-            color: textColor,
-            fontSize: textSize,
-            fontWeight: FontWeight.w500,
+      text: text ??
+          LMChatText(
+            inStyle.text ?? 'AI Bot',
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                color: inStyle.textColor,
+                fontSize: inStyle.textSize,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-        ),
-      ),
-      icon: LMChatIcon(
-        type: icon == null ? LMChatIconType.svg : LMChatIconType.icon,
-        icon: icon,
-        assetPath: kChatbotIcon,
-        style: LMChatIconStyle(
-          color: textColor,
-        ),
-      ),
+      icon: icon ??
+          LMChatIcon(
+            type:
+                inStyle.icon == null ? LMChatIconType.svg : LMChatIconType.icon,
+            icon: inStyle.icon,
+            assetPath: kChatbotIcon,
+            style: LMChatIconStyle(
+              color: inStyle.textColor,
+            ),
+          ),
       style: LMChatButtonStyle(
-        backgroundColor: backgroundColor,
-        borderRadius: borderRadius,
+        backgroundColor: inStyle.backgroundColor,
+        borderRadius: inStyle.borderRadius,
         spacing: 6,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        placement: iconPlacement,
+        placement: inStyle.iconPlacement,
       ),
     );
   }
