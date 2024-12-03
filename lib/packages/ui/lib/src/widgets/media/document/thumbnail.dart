@@ -93,12 +93,21 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
           return AbsorbPointer(
-            absorbing: widget.media.mediaUrl == null,
+            absorbing:
+                widget.media.mediaUrl == null && widget.media.mediaFile == null,
             child: InkWell(
               onTap: () async {
-                if (widget.media.mediaUrl != null) {
-                  Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                  launchUrl(fileUrl, mode: LaunchMode.inAppBrowserView);
+                if (widget.media.mediaUrl != null ||
+                    widget.media.mediaFile != null) {
+                  Uri fileUrl = Uri.parse(
+                    widget.media.mediaUrl ?? widget.media.mediaFile!.path,
+                  );
+                  launchUrl(
+                    fileUrl,
+                    mode: Platform.isIOS
+                        ? LaunchMode.inAppBrowserView
+                        : LaunchMode.externalApplication,
+                  );
                 }
               },
               child: Stack(
