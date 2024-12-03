@@ -369,7 +369,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               : chatroom.type! == 10
                   ? LMChatProfilePicture(
                       imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
-                      fallbackText: chatroom.header,
+                      fallbackText: chatUser?.name ?? chatroom.header,
                       style: LMChatProfilePictureStyle(
                         size: 42,
                         backgroundColor: LMChatTheme.theme.primaryColor,
