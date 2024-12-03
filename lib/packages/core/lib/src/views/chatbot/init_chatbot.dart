@@ -118,12 +118,12 @@ class _LMChatAIBotInitiationScreenState
   }
 
   void _navigateToChatroom(int chatroomId) {
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => LMChatroomScreen(chatroomId: chatroomId),
-    //   ),
-    // );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LMChatroomScreen(chatroomId: chatroomId),
+      ),
+    );
   }
 
   void _handleError(String? message) {
