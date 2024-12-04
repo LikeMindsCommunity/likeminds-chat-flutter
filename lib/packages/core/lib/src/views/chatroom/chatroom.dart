@@ -12,6 +12,7 @@ import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_con
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/report.dart';
@@ -78,6 +79,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   @override
   void initState() {
     super.initState();
+    LMChatRealtime.instance.chatroomId = widget.chatroomId;
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
     _chatroomBloc = LMChatroomBloc.instance
@@ -93,6 +95,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   @override
   void didUpdateWidget(LMChatroomScreen old) {
     super.didUpdateWidget(old);
+    LMChatRealtime.instance.chatroomId = widget.chatroomId;
     Bloc.observer = LMChatBlocObserver();
     currentUser = LMChatLocalPreference.instance.getUser();
     _chatroomBloc = LMChatroomBloc.instance;
@@ -106,6 +109,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void didChangeDependencies() {
+    LMChatRealtime.instance.chatroomId = widget.chatroomId;
     _chatroomBloc = LMChatroomBloc.instance;
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
@@ -343,7 +347,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       style: LMChatAppBarStyle(
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 18),
-        gap: 3.w,
+        gap: 2.6.w,
       ),
       leading: LMChatButton(
         onTap: () {
@@ -389,7 +393,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                       imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
                       fallbackText: chatUser?.name ?? chatroom.header,
                       style: LMChatProfilePictureStyle(
-                        size: 42,
+                        size: 36,
                         backgroundColor: LMChatTheme.theme.primaryColor,
                       ),
                     )
