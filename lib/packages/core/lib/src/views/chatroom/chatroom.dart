@@ -191,6 +191,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     },
                   ),
                 );
+                updateChatBotChatroom();
               }
             },
             builder: (chatroomContext, chatroomState) {
@@ -298,6 +299,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       selectedConversations: _selectedIds,
       scrollController: scrollController,
       listController: pagedListController,
+      isOtherUserAIChatbot: isOtherUserAIChatbot(
+        chatroom.toChatRoomViewData(),
+      ),
     );
   }
 
@@ -812,6 +816,15 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       return false;
     } else {
       return true;
+    }
+  }
+
+  void updateChatBotChatroom() {
+    if (isOtherUserAIChatbot(chatroom.toChatRoomViewData()) &&
+        widget.chatroomId !=
+            LMChatLocalPreference.instance.getChatroomIdWithAIChatbot()) {
+      LMChatLocalPreference.instance
+          .storeChatroomIdWithAIChatbot(widget.chatroomId);
     }
   }
 }

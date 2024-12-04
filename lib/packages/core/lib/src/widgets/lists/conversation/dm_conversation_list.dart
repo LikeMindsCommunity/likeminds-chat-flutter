@@ -20,6 +20,8 @@ class LMChatDMConversationList extends StatefulWidget {
 
   final ValueNotifier<bool>? appBarNotifier;
 
+  final bool? isOtherUserAIChatbot;
+
   final PagingController<int, LMChatConversationViewData>? listController;
 
   /// Creates a new instance of LMChatConversationList
@@ -30,6 +32,7 @@ class LMChatDMConversationList extends StatefulWidget {
     this.selectedConversations,
     this.appBarNotifier,
     this.listController,
+    this.isOtherUserAIChatbot,
   });
 
   @override
@@ -76,8 +79,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     scrollController = widget.scrollController ?? ScrollController();
     pagedListController = widget.listController ??
         PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
-    isOtherUserChatbot = widget.chatroomId ==
-        LMChatLocalPreference.instance.getChatroomIdWithAIChatbot();
+    isOtherUserChatbot = widget.isOtherUserAIChatbot ??
+        widget.chatroomId ==
+            LMChatLocalPreference.instance.getChatroomIdWithAIChatbot();
     _addPaginationListener();
   }
 
