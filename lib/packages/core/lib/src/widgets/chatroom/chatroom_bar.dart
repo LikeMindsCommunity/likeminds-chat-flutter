@@ -1273,6 +1273,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         widget.chatroom.type == 10 && isOtherUserAIChatbot(widget.chatroom);
     final bool showDocuments = !isAIChatbot;
     final bool showPoll = widget.chatroom.type != 10;
+    final bool showGIF = !isAIChatbot;
 
     final List<AttachmentMenuItem> items = [
       AttachmentMenuItem(
@@ -1317,19 +1318,20 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             }
           },
         ),
-      AttachmentMenuItem(
-        icon: Icons.gif_box_outlined,
-        label: 'GIF',
-        onTap: () async {
-          _popupMenuController.hideMenu();
-          final res = await LMChatMediaHandler.instance.pickGIF(context);
-          if (res.data != null) {
-            _navigateToForwarding();
-          } else if (res.errorMessage != null) {
-            toast(res.errorMessage!);
-          }
-        },
-      ),
+      if (showGIF)
+        AttachmentMenuItem(
+          icon: Icons.gif_box_outlined,
+          label: 'GIF',
+          onTap: () async {
+            _popupMenuController.hideMenu();
+            final res = await LMChatMediaHandler.instance.pickGIF(context);
+            if (res.data != null) {
+              _navigateToForwarding();
+            } else if (res.errorMessage != null) {
+              toast(res.errorMessage!);
+            }
+          },
+        ),
       if (showPoll)
         AttachmentMenuItem(
           iconType: LMChatIconType.svg,
