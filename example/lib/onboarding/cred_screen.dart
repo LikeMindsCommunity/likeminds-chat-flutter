@@ -181,6 +181,19 @@ class _CredScreenState extends State<CredScreen> {
                   style: buttonTextStyle,
                 ),
               ),
+              const SizedBox(height: 18),
+              LMChatAIButton(
+                style: LMChatAIButtonStyle.basic().copyWith(
+                  backgroundColor: Colors.white,
+                  textColor: backgroundColor,
+                  borderRadius: 12,
+                ),
+                props: LMChatAIButtonProps(
+                  uuid: _userIdController.text,
+                  userName: _usernameController.text,
+                  apiKey: _apiKeyController.text,
+                ),
+              ),
               const SizedBox(height: 80),
             ],
           ),

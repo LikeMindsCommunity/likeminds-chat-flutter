@@ -6,7 +6,7 @@ postConversationEventHandler(
   Emitter<LMChatConversationState> emit,
 ) async {
   final DateTime dateTime = DateTime.now();
-  final tempId = dateTime.toString();
+  final tempId = "-${dateTime.millisecondsSinceEpoch.toString()}";
   try {
     User user = LMChatLocalPreference.instance.getUser();
     LMChatConversationViewData conversationViewData =
@@ -16,11 +16,11 @@ postConversationEventHandler(
               ..createdAt("")
               ..memberId(user.id)
               ..header("")
-              ..date("${dateTime.day} ${dateTime.month} ${dateTime.year}")
+              ..date(DateFormat('dd MMM yyyy').format(dateTime))
+              ..attachmentsUploaded(false)
               ..replyId(event.replyId)
-              ..attachmentCount(event.attachmentCount)
               ..replyConversationObject(event.repliedTo)
-              ..hasFiles(event.hasFiles)
+              ..hasFiles(event.hasFiles ?? false)
               ..member(user.toUserViewData())
               ..temporaryId(tempId)
               ..createdEpoch(dateTime.millisecondsSinceEpoch)
@@ -34,6 +34,8 @@ postConversationEventHandler(
           ..chatroomId(event.chatroomId)
           ..text(event.text)
           ..replyId(event.replyId)
+          ..triggerBot(event.triggerBot ?? false)
+          ..hasFiles(event.hasFiles ?? false)
           ..temporaryId(tempId);
     if (event.replyId == null &&
         event.shareLink != null &&

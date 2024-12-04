@@ -822,8 +822,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
-    int index = conversationList.indexWhere(
-        (element) => element.temporaryId == conversation.temporaryId);
+    int index = conversationList.indexWhere((element) {
+      if (conversation.temporaryId == null || element.temporaryId == null) {
+        return element.id == conversation.id;
+      }
+      return element.temporaryId == conversation.temporaryId;
+    });
     if (pagedListController.itemList != null &&
         (conversation.replyId != null ||
             conversation.replyConversation != null) &&

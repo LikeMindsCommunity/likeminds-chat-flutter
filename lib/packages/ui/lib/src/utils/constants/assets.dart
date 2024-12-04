@@ -9,3 +9,7 @@ const String kTickIcon =
 /// document icon path
 const String kDocumentIcon =
     'packages/likeminds_chat_flutter_ui/assets/icons/document.svg';
+
+/// chatbot icon path
+const String kChatbotIcon =
+    'packages/likeminds_chat_flutter_ui/assets/icons/chatbot.svg';

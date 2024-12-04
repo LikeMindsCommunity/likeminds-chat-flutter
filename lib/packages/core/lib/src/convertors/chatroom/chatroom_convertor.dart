@@ -1,5 +1,6 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 
 extension ChatRoomViewDataConvertor on ChatRoom {
   LMChatRoomViewData toChatRoomViewData() {
@@ -42,7 +43,7 @@ extension ChatRoomViewDataConvertor on ChatRoom {
           ..isPrivateMember(isPrivateMember)
           ..isSecret(isSecret)
           ..isTagged(isTagged)
-          // ..member(member)
+          ..member(member?.toUserViewData())
           // ..topic(topic)
           ..muteStatus(muteStatus)
           ..onlineLinkEnableBefore(onlineLinkEnableBefore)
@@ -65,7 +66,7 @@ extension ChatRoomViewDataConvertor on ChatRoom {
           ..chatRequestState(chatRequestState)
           // ..chatRequestedBy(chatRequestedBy)
           ..chatRequestedById(chatRequestedById)
-          // ..chatroomWithUser(chatroomWithUser)
+          ..chatroomWithUser(chatroomWithUser?.toUserViewData())
           ..chatroomWithUserId(chatroomWithUserId)
           ..userId(userId)
           // ..lastResponseMembers(lastResponseMembers)
@@ -77,7 +78,6 @@ extension ChatRoomViewDataConvertor on ChatRoom {
 
 extension ChatRoomConvertor on LMChatRoomViewData {
   ChatRoom toChatRoom() {
-   
     return ChatRoom(
       access: access,
       answerText: answerText,
@@ -116,7 +116,7 @@ extension ChatRoomConvertor on LMChatRoomViewData {
       isPrivateMember: isPrivateMember,
       isSecret: isSecret,
       isTagged: isTagged,
-      // member: member, //TODO: implement this
+      member: member?.toUser(),
       // topic: topic, //TODO: implement this
       muteStatus: muteStatus,
       onlineLinkEnableBefore: onlineLinkEnableBefore,
@@ -139,7 +139,7 @@ extension ChatRoomConvertor on LMChatRoomViewData {
       chatRequestState: chatRequestState,
       // chatRequestedBy: chatRequestedBy,//TODO: implement this
       chatRequestedById: chatRequestedById,
-      // chatroomWithUser: chatroomWithUser,//TODO: implement this
+      chatroomWithUser: chatroomWithUser?.toUser(),
       chatroomWithUserId: chatroomWithUserId,
       userId: userId,
       // lastResponseMembers: lastResponseMembers,//TODO: implement this

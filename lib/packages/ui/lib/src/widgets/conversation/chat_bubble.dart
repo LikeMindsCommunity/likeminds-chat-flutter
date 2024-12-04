@@ -538,7 +538,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                                 attachments:
                                                     widget.attachments ?? [],
                                                 count: conversation
-                                                        .attachmentCount ??
+                                                        .attachments?.length ??
                                                     0,
                                                 attachmentUploaded: conversation
                                                         .attachmentsUploaded ??
@@ -557,7 +557,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                               attachments:
                                                   widget.attachments ?? [],
                                               count: conversation
-                                                      .attachmentCount ??
+                                                      .attachments?.length ??
                                                   0,
                                               attachmentUploaded: conversation
                                                       .attachmentsUploaded ??

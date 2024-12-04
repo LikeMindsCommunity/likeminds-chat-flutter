@@ -128,11 +128,14 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     return _screenBuilder.scaffold(
       resizeToAvoidBottomInset: true,
       onPopInvoked: (p) {
-        LMChatCoreAudioHandler.instance.stopAudio();
-        LMChatCoreAudioHandler.instance.stopRecording();
         _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
           chatroomId: chatroom.id,
         ));
+        if (LMChatCoreAudioHandler.instance.player.isPlaying ||
+            LMChatCoreAudioHandler.instance.recorder.isRecording) {
+          LMChatCoreAudioHandler.instance.stopAudio();
+          LMChatCoreAudioHandler.instance.stopRecording();
+        }
       },
       backgroundColor: LMChatTheme.theme.backgroundColor,
       floatingActionButton: ValueListenableBuilder(
@@ -188,6 +191,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                     },
                   ),
                 );
+                updateChatBotChatroom();
               }
             },
             builder: (chatroomContext, chatroomState) {
@@ -295,6 +299,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       selectedConversations: _selectedIds,
       scrollController: scrollController,
       listController: pagedListController,
+      isOtherUserAIChatbot: isOtherUserAIChatbot(
+        chatroom.toChatRoomViewData(),
+      ),
     );
   }
 
@@ -366,7 +373,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               : chatroom.type! == 10
                   ? LMChatProfilePicture(
                       imageUrl: chatUser?.imageUrl ?? chatroom.chatroomImageUrl,
-                      fallbackText: chatroom.header,
+                      fallbackText: chatUser?.name ?? chatroom.header,
                       style: LMChatProfilePictureStyle(
                         size: 42,
                         backgroundColor: LMChatTheme.theme.primaryColor,
@@ -411,21 +418,23 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               },
             )
           : const SizedBox.shrink(),
-      trailing: [
-        ValueListenableBuilder(
-            valueListenable: rebuildAppBar,
-            builder: (context, _, __) {
-              return isAnyMessageSelected()
-                  ? Row(
-                      children: _defaultSelectedChatroomMenu(),
-                    )
-                  : _screenBuilder.chatroomMenu(
-                      context,
-                      actions,
-                      _defaultChatroomMenu(),
-                    );
-            }),
-      ],
+      trailing: isOtherUserAIChatbot(chatroom.toChatRoomViewData())
+          ? []
+          : [
+              ValueListenableBuilder(
+                  valueListenable: rebuildAppBar,
+                  builder: (context, _, __) {
+                    return isAnyMessageSelected()
+                        ? Row(
+                            children: _defaultSelectedChatroomMenu(),
+                          )
+                        : _screenBuilder.chatroomMenu(
+                            context,
+                            actions,
+                            _defaultChatroomMenu(),
+                          );
+                  }),
+            ],
     );
   }
 
@@ -807,6 +816,15 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       return false;
     } else {
       return true;
+    }
+  }
+
+  void updateChatBotChatroom() {
+    if (isOtherUserAIChatbot(chatroom.toChatRoomViewData()) &&
+        widget.chatroomId !=
+            LMChatLocalPreference.instance.getChatroomIdWithAIChatbot()) {
+      LMChatLocalPreference.instance
+          .storeChatroomIdWithAIChatbot(widget.chatroomId);
     }
   }
 }
