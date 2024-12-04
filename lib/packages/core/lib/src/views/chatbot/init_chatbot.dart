@@ -147,7 +147,7 @@ class _LMChatAIBotInitiationScreenState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              child: Lottie.asset(
+              child: Lottie.network(
                 widget.animationToShow ?? aiChatbotLoadingAnimation,
               ),
             ),
