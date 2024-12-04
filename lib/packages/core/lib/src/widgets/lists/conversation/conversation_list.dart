@@ -184,9 +184,13 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     return LMChatStateBubble(
       message: message,
       style: LMChatTheme.theme.stateBubbleStyle.copyWith(
+        backgroundColor: const Color(0xffacb7c0),
         messageStyle: LMChatTextStyle.basic().copyWith(
           maxLines: 2,
-          textStyle: const TextStyle(fontSize: 12),
+          textStyle: TextStyle(
+            fontSize: 12,
+            color: LMChatTheme.theme.container,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
