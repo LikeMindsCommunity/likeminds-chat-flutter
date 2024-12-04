@@ -195,18 +195,21 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       ),
       itemBuilder: (context, index, realIndex) {
         final media = mediaList[index];
-        return Center(
-          child: media.mediaType == LMChatMediaType.image
-              ? _screenBuilder.image(
-                  context,
-                  _buildImageWidget(media),
-                  media,
-                )
-              : _screenBuilder.video(
-                  context,
-                  _buildVideoWidget(media),
-                  media,
-                ),
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 2.h),
+          child: Center(
+            child: media.mediaType == LMChatMediaType.image
+                ? _screenBuilder.image(
+                    context,
+                    _buildImageWidget(media),
+                    media,
+                  )
+                : _screenBuilder.video(
+                    context,
+                    _buildVideoWidget(media),
+                    media,
+                  ),
+          ),
         );
       },
     );
