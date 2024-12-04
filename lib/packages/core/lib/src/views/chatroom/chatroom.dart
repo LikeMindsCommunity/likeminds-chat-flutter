@@ -414,21 +414,23 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               },
             )
           : const SizedBox.shrink(),
-      trailing: [
-        ValueListenableBuilder(
-            valueListenable: rebuildAppBar,
-            builder: (context, _, __) {
-              return isAnyMessageSelected()
-                  ? Row(
-                      children: _defaultSelectedChatroomMenu(),
-                    )
-                  : _screenBuilder.chatroomMenu(
-                      context,
-                      actions,
-                      _defaultChatroomMenu(),
-                    );
-            }),
-      ],
+      trailing: isOtherUserAIChatbot(chatroom.toChatRoomViewData())
+          ? []
+          : [
+              ValueListenableBuilder(
+                  valueListenable: rebuildAppBar,
+                  builder: (context, _, __) {
+                    return isAnyMessageSelected()
+                        ? Row(
+                            children: _defaultSelectedChatroomMenu(),
+                          )
+                        : _screenBuilder.chatroomMenu(
+                            context,
+                            actions,
+                            _defaultChatroomMenu(),
+                          );
+                  }),
+            ],
     );
   }
 
