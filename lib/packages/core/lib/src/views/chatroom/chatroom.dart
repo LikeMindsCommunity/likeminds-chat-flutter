@@ -266,6 +266,20 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                             ),
                           );
                         }),
+                    if (isOtherUserAIChatbot(chatroom.toChatRoomViewData()))
+                      LMChatText(
+                        "AI may make mistakes",
+                        style: LMChatTextStyle(
+                          padding: const EdgeInsets.only(
+                            bottom: 10,
+                            top: 6,
+                          ),
+                          textStyle: TextStyle(
+                            color:
+                                LMChatTheme.theme.onContainer.withOpacity(0.6),
+                          ),
+                        ),
+                      )
                   ],
                 );
               }

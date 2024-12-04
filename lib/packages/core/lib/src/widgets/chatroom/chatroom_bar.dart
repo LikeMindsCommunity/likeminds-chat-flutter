@@ -372,7 +372,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                     left: 2.w,
                     right: 2.w,
                     top: 1.5.h,
-                    bottom: 1.5.h,
+                    bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : 1.5.h,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
