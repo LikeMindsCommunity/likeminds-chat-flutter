@@ -109,11 +109,14 @@ class _LMChatbotHomeScreenState extends State<LMChatbotHomeScreen> {
           );
         },
       ),
-      floatingActionButton: LMChatAIButton(
-        props: LMChatAIButtonProps(
-          apiKey: widget.apiKey,
-          uuid: widget.uuid,
-          userName: widget.userName,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 12, bottom: 12),
+        child: LMChatAIButton(
+          props: LMChatAIButtonProps(
+            apiKey: widget.apiKey,
+            uuid: widget.uuid,
+            userName: widget.userName,
+          ),
         ),
       ),
     );

@@ -71,6 +71,15 @@ class LMChatAIButtonStyle {
   /// Defaults to white (0xFFFFFFFF) if not provided.
   final Color? textColor;
 
+  /// The height of the button in logical pixels.
+  final double? height;
+
+  /// The width of the button in logical pixels.
+  final double? width;
+
+  /// The padding of the button in logical pixels.
+  final EdgeInsets? padding;
+
   /// The background color of the button.
   /// Defaults to dark blue (0xFF020D42) if not provided.
   final Color? backgroundColor;
@@ -93,15 +102,18 @@ class LMChatAIButtonStyle {
     this.textColor,
     this.backgroundColor,
     this.borderRadius,
+    this.height,
+    this.width,
     this.icon,
     this.iconPlacement = LMChatIconButtonPlacement.start,
+    this.padding,
   });
 
   /// Basic style factory constructor; used as default style
   factory LMChatAIButtonStyle.basic() {
     return const LMChatAIButtonStyle(
       text: 'AI Bot',
-      textSize: 14,
+      textSize: 16,
       textColor: Color(0xFFFFFFFF),
       backgroundColor: Color(0xFF020D42),
       borderRadius: 28,
@@ -328,7 +340,10 @@ class LMChatAIButton extends StatelessWidget {
         backgroundColor: inStyle.backgroundColor,
         borderRadius: inStyle.borderRadius,
         spacing: 6,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        height: inStyle.height,
+        width: inStyle.width,
+        padding: inStyle.padding ??
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         placement: inStyle.iconPlacement,
       ),
     );
