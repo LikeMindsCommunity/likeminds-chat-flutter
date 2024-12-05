@@ -7,6 +7,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/poll_handler.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:intl/intl.dart';
 
 class LMChatConversationList extends StatefulWidget {
   final int chatroomId;
@@ -102,7 +103,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           bloc: _convActionBloc,
           listener: (context, state) {
             if (state is LMChatConversationDelete) {
-              _updateDeletedConversation(state.conversations.first);
+              for (LMChatConversationViewData conversation
+                  in state.conversations) {
+                _updateDeletedConversation(conversation);
+              }
             }
             if (state is LMChatConversationEdited) {
               _updateEditedConversation(state.conversationViewData);
@@ -180,9 +184,13 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     return LMChatStateBubble(
       message: message,
       style: LMChatTheme.theme.stateBubbleStyle.copyWith(
+        backgroundColor: const Color(0xffacb7c0),
         messageStyle: LMChatTextStyle.basic().copyWith(
           maxLines: 2,
-          textStyle: const TextStyle(fontSize: 12),
+          textStyle: TextStyle(
+            fontSize: 12,
+            color: LMChatTheme.theme.container,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -750,6 +758,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
+    // Handle reply conversation logic
     if (pagedListController.itemList != null &&
         conversation.replyId != null &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
@@ -771,6 +780,35 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
+
+    // Check if we need to add a timestamp message
+    if (conversationList.isNotEmpty &&
+        conversationList.first.date != conversation.date) {
+      // Add timestamp message before the new conversation
+      conversationList.insert(
+        0,
+        Conversation(
+          isTimeStamp: true,
+          id: 1,
+          hasFiles: false,
+          attachmentCount: 0,
+          attachmentsUploaded: false,
+          createdEpoch: conversation.createdEpoch,
+          chatroomId: widget.chatroomId,
+          date: conversation.date,
+          memberId: conversation.memberId,
+          temporaryId: conversation.temporaryId,
+          answer: DateFormat('dd MMM yyyy').format(
+              DateTime.fromMillisecondsSinceEpoch(
+                  conversation.createdEpoch ?? 0)),
+          communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
+          createdAt: conversation.createdAt,
+          header: conversation.header,
+        ).toConversationViewData(),
+      );
+    }
+
+    // Add the actual conversation
     conversationList.insert(0, result);
     if (conversationList.length >= 500) {
       conversationList.removeLast();
@@ -788,8 +826,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
 
-    int index = conversationList.indexWhere(
-        (element) => element.temporaryId == conversation.temporaryId);
+    int index = conversationList.indexWhere((element) {
+      if (conversation.temporaryId == null || element.temporaryId == null) {
+        return element.id == conversation.id;
+      }
+      return element.temporaryId == conversation.temporaryId;
+    });
     if (pagedListController.itemList != null &&
         (conversation.replyId != null ||
             conversation.replyConversation != null) &&
@@ -829,7 +871,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             date: conversation.date,
             memberId: conversation.memberId,
             temporaryId: conversation.temporaryId,
-            answer: conversation.date ?? '',
+            answer: DateFormat('dd MMM yyyy').format(
+                DateTime.fromMillisecondsSinceEpoch(
+                    conversation.createdEpoch ?? 0)),
             communityId: LMChatLocalPreference.instance.getCommunityData()!.id,
             createdAt: conversation.createdAt,
             header: conversation.header,
@@ -852,6 +896,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   void _updateDeletedConversation(LMChatConversationViewData conversation) {
     List<LMChatConversationViewData> conversationList =
         pagedListController.itemList ?? <LMChatConversationViewData>[];
+
+    // Update the deleted conversation
     int index =
         conversationList.indexWhere((element) => element.id == conversation.id);
     if (index != -1) {
@@ -859,10 +905,24 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         deletedByUserId: user.id,
       );
     }
+
+    // Update conversations replying to the deleted conversation
+    for (int i = 0; i < conversationList.length; i++) {
+      if (conversationList[i].replyId == conversation.id ||
+          conversationList[i].replyConversation == conversation.id) {
+        conversationList[i] = conversationList[i].copyWith(
+          replyConversationObject: conversation.copyWith(
+            deletedByUserId: user.id,
+          ),
+        );
+      }
+    }
+
     if (conversationMeta.isNotEmpty &&
         conversationMeta.containsKey(conversation.id.toString())) {
       conversationMeta[conversation.id.toString()]!.deletedByUserId = user.id;
     }
+
     pagedListController.itemList = conversationList;
     scrollController.animateTo(
       scrollController.position.pixels + 10,

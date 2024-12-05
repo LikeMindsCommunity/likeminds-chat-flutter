@@ -43,3 +43,8 @@
 ### 0.10.0
 
 - Added support for voice notes
+
+### 0.11.0
+
+- Added support for chatbot
+- Added support for custom user roles

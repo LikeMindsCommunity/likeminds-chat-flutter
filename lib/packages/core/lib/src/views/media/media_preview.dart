@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 /// {@template lm_chat_media_preview_screen}
 /// A screen to preview media before adding attachments to a conversation
@@ -17,10 +19,14 @@ class LMChatMediaPreviewScreen extends StatefulWidget {
   /// required conversation object to fetch media and title
   final LMChatConversationViewData? conversation;
 
+  /// Controls whether to show the preview bar at the bottom
+  final bool showPreview;
+
   /// {@macro lm_chat_media_preview_screen}
   const LMChatMediaPreviewScreen({
     super.key,
     this.conversation,
+    this.showPreview = false,
   });
 
   @override
@@ -29,10 +35,9 @@ class LMChatMediaPreviewScreen extends StatefulWidget {
 }
 
 class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
-  int currPosition = 0;
+  late ValueNotifier<int> _currentPosition;
   List<LMChatMediaModel> mediaList = [];
-
-  ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
+  late CarouselSliderController _carouselController;
 
   final LMChatMediaPreviewBuilderDelegate _screenBuilder =
       LMChatCore.config.mediaPreviewConfig.builder;
@@ -41,6 +46,14 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   void initState() {
     super.initState();
     mediaList = LMChatMediaHandler.instance.pickedMedia;
+    _currentPosition = ValueNotifier<int>(0);
+    _carouselController = CarouselSliderController();
+  }
+
+  @override
+  void dispose() {
+    _currentPosition.dispose();
+    super.dispose();
   }
 
   @override
@@ -66,27 +79,29 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         context,
         _defAppBar(),
         LMChatMediaHandler.instance.pickedMedia.length,
-        currPosition,
+        _currentPosition.value,
       ),
       body: ValueListenableBuilder(
-        valueListenable: rebuildCurr,
+        valueListenable: _currentPosition,
         builder: (context, _, __) {
           return getMediaPreview();
         },
       ),
-      bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: rebuildCurr,
-        builder: (context, _, __) {
-          return (mediaList.isNotEmpty)
-              ? _screenBuilder.mediaPreviewBuilder(
-                  context,
-                  LMChatMediaHandler.instance.pickedMedia.copy(),
-                  currPosition,
-                  _defPreviewBar(),
-                )
-              : const SizedBox.shrink();
-        },
-      ),
+      bottomNavigationBar: widget.showPreview
+          ? ValueListenableBuilder(
+              valueListenable: _currentPosition,
+              builder: (context, _, __) {
+                return (mediaList.isNotEmpty)
+                    ? _screenBuilder.mediaPreviewBuilder(
+                        context,
+                        LMChatMediaHandler.instance.pickedMedia.copy(),
+                        _currentPosition.value,
+                        _defPreviewBar(),
+                      )
+                    : const SizedBox.shrink();
+              },
+            )
+          : null,
     );
   }
 
@@ -104,7 +119,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         },
         icon: const LMChatIcon(
           type: LMChatIconType.icon,
-          icon: Icons.cancel_outlined,
+          icon: Icons.arrow_back,
         ),
       ),
       title: LMChatText(
@@ -120,45 +135,84 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
               ?.copyWith(fontWeight: FontWeight.w500),
         ),
       ),
-      subtitle: ValueListenableBuilder(
-        valueListenable: rebuildCurr,
-        builder: (c, x, s) {
-          return LMChatText(
-            "${currPosition + 1} of ${mediaList.length} attachments",
-            style: LMChatTextStyle(
-              maxLines: 1,
-              textStyle: Theme.of(context).textTheme.bodySmall,
-            ),
-          );
-        },
-      ),
+      subtitle: _buildAppBarSubtitle(),
     );
   }
 
-  Widget getMediaPreview() {
-    // Updated to handle single attachment preview
-    if (mediaList.isNotEmpty) {
-      if (mediaList.first.mediaType == LMChatMediaType.image ||
-          mediaList.first.mediaType == LMChatMediaType.video) {
-        return Center(
-          child: mediaList[currPosition].mediaType == LMChatMediaType.image
-              ? _screenBuilder.image(
-                  context,
-                  _defImage(),
-                  mediaList[currPosition],
-                )
-              : Padding(
-                  padding: EdgeInsets.symmetric(vertical: 2.h),
-                  child: _screenBuilder.video(
-                    context,
-                    _defVideo(),
-                    mediaList[currPosition],
-                  ),
-                ),
+  Widget _buildAppBarSubtitle() {
+    return ValueListenableBuilder(
+      valueListenable: _currentPosition,
+      builder: (context, position, _) {
+        final DateTime now = DateTime.now();
+        final String formattedDate =
+            DateFormat('dd MMM yyyy, HH:mm').format(now);
+
+        return LMChatText(
+          "${position + 1} of ${mediaList.length} attachments • $formattedDate",
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: Theme.of(context).textTheme.bodySmall,
+          ),
         );
-      }
+      },
+    );
+  }
+
+  String _getMonth(int month) {
+    const List<String> months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return months[month - 1];
+  }
+
+  Widget getMediaPreview() {
+    if (mediaList.isEmpty) {
+      return const SizedBox();
     }
-    return const SizedBox();
+
+    return CarouselSlider.builder(
+      carouselController: _carouselController,
+      itemCount: mediaList.length,
+      options: CarouselOptions(
+        height: MediaQuery.sizeOf(context).height,
+        viewportFraction: 1.0,
+        enlargeCenterPage: false,
+        enableInfiniteScroll: false,
+        onPageChanged: (index, reason) {
+          _currentPosition.value = index;
+        },
+      ),
+      itemBuilder: (context, index, realIndex) {
+        final media = mediaList[index];
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 2.h),
+          child: Center(
+            child: media.mediaType == LMChatMediaType.image
+                ? _screenBuilder.image(
+                    context,
+                    _buildImageWidget(media),
+                    media,
+                  )
+                : _screenBuilder.video(
+                    context,
+                    _buildVideoWidget(media),
+                    media,
+                  ),
+          ),
+        );
+      },
+    );
   }
 
   Container _defPreviewBar() {
@@ -189,49 +243,56 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       padding: EdgeInsets.zero,
       itemCount: mediaList.length,
       scrollDirection: Axis.horizontal,
-      itemBuilder: (context, index) => GestureDetector(
-        onTap: () {
-          currPosition = index;
-          rebuildCurr.value = !rebuildCurr.value;
+      itemBuilder: (context, index) => ValueListenableBuilder(
+        valueListenable: _currentPosition,
+        builder: (context, currentPos, _) {
+          return GestureDetector(
+            onTap: () {
+              _carouselController.animateToPage(
+                index,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 3.0),
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                border: currentPos == index
+                    ? Border.all(
+                        color: LMChatTheme.theme.secondaryColor,
+                        width: 2.0,
+                        strokeAlign: BorderSide.strokeAlignOutside,
+                      )
+                    : null,
+              ),
+              width: 15.w,
+              height: 15.w,
+              child: mediaList[index].mediaType == LMChatMediaType.image
+                  ? _buildThumbnailImage(mediaList[index])
+                  : _buildThumbnailVideo(mediaList[index]),
+            ),
+          );
         },
-        child: Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 3.0,
-          ),
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              border: currPosition == index
-                  ? Border.all(
-                      color: LMChatTheme.theme.secondaryColor,
-                      width: 2.0,
-                      strokeAlign: BorderSide.strokeAlignOutside,
-                    )
-                  : null),
-          width: 15.w,
-          height: 15.w,
-          child: mediaList[index].mediaType == LMChatMediaType.image
-              ? _defImageThumbnail(index)
-              : _defVideoThumbnail(index),
-        ),
       ),
     );
   }
 
-  LMChatImage _defImage() {
+  LMChatImage _buildImageWidget(LMChatMediaModel media) {
     return LMChatImage(
-      imageUrl: mediaList[currPosition].mediaUrl,
-      imageFile: mediaList[currPosition].mediaFile,
+      imageUrl: media.mediaUrl,
+      imageFile: media.mediaFile,
       style: const LMChatImageStyle(
         boxFit: BoxFit.cover,
       ),
     );
   }
 
-  LMChatImage _defImageThumbnail(int index) {
+  LMChatImage _buildThumbnailImage(LMChatMediaModel media) {
     return LMChatImage(
-      imageUrl: mediaList[index].thumbnailUrl ?? mediaList[index].mediaUrl,
-      imageFile: mediaList[index].thumbnailFile ?? mediaList[index].mediaFile,
+      imageUrl: media.thumbnailUrl ?? media.mediaUrl,
+      imageFile: media.thumbnailFile ?? media.mediaFile,
       style: LMChatImageStyle(
         boxFit: BoxFit.cover,
         borderRadius: BorderRadius.circular(8.0),
@@ -240,20 +301,20 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     );
   }
 
-  LMChatVideo _defVideo() => LMChatVideo(
-        media: mediaList[currPosition],
-        key: ObjectKey(mediaList[currPosition].hashCode),
+  LMChatVideo _buildVideoWidget(LMChatMediaModel media) => LMChatVideo(
+        media: media,
+        key: ObjectKey(media.hashCode),
       );
 
-  Widget _defVideoThumbnail(int index) {
+  Widget _buildThumbnailVideo(LMChatMediaModel media) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: Stack(
         alignment: Alignment.center,
         children: [
           LMChatImage(
-            imageUrl: mediaList[index].thumbnailUrl,
-            imageFile: mediaList[index].thumbnailFile,
+            imageUrl: media.thumbnailUrl,
+            imageFile: media.thumbnailFile,
             style: const LMChatImageStyle(
               boxFit: BoxFit.fill,
             ),

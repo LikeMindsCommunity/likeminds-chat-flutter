@@ -390,21 +390,30 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     return GestureDetector(
       onLongPress: () {
         if (_isDeleted) return;
-        _isSelected = !_isSelected;
-        widget.onLongPress?.call(_isSelected, this);
-        reactionBarController.showMenu();
+        // Only handle long press if not already selected
+        if (!_isSelected) {
+          setState(() {
+            _isSelected = true;
+          });
+          widget.onLongPress?.call(_isSelected, this);
+          reactionBarController.showMenu();
+        }
       },
       onTap: () {
         if (_isDeleted) return;
-        if (_isSelected) {
-          _isSelected = false;
-          widget.onTap?.call(_isSelected, this);
-        } else {
-          if (widget.isSelectableOnTap?.call() ?? false) {
-            _isSelected = !_isSelected;
+
+        setState(() {
+          if (_isSelected) {
+            _isSelected = false;
             widget.onTap?.call(_isSelected, this);
+          } else {
+            // Only allow selection on tap if explicitly enabled
+            if (widget.isSelectableOnTap?.call() ?? false) {
+              _isSelected = true;
+              widget.onTap?.call(_isSelected, this);
+            }
           }
-        }
+        });
       },
       child: Stack(
         children: [
@@ -415,14 +424,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       const Color.fromRGBO(0, 96, 86, 0.3)
                   : null,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.6.h),
+            padding: EdgeInsets.symmetric(horizontal: 1.8.w, vertical: 0.6.h),
             child: Row(
               mainAxisAlignment:
                   isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 if (!isSent) widget.avatar ?? const SizedBox(),
-                const SizedBox(width: 6),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -452,14 +460,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ? EdgeInsets.only(
                                     top: _isDeleted ? 0.8.h : 1.h,
                                     bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 2.w,
-                                    right: 4.w,
+                                    left: 3.w,
+                                    right: 5.w,
                                   )
                                 : EdgeInsets.only(
                                     top: _isDeleted ? 0.8.h : 1.h,
                                     bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 4.w,
-                                    right: 2.w,
+                                    left: 5.w,
+                                    right: 3.w,
                                   ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +537,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                                 attachments:
                                                     widget.attachments ?? [],
                                                 count: conversation
-                                                        .attachmentCount ??
+                                                        .attachments?.length ??
                                                     0,
                                                 attachmentUploaded: conversation
                                                         .attachmentsUploaded ??
@@ -548,7 +556,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                               attachments:
                                                   widget.attachments ?? [],
                                               count: conversation
-                                                      .attachmentCount ??
+                                                      .attachments?.length ??
                                                   0,
                                               attachmentUploaded: conversation
                                                       .attachmentsUploaded ??
@@ -596,7 +604,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 if (conversation.deletedByUserId == null &&
                                     inStyle.showFooter == true)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 2.0),
+                                    padding: const EdgeInsets.only(top: 4.0),
                                     child: kAttachmentTypeVoiceNote ==
                                             widget.attachments?.first.type
                                         ? ValueListenableBuilder<Duration>(
@@ -666,7 +674,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         ),
                   ],
                 ),
-                const SizedBox(width: 6),
                 if (isSent) widget.avatar ?? const SizedBox(),
               ],
             ),
@@ -864,8 +871,16 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   // Update the duration handler to use ValueNotifier
   void _handleVoiceNoteDurationUpdate(Duration duration) {
-    // Only update if the duration is greater than zero to avoid resetting to 0
-    if (duration.inSeconds > 0) {
+    // If duration is 0, reset to initial duration from metadata
+    if (duration.inSeconds == 0) {
+      final initialDuration = Duration(
+        seconds: int.tryParse(
+              widget.attachments?.first.meta?["duration"]?.toString() ?? "0",
+            ) ??
+            0,
+      );
+      _voiceNoteDurationNotifier.value = initialDuration;
+    } else {
       _voiceNoteDurationNotifier.value = duration;
     }
   }

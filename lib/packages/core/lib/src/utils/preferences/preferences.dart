@@ -1,4 +1,3 @@
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
 /// [LMChatLocalPreference] is responsible for handling the local preferences of the chat.
@@ -79,6 +78,17 @@ class LMChatLocalPreference {
   /// This function is used to clear the community data from the local preferences.
   Future<void> clearCommunityData() async {
     await LMChatCore.instance.lmChatClient.deleteCommunity();
+  }
+
+  /// This function is used to store the chatroom id with AI chatbot in the local preferences.
+  Future<void> storeChatroomIdWithAIChatbot(int chatroomId) async {
+    await LMChatCore.instance.lmChatClient
+        .setChatroomIdWithAIChatbot(chatroomId);
+  }
+
+  /// This function is used to fetch the chatroom id with AI chatbot from the local preferences.
+  int? getChatroomIdWithAIChatbot() {
+    return LMChatCore.instance.lmChatClient.getChatroomIdWithAIChatbot().data;
   }
 
   /// This function is used to store the cache data in the local preferences.

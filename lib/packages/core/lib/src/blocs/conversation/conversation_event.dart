@@ -70,6 +70,9 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
   /// Has files of the conversation
   final bool? hasFiles;
 
+  /// Trigger bot of the conversation
+  final bool? triggerBot;
+
   /// Creates and returns a new instance of [LMChatPostConversationEvent]
   LMChatPostConversationEvent({
     required this.chatroomId,
@@ -79,6 +82,7 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
     this.shareLink,
     this.attachmentCount,
     this.hasFiles,
+    this.triggerBot,
   });
 
   @override
@@ -90,6 +94,7 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
         shareLink,
         attachmentCount,
         hasFiles,
+        triggerBot,
       ];
 }
 

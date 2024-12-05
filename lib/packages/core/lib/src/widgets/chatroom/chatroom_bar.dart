@@ -359,11 +359,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // OverlayPortal(
-        //   controller: _overlayPortalController,
-        //   overlayChildBuilder: (context) => _defVoiceOverlayLayout(context),
-        // ),
-        // Existing UI components
         BlocConsumer<LMChatConversationActionBloc,
             LMChatConversationActionState>(
           bloc: chatActionBloc,
@@ -377,7 +372,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                     left: 2.w,
                     right: 2.w,
                     top: 1.5.h,
-                    bottom: 1.5.h,
+                    bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : 1.5.h,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -403,14 +398,13 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                                     return ValueListenableBuilder<String>(
                                       valueListenable: _textInputNotifier,
                                       builder: (context, text, child) {
-                                        // Show send button if:
-                                        // 1. There is text to send
-                                        // 2. Recording is being reviewed
-                                        // 3. Recording is locked
                                         final shouldShowSendButton =
                                             text.trim().isNotEmpty ||
                                                 isReviewing ||
-                                                isLocked;
+                                                isLocked ||
+                                                (widget.chatroom.type == 10 &&
+                                                    isOtherUserAIChatbot(
+                                                        widget.chatroom));
 
                                         return shouldShowSendButton
                                             ? _screenBuilder.sendButton(
@@ -434,7 +428,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             );
           },
         ),
-        // Show overlay when button is held
       ],
     );
   }
@@ -501,6 +494,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _defVoiceOverlayLayout(BuildContext context) {
+    if (widget.chatroom.type == 10 && isOtherUserAIChatbot(widget.chatroom)) {
+      return const SizedBox.shrink();
+    }
+
     return Stack(
       fit: StackFit.passthrough,
       clipBehavior: Clip.none,
@@ -669,11 +666,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       valueListenable: _isRecordingLocked,
       builder: (context, isLocked, child) {
         return Stack(
-          clipBehavior: Clip.none, // Allow overflow for animations
+          clipBehavior: Clip.none,
           children: [
             Container(
               width: 80.w,
-              height: 6.h,
+              height: 6.2.h,
               decoration: BoxDecoration(
                 color: _themeData.container,
                 borderRadius: BorderRadius.circular(24),
@@ -871,7 +868,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   Widget _buildReviewContainer(BuildContext context) {
     return Container(
       width: 80.w,
-      height: 6.h,
+      height: 6.2.h,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: _themeData.container,
@@ -1214,6 +1211,15 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _defAttachmentMenu() {
+    // First determine which buttons should be visible based on conditions
+    final List<AttachmentMenuItem> menuItems = _getVisibleMenuItems();
+
+    // Calculate grid layout
+    final int itemCount = menuItems.length;
+    // Use 3 columns for both 3 items and 5 items cases
+    final int columns = (itemCount == 3 || itemCount == 5) ? 3 : 2;
+    final int rows = (itemCount / columns).ceil();
+
     return Container(
       margin: EdgeInsets.only(bottom: 1.h),
       child: ClipRRect(
@@ -1227,257 +1233,180 @@ class _LMChatroomBarState extends State<LMChatroomBar>
               horizontal: 12.w,
             ),
             child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          LMChatButton(
-                            onTap: () async {
-                              _popupMenuController.hideMenu();
-                              final res = await LMChatMediaHandler.instance
-                                  .pickSingleImage();
-                              if (res.data != null) {
-                                _navigateToForwarding();
-                              } else if (res.errorMessage != null) {
-                                toast(res.errorMessage!);
-                              }
-                            },
-                            icon: LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.camera_alt_outlined,
-                              style: LMChatIconStyle(
-                                color: LMChatTheme.theme.container,
-                                size: 30,
-                                boxSize: 48,
-                                boxPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            style: LMChatButtonStyle(
-                              height: 48,
-                              width: 48,
-                              borderRadius: 24,
-                              backgroundColor: LMChatTheme.theme.secondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          LMChatText(
-                            'Camera',
-                            style: LMChatTextStyle(
-                              textStyle: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          LMChatButton(
-                            onTap: () async {
-                              _popupMenuController.hideMenu();
-                              final res =
-                                  await LMChatMediaHandler.instance.pickMedia();
-                              if (res.data != null) {
-                                _navigateToForwarding();
-                              } else if (res.errorMessage != null) {
-                                toast(res.errorMessage!);
-                              }
-                            },
-                            icon: LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.photo_outlined,
-                              style: LMChatIconStyle(
-                                color: LMChatTheme.theme.container,
-                                size: 30,
-                                boxSize: 48,
-                                boxPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            style: LMChatButtonStyle(
-                              height: 48,
-                              width: 48,
-                              borderRadius: 24,
-                              backgroundColor: LMChatTheme.theme.secondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          LMChatText(
-                            'Gallery',
-                            style: LMChatTextStyle(
-                              textStyle: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          LMChatButton(
-                            onTap: () async {
-                              _popupMenuController.hideMenu();
-                              final res = await LMChatMediaHandler.instance
-                                  .pickDocuments();
-                              if (res.data != null) {
-                                _navigateToForwarding();
-                              } else if (res.errorMessage != null) {
-                                toast(res.errorMessage!);
-                              }
-                            },
-                            icon: LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.insert_drive_file_outlined,
-                              style: LMChatIconStyle(
-                                color: LMChatTheme.theme.container,
-                                size: 30,
-                                boxSize: 48,
-                                boxPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            style: LMChatButtonStyle(
-                              height: 48,
-                              width: 48,
-                              borderRadius: 24,
-                              backgroundColor: LMChatTheme.theme.secondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          LMChatText(
-                            'Documents',
-                            style: LMChatTextStyle(
-                              textStyle: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 2.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          LMChatButton(
-                            onTap: () async {
-                              _popupMenuController.hideMenu();
-                              final res = await LMChatMediaHandler.instance
-                                  .pickGIF(context);
-                              if (res.data != null) {
-                                _navigateToForwarding();
-                              } else if (res.errorMessage != null) {
-                                toast(res.errorMessage!);
-                              }
-                            },
-                            icon: LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.gif_box_outlined,
-                              style: LMChatIconStyle(
-                                color: LMChatTheme.theme.container,
-                                size: 30,
-                                boxSize: 48,
-                                boxPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            style: LMChatButtonStyle(
-                              height: 48,
-                              width: 48,
-                              borderRadius: 24,
-                              backgroundColor: LMChatTheme.theme.secondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          LMChatText(
-                            'GIF',
-                            style: LMChatTextStyle(
-                              textStyle: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    widget.chatroom.type != 10
-                        ? Expanded(
-                            child: Column(
-                              children: [
-                                LMChatButton(
-                                  onTap: () async {
-                                    _popupMenuController.hideMenu();
-                                    // unfocus the text field
-                                    _focusNode.unfocus();
-                                    // show bottom sheet to create a poll
-                                    showModalBottomSheet(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      useSafeArea: true,
-                                      builder: (context) {
-                                        return DraggableScrollableSheet(
-                                          expand: false,
-                                          initialChildSize: 0.9,
-                                          minChildSize: 0.5,
-                                          snap: true,
-                                          builder: (context, controller) =>
-                                              widget.createPollWidgetBuilder
-                                                  ?.call(
-                                                context,
-                                                LMChatCreatePollBottomSheet(
-                                                  chatroomId:
-                                                      widget.chatroom.id,
-                                                  scrollController: controller,
-                                                ),
-                                              ) ??
-                                              LMChatCreatePollBottomSheet(
-                                                chatroomId: widget.chatroom.id,
-                                                scrollController: controller,
-                                              ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  icon: LMChatIcon(
-                                    type: LMChatIconType.svg,
-                                    assetPath: kPollIcon,
-                                    style: LMChatIconStyle(
-                                      size: 38,
-                                      backgroundColor:
-                                          _themeData.secondaryColor,
-                                      boxPadding: const EdgeInsets.all(8),
-                                      boxBorderRadius: 100,
-                                    ),
-                                  ),
-                                  style: LMChatButtonStyle(
-                                    height: 48,
-                                    width: 48,
-                                    borderRadius: 24,
-                                    backgroundColor:
-                                        LMChatTheme.theme.secondaryColor,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                LMChatText(
-                                  'Poll',
-                                  style: LMChatTextStyle(
-                                    textStyle:
-                                        Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : const Spacer(),
-                    const Spacer(),
-                  ],
-                ),
-              ],
+              children: List.generate(rows, (rowIndex) {
+                // Calculate items for this row
+                final int startIndex = rowIndex * columns;
+                final int endIndex = math.min(startIndex + columns, itemCount);
+                final int itemsInRow = endIndex - startIndex;
+
+                return Padding(
+                  padding:
+                      EdgeInsets.only(bottom: rowIndex < rows - 1 ? 2.h : 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ...List.generate(itemsInRow, (index) {
+                        final item = menuItems[startIndex + index];
+                        return Expanded(
+                          child: _buildMenuItem(item),
+                        );
+                      }),
+                      // Add spacers if needed to maintain grid alignment
+                      if (itemsInRow < columns)
+                        ...List.generate(
+                          columns - itemsInRow,
+                          (index) => const Spacer(),
+                        ),
+                    ],
+                  ),
+                );
+              }),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  List<AttachmentMenuItem> _getVisibleMenuItems() {
+    final bool isAIChatbot =
+        widget.chatroom.type == 10 && isOtherUserAIChatbot(widget.chatroom);
+    final bool showDocuments = !isAIChatbot;
+    final bool showPoll = widget.chatroom.type != 10;
+    final bool showGIF = !isAIChatbot;
+
+    final List<AttachmentMenuItem> items = [
+      AttachmentMenuItem(
+        icon: Icons.camera_alt_outlined,
+        label: 'Camera',
+        onTap: () async {
+          _popupMenuController.hideMenu();
+          final res = await LMChatMediaHandler.instance.pickSingleImage();
+          if (res.data != null) {
+            _navigateToForwarding();
+          } else if (res.errorMessage != null) {
+            toast(res.errorMessage!);
+          }
+        },
+      ),
+      AttachmentMenuItem(
+        icon: Icons.photo_outlined,
+        label: 'Gallery',
+        onTap: () async {
+          _popupMenuController.hideMenu();
+          final res = await LMChatMediaHandler.instance.pickMedia(
+            mediaCount: isAIChatbot ? 1 : 10,
+          );
+          if (res.data != null) {
+            _navigateToForwarding();
+          } else if (res.errorMessage != null) {
+            toast(res.errorMessage!);
+          }
+        },
+      ),
+      if (showDocuments)
+        AttachmentMenuItem(
+          icon: Icons.insert_drive_file_outlined,
+          label: 'Documents',
+          onTap: () async {
+            _popupMenuController.hideMenu();
+            final res = await LMChatMediaHandler.instance.pickDocuments();
+            if (res.data != null) {
+              _navigateToForwarding();
+            } else if (res.errorMessage != null) {
+              toast(res.errorMessage!);
+            }
+          },
+        ),
+      if (showGIF)
+        AttachmentMenuItem(
+          icon: Icons.gif_box_outlined,
+          label: 'GIF',
+          onTap: () async {
+            _popupMenuController.hideMenu();
+            final res = await LMChatMediaHandler.instance.pickGIF(context);
+            if (res.data != null) {
+              _navigateToForwarding();
+            } else if (res.errorMessage != null) {
+              toast(res.errorMessage!);
+            }
+          },
+        ),
+      if (showPoll)
+        AttachmentMenuItem(
+          iconType: LMChatIconType.svg,
+          assetPath: kPollIcon,
+          label: 'Poll',
+          onTap: () async {
+            _popupMenuController.hideMenu();
+            _focusNode.unfocus();
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              useSafeArea: true,
+              builder: (context) => DraggableScrollableSheet(
+                expand: false,
+                initialChildSize: 0.9,
+                minChildSize: 0.5,
+                snap: true,
+                builder: (context, controller) =>
+                    widget.createPollWidgetBuilder?.call(
+                      context,
+                      LMChatCreatePollBottomSheet(
+                        chatroomId: widget.chatroom.id,
+                        scrollController: controller,
+                      ),
+                    ) ??
+                    LMChatCreatePollBottomSheet(
+                      chatroomId: widget.chatroom.id,
+                      scrollController: controller,
+                    ),
+              ),
+            );
+          },
+        ),
+    ];
+
+    return items;
+  }
+
+  Widget _buildMenuItem(AttachmentMenuItem item) {
+    return Column(
+      children: [
+        LMChatButton(
+          onTap: item.onTap,
+          icon: LMChatIcon(
+            type: item.iconType ?? LMChatIconType.icon,
+            icon: item.icon,
+            assetPath: item.assetPath,
+            style: LMChatIconStyle(
+              color: LMChatTheme.theme.container,
+              size: item.iconType == LMChatIconType.svg ? 38 : 30,
+              boxSize: 48,
+              boxBorderRadius: item.iconType == LMChatIconType.svg ? 100 : 0,
+              boxPadding: item.iconType == LMChatIconType.svg
+                  ? const EdgeInsets.all(12)
+                  : EdgeInsets.zero,
+              backgroundColor: item.iconType == LMChatIconType.svg
+                  ? _themeData.secondaryColor
+                  : null,
+            ),
+          ),
+          style: LMChatButtonStyle(
+            height: 48,
+            width: 48,
+            borderRadius: 24,
+            backgroundColor: LMChatTheme.theme.primaryColor,
+          ),
+        ),
+        const SizedBox(height: 4),
+        LMChatText(
+          item.label,
+          style: LMChatTextStyle(
+            textStyle: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
     );
   }
 
@@ -1736,6 +1665,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                 ..chatroomId(widget.chatroom.id)
                 ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
                 ..text(result!)
+                ..triggerBot(widget.chatroom.type == 10 &&
+                    isOtherUserAIChatbot(widget.chatroom))
                 ..replyId(replyToConversation?.id)
                 ..ogTags(linkModel!.ogTags!.toOGTag())
                 ..shareLink(linkModel!.link!))
@@ -1762,6 +1693,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           replyId: replyToConversation?.id,
           repliedTo: replyToConversation,
           shareLink: extractedLink,
+          triggerBot: widget.chatroom.type == 10 &&
+              isOtherUserAIChatbot(widget.chatroom),
         ),
       );
       _updateLinkPreviewState();
@@ -1871,6 +1804,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           chatroomName: widget.chatroom.header,
           replyConversation: replyToConversation,
           textFieldText: _textEditingController.text,
+          triggerBot: widget.chatroom.type == 10 &&
+              isOtherUserAIChatbot(widget.chatroom),
         ),
       ),
     );
@@ -1940,7 +1875,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                 ..chatroomId(widget.chatroom.id)
                 ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
                 ..replyId(replyToConversation?.id)
-                ..attachmentCount(1)
                 ..hasFiles(true)
                 ..text(result ?? ''))
               .build(),
@@ -2114,4 +2048,20 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       _isPlaying.value = false;
     }
   }
+}
+
+class AttachmentMenuItem {
+  final IconData? icon;
+  final String label;
+  final VoidCallback onTap;
+  final LMChatIconType? iconType;
+  final String? assetPath;
+
+  AttachmentMenuItem({
+    this.icon,
+    required this.label,
+    required this.onTap,
+    this.iconType,
+    this.assetPath,
+  });
 }
