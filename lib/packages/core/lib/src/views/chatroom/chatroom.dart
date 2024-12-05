@@ -147,8 +147,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         builder: (context, _, __) {
           return Padding(
             padding: EdgeInsets.only(
-              bottom: Platform.isIOS ? 48.0 : 72.0,
-              right: Platform.isIOS ? 1.5 : 4,
+              bottom: Platform.isIOS ? 64.0 : 96.0,
+              right: Platform.isIOS ? 2 : 4,
             ),
             child: showScrollButton
                 ? _screenBuilder.floatingActionButton(_defaultScrollButton())
@@ -375,12 +375,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             type: LMChatIconType.icon,
             icon: Icons.arrow_back,
             style: LMChatIconStyle(
-              color: LMChatTheme.theme.onPrimary,
-              size: 20,
+              color: LMChatTheme.theme.onContainer,
+              size: 24,
               boxSize: 28,
             ),
           ),
-          backgroundColor: LMChatTheme.theme.primaryColor,
+          backgroundColor: LMChatTheme.theme.container,
         ),
       ),
       banner: ValueListenableBuilder(
