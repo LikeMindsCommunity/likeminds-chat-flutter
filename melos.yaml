@@ -3,6 +3,7 @@ name: likeminds_chat_flutter
 packages:
   - lib/packages/*
   - example/
+  - chatbot_example/
 
 scripts:
   analyze:
@@ -17,5 +18,5 @@ scripts:
   test-dependencies:
     run: fvm spawn 3.10.2 pub get; fvm spawn stable pub get
 
-  upgrade: 
+  upgrade:
     exec: flutter pub upgrade
