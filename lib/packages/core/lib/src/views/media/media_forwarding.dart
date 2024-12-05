@@ -262,7 +262,10 @@ class _LMChatMediaForwardingScreenState
                 ),
               ),
               if (mediaList.isNotEmpty &&
-                  mediaList.first.mediaType != LMChatMediaType.gif)
+                  mediaList.first.mediaType != LMChatMediaType.gif &&
+                  widget.chatroomId !=
+                      LMChatLocalPreference.instance
+                          .getChatroomIdWithAIChatbot())
                 _screenBuilder.attachmentButton(
                   context,
                   _defAttachmentButton(),

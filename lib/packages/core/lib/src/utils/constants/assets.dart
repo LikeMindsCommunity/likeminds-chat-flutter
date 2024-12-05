@@ -9,4 +9,4 @@ const secretLockIcon =
 const emptyViewImage =
     'packages/likeminds_chat_flutter_core/assets/images/empty_view.png';
 const aiChatbotLoadingAnimation =
-    'packages/likeminds_chat_flutter_core/assets/animations/chatbot_loading.json';
+    'https://likeminds-configs-prod.s3.ap-south-1.amazonaws.com/sdk-configs/ai-chatbot-initiate-lottie-animation.json';

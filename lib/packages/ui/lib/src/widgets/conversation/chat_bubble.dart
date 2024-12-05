@@ -424,14 +424,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       const Color.fromRGBO(0, 96, 86, 0.3)
                   : null,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.6.h),
+            padding: EdgeInsets.symmetric(horizontal: 1.8.w, vertical: 0.6.h),
             child: Row(
               mainAxisAlignment:
                   isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 if (!isSent) widget.avatar ?? const SizedBox(),
-                const SizedBox(width: 6),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -461,14 +460,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                                 ? EdgeInsets.only(
                                     top: _isDeleted ? 0.8.h : 1.h,
                                     bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 2.w,
-                                    right: 4.w,
+                                    left: 3.w,
+                                    right: 5.w,
                                   )
                                 : EdgeInsets.only(
                                     top: _isDeleted ? 0.8.h : 1.h,
                                     bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 4.w,
-                                    right: 2.w,
+                                    left: 5.w,
+                                    right: 3.w,
                                   ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -675,7 +674,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         ),
                   ],
                 ),
-                const SizedBox(width: 6),
                 if (isSent) widget.avatar ?? const SizedBox(),
               ],
             ),

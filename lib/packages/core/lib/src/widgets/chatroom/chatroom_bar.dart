@@ -372,7 +372,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                     left: 2.w,
                     right: 2.w,
                     top: 1.5.h,
-                    bottom: 1.5.h,
+                    bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : 1.5.h,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1396,7 +1396,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             height: 48,
             width: 48,
             borderRadius: 24,
-            backgroundColor: LMChatTheme.theme.secondaryColor,
+            backgroundColor: LMChatTheme.theme.primaryColor,
           ),
         ),
         const SizedBox(height: 4),

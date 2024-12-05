@@ -57,6 +57,5 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
-    - assets/animations/
     - assets/images/
     - assets/icons/

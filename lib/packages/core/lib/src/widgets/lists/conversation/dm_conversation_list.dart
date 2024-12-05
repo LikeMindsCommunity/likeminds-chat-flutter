@@ -204,9 +204,13 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     return LMChatStateBubble(
       message: message,
       style: LMChatTheme.theme.stateBubbleStyle.copyWith(
+        backgroundColor: const Color(0xffacb7c0),
         messageStyle: LMChatTextStyle.basic().copyWith(
           maxLines: 2,
-          textStyle: const TextStyle(fontSize: 12),
+          textStyle: TextStyle(
+            fontSize: 12,
+            color: LMChatTheme.theme.container,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -719,7 +723,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
 
     if (conversationList.isNotEmpty &&
-        conversationList.first.date != conversation.date) {
+        conversationList.first.date != conversation.date &&
+        conversationList.first.id != -1) {
       conversationList.insert(
         0,
         Conversation(
@@ -745,6 +750,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
     conversationList.insert(0, result);
     if (isOtherUserChatbot) {
+      conversationList.removeWhere((element) => element.id == -1);
       conversationList.insert(0, _getChatBotShimmerConversation());
     }
     if (conversationList.length >= 500) {
