@@ -136,7 +136,7 @@ class _LMImageState extends State<LMChatImage> {
             style!.shimmerWidget ??
             LMChatMediaShimmerWidget(
               height: style!.height,
-              width: style!.width,
+              width: style!.width ?? 100.w,
             ),
       ),
     );

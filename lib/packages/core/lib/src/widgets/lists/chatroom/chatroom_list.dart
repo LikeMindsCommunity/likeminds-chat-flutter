@@ -359,7 +359,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             ),
         ],
       ),
-      subtitle: ((chatroom.lastConversation?.attachmentsUploaded ?? false) &&
+      subtitle: (((chatroom.lastConversation?.attachmentsUploaded ?? false) ||
+                      (chatroom.lastConversation?.hasFiles ?? false)) &&
                   chatroom.lastConversation?.deletedByUserId == null) ||
               (chatroom.lastConversation?.state == 10 &&
                   chatroom.lastConversation?.deletedByUserId == null)

@@ -93,12 +93,21 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
           return AbsorbPointer(
-            absorbing: widget.media.mediaUrl == null,
+            absorbing:
+                widget.media.mediaUrl == null && widget.media.mediaFile == null,
             child: InkWell(
               onTap: () async {
-                if (widget.media.mediaUrl != null) {
-                  Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                  launchUrl(fileUrl, mode: LaunchMode.externalApplication);
+                if (widget.media.mediaUrl != null ||
+                    widget.media.mediaFile != null) {
+                  Uri fileUrl = Uri.parse(
+                    widget.media.mediaUrl ?? widget.media.mediaFile!.path,
+                  );
+                  launchUrl(
+                    fileUrl,
+                    mode: Platform.isIOS
+                        ? LaunchMode.inAppBrowserView
+                        : LaunchMode.externalApplication,
+                  );
                 }
               },
               child: Stack(
@@ -109,13 +118,15 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                   widget.showOverlay
                       ? widget.overlay ??
                           Positioned(
-                            bottom: 0,
+                            bottom: -2,
                             child: LMChatDocumentTile(
                               media: widget.media,
                               style: style?.overlayStyle ??
                                   LMChatDocumentTileStyle(
                                     padding: EdgeInsets.zero,
                                     width: 54.w,
+                                    backgroundColor:
+                                        LMChatTheme.theme.container,
                                   ),
                             ),
                           )

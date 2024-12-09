@@ -28,6 +28,8 @@ class LMChatMediaForwardingScreen extends StatefulWidget {
 
   final String? chatroomName;
 
+  final bool triggerBot;
+
   ///{@macro lm_chat_media_forwarding_screen}
   const LMChatMediaForwardingScreen({
     super.key,
@@ -35,6 +37,7 @@ class LMChatMediaForwardingScreen extends StatefulWidget {
     this.replyConversation,
     this.textFieldText,
     this.chatroomName,
+    this.triggerBot = false,
   });
 
   @override
@@ -259,7 +262,10 @@ class _LMChatMediaForwardingScreenState
                 ),
               ),
               if (mediaList.isNotEmpty &&
-                  mediaList.first.mediaType != LMChatMediaType.gif)
+                  mediaList.first.mediaType != LMChatMediaType.gif &&
+                  widget.chatroomId !=
+                      LMChatLocalPreference.instance
+                          .getChatroomIdWithAIChatbot())
                 _screenBuilder.attachmentButton(
                   context,
                   _defAttachmentButton(),
@@ -321,10 +327,10 @@ class _LMChatMediaForwardingScreenState
       LMChatPostMultiMediaConversationEvent(
         (PostConversationRequestBuilder()
               ..replyId(replyConversation?.id)
-              ..attachmentCount(mediaList.length)
               ..chatroomId(widget.chatroomId)
               ..temporaryId(DateTime.now().millisecondsSinceEpoch.toString())
               ..text(result)
+              ..triggerBot(widget.triggerBot)
               ..hasFiles(true))
             .build(),
         LMChatMediaHandler.instance.pickedMedia.copy(),

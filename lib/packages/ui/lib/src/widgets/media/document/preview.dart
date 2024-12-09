@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:path/path.dart';
 
 ///{@template lm_chat_document_preview}
 /// A widget that displays a document preview with single attachment.
@@ -77,47 +76,6 @@ class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
                   ),
                 ),
                 kVerticalPaddingXLarge,
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    kVerticalPaddingSmall,
-                    SizedBox(
-                      width: 80.w,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Column(
-                            children: [
-                              LMChatText(
-                                basenameWithoutExtension(
-                                    media!.mediaFile!.path),
-                                style: style.fileNameStyle ??
-                                    const LMChatTextStyle(
-                                      maxLines: 1,
-                                      textAlign: TextAlign.right,
-                                      textStyle: TextStyle(
-                                        fontSize: 14,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                              ),
-                              LMChatText(
-                                '${media!.pageCount ?? ''} ${media!.pageCount == null ? '' : (media!.pageCount ?? 0) > 1 ? 'pages' : 'page'} ${media!.pageCount == null ? '' : '·'} ${getFileSizeString(bytes: media!.size!)} · PDF',
-                                style: LMChatTextStyle(
-                                  textStyle: TextStyle(
-                                    color: LMChatTheme.theme.onContainer,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

@@ -479,7 +479,17 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
           style: widget.style,
         ));
       }
-      if (link != null && link.isNotEmpty && link[0] == '#') {
+
+      // Handle bold text between double asterisks
+      if (link != null && link.startsWith('**') && link.endsWith('**')) {
+        String boldText =
+            link.substring(2, link.length - 2); // Remove ** from both ends
+        textSpans.add(TextSpan(
+          text: boldText,
+          style: widget.style?.copyWith(fontWeight: FontWeight.bold) ??
+              const TextStyle(fontWeight: FontWeight.bold),
+        ));
+      } else if (link != null && link.isNotEmpty && link[0] == '#') {
         textSpans.add(TextSpan(
           text: link,
           style: widget.hashtagStyle ?? const TextStyle(color: Colors.blue),

@@ -289,7 +289,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
 
   TextFieldConfiguration _buildTextFieldConfiguration() {
     return TextFieldConfiguration(
-      textInputAction: TextInputAction.done,
+      textInputAction: TextInputAction.newline,
       keyboardType: TextInputType.multiline,
       controller: _controller,
       style: effectiveStyle.textStyle ??

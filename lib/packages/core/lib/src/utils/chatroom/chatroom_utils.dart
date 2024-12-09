@@ -116,5 +116,24 @@ String getTime(String time) {
   if (difference.inDays > 0 || now.day != messageTime.day) {
     return DateFormat('dd/MM/yyyy').format(messageTime);
   }
-  return DateFormat('kk:mm').format(messageTime);
+  return DateFormat('HH:mm')
+      .format(messageTime); // Using HH instead of kk for proper 24-hour format
+}
+
+/// Checks if the other user in a DM chatroom is an AI Chatbot
+bool isOtherUserAIChatbot(LMChatRoomViewData chatroom) {
+  // Get logged in user's UUID
+  final String loggedInUserUUID =
+      LMChatLocalPreference.instance.getUser().sdkClientInfo?.uuid ?? '';
+
+  // Determine the other member based on UUID comparison
+  LMChatUserViewData? otherMember;
+  if (loggedInUserUUID == chatroom.member?.sdkClientInfo?.uuid) {
+    otherMember = chatroom.chatroomWithUser;
+  } else {
+    otherMember = chatroom.member;
+  }
+
+  // Check if the other member has the chatbot role
+  return otherMember?.roles?.contains(LMChatUserRole.chatbot) ?? false;
 }

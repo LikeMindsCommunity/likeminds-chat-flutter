@@ -53,8 +53,7 @@ class LMChatMediaService {
   }) async {
     try {
       String url = "https://$_bucketName.s3.$_region.amazonaws.com/";
-      String folderName =
-          "files/collabcard/$chatroomId/conversation/$conversationId";
+      String folderName = "files/collabcard/$chatroomId/conversation/$uuid";
       String generateFileName =
           fileName ?? "$uuid-${DateTime.now().millisecondsSinceEpoch}";
       LMResponse<String> response = await LMChatAWSClient.uploadFile(
