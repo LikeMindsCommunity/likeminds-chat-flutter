@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
+import 'package:photo_view/photo_view.dart';
 
 /// {@template lm_chat_image}
 /// A widget to display an image in a post.
@@ -79,19 +81,15 @@ class _LMImageState extends State<LMChatImage> {
   }
 
   @override
-  void didUpdateWidget(covariant LMChatImage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    style = widget.style ?? LMChatTheme.theme.imageStyle;
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
-      absorbing: widget.onTap == null,
-      child: GestureDetector(
-        onTap: () => widget.onTap?.call(),
-        child: _buildImageWidget(),
-      ),
+    return GestureDetector(
+      onTap: () => widget.onTap?.call(),
+      child: _buildImageWidget(),
     );
   }
 
@@ -124,8 +122,56 @@ class _LMImageState extends State<LMChatImage> {
         imageUrl: widget.imageUrl!,
         fit: style?.boxFit ?? BoxFit.contain,
         fadeInDuration: const Duration(milliseconds: 100),
+        imageBuilder: (context, imageProvider) {
+          // Load image info to get dimensions
+          ImageStream stream = imageProvider.resolve(ImageConfiguration.empty);
+          late ImageInfo imageInfo;
+
+          return FutureBuilder(
+            future: Future(() async {
+              Completer<void> completer = Completer();
+              stream.addListener(
+                ImageStreamListener((info, _) {
+                  imageInfo = info;
+                  completer.complete();
+                }),
+              );
+              await completer.future;
+              return imageInfo;
+            }),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final imageInfo = snapshot.data as ImageInfo;
+              final imageWidth = imageInfo.image.width.toDouble();
+              final imageHeight = imageInfo.image.height.toDouble();
+
+              // Calculate container dimensions
+              final containerWidth = style?.width ?? 100.w;
+              final containerHeight = style?.height ?? 80.h;
+
+              // Calculate scale to fit
+              final double scaleX = containerWidth / imageWidth;
+              final double scaleY = containerHeight / imageHeight;
+              final double minScale = scaleX < scaleY ? scaleX : scaleY;
+
+              return PhotoView(
+                customSize: style != null &&
+                        style!.width != null &&
+                        style!.height != null
+                    ? Size(style!.width!, style!.height!)
+                    : null,
+                imageProvider: imageProvider,
+                maxScale: 3.0,
+                minScale: minScale,
+                tightMode: true,
+              );
+            },
+          );
+        },
         errorWidget: (context, url, error) {
-          // Log the error for debugging
           debugPrint('Error loading image: $error');
           if (widget.onError != null) {
             widget.onError!(error.toString(), StackTrace.empty);
@@ -150,11 +196,16 @@ class _LMImageState extends State<LMChatImage> {
         borderRadius: style!.borderRadius ?? BorderRadius.zero,
         color: style?.backgroundColor,
       ),
-      child: Image.file(
-        widget.imageFile!,
-        height: style!.height,
-        width: style!.width,
-        fit: style!.boxFit ?? BoxFit.contain,
+      child: PhotoView(
+        // customSize: Size(style!.width, style!.height),
+        maxScale: 5.0,
+        minScale: 1.0,
+        imageProvider: FileImage(
+          widget.imageFile!,
+          // height: style!.height,
+          // width: style!.width,
+          // fit: style!.boxFit ?? BoxFit.contain,
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/builder.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:photo_view/photo_view.dart';
 
 /// {@template lm_chat_media_preview_screen}
 /// A screen to preview media before adding attachments to a conversation
@@ -110,6 +111,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       style: LMChatAppBarStyle(
         height: 60,
         gap: 12,
+        backgroundColor: LMChatTheme.theme.onContainer,
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
       leading: LMChatButton(
@@ -117,9 +119,12 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           LMChatMediaHandler.instance.clearPickedMedia();
           Navigator.pop(context);
         },
-        icon: const LMChatIcon(
+        icon: LMChatIcon(
           type: LMChatIconType.icon,
           icon: Icons.arrow_back,
+          style: LMChatIconStyle(
+            color: LMChatTheme.theme.container,
+          ),
         ),
       ),
       title: LMChatText(
@@ -129,10 +134,10 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         style: LMChatTextStyle(
           maxLines: 1,
           padding: const EdgeInsets.only(top: 2),
-          textStyle: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w500),
+          textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: LMChatTheme.theme.container,
+              ),
         ),
       ),
       subtitle: _buildAppBarSubtitle(),
@@ -151,7 +156,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           "${position + 1} of ${mediaList.length} attachments • $formattedDate",
           style: LMChatTextStyle(
             maxLines: 1,
-            textStyle: Theme.of(context).textTheme.bodySmall,
+            textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: LMChatTheme.theme.disabledColor,
+                ),
           ),
         );
       },
@@ -181,38 +188,44 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       return const SizedBox();
     }
 
-    return CarouselSlider.builder(
-      carouselController: _carouselController,
-      itemCount: mediaList.length,
-      disableGesture: true,
-      options: CarouselOptions(
-        height: MediaQuery.sizeOf(context).height,
-        viewportFraction: 1.0,
-        enlargeCenterPage: false,
-        enableInfiniteScroll: false,
-        onPageChanged: (index, reason) {
-          _currentPosition.value = index;
+    return PhotoViewGestureDetectorScope(
+      axis: Axis.horizontal,
+      child: CarouselSlider.builder(
+        carouselController: _carouselController,
+        itemCount: mediaList.length,
+        options: CarouselOptions(
+          height: 90.h,
+          viewportFraction: 1.0,
+          enlargeCenterPage: false,
+          animateToClosest: false,
+          enableInfiniteScroll: false,
+          onPageChanged: (index, reason) {
+            _currentPosition.value = index;
+          },
+        ),
+        itemBuilder: (context, index, realIndex) {
+          final media = mediaList[index];
+          return Container(
+            color: LMChatTheme.theme.onContainer,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 2.h),
+              child: Center(
+                child: media.mediaType == LMChatMediaType.image
+                    ? _screenBuilder.image(
+                        context,
+                        _buildImageWidget(media),
+                        media,
+                      )
+                    : _screenBuilder.video(
+                        context,
+                        _buildVideoWidget(media),
+                        media,
+                      ),
+              ),
+            ),
+          );
         },
       ),
-      itemBuilder: (context, index, realIndex) {
-        final media = mediaList[index];
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 2.h),
-          child: Center(
-            child: media.mediaType == LMChatMediaType.image
-                ? _screenBuilder.image(
-                    context,
-                    _buildImageWidget(media),
-                    media,
-                  )
-                : _screenBuilder.video(
-                    context,
-                    _buildVideoWidget(media),
-                    media,
-                  ),
-          ),
-        );
-      },
     );
   }
 
