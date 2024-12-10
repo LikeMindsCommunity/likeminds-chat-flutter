@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
@@ -75,7 +76,8 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       onPopInvoked: (p0) {
         LMChatMediaHandler.instance.clearPickedMedia();
       },
-      backgroundColor: LMChatTheme.theme.scaffold,
+      systemUiOverlay: SystemUiOverlayStyle.light,
+      backgroundColor: LMChatTheme.theme.onContainer,
       appBar: _screenBuilder.appBarBuilder(
         context,
         _defAppBar(),
@@ -111,7 +113,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       style: LMChatAppBarStyle(
         height: 60,
         gap: 12,
-        backgroundColor: LMChatTheme.theme.onContainer,
+        backgroundColor: LMChatTheme.theme.onContainer.withOpacity(0.5),
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
       leading: LMChatButton(
