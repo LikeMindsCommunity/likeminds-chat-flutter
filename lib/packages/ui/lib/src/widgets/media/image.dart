@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +107,30 @@ class _LMImageState extends State<LMChatImage> {
     return const SizedBox();
   }
 
+  Widget _buildPhotoView({
+    required ImageProvider imageProvider,
+    required BuildContext context,
+    required double imageWidth,
+    required double imageHeight,
+  }) {
+    // Calculate container dimensions
+    final containerWidth = style?.width ?? 100.w;
+    final containerHeight = style?.height ?? 80.h;
+
+    // Calculate scale to fit
+    final double scaleX = containerWidth / imageWidth;
+    final double scaleY = containerHeight / imageHeight;
+    final double minScale = scaleX < scaleY ? scaleX : scaleY;
+
+    return PhotoView(
+      imageProvider: imageProvider,
+      maxScale: 3.0,
+      minScale: minScale,
+      initialScale: minScale,
+      tightMode: true,
+    );
+  }
+
   Widget _buildNetworkImage() {
     return Container(
       padding: style?.padding,
@@ -123,7 +148,6 @@ class _LMImageState extends State<LMChatImage> {
         fit: style?.boxFit ?? BoxFit.contain,
         fadeInDuration: const Duration(milliseconds: 100),
         imageBuilder: (context, imageProvider) {
-          // Load image info to get dimensions
           ImageStream stream = imageProvider.resolve(ImageConfiguration.empty);
           late ImageInfo imageInfo;
 
@@ -145,28 +169,11 @@ class _LMImageState extends State<LMChatImage> {
               }
 
               final imageInfo = snapshot.data as ImageInfo;
-              final imageWidth = imageInfo.image.width.toDouble();
-              final imageHeight = imageInfo.image.height.toDouble();
-
-              // Calculate container dimensions
-              final containerWidth = style?.width ?? 100.w;
-              final containerHeight = style?.height ?? 80.h;
-
-              // Calculate scale to fit
-              final double scaleX = containerWidth / imageWidth;
-              final double scaleY = containerHeight / imageHeight;
-              final double minScale = scaleX < scaleY ? scaleX : scaleY;
-
-              return PhotoView(
-                customSize: style != null &&
-                        style!.width != null &&
-                        style!.height != null
-                    ? Size(style!.width!, style!.height!)
-                    : null,
+              return _buildPhotoView(
                 imageProvider: imageProvider,
-                maxScale: 3.0,
-                minScale: minScale,
-                tightMode: true,
+                context: context,
+                imageWidth: imageInfo.image.width.toDouble(),
+                imageHeight: imageInfo.image.height.toDouble(),
               );
             },
           );
@@ -196,16 +203,20 @@ class _LMImageState extends State<LMChatImage> {
         borderRadius: style!.borderRadius ?? BorderRadius.zero,
         color: style?.backgroundColor,
       ),
-      child: PhotoView(
-        // customSize: Size(style!.width, style!.height),
-        maxScale: 5.0,
-        minScale: 1.0,
-        imageProvider: FileImage(
-          widget.imageFile!,
-          // height: style!.height,
-          // width: style!.width,
-          // fit: style!.boxFit ?? BoxFit.contain,
-        ),
+      child: FutureBuilder<ui.Image>(
+        future: _getImageDimensions(FileImage(widget.imageFile!)),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return _buildPhotoView(
+            imageProvider: FileImage(widget.imageFile!),
+            context: context,
+            imageWidth: snapshot.data!.width.toDouble(),
+            imageHeight: snapshot.data!.height.toDouble(),
+          );
+        },
       ),
     );
   }
@@ -218,13 +229,35 @@ class _LMImageState extends State<LMChatImage> {
         borderRadius: style!.borderRadius ?? BorderRadius.zero,
         color: style?.backgroundColor,
       ),
-      child: Image.asset(
-        widget.imageAssetPath!,
-        height: style!.height,
-        width: style!.width,
-        fit: style!.boxFit ?? BoxFit.contain,
+      child: FutureBuilder<ui.Image>(
+        future: _getImageDimensions(AssetImage(widget.imageAssetPath!)),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return _buildPhotoView(
+            imageProvider: AssetImage(widget.imageAssetPath!),
+            context: context,
+            imageWidth: snapshot.data!.width.toDouble(),
+            imageHeight: snapshot.data!.height.toDouble(),
+          );
+        },
       ),
     );
+  }
+
+  // Helper function to get image dimensions for File and Asset images
+  Future<ui.Image> _getImageDimensions(ImageProvider provider) async {
+    final Completer<ui.Image> completer = Completer<ui.Image>();
+    final ImageStream stream = provider.resolve(ImageConfiguration.empty);
+
+    final listener = ImageStreamListener((ImageInfo info, bool _) {
+      completer.complete(info.image);
+    });
+
+    stream.addListener(listener);
+    return completer.future;
   }
 
   Widget _defaultErrorWidget() {
