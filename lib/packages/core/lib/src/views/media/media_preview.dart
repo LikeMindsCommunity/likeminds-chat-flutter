@@ -184,6 +184,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     return CarouselSlider.builder(
       carouselController: _carouselController,
       itemCount: mediaList.length,
+      disableGesture: true,
       options: CarouselOptions(
         height: MediaQuery.sizeOf(context).height,
         viewportFraction: 1.0,
@@ -283,8 +284,10 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
     return LMChatImage(
       imageUrl: media.mediaUrl,
       imageFile: media.mediaFile,
-      style: const LMChatImageStyle(
+      style: LMChatImageStyle(
         boxFit: BoxFit.cover,
+        height: media.height?.toDouble(),
+        width: media.width?.toDouble(),
       ),
     );
   }
