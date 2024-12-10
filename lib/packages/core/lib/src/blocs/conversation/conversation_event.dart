@@ -37,6 +37,7 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
 
   final PaginationDirection direction;
   final int? lastConversationId;
+  final int? replyId;
 
   /// Creates and returns a new instance of [LMChatFetchConversationsEvent]
   LMChatFetchConversationsEvent({
@@ -47,6 +48,7 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
     required this.lastConversationId,
     this.minTimestamp,
     this.maxTimestamp,
+    this.replyId,
   });
 
   @override
@@ -58,6 +60,7 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
         lastConversationId ?? -1,
         minTimestamp ?? 0,
         maxTimestamp ?? 0,
+        replyId ?? -1,
       ];
 }
 

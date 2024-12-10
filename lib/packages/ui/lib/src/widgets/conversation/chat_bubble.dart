@@ -423,7 +423,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       },
       child: Stack(
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(
+              milliseconds: 500,
+            ),
             foregroundDecoration: BoxDecoration(
               color: _isSelected
                   ? inStyle.selectedColor ??
@@ -692,6 +695,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   LMChatBubbleReply _defReplyWidget() {
     return LMChatBubbleReply(
+      onTap: widget.onReplyTap,
       replyToConversation: conversation.replyConversationObject!,
       title: LMChatText(
         currentUser.id == conversation.replyConversationObject!.memberId

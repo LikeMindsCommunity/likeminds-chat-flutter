@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_controller.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_typedef.dart';
@@ -41,12 +40,6 @@ class LMDualSidePagedList<T> extends StatefulWidget {
 
   /// The initial page to load.
   final int initialPage;
-
-  /// The limit for the top side of the list.
-  final int? topSideLimit;
-
-  /// The limit for the bottom side of the list.
-  final int? bottomSideLimit;
 
   /// The pagination controller to manage the pagination.
   final LMChatPaginationController<T> paginationController;
@@ -108,6 +101,9 @@ class LMDualSidePagedList<T> extends StatefulWidget {
   /// Whether to delay populating the cache area.
   final bool? delayPopulatingCacheArea;
 
+  /// Pagination type
+  final PaginationType paginationType;
+
   /// {@macro lm_dual_side_paged_list}
   const LMDualSidePagedList({
     super.key,
@@ -120,8 +116,6 @@ class LMDualSidePagedList<T> extends StatefulWidget {
     this.errorBuilder,
     this.paginationErrorBuilder,
     required this.initialPage,
-    this.topSideLimit,
-    this.bottomSideLimit,
     required this.paginationController,
     this.scrollDirection,
     this.reverse,
@@ -142,6 +136,7 @@ class LMDualSidePagedList<T> extends StatefulWidget {
     this.extentEstimation,
     this.extentPrecalculationPolicy,
     this.delayPopulatingCacheArea,
+    this.paginationType = PaginationType.both,
   });
 
   @override
@@ -211,8 +206,8 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     if (widget.paginationController.isLastPageToTopReached) {
       return;
     }
-    // Check if the top side limit is reached
-    if (widget.topSideLimit != null && _upSidePage <= widget.topSideLimit!) {
+    // Check if type only allows bottom pagination
+    if (widget.paginationType == PaginationType.bottom) {
       return;
     }
     if (widget.paginationController.isLoadingTop) {
@@ -224,13 +219,13 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
 
     try {
       // _upSidePage++;
-      int previousItemsCount = widget.paginationController.items.length;
+      int previousItemsCount = widget.paginationController.itemList.length;
       await widget.onPaginationTriggered(
         _upSidePage,
         PaginationDirection.top,
-        widget.paginationController.items.first,
+        widget.paginationController.itemList.first,
       );
-      int newItemsCount = widget.paginationController.items.length;
+      int newItemsCount = widget.paginationController.itemList.length;
       int newItemsLength = newItemsCount - previousItemsCount;
       // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -255,9 +250,8 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     if (widget.paginationController.isLastPageToBottomReached) {
       return;
     }
-    // Check if the bottom side limit is reached
-    if (widget.bottomSideLimit != null &&
-        _downSidePage >= widget.bottomSideLimit!) {
+    // Check if type only allows top pagination
+    if (widget.paginationType == PaginationType.top) {
       return;
     }
     if (widget.paginationController.isLoadingBottom) {
@@ -273,7 +267,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       await widget.onPaginationTriggered(
         _downSidePage,
         PaginationDirection.bottom,
-        widget.paginationController.items.last,
+        widget.paginationController.itemList.last,
       );
     } catch (e) {
       _downSidePage--; // revert page increment if no data is returned
@@ -294,7 +288,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       return widget.errorBuilder?.call(context, _loadInitialData) ??
           const Center(child: Text("An error occurred"));
     }
-    final items = widget.paginationController.items;
+    final items = widget.paginationController.itemList;
 
     if (items.isEmpty) {
       return widget.noItemsBuilder?.call(context) ??

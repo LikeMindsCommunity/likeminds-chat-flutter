@@ -4,7 +4,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+// import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
@@ -19,6 +19,7 @@ import 'package:likeminds_chat_flutter_core/src/views/report/report.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 /// {@template chatroom_screen}
 /// Chatroom screen is the main screen where the user can chat with other users.
@@ -62,8 +63,14 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   ValueNotifier<bool> rebuildFloatingButton = ValueNotifier(false);
 
   ScrollController scrollController = ScrollController();
-  PagingController<int, LMChatConversationViewData> pagedListController =
-      PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
+  // PagingController<int, LMChatConversationViewData> pagedListController =
+  //     PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
+  ListController listController = ListController();
+  late LMChatPaginationController<LMChatConversationViewData>
+      pagedListController = LMChatPaginationController(
+    listController: ListController(),
+    scrollController: scrollController,
+  );
 
   final List<int> _selectedIds = <int>[];
   final LMChatroomBuilderDelegate _screenBuilder =
@@ -316,7 +323,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       appBarNotifier: rebuildAppBar,
       selectedConversations: _selectedIds,
       scrollController: scrollController,
-      listController: pagedListController,
+      // listController: pagedListController,
       isOtherUserAIChatbot: isOtherUserAIChatbot(
         chatroom.toChatRoomViewData(),
       ),
@@ -329,7 +336,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       appBarNotifier: rebuildAppBar,
       selectedConversations: _selectedIds,
       scrollController: scrollController,
-      listController: pagedListController,
+      pagingController: pagedListController,
     );
   }
 
@@ -457,10 +464,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   }
 
   List<Widget> _defaultSelectedChatroomMenu() {
+    // final LMChatConversationViewData? conversationViewData = pagedListController
+    //     .value.itemList
+    //     ?.firstWhere((element) => element.id == _selectedIds.first);
     final LMChatConversationViewData? conversationViewData = pagedListController
-        .value.itemList
-        ?.firstWhere((element) => element.id == _selectedIds.first);
-
+        .itemList
+        .firstWhere((element) => element.id == _selectedIds.first);
     bool haveDeletePermission = conversationViewData != null &&
         LMChatMemberRightUtil.checkDeletePermissions(conversationViewData) &&
         chatroom.chatRequestState != 2;
@@ -510,7 +519,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         const SizedBox(width: 8),
         _screenBuilder.copyButton(
           context,
-          pagedListController.value.itemList
+          pagedListController.itemList
                   ?.where(
                       (conversation) => _selectedIds.contains(conversation.id))
                   .toList() ??
@@ -526,7 +535,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               if (isMultiple) {
                 for (int id in _selectedIds) {
                   LMChatConversationViewData conversation = pagedListController
-                      .value.itemList!
+                      .itemList!
                       .firstWhere((element) => element.id == id);
                   copiedMessage +=
                       "[${conversation.date}] ${conversation.member!.name} : ${conversation.answer}\n";

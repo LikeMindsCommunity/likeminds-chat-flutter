@@ -15,7 +15,7 @@ class LMChatPaginationController<T> {
   final StreamController<int> downSidePage = StreamController<int>();
 
   /// The list of items that have been loaded so far.
-  List<T> items = [];
+  List<T> itemList = [];
 
   final ListController _listController;
   final ScrollController _scrollController;
@@ -61,9 +61,9 @@ class LMChatPaginationController<T> {
     isFirstPageLoadedController.add(true);
     // }
     downSidePage.add(nextPageKey ?? 0);
-    final previousItems = items;
+    final previousItems = this.itemList;
     final itemList = previousItems + newItems;
-    items = itemList;
+    this.itemList = itemList;
     isLoadingBottom = false;
   }
 
@@ -77,12 +77,12 @@ class LMChatPaginationController<T> {
     if (previousPageKey == null) {
       _isLastPageToTopReached = true;
     }
-    final previousItems = items;
+    final previousItems = this.itemList;
     final itemList = newItems + previousItems;
     upSidePage.add(previousPageKey ?? 0);
     // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      items = itemList;
+      this.itemList = itemList;
       listController.jumpToItem(
         index: newItems.length,
         scrollController: scrollController,
@@ -101,7 +101,7 @@ class LMChatPaginationController<T> {
   /// This is useful when you want to reset the list.
   /// For example, when you want to load a new list of items.
   void clear() {
-    items = [];
+    itemList = [];
     upSidePage.add(0);
     downSidePage.add(0);
     _isLastPageToBottomReached = false;
@@ -110,7 +110,7 @@ class LMChatPaginationController<T> {
 
   /// Appends [newItems] to the previously loaded ones.
   void addAll(List<T> newItems) {
-    items.addAll(newItems);
+    itemList.addAll(newItems);
     upSidePage.add(2);
     downSidePage.add(2);
     isLoadingBottom = false;

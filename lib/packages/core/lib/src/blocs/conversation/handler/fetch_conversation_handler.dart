@@ -9,17 +9,19 @@ fetchConversationsEventHandler(
   final currentTime = DateTime.now().millisecondsSinceEpoch;
   final int minTimestamp = event.minTimestamp ?? 0;
   final int maxTimestamp = event.maxTimestamp ?? currentTime;
-  final GetConversationRequest getConversationRequest =
-      (GetConversationRequestBuilder()
-            ..chatroomId(event.chatroomId)
-            ..page(event.page)
-            ..pageSize(event.pageSize)
-            ..isLocalDB(false)
-            ..minTimestamp(minTimestamp)
-            ..maxTimestamp(maxTimestamp))
-          .build();
-  LMResponse response =
-      await LMChatCore.client.getConversation(getConversationRequest);
+  final GetConversationRequestBuilder getConversationRequestBuilder =
+      GetConversationRequestBuilder()
+        ..chatroomId(event.chatroomId)
+        ..page(event.page)
+        ..pageSize(event.pageSize)
+        ..isLocalDB(false)
+        ..minTimestamp(minTimestamp)
+        ..maxTimestamp(maxTimestamp);
+  if (event.replyId != null) {
+    getConversationRequestBuilder.conversationId(event.replyId!);
+  }
+  LMResponse response = await LMChatCore.client
+      .getConversation(getConversationRequestBuilder.build());
   if (response.success) {
     GetConversationResponse conversationResponse = response.data;
     for (var element in conversationResponse.conversationData!) {

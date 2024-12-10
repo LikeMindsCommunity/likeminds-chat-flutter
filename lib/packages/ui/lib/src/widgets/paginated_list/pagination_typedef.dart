@@ -26,3 +26,14 @@ enum PaginationDirection {
   /// bottom side pagination
   bottom,
 }
+
+enum PaginationType {
+  /// trigger pagination when the user scrolls to the top of the list
+  top,
+
+  /// trigger pagination when the user scrolls to the bottom of the list
+  bottom,
+
+  /// trigger pagination when the user scrolls to the top or bottom of the list
+  both,
+}
