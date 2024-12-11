@@ -75,25 +75,25 @@ class LMChatImage extends StatefulWidget {
 class _LMImageState extends State<LMChatImage> {
   LMChatImageStyle? style;
 
+  /// Initializes the state of the widget by setting up the style
   @override
   void initState() {
     super.initState();
     style = widget.style ?? LMChatTheme.theme.imageStyle;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
+  /// Builds the widget tree for the image widget
+  /// Returns a GestureDetector that handles tap events
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => widget.onTap?.call(),
+      onTap: widget.onTap,
       child: _buildImageWidget(),
     );
   }
 
+  /// Determines which type of image to build based on the provided source
+  /// Returns the appropriate image widget for URL, File, or Asset images
   Widget _buildImageWidget() {
     if (widget.imageUrl != null) {
       return _buildNetworkImage();
@@ -107,6 +107,15 @@ class _LMImageState extends State<LMChatImage> {
     return const SizedBox();
   }
 
+  /// Builds a PhotoView widget with proper scaling based on image dimensions
+  ///
+  /// Parameters:
+  /// - imageProvider: The provider for the image source
+  /// - context: The build context
+  /// - imageWidth: The width of the image
+  /// - imageHeight: The height of the image
+  ///
+  /// Returns a PhotoView widget with calculated scaling parameters
   Widget _buildPhotoView({
     required ImageProvider imageProvider,
     required BuildContext context,
@@ -131,6 +140,9 @@ class _LMImageState extends State<LMChatImage> {
     );
   }
 
+  /// Builds a widget for displaying network images
+  /// Uses CachedNetworkImage for efficient loading and caching
+  /// Returns a Container with the network image
   Widget _buildNetworkImage() {
     return Container(
       padding: style?.padding,
@@ -195,6 +207,9 @@ class _LMImageState extends State<LMChatImage> {
     );
   }
 
+  /// Builds a widget for displaying images from local files
+  /// Uses FutureBuilder to handle async loading of image dimensions
+  /// Returns a Container with the file image
   Widget _buildFileImage() {
     return Container(
       padding: style?.padding,
@@ -221,6 +236,9 @@ class _LMImageState extends State<LMChatImage> {
     );
   }
 
+  /// Builds a widget for displaying images from assets
+  /// Uses FutureBuilder to handle async loading of image dimensions
+  /// Returns a Container with the asset image
   Widget _buildAssetImage() {
     return Container(
       padding: style?.padding,
@@ -247,7 +265,12 @@ class _LMImageState extends State<LMChatImage> {
     );
   }
 
-  // Helper function to get image dimensions for File and Asset images
+  /// Helper function to get image dimensions asynchronously
+  ///
+  /// Parameters:
+  /// - provider: The ImageProvider to get dimensions from
+  ///
+  /// Returns a Future that resolves to the image dimensions
   Future<ui.Image> _getImageDimensions(ImageProvider provider) async {
     final Completer<ui.Image> completer = Completer<ui.Image>();
     final ImageStream stream = provider.resolve(ImageConfiguration.empty);
@@ -260,6 +283,8 @@ class _LMImageState extends State<LMChatImage> {
     return completer.future;
   }
 
+  /// Builds a default error widget to display when image loading fails
+  /// Returns a Container with error icon and message
   Widget _defaultErrorWidget() {
     return Container(
       color: Colors.grey,
