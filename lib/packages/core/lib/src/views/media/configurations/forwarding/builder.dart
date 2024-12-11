@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -45,10 +46,12 @@ class LMChatMediaForwardingBuilderDelegate {
     LMChatWidgetSource source = LMChatWidgetSource.mediaForwarding,
     bool canPop = true,
     Function(bool)? onPopInvoked,
+    SystemUiOverlayStyle? systemUiOverlay,
   }) {
     return _chatWidgetBuilderDelegate.scaffold(
       key: key,
       extendBody: extendBody,
+      systemUiOverlay: systemUiOverlay,
       extendBodyBehindAppBar: extendBodyBehindAppBar,
       appBar: appBar,
       body: body,

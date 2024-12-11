@@ -116,7 +116,7 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
                 ),
                 child: Container(
                   height: style.height ?? 60,
-                  width: style.width ?? 60.w,
+                  width: style.width ?? 55.w,
                   decoration: BoxDecoration(
                     border: Border.all(color: LMChatDefaultTheme.greyColor),
                     borderRadius: BorderRadius.circular(kBorderRadiusMedium),

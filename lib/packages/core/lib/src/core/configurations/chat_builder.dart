@@ -41,9 +41,11 @@ class LMChatWidgetBuilderDelegate {
     LMChatWidgetSource source = LMChatWidgetSource.home,
     bool canPop = true,
     Function(bool)? onPopInvoked,
+    SystemUiOverlayStyle? systemUiOverlay,
   }) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: LMChatCore.config.globalSystemOverlayStyle ??
+      value: systemUiOverlay ??
+          LMChatCore.config.globalSystemOverlayStyle ??
           SystemUiOverlayStyle.dark,
       child: WillPopScope(
         onWillPop: () async {
