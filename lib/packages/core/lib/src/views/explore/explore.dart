@@ -47,19 +47,25 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   int _page = 1;
   bool pinnedChatroom = false;
   final LMChatCustomPopupMenuStyle _defMenuStyle = LMChatCustomPopupMenuStyle(
-    textStyle: const LMChatTextStyle(
+    textStyle: LMChatTextStyle(
       maxLines: 1,
       textStyle: TextStyle(
         fontSize: 16,
+        color: LMChatTheme.theme.onContainer,
       ),
     ),
-    iconStyle: const LMChatIconStyle(
+    iconStyle: LMChatIconStyle(
       size: 28,
+      color: LMChatTheme.theme.onContainer,
     ),
     menuBoxWidth: 52.w,
     menuBoxDecoration: BoxDecoration(
       color: LMChatTheme.theme.container,
       borderRadius: BorderRadius.circular(10),
+    ),
+    menuTextStyle: TextStyle(
+      fontSize: 14,
+      color: LMChatTheme.theme.onContainer,
     ),
   );
 
@@ -173,7 +179,12 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
                 children: [
                   LMChatText(
                     getStateSpace(_space),
-                    style: _popUpMenuStyle().textStyle,
+                    style: _popUpMenuStyle().textStyle?.copyWith(
+                          textStyle: _popUpMenuStyle()
+                              .textStyle
+                              ?.textStyle
+                              ?.copyWith(color: LMChatTheme.theme.onContainer),
+                        ),
                   ),
                   const SizedBox(width: 8),
                   LMChatIcon(
@@ -367,17 +378,20 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         );
         debugPrint("Pin button tapped");
       },
-      icon: const LMChatIcon(
+      icon: LMChatIcon(
         type: LMChatIconType.icon,
         icon: Icons.push_pin_outlined,
         style: LMChatIconStyle(
           size: 20,
+          color: LMChatTheme.theme.onContainer,
         ),
       ),
       style: LMChatButtonStyle(
         height: 32,
         width: 32,
-        border: Border.all(),
+        border: Border.all(
+          color: LMChatTheme.theme.onContainer,
+        ),
         borderRadius: 16,
         backgroundColor: Colors.transparent,
       ),
@@ -392,10 +406,13 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         _refreshExploreFeed();
         debugPrint("Pin button tapped");
       },
-      text: const LMChatText(
+      text: LMChatText(
         "Pinned",
         style: LMChatTextStyle(
-          textStyle: TextStyle(fontSize: 14),
+          textStyle: TextStyle(
+            fontSize: 14,
+            color: LMChatTheme.theme.onContainer,
+          ),
         ),
       ),
       icon: LMChatIcon(
@@ -407,13 +424,16 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
           boxBorderRadius: 11,
           boxPadding: const EdgeInsets.all(2),
           boxSize: 22,
+          color: LMChatTheme.theme.onContainer,
           boxBorderColor: LMChatTheme.theme.onContainer,
         ),
       ),
       style: LMChatButtonStyle(
         height: 32,
         spacing: 6,
-        border: Border.all(),
+        border: Border.all(
+          color: LMChatTheme.theme.onContainer,
+        ),
         borderRadius: 16,
         padding: const EdgeInsets.symmetric(
           horizontal: 6,

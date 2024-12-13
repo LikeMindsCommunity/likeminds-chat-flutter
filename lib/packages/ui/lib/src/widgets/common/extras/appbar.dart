@@ -101,13 +101,12 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                     type: LMChatIconType.icon,
                                     icon: Icons.arrow_back,
                                     style: LMChatIconStyle(
-                                      color: LMChatTheme.theme.onPrimary,
-                                      size: 20,
+                                      color: LMChatTheme.theme.onContainer,
+                                      size: 24,
                                       boxSize: 28,
                                     ),
                                   ),
-                                  backgroundColor:
-                                      LMChatTheme.theme.primaryColor,
+                                  backgroundColor: LMChatTheme.theme.container,
                                 ),
                               )
                             : const SizedBox.shrink()),
@@ -256,9 +255,9 @@ class LMChatAppBarStyle {
   }
 
   /// A basic style for the AppBar.
-  factory LMChatAppBarStyle.basic() {
-    return const LMChatAppBarStyle(
-      backgroundColor: LMChatDefaultTheme.container,
+  factory LMChatAppBarStyle.basic(Color? backgroundColor) {
+    return LMChatAppBarStyle(
+      backgroundColor: backgroundColor ?? LMChatDefaultTheme.container,
       width: double.infinity,
     );
   }

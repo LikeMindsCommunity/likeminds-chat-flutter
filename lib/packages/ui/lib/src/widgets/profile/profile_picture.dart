@@ -49,7 +49,10 @@ class LMChatProfilePicture extends StatelessWidget {
                 shape: inStyle.boxShape ?? BoxShape.rectangle,
                 color: imageUrl != null && imageUrl!.isNotEmpty
                     ? Colors.grey.shade300
-                    : inStyle.backgroundColor ?? LMChatTheme.theme.primaryColor,
+                    : inStyle.backgroundColor ??
+                        (LMChatTheme.isThemeDark
+                            ? LMChatTheme.theme.container
+                            : LMChatTheme.theme.primaryColor),
                 image: filePath != null
                     ? DecorationImage(
                         image: FileImage(File(filePath!)),
@@ -74,7 +77,9 @@ class LMChatProfilePicture extends StatelessWidget {
                               textAlign: TextAlign.center,
                               textStyle: TextStyle(
                                 overflow: TextOverflow.clip,
-                                color: LMChatTheme.theme.onPrimary,
+                                color: LMChatTheme.isThemeDark
+                                    ? LMChatTheme.theme.onContainer
+                                    : LMChatTheme.theme.onPrimary,
                                 fontSize: inStyle.size != null
                                     ? inStyle.size! / 2
                                     : 24,
@@ -128,13 +133,17 @@ class LMChatProfilePictureStyle {
 
   factory LMChatProfilePictureStyle.basic() {
     return LMChatProfilePictureStyle(
-      backgroundColor: LMChatTheme.theme.primaryColor,
+      backgroundColor: (LMChatTheme.isThemeDark
+          ? LMChatTheme.theme.container
+          : LMChatTheme.theme.primaryColor),
       boxShape: BoxShape.circle,
       fallbackTextStyle: LMChatTextStyle(
         textStyle: TextStyle(
-          color: LMChatTheme.theme.onPrimary,
           fontSize: 24,
           fontWeight: FontWeight.w600,
+          color: LMChatTheme.isThemeDark
+              ? LMChatTheme.theme.primaryColor
+              : LMChatTheme.theme.onPrimary,
         ),
       ),
     );

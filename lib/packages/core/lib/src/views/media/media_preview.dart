@@ -77,7 +77,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         LMChatMediaHandler.instance.clearPickedMedia();
       },
       systemUiOverlay: SystemUiOverlayStyle.light,
-      backgroundColor: LMChatTheme.theme.onContainer,
+      backgroundColor: LMChatTheme.isThemeDark
+          ? LMChatTheme.theme.container
+          : LMChatTheme.theme.onContainer,
       appBar: _screenBuilder.appBarBuilder(
         context,
         _defAppBar(),
@@ -113,7 +115,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       style: LMChatAppBarStyle(
         height: 60,
         gap: 12,
-        backgroundColor: LMChatTheme.theme.onContainer.withOpacity(0.5),
+        backgroundColor: LMChatTheme.isThemeDark
+            ? LMChatTheme.theme.container.withOpacity(0.5)
+            : LMChatTheme.theme.onContainer.withOpacity(0.5),
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
       leading: LMChatButton(
@@ -125,7 +129,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           type: LMChatIconType.icon,
           icon: Icons.arrow_back,
           style: LMChatIconStyle(
-            color: LMChatTheme.theme.container,
+            color: LMChatTheme.isThemeDark
+                ? LMChatTheme.theme.onContainer
+                : LMChatTheme.theme.container,
           ),
         ),
       ),
@@ -138,7 +144,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           padding: const EdgeInsets.only(top: 2),
           textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: LMChatTheme.theme.container,
+                color: LMChatTheme.isThemeDark
+                    ? LMChatTheme.theme.onContainer
+                    : LMChatTheme.theme.container,
               ),
         ),
       ),
@@ -159,7 +167,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
           style: LMChatTextStyle(
             maxLines: 1,
             textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: LMChatTheme.theme.disabledColor,
+                  color: LMChatTheme.isThemeDark
+                      ? LMChatTheme.theme.onContainer
+                      : LMChatTheme.theme.container,
                 ),
           ),
         );
@@ -208,7 +218,9 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         itemBuilder: (context, index, realIndex) {
           final media = mediaList[index];
           return Container(
-            color: LMChatTheme.theme.onContainer,
+            color: LMChatTheme.isThemeDark
+                ? LMChatTheme.theme.container
+                : LMChatTheme.theme.onContainer,
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 2.h),
               child: Center(

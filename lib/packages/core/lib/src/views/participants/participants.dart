@@ -71,7 +71,7 @@ class _LMChatroomParticipantsPageState
   @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
-      backgroundColor: LMChatTheme.instance.themeData.container,
+      backgroundColor: LMChatTheme.instance.themeData.scaffold,
       appBar: _screenBuilder.appBarBuilder(
         context,
         _searchController,
@@ -112,7 +112,8 @@ class _LMChatroomParticipantsPageState
     return LMChatAppBar(
       style: LMChatAppBarStyle(
         height: 72,
-        gap: 0,
+        gap: 4,
+        backgroundColor: LMChatTheme.theme.container,
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
       title: ValueListenableBuilder(
@@ -121,7 +122,6 @@ class _LMChatroomParticipantsPageState
           return Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 4.w,
-              // vertical: 2.h,
             ),
             child: _showSearchBarTextField.value
                 ? TextField(
@@ -135,7 +135,7 @@ class _LMChatroomParticipantsPageState
                       hintText: "Search...",
                       hintStyle:
                           Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                color: Colors.grey,
+                                color: LMChatTheme.theme.onContainer,
                                 fontSize: 16,
                               ),
                     ),
@@ -143,21 +143,23 @@ class _LMChatroomParticipantsPageState
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const LMChatText(
+                      LMChatText(
                         "Participants",
                         style: LMChatTextStyle(
                           maxLines: 1,
                           textStyle: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
+                            color: LMChatTheme.theme.onContainer,
                           ),
                         ),
                       ),
                       kVerticalPaddingSmall,
                       Text(
                         _memberCountText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
+                          color: LMChatTheme.theme.onContainer,
                         ),
                       ),
                     ],
@@ -174,8 +176,9 @@ class _LMChatroomParticipantsPageState
                 child: LMChatIcon(
                     type: LMChatIconType.icon,
                     icon: value ? Icons.close : Icons.search,
-                    style: const LMChatIconStyle(
+                    style: LMChatIconStyle(
                       size: 24,
+                      color: LMChatTheme.theme.onContainer,
                     )),
               );
             }),

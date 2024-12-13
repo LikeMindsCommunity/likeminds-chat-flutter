@@ -55,31 +55,33 @@ Widget getChatItemAttachmentTile(
       children: [
         LMChatText(
           prefix ?? '',
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
         LMChatText(
           message,
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 12,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
-        const LMChatIcon(
+        LMChatIcon(
           type: LMChatIconType.icon,
           icon: Icons.link,
           style: LMChatIconStyle(
-            color: LMChatDefaultTheme.greyColor,
+            color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             size: 16,
           ),
         ),
@@ -91,23 +93,24 @@ Widget getChatItemAttachmentTile(
       children: [
         LMChatText(
           prefix ?? '',
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
         LMChatText(message),
-        const LMChatIcon(
+        LMChatIcon(
           type: LMChatIconType.svg,
           assetPath: kPollIcon,
           style: LMChatIconStyle(
             size: 14,
-            color: LMChatDefaultTheme.greyColor,
-            boxPadding: EdgeInsets.only(
+            color: LMChatTheme.theme.onContainer.withOpacity(0.8),
+            boxPadding: const EdgeInsets.only(
               right: 4,
             ),
           ),
@@ -116,12 +119,13 @@ Widget getChatItemAttachmentTile(
           width: 42.w,
           child: LMChatText(
             answerText,
-            style: const LMChatTextStyle(
+            style: LMChatTextStyle(
               maxLines: 1,
               textStyle: TextStyle(
                 overflow: TextOverflow.ellipsis,
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
               ),
             ),
           ),
@@ -136,23 +140,25 @@ Widget getChatItemAttachmentTile(
       children: [
         LMChatText(
           prefix ?? '',
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
         LMChatText(
           answerText,
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 12,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
@@ -167,25 +173,26 @@ Widget getChatItemAttachmentTile(
         children: [
           LMChatText(
             prefix ?? '',
-            style: const LMChatTextStyle(
+            style: LMChatTextStyle(
               maxLines: 1,
               textStyle: TextStyle(
                 overflow: TextOverflow.ellipsis,
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
               ),
             ),
           ),
-          const LMChatIcon(
+          LMChatIcon(
             type: LMChatIconType.icon,
             icon: Icons.mic,
             style: LMChatIconStyle(
-              color: LMChatDefaultTheme.greyColor,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
               size: 16,
             ),
           ),
           LMChatDefaultTheme.kHorizontalPaddingSmall,
-          const LMChatText(
+          LMChatText(
             "Voice Message",
             style: LMChatTextStyle(
               maxLines: 1,
@@ -193,6 +200,7 @@ Widget getChatItemAttachmentTile(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
                 overflow: TextOverflow.ellipsis,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
               ),
             ),
           ),
@@ -224,53 +232,56 @@ Widget getChatItemAttachmentTile(
           children: <Widget>[
             LMChatText(
               prefix ?? '',
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   overflow: TextOverflow.ellipsis,
                   fontSize: 14,
                   fontWeight: FontWeight.normal,
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                 ),
               ),
             ),
             LMChatText(
               videoCount.toString(),
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
                   overflow: TextOverflow.ellipsis,
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                 ),
               ),
             ),
             LMChatDefaultTheme.kHorizontalPaddingSmall,
-            const LMChatIcon(
+            LMChatIcon(
               type: LMChatIconType.icon,
               icon: Icons.video_camera_back,
               style: LMChatIconStyle(
-                color: LMChatDefaultTheme.greyColor,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                 size: 16,
               ),
             ),
             LMChatDefaultTheme.kHorizontalPaddingMedium,
             LMChatText(
               imageCount.toString(),
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
                   overflow: TextOverflow.ellipsis,
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                 ),
               ),
             ),
             LMChatDefaultTheme.kHorizontalPaddingSmall,
-            const LMChatIcon(
+            LMChatIcon(
               type: LMChatIconType.icon,
               icon: Icons.image,
               style: LMChatIconStyle(
-                color: LMChatDefaultTheme.greyColor,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                 size: 16,
               ),
             ),
@@ -278,12 +289,13 @@ Widget getChatItemAttachmentTile(
             Expanded(
               child: LMChatText(
                 answerText,
-                style: const LMChatTextStyle(
+                style: LMChatTextStyle(
                   maxLines: 1,
                   textStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
                     overflow: TextOverflow.ellipsis,
+                    color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                   ),
                 ),
               ),
@@ -313,24 +325,26 @@ Widget getChatItemAttachmentTile(
       children: <Widget>[
         LMChatText(
           prefix ?? '',
-          style: const LMChatTextStyle(
+          style: LMChatTextStyle(
             maxLines: 1,
             textStyle: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 14,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
         mediaFiles.length > 1
             ? LMChatText(
                 '${mediaFiles.length}',
-                style: const LMChatTextStyle(
+                style: LMChatTextStyle(
                   maxLines: 1,
                   textStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
                     overflow: TextOverflow.ellipsis,
+                    color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                   ),
                 ),
               )
@@ -341,8 +355,8 @@ Widget getChatItemAttachmentTile(
         LMChatIcon(
           type: LMChatIconType.icon,
           icon: iconData,
-          style: const LMChatIconStyle(
-            color: LMChatDefaultTheme.greyColor,
+          style: LMChatIconStyle(
+            color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             size: 16,
             boxSize: 16,
           ),
@@ -353,9 +367,10 @@ Widget getChatItemAttachmentTile(
             text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
@@ -598,7 +613,7 @@ Widget getImageMessage(
                     '+2',
                     style: LMChatTextStyle(
                       textStyle: TextStyle(
-                        color: LMChatTheme.theme.onContainer,
+                        color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                         fontSize: 20,
                       ),
                     ),
@@ -701,7 +716,8 @@ Widget getImageMessage(
                         '+2',
                         style: LMChatTextStyle(
                           textStyle: TextStyle(
-                            color: LMChatTheme.theme.onContainer,
+                            color:
+                                LMChatTheme.theme.onContainer.withOpacity(0.8),
                             fontSize: 20,
                           ),
                         ),

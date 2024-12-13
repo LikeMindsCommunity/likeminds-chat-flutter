@@ -992,7 +992,9 @@ class LMChatBubbleStyle {
   /// Creates a basic style with default values.
   factory LMChatBubbleStyle.basic() {
     return LMChatBubbleStyle(
-      backgroundColor: LMChatDefaultTheme.container,
+      backgroundColor: LMChatTheme.isThemeDark
+          ? LMChatDefaultDarkTheme.container.withAlpha(255)
+          : LMChatDefaultTheme.container,
       selectedColor: const Color.fromRGBO(0, 96, 86, 0.3),
       showSides: true,
       showActions: true,
