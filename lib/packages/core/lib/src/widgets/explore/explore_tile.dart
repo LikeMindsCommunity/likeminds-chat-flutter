@@ -134,12 +134,13 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
             context,
             LMChatText(
               chatroom.title,
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 textAlign: TextAlign.left,
                 maxLines: 2,
                 minLines: 1,
                 textStyle: TextStyle(
                   overflow: TextOverflow.ellipsis,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               ),
             ),
@@ -159,12 +160,13 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
                   chatroom.isSecret ?? false
                       ? LMChatText(
                           chatroom.header,
-                          style: const LMChatTextStyle(
+                          style: LMChatTextStyle(
                             maxLines: 1,
                             textStyle: TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
+                              color: LMChatTheme.theme.onContainer,
                             ),
                           ),
                         )
@@ -173,26 +175,28 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
                             context,
                             LMChatText(
                               chatroom.header,
-                              style: const LMChatTextStyle(
+                              style: LMChatTextStyle(
                                 maxLines: 1,
                                 textStyle: TextStyle(
                                   overflow: TextOverflow.ellipsis,
                                   fontSize: 16,
+                                  color: LMChatTheme.theme.onContainer,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                  const SizedBox(width: 2),
+                  const SizedBox(width: 4),
                   if (chatroom.isSecret ?? false)
                     _screenBuilder.lockIconBuilder(
                       context,
-                      const LMChatIcon(
+                      LMChatIcon(
                         type: LMChatIconType.svg,
                         assetPath: secretLockIcon,
                         style: LMChatIconStyle(
-                          size: 20,
+                          size: 18,
+                          color: LMChatTheme.theme.onContainer.withOpacity(0.8),
                         ),
                       ),
                     ),
@@ -231,12 +235,12 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
       children: [
         _screenBuilder.memberCountIconBuilder(
           context,
-          const LMChatIcon(
+          LMChatIcon(
             type: LMChatIconType.icon,
             icon: Icons.people_outline,
             style: LMChatIconStyle(
               size: 20,
-              color: LMChatDefaultTheme.greyColor,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.6),
             ),
           ),
         ),
@@ -246,12 +250,12 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           chatroom.participantCount ?? 0,
           LMChatText(
             chatroom.participantCount.toString(),
-            style: const LMChatTextStyle(
+            style: LMChatTextStyle(
               maxLines: 1,
               textStyle: TextStyle(
                 overflow: TextOverflow.ellipsis,
                 fontSize: 14,
-                color: LMChatDefaultTheme.greyColor,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.6),
               ),
             ),
           ),
@@ -259,12 +263,12 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
         const SizedBox(width: 10),
         _screenBuilder.totalResponseCountIconBuilder(
           context,
-          const LMChatIcon(
+          LMChatIcon(
             type: LMChatIconType.icon,
             icon: CupertinoIcons.chat_bubble,
             style: LMChatIconStyle(
               size: 20,
-              color: LMChatDefaultTheme.greyColor,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.6),
             ),
           ),
         ),
@@ -274,12 +278,12 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
           chatroom.totalResponseCount ?? 0,
           LMChatText(
             chatroom.totalResponseCount.toString(),
-            style: const LMChatTextStyle(
+            style: LMChatTextStyle(
               maxLines: 1,
               textStyle: TextStyle(
                 overflow: TextOverflow.ellipsis,
                 fontSize: 14,
-                color: LMChatDefaultTheme.greyColor,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.6),
               ),
             ),
           ),
@@ -299,17 +303,6 @@ class _LMChatExploreTileState extends State<LMChatExploreTile> {
               _onTapJoinButton();
             },
           );
-          // bool isJoined = chatroom.followStatus!;
-          // return chatroom.isSecret != null && chatroom.isSecret!
-          //     ? LMChatButton(
-          //         onTap: () {},
-          //         text: LMChatText(isJoined ? 'Joined' : 'Join'),
-          //         icon: const LMChatIcon(
-          //           type: LMChatIconType.icon,
-          //           icon: Icons.notification_add_outlined,
-          //         ),
-          //       )
-          //     : const SizedBox.shrink();
         });
   }
 

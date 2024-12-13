@@ -622,7 +622,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
       isSecret: widget.chatroom.isSecret ?? false,
       chatroomId: widget.chatroom.id,
-      style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 14),
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontSize: 14,
+            color: LMChatTheme.theme.onContainer,
+          ),
       onTagSelected: (tag) {
         tags.add(tag);
         LMChatAnalyticsBloc.instance.add(
@@ -643,7 +646,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         border: InputBorder.none,
         enabled: true,
         hintMaxLines: 1,
-        hintStyle: const TextStyle(fontSize: 14),
+        hintStyle: TextStyle(
+          fontSize: 14,
+          color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+        ),
         hintText: _getChatBarHintText(),
       ),
       focusNode: _focusNode,
@@ -1388,7 +1394,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                   ? const EdgeInsets.all(12)
                   : EdgeInsets.zero,
               backgroundColor: item.iconType == LMChatIconType.svg
-                  ? _themeData.secondaryColor
+                  ? _themeData.primaryColor
                   : null,
             ),
           ),
@@ -1403,7 +1409,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         LMChatText(
           item.label,
           style: LMChatTextStyle(
-            textStyle: Theme.of(context).textTheme.bodySmall,
+            textStyle: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: LMChatTheme.theme.onContainer),
           ),
         ),
       ],
@@ -1469,7 +1478,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       title: LMChatText(
         "Edit message",
         style: LMChatTextStyle(
-          textStyle: Theme.of(context).textTheme.bodyLarge,
+          textStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: LMChatTheme.theme.onContainer,
+              ),
           maxLines: 1,
         ),
       ),
@@ -1484,7 +1495,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             ) ??
             "",
         style: LMChatTextStyle(
-          textStyle: Theme.of(context).textTheme.bodySmall,
+          textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: LMChatTheme.theme.onContainer,
+              ),
         ),
       ),
     );
