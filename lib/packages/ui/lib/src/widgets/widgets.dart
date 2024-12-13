@@ -19,7 +19,6 @@ export 'profile/profile_picture.dart';
 export 'profile/user_tile.dart';
 
 export 'shimmers/chatroom_skeleton.dart';
-export 'shimmers/skeleton_chat_box.dart';
 export 'shimmers/document_shimmer.dart';
 export 'shimmers/media_shimmer.dart';
 
