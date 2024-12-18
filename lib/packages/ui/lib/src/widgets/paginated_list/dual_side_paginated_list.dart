@@ -150,8 +150,6 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
   bool _isLoadingFirstPage = true;
   bool _hasError = false;
   bool _paginationError = false;
-  late final ScrollController _scrollController;
-  late final ListController _listController;
 
   @override
   void initState() {
@@ -159,8 +157,6 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     _currentPage = widget.initialPage;
     _upSidePage = _currentPage;
     _downSidePage = _currentPage;
-    _scrollController = widget.paginationController.scrollController;
-    _listController = widget.paginationController.listController;
     _loadInitialData();
     widget.paginationController.isFirstPageLoadedController.stream
         .listen((event) {
@@ -185,12 +181,6 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
         PaginationDirection.bottom,
         null,
       );
-      if (mounted) {
-        // setState(() {
-        //   _isLoadingFirstPage = false;
-        //   _hasError = false;
-        // });
-      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -213,32 +203,20 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     if (widget.paginationController.isLoadingTop) {
       return; // Prevent multiple calls
     }
-    setState(() {
-      widget.paginationController.isLoadingTop = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        widget.paginationController.isLoadingTop = true;
+      });
     });
 
     try {
-      // _upSidePage++;
-      int previousItemsCount = widget.paginationController.itemList.length;
       await widget.onPaginationTriggered(
         _upSidePage,
         PaginationDirection.top,
         widget.paginationController.itemList.first,
       );
-      int newItemsCount = widget.paginationController.itemList.length;
-      int newItemsLength = newItemsCount - previousItemsCount;
-      // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        _listController.jumpToItem(
-          index: newItemsLength - 1,
-          scrollController: _scrollController,
-          alignment: 0.0,
-        );
-        widget.paginationController.isLoadingTop =
-            false; // Stop the loading state
-      });
     } catch (e) {
-      _upSidePage--; // Revert if error occurs
       setState(() {
         _paginationError = true;
       });
@@ -263,14 +241,12 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     });
 
     try {
-      // _downSidePage++;
       await widget.onPaginationTriggered(
         _downSidePage,
         PaginationDirection.bottom,
         widget.paginationController.itemList.last,
       );
     } catch (e) {
-      _downSidePage--; // revert page increment if no data is returned
       setState(() {
         _paginationError = true;
       });
@@ -295,15 +271,20 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
           const Center(child: Text("No items found"));
     }
 
-    return _listBuilder(items);
+    return ValueListenableBuilder(
+        valueListenable: widget.paginationController.isScrollingNotifier,
+        builder: (context, _, __) {
+          return _listBuilder(items);
+        });
   }
 
   SuperListView _listBuilder(List<dynamic> items) {
     return SuperListView.builder(
-      key: widget.key,
+      key: ObjectKey("dual_side_paged_list"),
       scrollDirection: widget.scrollDirection ?? Axis.vertical,
       primary: widget.primary,
-      physics: widget.physics,
+      physics:
+          const PreservePositionScrollPhysics(parent: ClampingScrollPhysics()),
       shrinkWrap: widget.shrinkWrap ?? false,
       padding: widget.padding,
       findChildIndexCallback: widget.findChildIndexCallback,
@@ -320,15 +301,15 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       extentEstimation: widget.extentEstimation,
       extentPrecalculationPolicy: widget.extentPrecalculationPolicy,
       delayPopulatingCacheArea: widget.delayPopulatingCacheArea ?? false,
-      controller: _scrollController,
-      listController: _listController,
+      controller: widget.paginationController.scrollController,
+      listController: widget.paginationController.listController,
       reverse: widget.reverse ?? false,
       itemCount: items.length +
           (widget.paginationController.isLoadingBottom ? 1 : 0) +
           (widget.paginationController.isLoadingTop ? 1 : 0),
       itemBuilder: (context, index) {
         // Trigger _loadMoreTop() when the first item is being built
-        if (index == 3 && !widget.paginationController.isLoadingTop) {
+        if (index == 0 && !widget.paginationController.isLoadingTop) {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             _loadMoreTop();
           });

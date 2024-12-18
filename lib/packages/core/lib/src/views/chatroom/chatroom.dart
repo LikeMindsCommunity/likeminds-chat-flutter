@@ -62,7 +62,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   ValueNotifier<bool> rebuildAppBar = ValueNotifier(false);
   ValueNotifier<bool> rebuildFloatingButton = ValueNotifier(false);
 
-  ScrollController scrollController = ScrollController();
+  final scrollController = ScrollController();
   // PagingController<int, LMChatConversationViewData> pagedListController =
   //     PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
   ListController listController = ListController();

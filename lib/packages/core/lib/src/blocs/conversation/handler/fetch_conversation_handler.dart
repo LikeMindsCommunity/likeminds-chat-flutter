@@ -16,6 +16,7 @@ fetchConversationsEventHandler(
         ..pageSize(event.pageSize)
         ..isLocalDB(false)
         ..minTimestamp(minTimestamp)
+        ..orderBy(event.orderBy ?? OrderBy.descending)
         ..maxTimestamp(maxTimestamp);
   if (event.replyId != null) {
     getConversationRequestBuilder.conversationId(event.replyId!);

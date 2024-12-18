@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 /// {@template lm_chat_pagination_controller}
@@ -44,6 +43,8 @@ class LMChatPaginationController<T> {
   /// The scroll controller to control the scroll view.
   ScrollController get scrollController => _scrollController;
 
+  final ValueNotifier<bool> isScrollingNotifier = ValueNotifier(false);
+
   /// Creates a new instance of [LMChatPaginationController].
   LMChatPaginationController({
     required ListController listController,
@@ -57,9 +58,7 @@ class LMChatPaginationController<T> {
     if (nextPageKey == null) {
       _isLastPageToBottomReached = true;
     }
-    // if(nextPageKey == 2) {
     isFirstPageLoadedController.add(true);
-    // }
     downSidePage.add(nextPageKey ?? 0);
     final previousItems = this.itemList;
     final itemList = previousItems + newItems;
@@ -77,18 +76,20 @@ class LMChatPaginationController<T> {
     if (previousPageKey == null) {
       _isLastPageToTopReached = true;
     }
-    final previousItems = this.itemList;
-    final itemList = newItems + previousItems;
-    upSidePage.add(previousPageKey ?? 0);
-    // Use PostFrameCallback to ensure the scroll adjustment happens after the frame
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      this.itemList = itemList;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      isLoadingTop = false;
+
+      this.itemList.insertAll(0, newItems);
+      upSidePage.add(previousPageKey ?? 0);
+
       listController.jumpToItem(
         index: newItems.length,
         scrollController: scrollController,
         alignment: 0.0,
       );
-      isLoadingTop = false; // Stop the loading state
+
+  
     });
   }
 
@@ -115,5 +116,67 @@ class LMChatPaginationController<T> {
     downSidePage.add(2);
     isLoadingBottom = false;
     isLoadingTop = false;
+  }
+}
+
+class PositionRetainedScrollPhysics extends ScrollPhysics {
+  final bool shouldRetain;
+  const PositionRetainedScrollPhysics({super.parent, this.shouldRetain = true});
+
+  @override
+  PositionRetainedScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return PositionRetainedScrollPhysics(
+      parent: buildParent(ancestor),
+      shouldRetain: shouldRetain,
+    );
+  }
+
+  @override
+  double adjustPositionForNewDimensions({
+    required ScrollMetrics oldPosition,
+    required ScrollMetrics newPosition,
+    required bool isScrolling,
+    required double velocity,
+  }) {
+    final position = super.adjustPositionForNewDimensions(
+      oldPosition: oldPosition,
+      newPosition: newPosition,
+      isScrolling: isScrolling,
+      velocity: velocity,
+    );
+
+    final diff = newPosition.maxScrollExtent - oldPosition.maxScrollExtent;
+
+    if (oldPosition.pixels > oldPosition.minScrollExtent &&
+        diff > 0 &&
+        shouldRetain) {
+      return position + diff;
+    } else {
+      return position;
+    }
+  }
+}
+
+class PreservePositionScrollPhysics extends ScrollPhysics {
+  const PreservePositionScrollPhysics({ScrollPhysics? parent})
+      : super(parent: parent);
+
+  @override
+  PreservePositionScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return PreservePositionScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  double adjustPositionForNewDimensions({
+    required ScrollMetrics oldPosition,
+    required ScrollMetrics newPosition,
+    required bool isScrolling,
+    required double velocity,
+  }) {
+    // Preserve the user's current position relative to the new content
+    final double scrollOffsetAdjustment =
+        newPosition.viewportDimension - oldPosition.viewportDimension;
+
+    return oldPosition.pixels + scrollOffsetAdjustment;
   }
 }

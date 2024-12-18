@@ -467,7 +467,7 @@ Widget getChatBubbleImage(
                           const SizedBox(width: 4),
                           mediaFile.meta?["duration"] != null
                               ? LMChatText(
-                                  mediaFile.meta["duration"].toString(),
+                                  mediaFile.meta?["duration"].toString()?? '',
                                   style: LMChatTextStyle.basic().copyWith(
                                     backgroundColor:
                                         LMChatTheme.theme.onPrimary,
