@@ -124,7 +124,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                               style: style?.overlayStyle ??
                                   LMChatDocumentTileStyle(
                                     padding: EdgeInsets.zero,
-                                    width: 54.w,
+                                    width: 52.w,
                                     backgroundColor:
                                         LMChatTheme.theme.container,
                                   ),
@@ -175,7 +175,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                 ),
           ),
           child: FittedBox(
-            fit: BoxFit.cover,
+            fit: BoxFit.fitWidth,
             child: textureBuilder(
               allowAntialiasingIOS: true,
               backgroundFill: true,
