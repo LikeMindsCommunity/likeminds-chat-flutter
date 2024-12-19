@@ -140,6 +140,9 @@ class LMChatBubble extends StatefulWidget {
   /// Instance of [LMChatAudioHandler] to manage audio playback seamlessly
   final LMChatAudioHandler? audioHandler;
 
+  /// Callback for reply tap
+  final VoidCallback? onReplyTap;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -178,6 +181,7 @@ class LMChatBubble extends StatefulWidget {
     this.reactionBarBuilder,
     this.replyBuilder,
     this.onReactionsTap,
+    this.onReplyTap,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -222,6 +226,7 @@ class LMChatBubble extends StatefulWidget {
             LMChatBubbleReactions oldWidget)?
         bubbleReactionsBuilder,
     Widget Function(LMChatReactionBar oldWidget)? reactionBarBuilder,
+    VoidCallback? onReplyTap,
   }) {
     return LMChatBubble(
       conversation: conversation ?? this.conversation,
@@ -253,6 +258,7 @@ class LMChatBubble extends StatefulWidget {
       bubbleReactionsBuilder:
           bubbleReactionsBuilder ?? this.bubbleReactionsBuilder,
       reactionBarBuilder: reactionBarBuilder ?? this.reactionBarBuilder,
+      onReplyTap: onReplyTap ?? this.onReplyTap,
     );
   }
 
@@ -417,7 +423,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       },
       child: Stack(
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(
+              milliseconds: 500,
+            ),
             foregroundDecoration: BoxDecoration(
               color: _isSelected
                   ? inStyle.selectedColor ??
@@ -686,6 +695,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   LMChatBubbleReply _defReplyWidget() {
     return LMChatBubbleReply(
+      onTap: widget.onReplyTap,
       replyToConversation: conversation.replyConversationObject!,
       title: LMChatText(
         currentUser.id == conversation.replyConversationObject!.memberId

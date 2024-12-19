@@ -48,7 +48,8 @@ class LMChatMemberRightUtil {
   static bool checkEditPermissions(
       LMChatConversationViewData conversationViewData) {
     final currentUser = LMChatLocalPreference.instance.getUser();
-    return currentUser.id == conversationViewData.memberId;
+    return currentUser.id == conversationViewData.memberId &&
+        conversationViewData.state != 10;
   }
 
   static bool isReportAllowed(LMChatConversationViewData conversationViewData) {
