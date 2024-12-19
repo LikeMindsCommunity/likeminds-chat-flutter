@@ -4,8 +4,6 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/chatroom/chatroom_convertor.dart';
@@ -17,7 +15,6 @@ import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/report.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
@@ -62,13 +59,11 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   ValueNotifier<bool> rebuildAppBar = ValueNotifier(false);
   ValueNotifier<bool> rebuildFloatingButton = ValueNotifier(false);
 
-  final scrollController = ScrollController();
-  // PagingController<int, LMChatConversationViewData> pagedListController =
-  //     PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
-  ListController listController = ListController();
+  final ScrollController scrollController = ScrollController();
+  final ListController listController = ListController();
   late LMDualSidePaginationController<LMChatConversationViewData>
       pagedListController = LMDualSidePaginationController(
-    listController: ListController(),
+    listController: listController,
     scrollController: scrollController,
   );
 
@@ -322,11 +317,10 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       chatroomId: widget.chatroomId,
       appBarNotifier: rebuildAppBar,
       selectedConversations: _selectedIds,
-      scrollController: scrollController,
-      // listController: pagedListController,
       isOtherUserAIChatbot: isOtherUserAIChatbot(
         chatroom.toChatRoomViewData(),
       ),
+      paginatedListController: pagedListController,
     );
   }
 
@@ -335,8 +329,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       chatroomId: widget.chatroomId,
       appBarNotifier: rebuildAppBar,
       selectedConversations: _selectedIds,
-      scrollController: scrollController,
-      pagingController: pagedListController,
+      paginatedListController: pagedListController,
     );
   }
 
