@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -42,7 +44,7 @@ class LMDualSidePagedList<T> extends StatefulWidget {
   final int initialPage;
 
   /// The pagination controller to manage the pagination.
-  final LMChatPaginationController<T> paginationController;
+  final LMDualSidePaginationController<T> paginationController;
 
   /// The axis along which the scroll view scrolls.
   final Axis? scrollDirection;
@@ -172,6 +174,17 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     widget.paginationController.downSidePage.stream.listen((event) {
       _downSidePage = event;
     });
+
+    Timer? debounce;
+    widget.paginationController.scrollController.addListener(() {
+      // add listener to hit _loadMoreTop() when hitting top of the scroll view
+      if (widget.paginationController.scrollController.position.pixels == 0) {
+        if (debounce?.isActive ?? false) debounce?.cancel();
+        debounce = Timer(const Duration(milliseconds: 200), () {
+          _loadMoreTop();
+        });
+      }
+    });
   }
 
   Future<void> _loadInitialData() async {
@@ -280,11 +293,10 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
 
   SuperListView _listBuilder(List<dynamic> items) {
     return SuperListView.builder(
-      key: ObjectKey("dual_side_paged_list"),
+      key: const ObjectKey("dual_side_paged_list"),
       scrollDirection: widget.scrollDirection ?? Axis.vertical,
       primary: widget.primary,
-      physics:
-          const PreservePositionScrollPhysics(parent: ClampingScrollPhysics()),
+      physics: widget.physics,
       shrinkWrap: widget.shrinkWrap ?? false,
       padding: widget.padding,
       findChildIndexCallback: widget.findChildIndexCallback,
@@ -308,12 +320,12 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
           (widget.paginationController.isLoadingBottom ? 1 : 0) +
           (widget.paginationController.isLoadingTop ? 1 : 0),
       itemBuilder: (context, index) {
-        // Trigger _loadMoreTop() when the first item is being built
-        if (index == 0 && !widget.paginationController.isLoadingTop) {
-          SchedulerBinding.instance.addPostFrameCallback((_) {
-            _loadMoreTop();
-          });
-        }
+        // // Trigger _loadMoreTop() when the first item is being built
+        // if (index == 0 && !widget.paginationController.isLoadingTop) {
+        //   SchedulerBinding.instance.addPostFrameCallback((_) {
+        //     _loadMoreTop();
+        //   });
+        // }
         if (index == 0 && widget.paginationController.isLoadingTop) {
           return widget.paginationLoadingBuilder?.call(context) ??
               const Padding(

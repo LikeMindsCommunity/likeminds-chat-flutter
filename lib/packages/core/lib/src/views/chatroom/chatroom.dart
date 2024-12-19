@@ -66,8 +66,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   // PagingController<int, LMChatConversationViewData> pagedListController =
   //     PagingController<int, LMChatConversationViewData>(firstPageKey: 1);
   ListController listController = ListController();
-  late LMChatPaginationController<LMChatConversationViewData>
-      pagedListController = LMChatPaginationController(
+  late LMDualSidePaginationController<LMChatConversationViewData>
+      pagedListController = LMDualSidePaginationController(
     listController: ListController(),
     scrollController: scrollController,
   );

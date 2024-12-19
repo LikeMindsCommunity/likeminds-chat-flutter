@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 /// {@template lm_chat_pagination_controller}
 /// A helper class to manage pagination for a list of items.
 /// it is used in the [LMDualSidePagedList] widget.
 /// {@endtemplate}
-class LMChatPaginationController<T> {
+class LMDualSidePaginationController<T> {
   final StreamController<bool> isFirstPageLoadedController =
       StreamController<bool>();
   final StreamController<int> upSidePage = StreamController<int>();
@@ -45,8 +46,8 @@ class LMChatPaginationController<T> {
 
   final ValueNotifier<bool> isScrollingNotifier = ValueNotifier(false);
 
-  /// Creates a new instance of [LMChatPaginationController].
-  LMChatPaginationController({
+  /// Creates a new instance of [LMDualSidePaginationController].
+  LMDualSidePaginationController({
     required ListController listController,
     required ScrollController scrollController,
   })  : _listController = listController,
@@ -60,9 +61,7 @@ class LMChatPaginationController<T> {
     }
     isFirstPageLoadedController.add(true);
     downSidePage.add(nextPageKey ?? 0);
-    final previousItems = this.itemList;
-    final itemList = previousItems + newItems;
-    this.itemList = itemList;
+    itemList.addAll(newItems);
     isLoadingBottom = false;
   }
 
@@ -77,20 +76,20 @@ class LMChatPaginationController<T> {
       _isLastPageToTopReached = true;
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      isLoadingTop = false;
-
-      this.itemList.insertAll(0, newItems);
-      upSidePage.add(previousPageKey ?? 0);
-
+    upSidePage.add(previousPageKey ?? 0);
+    itemList.insertAll(0, newItems);
+    isLoadingTop = false;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      // isLoadingTop = true;
       listController.jumpToItem(
         index: newItems.length,
         scrollController: scrollController,
         alignment: 0.0,
       );
-
-  
+      isScrollingNotifier.value = !isScrollingNotifier.value;
     });
+    // isLoadingTop = false;
+    // isScrollingNotifier.value = !isScrollingNotifier.value;
   }
 
   /// Prepends [newItems] to the previously loaded ones and sets the previous
@@ -146,7 +145,6 @@ class PositionRetainedScrollPhysics extends ScrollPhysics {
     );
 
     final diff = newPosition.maxScrollExtent - oldPosition.maxScrollExtent;
-
     if (oldPosition.pixels > oldPosition.minScrollExtent &&
         diff > 0 &&
         shouldRetain) {
@@ -158,8 +156,7 @@ class PositionRetainedScrollPhysics extends ScrollPhysics {
 }
 
 class PreservePositionScrollPhysics extends ScrollPhysics {
-  const PreservePositionScrollPhysics({ScrollPhysics? parent})
-      : super(parent: parent);
+  const PreservePositionScrollPhysics({super.parent});
 
   @override
   PreservePositionScrollPhysics applyTo(ScrollPhysics? ancestor) {
@@ -176,7 +173,8 @@ class PreservePositionScrollPhysics extends ScrollPhysics {
     // Preserve the user's current position relative to the new content
     final double scrollOffsetAdjustment =
         newPosition.viewportDimension - oldPosition.viewportDimension;
-
+    print(
+        '-------------scrolllll-------------$scrollOffsetAdjustment------------');
     return oldPosition.pixels + scrollOffsetAdjustment;
   }
 }
