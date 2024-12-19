@@ -47,4 +47,4 @@ export 'poll/poll_option.dart';
 
 export 'paginated_list/dual_side_paginated_list.dart';
 export 'paginated_list/pagination_controller.dart';
-export 'paginated_list/pagination_typedef.dart';
+export 'paginated_list/pagination_utils.dart';

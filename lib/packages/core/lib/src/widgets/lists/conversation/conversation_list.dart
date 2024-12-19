@@ -172,17 +172,17 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               vertical: 10,
             ),
             reverse: true,
-            firstPageLoadingBuilder: (context) =>
+            firstPageProgressIndicatorBuilder: (context) =>
                 _screenBuilder.loadingListWidgetBuilder(
               context,
               const LMChatSkeletonChatList(),
             ),
-            paginationLoadingBuilder: (context) =>
+            newPageProgressIndicatorBuilder: (context) =>
                 _screenBuilder.paginatedLoadingWidgetBuilder(
               context,
               const LMChatLoader(),
             ),
-            noItemsBuilder: (context) {
+            noItemsFoundIndicatorBuilder: (context) {
               return _defaultEmptyView();
             },
             itemBuilder: (context, item, index) {

@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_controller.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_typedef.dart';
+import 'package:likeminds_chat_flutter_ui/src/widgets/paginated_list/pagination_utils.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 /// {@template lm_dual_side_paged_list}
@@ -12,7 +12,7 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 /// {@endtemplate}
 
 class LMDualSidePagedList<T> extends StatefulWidget {
-  /// The function to call when pagination is triggered.
+  /// The callback function triggered when pagination conditions are satisfied
   final Future<void> Function(
     int page,
     PaginationDirection paginationDirection,
@@ -22,23 +22,23 @@ class LMDualSidePagedList<T> extends StatefulWidget {
   /// The function to build a widget for an item in the list.
   final ItemBuilder<T> itemBuilder;
 
-  /// The function to build a widget for loading the first page.
-  final LoadingBuilder? firstPageLoadingBuilder;
+  /// The builder for the first page's error indicator.
+  final WidgetBuilder? firstPageErrorIndicatorBuilder;
 
-  /// The function to build a widget for loading more items.
-  final LoadingBuilder? paginationLoadingBuilder;
+  /// The builder for a new page's error indicator.
+  final WidgetBuilder? newPageErrorIndicatorBuilder;
 
-  /// The function to build a widget when there are no items.
-  final WidgetBuilder? noItemsBuilder;
+  /// The builder for the first page's progress indicator.
+  final WidgetBuilder? firstPageProgressIndicatorBuilder;
 
-  /// The function to build a widget when there are no more items.
-  final WidgetBuilder? noMoreItemsBuilder;
+  /// The builder for a new page's progress indicator.
+  final WidgetBuilder? newPageProgressIndicatorBuilder;
 
-  /// The function to build a widget when there is an error.
-  final ErrorBuilder? errorBuilder;
+  /// The builder for a no items list indicator.
+  final WidgetBuilder? noItemsFoundIndicatorBuilder;
 
-  /// The function to build a widget when there is an error during pagination.
-  final ErrorBuilder? paginationErrorBuilder;
+  /// The builder for an indicator that all items have been fetched.
+  final WidgetBuilder? noMoreItemsIndicatorBuilder;
 
   /// The initial page to load.
   final int initialPage;
@@ -111,12 +111,12 @@ class LMDualSidePagedList<T> extends StatefulWidget {
     super.key,
     required this.onPaginationTriggered,
     required this.itemBuilder,
-    this.firstPageLoadingBuilder,
-    this.paginationLoadingBuilder,
-    this.noItemsBuilder,
-    this.noMoreItemsBuilder,
-    this.errorBuilder,
-    this.paginationErrorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noItemsFoundIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
     required this.initialPage,
     required this.paginationController,
     this.scrollDirection,
@@ -269,18 +269,18 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
   @override
   Widget build(BuildContext context) {
     if (_isLoadingFirstPage) {
-      return widget.firstPageLoadingBuilder?.call(context) ??
+      return widget.firstPageProgressIndicatorBuilder?.call(context) ??
           const Center(child: CircularProgressIndicator());
     }
 
     if (_hasError) {
-      return widget.errorBuilder?.call(context, _loadInitialData) ??
+      return widget.firstPageErrorIndicatorBuilder?.call(context) ??
           const Center(child: Text("An error occurred"));
     }
     final items = widget.paginationController.itemList;
 
     if (items.isEmpty) {
-      return widget.noItemsBuilder?.call(context) ??
+      return widget.noItemsFoundIndicatorBuilder?.call(context) ??
           const Center(child: Text("No items found"));
     }
 
@@ -327,7 +327,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
         //   });
         // }
         if (index == 0 && widget.paginationController.isLoadingTop) {
-          return widget.paginationLoadingBuilder?.call(context) ??
+          return widget.newPageProgressIndicatorBuilder?.call(context) ??
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Center(
@@ -337,7 +337,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
         }
         if (widget.paginationController.isLoadingBottom &&
             index == items.length) {
-          return widget.paginationLoadingBuilder?.call(context) ??
+          return widget.newPageProgressIndicatorBuilder?.call(context) ??
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Center(
