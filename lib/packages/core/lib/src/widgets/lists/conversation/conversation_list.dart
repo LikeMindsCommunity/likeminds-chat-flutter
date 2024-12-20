@@ -1246,21 +1246,19 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
   void _scrollToConversation(int index, int replyId,
       LMDualSidePaginationController pagedListController) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      pagedListController.listController.animateToItem(
-        index: index,
-        scrollController: pagedListController.scrollController,
-        alignment: 0.5,
-        duration: (estimatedDuration) {
-          return const Duration(milliseconds: 200);
-        },
-        curve: (estimatedDuration) {
-          return Curves.easeInOut;
-        },
-      );
-      // highlight the reply message
-      _highLightConversation(replyId);
-    });
+    pagedListController.listController.animateToItem(
+      index: index,
+      scrollController: pagedListController.scrollController,
+      alignment: 0.5,
+      duration: (estimatedDuration) {
+        return const Duration(milliseconds: 200);
+      },
+      curve: (estimatedDuration) {
+        return Curves.easeInOut;
+      },
+    );
+    // highlight the reply message
+    _highLightConversation(replyId);
   }
 
   Future<void> _highLightConversation(int replyId) async {
