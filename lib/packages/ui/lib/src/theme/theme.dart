@@ -20,13 +20,23 @@ class LMChatTheme {
   /// Gets the text theme
   static TextTheme get text => instance.textTheme;
 
+  /// Sets the theme data
+  static void setTheme(LMChatThemeData theme) {
+    instance.themeData = theme;
+  }
+
+  /// Sets the theme data
+  static void setTextTheme(TextTheme theme) {
+    instance.textTheme = theme;
+  }
+
   LMChatTheme._();
 
   /// The theme data for the chat
-  late final LMChatThemeData themeData;
+  late LMChatThemeData themeData;
 
   /// The text theme for the chat
-  late final TextTheme textTheme;
+  late TextTheme textTheme;
 
   /// Whether the current theme is dark
   late final bool isDark;

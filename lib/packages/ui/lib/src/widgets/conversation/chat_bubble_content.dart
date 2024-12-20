@@ -123,7 +123,6 @@ class LMChatBubbleContentStyle {
         textStyle: TextStyle(
           color: onContainer ?? LMChatDefaultTheme.onContainer,
           fontSize: 14,
-          fontFamily: 'Roboto',
           fontWeight: FontWeight.w400,
         ),
       );
