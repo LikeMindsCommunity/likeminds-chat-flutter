@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/media/error.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 const List<String> videoExtentions = [
   'mp4',
@@ -924,5 +927,48 @@ Widget getImageFileMessage(
         ],
       ),
     );
+  }
+}
+
+/// Downloads a file from a URL and saves it locally
+///
+/// Parameters:
+/// - fileUrl: Direct URL to the file on AWS storage
+/// - media: Optional media model containing file information
+///
+/// Returns the local file path where the file was saved
+Future<String> downloadFile({String? fileUrl, LMChatMediaModel? media}) async {
+  try {
+    // Use either direct URL or get URL from media model
+    final String url = fileUrl ?? media?.mediaUrl ?? '';
+    if (url.isEmpty) {
+      throw Exception('No URL provided for download');
+    }
+
+    // Get file name from URL
+    final String fileName = path.basename(url);
+
+    // Get temporary directory for storing downloaded files
+    final Directory tempDir = await getTemporaryDirectory();
+    final String localPath = path.join(tempDir.path, fileName);
+
+    // Check if file already exists locally
+    if (await File(localPath).exists()) {
+      return localPath;
+    }
+
+    // Download file
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to download file: ${response.statusCode}');
+    }
+
+    // Save file locally
+    final File file = File(localPath);
+    await file.writeAsBytes(response.bodyBytes);
+
+    return localPath;
+  } catch (e) {
+    throw Exception('Error downloading file: $e');
   }
 }
