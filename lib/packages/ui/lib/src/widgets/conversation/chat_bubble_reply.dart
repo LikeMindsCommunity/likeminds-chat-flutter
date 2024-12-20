@@ -19,6 +19,9 @@ class LMChatBubbleReply extends StatelessWidget {
   /// Style of the reply item
   final LMChatBubbleReplyStyle? chatBubbleReplyStyle;
 
+  /// onTap function for the reply item
+  final VoidCallback? onTap;
+
   /// {@macro lm_chat_bubble_reply}
   const LMChatBubbleReply({
     super.key,
@@ -27,6 +30,7 @@ class LMChatBubbleReply extends StatelessWidget {
     this.subtitle,
     this.media,
     this.chatBubbleReplyStyle,
+    this.onTap,
   });
 
   LMChatBubbleReply copyWith({
@@ -35,6 +39,7 @@ class LMChatBubbleReply extends StatelessWidget {
     Widget? subtitle,
     Widget? media,
     LMChatBubbleReplyStyle? chatBubbleReplyStyle,
+    VoidCallback? onTap,
   }) {
     return LMChatBubbleReply(
       replyToConversation: replyToConversation ?? this.replyToConversation,
@@ -42,6 +47,7 @@ class LMChatBubbleReply extends StatelessWidget {
       subtitle: subtitle ?? this.subtitle,
       media: media ?? this.media,
       chatBubbleReplyStyle: chatBubbleReplyStyle ?? this.chatBubbleReplyStyle,
+      onTap: onTap ?? this.onTap,
     );
   }
 
@@ -49,87 +55,93 @@ class LMChatBubbleReply extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = LMChatTheme.theme;
     final inStyle = chatBubbleReplyStyle ?? theme.replyStyle;
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        color: inStyle.backgroundColor ?? theme.disabledColor.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
-      ),
-      constraints: BoxConstraints(
-        minWidth: 20.w,
-        maxWidth: 64.w,
-      ),
-      margin: inStyle.margin ?? const EdgeInsets.symmetric(vertical: 4),
-      padding: inStyle.padding,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            height: 6.h,
-            width: 1.w,
-            decoration: BoxDecoration(
-              color: inStyle.highlightColor ?? theme.primaryColor,
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+          color:
+              inStyle.backgroundColor ?? theme.disabledColor.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
+        ),
+        constraints: BoxConstraints(
+          minWidth: 20.w,
+          maxWidth: 64.w,
+        ),
+        margin: inStyle.margin ?? const EdgeInsets.symmetric(vertical: 4),
+        padding: inStyle.padding,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              height: 6.h,
+              width: 1.w,
+              decoration: BoxDecoration(
+                color: inStyle.highlightColor ?? theme.primaryColor,
+              ),
             ),
-          ),
-          kHorizontalPaddingMedium,
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                title ??
-                    LMChatText(
-                      replyToConversation.member!.name,
-                      style: LMChatTextStyle(
-                        maxLines: 1,
-                        minLines: 1,
-                        textStyle: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          color: theme.primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                kVerticalPaddingXSmall,
-                replyToConversation.deletedByUserId != null
-                    ? LMChatText(
-                        "Deleted message",
+            kHorizontalPaddingMedium,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  title ??
+                      LMChatText(
+                        replyToConversation.member!.name,
                         style: LMChatTextStyle(
-                          textStyle: replyToConversation.deletedByUserId != null
-                              ? TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: LMChatTheme.theme.disabledColor,
-                                )
-                              : TextStyle(
-                                  fontSize: 14,
-                                  color: LMChatTheme.theme.disabledColor,
-                                ),
-                        ),
-                      )
-                    : subtitle ??
-                        LMChatText(
-                          replyToConversation.answer.isEmpty
-                              ? "Media files"
-                              : LMChatTaggingHelper.convertRouteToTag(
-                                  replyToConversation.answer,
-                                  withTilde: false,
-                                )!,
-                          style: LMChatTextStyle(
-                            maxLines: 1,
-                            textStyle: TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              color: theme.onContainer,
-                              fontSize: 12,
-                            ),
+                          maxLines: 1,
+                          minLines: 1,
+                          textStyle: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            color: theme.primaryColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-              ],
+                      ),
+                  kVerticalPaddingXSmall,
+                  replyToConversation.deletedByUserId != null
+                      ? LMChatText(
+                          "Deleted message",
+                          style: LMChatTextStyle(
+                            textStyle:
+                                replyToConversation.deletedByUserId != null
+                                    ? TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                        color: LMChatTheme.theme.disabledColor,
+                                      )
+                                    : TextStyle(
+                                        fontSize: 14,
+                                        color: LMChatTheme.theme.disabledColor,
+                                      ),
+                          ),
+                        )
+                      : subtitle ??
+                          LMChatText(
+                            replyToConversation.answer.isEmpty
+                                ? "Media files"
+                                : LMChatTaggingHelper.convertRouteToTag(
+                                    replyToConversation.answer,
+                                    withTilde: false,
+                                  )!,
+                            style: LMChatTextStyle(
+                              maxLines: 1,
+                              textStyle: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                color: theme.onContainer,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                ],
+              ),
             ),
-          ),
-          kHorizontalPaddingMedium,
-        ],
+            kHorizontalPaddingMedium,
+          ],
+        ),
       ),
     );
   }
