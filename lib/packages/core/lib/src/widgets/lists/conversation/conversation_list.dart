@@ -40,7 +40,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   late User user;
   int _topPage = 1;
   int _bottomPage = 1;
-  final int _pageSize = 20;
+  final int _pageSize = 200;
   int lastConversationId = 0;
 
   ValueNotifier showConversationActions = ValueNotifier(false);
@@ -1178,7 +1178,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           GetConversationRequestBuilder()
             ..chatroomId(chatroomId)
             ..page(1)
-            ..pageSize(20)
+            ..pageSize(_pageSize)
             ..isLocalDB(false)
             ..minTimestamp(replyConversationsVewData.first.createdEpoch!)
             ..maxTimestamp(currentTime)
@@ -1203,7 +1203,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           GetConversationRequestBuilder()
             ..chatroomId(chatroomId)
             ..page(1)
-            ..pageSize(20)
+            ..pageSize(_pageSize)
             ..isLocalDB(true)
             ..minTimestamp(0)
             ..maxTimestamp(replyConversationsVewData.first.createdEpoch!);

@@ -1123,7 +1123,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           GetConversationRequestBuilder()
             ..chatroomId(chatroomId)
             ..page(1)
-            ..pageSize(100)
+            ..pageSize(_pageSize)
             ..isLocalDB(false)
             ..minTimestamp(replyConversationsVewData.first.createdEpoch!)
             ..maxTimestamp(currentTime)
@@ -1148,7 +1148,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           GetConversationRequestBuilder()
             ..chatroomId(chatroomId)
             ..page(1)
-            ..pageSize(100)
+            ..pageSize(_pageSize)
             ..isLocalDB(true)
             ..minTimestamp(0)
             ..maxTimestamp(replyConversationsVewData.first.createdEpoch!);
