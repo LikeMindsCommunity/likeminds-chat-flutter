@@ -701,6 +701,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       }).toList();
       conversationData = addTimeStampInConversationList(conversationData,
           LMChatLocalPreference.instance.getCommunityData()!.id);
+      conversationData = assignConversationViewType(conversationData ?? []);
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
           state.getConversationResponse.conversationData!.length > _pageSize) {
@@ -1273,5 +1274,23 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     // again setting [_animateToChatId] to null for removing selection state
     _animateToChatId = null;
     rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  List<LMChatConversationViewData> assignConversationViewType(
+      List<LMChatConversationViewData> conversations) {
+    List<LMChatConversationViewData> updatedConversations = [];
+     List<LMChatConversationViewData> reversedConversations = conversations.reversed.toList();
+    int? userId;
+    for (final conversation in reversedConversations) {
+      if (conversation.memberId == userId) {
+        updatedConversations.add(conversation.copyWith(
+            conversationViewType: LMChatConversationViewType.bottom));
+      } else {
+        userId = conversation.memberId;
+        updatedConversations.add(conversation.copyWith(
+            conversationViewType: LMChatConversationViewType.top));
+      }
+    }
+    return updatedConversations.reversed.toList();
   }
 }
