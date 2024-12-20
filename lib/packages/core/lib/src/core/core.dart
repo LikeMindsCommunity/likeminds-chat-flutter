@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_config.dart';
@@ -43,6 +44,16 @@ class LMChatCore {
 
   /// Domain passed from client's end [String]
   static String get domain => instance._clientDomain;
+
+  /// Static setter for LMChatTheme
+  static void setTheme(LMChatThemeData theme) {
+    LMChatTheme.setTheme(theme);
+  }
+
+  /// Static setter for TextTheme
+  static void setTextTheme(TextTheme theme) {
+    LMChatTheme.setTextTheme(theme);
+  }
 
   /// This function is used to initialize the chat.
   /// The [lmChatClient] parameter is optional and is used to pass the instance of the [LMChatClient] class.

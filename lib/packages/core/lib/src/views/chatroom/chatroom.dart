@@ -346,8 +346,9 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
         height: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
         gap: 2.6.w,
+        backgroundColor: LMChatTheme.theme.container,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
       ),
       leading: LMChatButton(
         onTap: () {

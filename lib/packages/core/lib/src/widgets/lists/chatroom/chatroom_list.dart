@@ -334,7 +334,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         fallbackText: chatroom.header,
         imageUrl: chatroom.chatroomImageUrl,
         style: _style.profilePictureStyle ??
-            const LMChatProfilePictureStyle(size: 48),
+            LMChatProfilePictureStyle.basic().copyWith(size: 48),
       ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
@@ -342,12 +342,13 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           Flexible(
             child: LMChatText(
               chatroom.header,
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   overflow: TextOverflow.ellipsis,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               ),
             ),
@@ -438,7 +439,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       type: LMChatIconType.icon,
       icon: Icons.volume_off_outlined,
       style: LMChatIconStyle(
-        backgroundColor: LMChatTheme.theme.scaffold,
+        backgroundColor: LMChatTheme.theme.container,
+        color: LMChatTheme.theme.onContainer,
         boxSize: 36,
         boxPadding: const EdgeInsets.only(
           left: 6,
@@ -487,7 +489,8 @@ class LMChatHomeFeedListStyle {
           right: 8,
           left: 4,
         ),
-        profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
+        profilePictureStyle:
+            LMChatProfilePictureStyle.basic().copyWith(size: 48),
         unReadCountTextStyle: LMChatTextStyle(
           maxLines: 1,
           backgroundColor: LMChatTheme.theme.primaryColor,
