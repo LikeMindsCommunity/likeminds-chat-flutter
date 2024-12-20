@@ -437,9 +437,15 @@ class _LMChatBubbleState extends State<LMChatBubble> {
             child: Row(
               mainAxisAlignment:
                   isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!isSent) widget.avatar ?? const SizedBox(),
+                if (!isSent)
+                  conversation.conversationViewType ==
+                          LMChatConversationViewType.top
+                      ? widget.avatar ?? const SizedBox()
+                      : const SizedBox(
+                          width: 39,
+                        ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -460,6 +466,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         ),
                         child: PhysicalShape(
                           clipper: LMChatBubbleClipper(
+                            conversationViewType:
+                                conversation.conversationViewType ??
+                                    LMChatConversationViewType.top,
                             isSent: isSent,
                           ),
                           color:
