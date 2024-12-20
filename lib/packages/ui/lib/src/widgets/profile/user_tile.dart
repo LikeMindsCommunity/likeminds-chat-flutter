@@ -66,15 +66,7 @@ class LMChatUserTile extends LMChatTile {
       leading: leading ??
           LMChatProfilePicture(
             style: LMChatProfilePictureStyle.basic().copyWith(
-              backgroundColor: _chatTheme.primaryColor,
               size: 48,
-              fallbackTextStyle: LMChatTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: _chatTheme.onPrimary,
-                ),
-              ),
             ),
             fallbackText: userViewData.name,
             imageUrl: userViewData.imageUrl,
@@ -84,10 +76,11 @@ class LMChatUserTile extends LMChatTile {
       title: title ??
           LMChatText(
             userViewData.name,
-            style: const LMChatTextStyle(
+            style: LMChatTextStyle(
               textStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
+                color: _chatTheme.onContainer,
               ),
             ),
           ),

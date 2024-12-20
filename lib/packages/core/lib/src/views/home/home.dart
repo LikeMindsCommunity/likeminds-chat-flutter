@@ -33,35 +33,33 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: DefaultTabController(
-        length: 2,
-        child: Builder(builder: (context) {
-          return _homeScreenBuilder.scaffold(
-            backgroundColor: LMChatTheme.theme.backgroundColor,
-            appBar: _homeScreenBuilder.appBarBuilder(
-              context,
-              user,
-              DefaultTabController.of(context),
-              _defAppBar(context),
-            ),
-            body: const TabBarView(
-              children: [
-                LMChatHomeFeedList(),
-                LMChatDMFeedList(),
-              ],
-            ),
-          );
-        }),
-      ),
+    return DefaultTabController(
+      length: 2,
+      child: Builder(builder: (context) {
+        return _homeScreenBuilder.scaffold(
+          backgroundColor: LMChatTheme.theme.backgroundColor,
+          appBar: _homeScreenBuilder.appBarBuilder(
+            context,
+            user,
+            DefaultTabController.of(context),
+            _defAppBar(context),
+          ),
+          body: const TabBarView(
+            children: [
+              LMChatHomeFeedList(),
+              LMChatDMFeedList(),
+            ],
+          ),
+        );
+      }),
     );
   }
 
   LMChatAppBar _defAppBar(BuildContext context) {
     return LMChatAppBar(
-      style: const LMChatAppBarStyle(
+      style: LMChatAppBarStyle(
         height: 120,
+        backgroundColor: LMChatTheme.theme.container,
       ),
       leading: const SizedBox.shrink(),
       trailing: [
@@ -86,6 +84,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
           textStyle: TextStyle(
             fontSize: 22.0.sp,
             fontWeight: FontWeight.w600,
+            color: LMChatTheme.theme.onContainer,
           ),
         ),
       ),
@@ -94,8 +93,10 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
 
   TabBar _defTabBar() {
     return TabBar(
-      labelColor: LMChatTheme.theme.primaryColor,
+      labelColor: LMChatTheme.theme.onContainer,
       indicatorColor: LMChatTheme.theme.primaryColor,
+      labelStyle: TextStyle(color: LMChatTheme.theme.onContainer),
+      unselectedLabelStyle: TextStyle(color: LMChatTheme.theme.onContainer),
       tabs: const [
         Tab(text: LMChatStringConstants.groupHomeTabTitle),
         Tab(text: LMChatStringConstants.dmHomeTabTitle),

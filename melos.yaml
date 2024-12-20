@@ -10,10 +10,10 @@ scripts:
     exec: dart analyze .
 
   clean:
-    exec: flutter clean .
+    exec: fvm flutter clean .
 
   dry-run:
-    exec: flutter pub publish --dry-run
+    exec: fvm flutter pub publish --dry-run
 
   test-dependencies:
     run: fvm spawn 3.10.2 pub get; fvm spawn stable pub get
