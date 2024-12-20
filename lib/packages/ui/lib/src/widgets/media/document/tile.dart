@@ -3,7 +3,6 @@ import 'package:likeminds_chat_flutter_ui/src/widgets/shimmers/document_shimmer.
 import 'dart:io';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 ///{@template lm_chat_document_tile}
@@ -78,8 +77,8 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
     if (widget.media.mediaFile != null) {
       file = widget.media.mediaFile!;
     } else {
-      final String url = widget.media.mediaUrl!;
-      file = File(url);
+      final String path = await downloadFile(media: widget.media);
+      file = File(path);
     }
     _fileSize = getFileSizeString(
         bytes: widget.media.size ?? widget.media.meta?['size'] ?? 0);
@@ -103,12 +102,7 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
               snapshot.hasData) {
             return InkWell(
               onTap: () async {
-                if (widget.media.mediaFile != null) {
-                  OpenFilex.open(widget.media.mediaFile!.path);
-                } else {
-                  Uri fileUrl = Uri.parse(widget.media.mediaUrl!);
-                  launchUrl(fileUrl, mode: LaunchMode.inAppBrowserView);
-                }
+                OpenFilex.open((snapshot.data as File).path);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(
