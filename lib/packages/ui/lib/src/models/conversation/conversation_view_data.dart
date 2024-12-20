@@ -53,6 +53,7 @@ class LMChatConversationViewData {
   final List<LMChatReactionViewData>? conversationReactions;
   final List<LMChatPollOptionViewData>? poll;
   final bool? isPollSubmitted;
+  LMChatConversationViewType? conversationViewType;
 
   LMChatConversationViewData._({
     this.allowAddOption,
@@ -103,6 +104,7 @@ class LMChatConversationViewData {
     this.conversationReactions,
     this.poll,
     this.isPollSubmitted,
+    this.conversationViewType,
   });
 
   /// copyWith method is used to create a new instance of `LMChatConversationViewData` with the updated values.
@@ -156,6 +158,7 @@ class LMChatConversationViewData {
     List<LMChatReactionViewData>? conversationReactions,
     List<LMChatPollOptionViewData>? poll,
     bool? isPollSubmitted,
+    LMChatConversationViewType? conversationViewType,
   }) {
     return LMChatConversationViewData._(
       allowAddOption: allowAddOption ?? this.allowAddOption,
@@ -209,6 +212,7 @@ class LMChatConversationViewData {
           conversationReactions ?? this.conversationReactions,
       poll: poll ?? this.poll,
       isPollSubmitted: isPollSubmitted ?? this.isPollSubmitted,
+      conversationViewType: conversationViewType ?? this.conversationViewType,
     );
   }
 }
@@ -264,6 +268,7 @@ class LMChatConversationViewDataBuilder {
   List<LMChatReactionViewData>? _conversationReactions;
   List<LMChatPollOptionViewData>? _poll;
   bool? _isPollSubmitted;
+  LMChatConversationViewType? _conversationViewType;
 
   void allowAddOption(bool? allowAddOption) {
     _allowAddOption = allowAddOption;
@@ -459,6 +464,10 @@ class LMChatConversationViewDataBuilder {
     _isPollSubmitted = isPollSubmitted;
   }
 
+  void conversationViewType(LMChatConversationViewType? conversationViewType) {
+    _conversationViewType = conversationViewType;
+  }
+
   /// Builds the `LMChatConversationViewData` object using the provided values.
   LMChatConversationViewData build() {
     return LMChatConversationViewData._(
@@ -510,6 +519,9 @@ class LMChatConversationViewDataBuilder {
       conversationReactions: _conversationReactions,
       poll: _poll,
       isPollSubmitted: _isPollSubmitted,
+      conversationViewType: _conversationViewType,
     );
   }
 }
+
+enum LMChatConversationViewType { top, bottom }
