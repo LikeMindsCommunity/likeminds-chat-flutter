@@ -466,25 +466,33 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         ),
                         child: PhysicalShape(
                           clipper: LMChatBubbleClipper(
+                            isSent: isSent,
                             conversationViewType:
                                 conversation.conversationViewType ??
                                     LMChatConversationViewType.top,
-                            isSent: isSent,
                           ),
                           color:
                               inStyle.backgroundColor ?? _themeData.container,
+                          // painter: LMChatBubblePainter(
+                          //   conversationViewType:
+                          //       conversation.conversationViewType ??
+                          //           LMChatConversationViewType.top,
+                          //   isSent: isSent,
+                          //   bubbleColor: inStyle.backgroundColor ??
+                          //       _themeData.container,
+                          // ),
                           child: Padding(
                             padding: isSent
                                 ? EdgeInsets.only(
                                     top: _isDeleted ? 0.8.h : 1.h,
                                     bottom: _isDeleted ? 1.2.h : 1.h,
                                     left: 3.w,
-                                    right: 5.w,
+                                    right: 3.w + 10,
                                   )
                                 : EdgeInsets.only(
                                     top: _isDeleted ? 0.8.h : 1.h,
                                     bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 5.w,
+                                    left: 3.w + 10,
                                     right: 3.w,
                                   ),
                             child: Column(

@@ -1279,7 +1279,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   List<LMChatConversationViewData> assignConversationViewType(
       List<LMChatConversationViewData> conversations) {
     List<LMChatConversationViewData> updatedConversations = [];
-     List<LMChatConversationViewData> reversedConversations = conversations.reversed.toList();
+    List<LMChatConversationViewData> reversedConversations =
+        conversations.reversed.toList();
     int? userId;
     for (final conversation in reversedConversations) {
       if (conversation.memberId == userId) {
