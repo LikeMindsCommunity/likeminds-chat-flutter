@@ -458,9 +458,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   }
 
   List<Widget> _defaultSelectedChatroomMenu() {
-    // final LMChatConversationViewData? conversationViewData = pagedListController
-    //     .value.itemList
-    //     ?.firstWhere((element) => element.id == _selectedIds.first);
     final LMChatConversationViewData? conversationViewData = pagedListController
         .itemList
         .firstWhere((element) => element.id == _selectedIds.first);
