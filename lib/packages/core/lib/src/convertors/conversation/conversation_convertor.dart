@@ -14,6 +14,8 @@ extension ConversationViewDataConvertor on Conversation {
     Map<String, List<PollOption>>? conversationPollsMeta,
     Map<int, User>? userMeta,
   }) {
+    final LMChatUserViewData? member =
+        this.member?.toUserViewData() ?? userMeta?[memberId]?.toUserViewData();
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
           ..allowAddOption(allowAddOption)
@@ -56,7 +58,7 @@ extension ConversationViewDataConvertor on Conversation {
           ..pollTypeText(pollTypeText)
           ..submitTypeText(submitTypeText)
           ..isTimeStamp(isTimeStamp)
-          ..member(member?.toUserViewData())
+          ..member(member)
           ..replyConversation(replyConversation)
           ..replyConversationObject(
               replyConversationObject?.toConversationViewData(

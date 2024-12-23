@@ -29,6 +29,7 @@ dependencies:
   custom_pop_up_menu: ^1.2.4
   emoji_picker_flutter: ^3.0.0
   flutter_sound: ^9.16.3
+  super_sliver_list: ^0.4.1
   photo_view: ^0.15.0
   http: ^1.1.0
   path_provider: ^2.1.1
