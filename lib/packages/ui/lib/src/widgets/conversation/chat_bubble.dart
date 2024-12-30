@@ -397,6 +397,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           });
           widget.onLongPress?.call(_isSelected, this);
           reactionBarController.showMenu();
+          _showContextMenu(context);
         }
       },
       onTap: () {
@@ -882,6 +883,67 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       _voiceNoteDurationNotifier.value = initialDuration;
     } else {
       _voiceNoteDurationNotifier.value = duration;
+    }
+  }
+
+  // Method to show the context menu
+  void _showContextMenu(BuildContext context) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    // Get the position of the chat bubble
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(
+          offset,
+          offset,
+        ),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        const PopupMenuItem(
+          value: 'copy',
+          child: Text('Copy'),
+        ),
+        const PopupMenuItem(
+          value: 'reply',
+          child: Text('Reply'),
+        ),
+        const PopupMenuItem(
+          value: 'edit',
+          child: Text('Edit'),
+        ),
+        const PopupMenuItem(
+          value: 'delete',
+          child: Text('Delete'),
+        ),
+      ],
+    ).then((value) {
+      if (value != null) {
+        _handleMenuAction(value);
+      }
+    });
+  }
+
+  // Handle the selected action from the context menu
+  void _handleMenuAction(String action) {
+    switch (action) {
+      case 'copy':
+        // Implement copy action
+        break;
+      case 'reply':
+        // Implement reply action
+        break;
+      case 'edit':
+        // Implement edit action
+        break;
+      case 'delete':
+        // Implement delete action
+        break;
     }
   }
 }
