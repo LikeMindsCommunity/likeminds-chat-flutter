@@ -36,6 +36,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
 
   final LMChatHomeBuilderDelegate _screenBuilder =
       LMChatCore.config.homeConfig.builder;
+  final _homeScreenSettings = LMChatCore.config.homeConfig.setting;
   final LMChatHomeFeedListStyle _style =
       LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
             LMChatHomeFeedListStyle.basic(),
@@ -159,7 +160,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             builder: (context) => const LMChatExplorePage(),
           ),
         ).then((val) {
-          feedBloc.add(LMChatRefreshHomeFeedEvent());
+          feedBloc
+              .add(LMChatRefreshHomeFeedEvent(tag: _homeScreenSettings.tag));
         });
       },
       style: LMChatTileStyle.basic().copyWith(
@@ -250,7 +252,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   _addPaginationListener() {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
-        feedBloc.add(LMChatFetchHomeFeedEvent(page: pageKey));
+        feedBloc.add(LMChatFetchHomeFeedEvent(
+          page: pageKey,
+          tag: _homeScreenSettings.tag,
+        ));
       },
     );
   }
@@ -327,7 +332,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           },
         );
         Navigator.of(context).push(route).whenComplete(
-              () => feedBloc.add(LMChatRefreshHomeFeedEvent()),
+              () => feedBloc.add(
+                  LMChatRefreshHomeFeedEvent(tag: _homeScreenSettings.tag)),
             );
       },
       leading: LMChatProfilePicture(

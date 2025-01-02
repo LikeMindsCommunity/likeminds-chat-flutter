@@ -19,6 +19,7 @@ void fetchHomeFeedEventHandler(
             ..pageSize(50)
             ..minTimestamp(0)
             ..maxTimestamp(currentTime)
+            ..tag(event.tag)
             ..chatroomTypes([0, 7]))
           .build());
 
