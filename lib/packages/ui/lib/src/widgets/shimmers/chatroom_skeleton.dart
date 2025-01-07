@@ -319,7 +319,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
               LMChatDefaultTheme.kHorizontalPaddingMedium,
               Container(
                 decoration: BoxDecoration(
-                  color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                  color: LMChatTheme.theme.container.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 constraints: BoxConstraints(
@@ -332,7 +332,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                      color: LMChatTheme.theme.container.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(1.h),
                     ),
                   ),

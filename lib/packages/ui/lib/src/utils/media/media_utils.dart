@@ -94,7 +94,14 @@ Widget getChatItemAttachmentTile(
   if (conversation.state == 10) {
     return Row(
       children: [
-        LMChatText(message),
+        LMChatText(
+          message,
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              color: LMChatTheme.theme.onContainer,
+            ),
+          ),
+        ),
         const SizedBox(width: 4),
         LMChatIcon(
           type: LMChatIconType.svg,
