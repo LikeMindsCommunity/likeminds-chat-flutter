@@ -3,6 +3,11 @@
 /// screen. It is used to customize the home screen.
 /// {@endtemplate}
 class LMChatHomeSetting {
+  /// Custom tags to be used for fetching group chatrooms
+  final String? tag;
+
   /// {@macro lm_chat_home_setting}
-  const LMChatHomeSetting();
+  const LMChatHomeSetting({
+    this.tag,
+  });
 }
