@@ -94,19 +94,8 @@ Widget getChatItemAttachmentTile(
   if (conversation.state == 10) {
     return Row(
       children: [
-        LMChatText(
-          prefix ?? '',
-          style: LMChatTextStyle(
-            maxLines: 1,
-            textStyle: TextStyle(
-              overflow: TextOverflow.ellipsis,
-              fontSize: 14,
-              fontWeight: FontWeight.normal,
-              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
-            ),
-          ),
-        ),
         LMChatText(message),
+        const SizedBox(width: 4),
         LMChatIcon(
           type: LMChatIconType.svg,
           assetPath: kPollIcon,
@@ -118,18 +107,15 @@ Widget getChatItemAttachmentTile(
             ),
           ),
         ),
-        SizedBox(
-          width: 42.w,
-          child: LMChatText(
-            answerText,
-            style: LMChatTextStyle(
-              maxLines: 1,
-              textStyle: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
-              ),
+        LMChatText(
+          answerText,
+          style: LMChatTextStyle(
+            maxLines: 1,
+            textStyle: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
             ),
           ),
         ),
@@ -485,7 +471,7 @@ Widget getChatBubbleImage(
                           const SizedBox(width: 4),
                           mediaFile.meta?["duration"] != null
                               ? LMChatText(
-                                  mediaFile.meta?["duration"].toString()?? '',
+                                  mediaFile.meta?["duration"].toString() ?? '',
                                   style: LMChatTextStyle.basic().copyWith(
                                     backgroundColor:
                                         LMChatTheme.theme.onPrimary,

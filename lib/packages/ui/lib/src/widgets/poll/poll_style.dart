@@ -82,12 +82,12 @@ class LMChatPollStyle {
         color: onContainer,
         fontSize: 16,
       ),
-      pollInfoStyle: const LMChatTextStyle(
+      pollInfoStyle: LMChatTextStyle(
         textStyle: TextStyle(
           height: 1.33,
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: Colors.grey,
+          color: inActiveColor ?? Colors.grey,
         ),
       ),
       pollAnswerStyle: LMChatTextStyle(
@@ -262,7 +262,7 @@ class LMChatPollOptionStyle {
           pollOptionSelectedColor ?? this.pollOptionSelectedColor,
       pollOptionOtherColor: pollOptionOtherColor ?? this.pollOptionOtherColor,
       pollOptionSelectedCheckColor:
-          pollOptionSelectedTickColor ?? this.pollOptionSelectedCheckColor,
+          pollOptionSelectedTickColor ?? pollOptionSelectedCheckColor,
       pollOptionSelectedBorderColor:
           pollOptionSelectedBorderColor ?? this.pollOptionSelectedBorderColor,
       pollOptionSelectedTextColor:
