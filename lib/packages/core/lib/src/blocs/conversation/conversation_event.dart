@@ -209,7 +209,7 @@ class LMChatPostPollConversationEvent extends LMChatConversationEvent {
   final bool allowAddOption;
 
   /// The expiry time of the poll.
-  final int expiryTime;
+  final int? expiryTime;
 
   /// A temporary ID for the conversation.
   final String temporaryId;
@@ -228,7 +228,7 @@ class LMChatPostPollConversationEvent extends LMChatConversationEvent {
     required this.multipleSelectNo,
     required this.isAnonymous,
     required this.allowAddOption,
-    required this.expiryTime,
+    this.expiryTime,
     required this.temporaryId,
     this.repliedConversationId,
   });
@@ -244,7 +244,7 @@ class LMChatPostPollConversationEvent extends LMChatConversationEvent {
         multipleSelectNo,
         isAnonymous,
         allowAddOption,
-        expiryTime,
+        expiryTime ?? -1,
         temporaryId,
         repliedConversationId ?? -1,
       ];

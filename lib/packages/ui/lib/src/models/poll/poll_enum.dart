@@ -48,17 +48,25 @@ enum LMChatPollMultiSelectState {
 
 /// {@template lm_chat_poll_type}
 /// Enum to define the type of poll
-/// i.e. instant, deferred
+/// i.e. instant, deferred and open
 /// {@endtemplate}
 enum LMChatPollType {
   /// Instant poll
+  /// User can see the results as soon as they vote
   instant(
     value: 0,
   ),
 
   /// Deferred poll
+  /// User can see the results only after the poll ends
   deferred(
     value: 1,
+  ),
+
+  /// Open poll
+  /// User can see the results without voting or waiting for the poll to end
+  open(
+    value: 2,
   );
 
   /// Value of the enum
@@ -74,6 +82,8 @@ enum LMChatPollType {
         return LMChatPollType.instant;
       case 1:
         return LMChatPollType.deferred;
+      case 2:
+        return LMChatPollType.open;
       default:
         return LMChatPollType.instant;
     }

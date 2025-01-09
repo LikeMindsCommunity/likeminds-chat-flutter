@@ -34,16 +34,11 @@ class LMChatroomBar extends StatefulWidget {
   /// If true, users can tag other users in their messages.
   final bool? enableTagging;
 
-  /// [createPollWidgetBuilder] is the builder to create the poll widget.
-  final Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
-      createPollWidgetBuilder;
-
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
-    this.createPollWidgetBuilder,
     this.controller,
     this.enableTagging,
   });
@@ -53,13 +48,11 @@ class LMChatroomBar extends StatefulWidget {
       VoidCallback? scrollToBottom,
       TextEditingController? controller,
       bool? enableTagging,
-      Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
+      Widget Function(BuildContext, LMChatCreatePollScreen)?
           createPollWidgetBuilder}) {
     return LMChatroomBar(
       chatroom: chatroom ?? this.chatroom,
       scrollToBottom: scrollToBottom ?? this.scrollToBottom,
-      createPollWidgetBuilder:
-          createPollWidgetBuilder ?? this.createPollWidgetBuilder,
       controller: controller ?? this.controller,
       enableTagging: enableTagging ?? this.enableTagging,
     );
@@ -1344,29 +1337,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           assetPath: kPollIcon,
           label: 'Poll',
           onTap: () async {
+            // hide pop up menu
             _popupMenuController.hideMenu();
+            // close keyboard if opened
             _focusNode.unfocus();
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              useSafeArea: true,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                initialChildSize: 0.9,
-                minChildSize: 0.5,
-                snap: true,
-                builder: (context, controller) =>
-                    widget.createPollWidgetBuilder?.call(
-                      context,
-                      LMChatCreatePollBottomSheet(
-                        chatroomId: widget.chatroom.id,
-                        scrollController: controller,
-                      ),
-                    ) ??
-                    LMChatCreatePollBottomSheet(
-                      chatroomId: widget.chatroom.id,
-                      scrollController: controller,
-                    ),
+            // navigate to create poll screen
+            context.push(
+              LMChatCreatePollScreen(
+                chatroomId: widget.chatroom.id,
               ),
             );
           },
