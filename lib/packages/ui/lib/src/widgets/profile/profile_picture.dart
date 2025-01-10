@@ -139,7 +139,7 @@ class LMChatProfilePictureStyle {
       boxShape: BoxShape.circle,
       fallbackTextStyle: LMChatTextStyle(
         textStyle: TextStyle(
-          fontSize: 24,
+          fontSize: 20,
           fontWeight: FontWeight.w600,
           color: LMChatTheme.isThemeDark
               ? LMChatTheme.theme.primaryColor
