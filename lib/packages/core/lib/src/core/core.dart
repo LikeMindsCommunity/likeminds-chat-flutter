@@ -154,9 +154,18 @@ class LMChatCore {
       if (initiateUserResponse.success) {
         // get member state and store them in local preference
         LMResponse memberState = await _getMemberState();
+        // get community configurations and store them in local preference
+        LMResponse communityConfigurations =
+            await _getCommunityConfigurations();
+
+        // check if member state or community configurations are not fetched successfully
         if (!memberState.success) {
           return LMResponse(
               success: false, errorMessage: memberState.errorMessage);
+        } else if (!communityConfigurations.success) {
+          return LMResponse(
+              success: false,
+              errorMessage: communityConfigurations.errorMessage);
         }
       }
       return initiateUserResponse;
@@ -216,10 +225,19 @@ class LMChatCore {
     // get member state store them in local preference
     LMResponse memberStateResponse = await _getMemberState();
 
+    // get community configurations and store them in local preference
+    LMResponse communityConfigurations = await _getCommunityConfigurations();
+
+    // check if member state or community configurations are not fetched successfully
     if (!memberStateResponse.success) {
       return LMResponse(
         success: false,
         errorMessage: memberStateResponse.errorMessage,
+      );
+    } else if (!communityConfigurations.success) {
+      return LMResponse(
+        success: false,
+        errorMessage: communityConfigurations.errorMessage,
       );
     }
 
@@ -276,5 +294,24 @@ class LMChatCore {
   Future<LMResponse<ValidateUserResponse>> _validateUser(
       ValidateUserRequest request) async {
     return client.validateUser(request);
+  }
+
+  Future<LMResponse<GetCommunityConfigurationsResponse>>
+      _getCommunityConfigurations() async {
+    final response = await lmChatClient.getCommunityConfigurations();
+
+    if (response.success && response.data != null) {
+      await LMChatLocalPreference.instance.clearCommunityConfiguration();
+      for (CommunityConfigurations configuration
+          in response.data!.communityConfigurations) {
+        if (configuration.type == 'chat_poll') {
+          await LMChatLocalPreference.instance
+              .storeCommunityConfiguration(configuration);
+          return response;
+        }
+      }
+    }
+
+    return response;
   }
 }
