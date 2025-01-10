@@ -113,6 +113,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           action.title,
           style: LMChatTextStyle(
             maxLines: 1,
+            padding: EdgeInsets.zero,
             textStyle: widget.style?.menuTextStyle ??
                 TextStyle(
                   fontSize: 14,
