@@ -15,7 +15,7 @@ class LMDualSidePagedList<T> extends StatefulWidget {
   /// The callback function triggered when pagination conditions are satisfied
   final Future<void> Function(
     int page,
-    PaginationDirection paginationDirection,
+    LMPaginationDirection paginationDirection,
     T? item,
   ) onPaginationTriggered;
 
@@ -104,7 +104,7 @@ class LMDualSidePagedList<T> extends StatefulWidget {
   final bool? delayPopulatingCacheArea;
 
   /// Pagination type
-  final PaginationType paginationType;
+  final LMPaginationType paginationType;
 
   /// {@macro lm_dual_side_paged_list}
   const LMDualSidePagedList({
@@ -138,7 +138,7 @@ class LMDualSidePagedList<T> extends StatefulWidget {
     this.extentEstimation,
     this.extentPrecalculationPolicy,
     this.delayPopulatingCacheArea,
-    this.paginationType = PaginationType.both,
+    this.paginationType = LMPaginationType.both,
   });
 
   @override
@@ -191,7 +191,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     try {
       await widget.onPaginationTriggered(
         _currentPage,
-        PaginationDirection.bottom,
+        LMPaginationDirection.bottom,
         null,
       );
     } catch (e) {
@@ -210,7 +210,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       return;
     }
     // Check if type only allows bottom pagination
-    if (widget.paginationType == PaginationType.bottom) {
+    if (widget.paginationType == LMPaginationType.bottom) {
       return;
     }
     if (widget.paginationController.isLoadingTop) {
@@ -226,7 +226,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     try {
       await widget.onPaginationTriggered(
         _upSidePage,
-        PaginationDirection.top,
+        LMPaginationDirection.top,
         widget.paginationController.itemList.first,
       );
     } catch (e) {
@@ -242,7 +242,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       return;
     }
     // Check if type only allows top pagination
-    if (widget.paginationType == PaginationType.top) {
+    if (widget.paginationType == LMPaginationType.top) {
       return;
     }
     if (widget.paginationController.isLoadingBottom) {
@@ -256,7 +256,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     try {
       await widget.onPaginationTriggered(
         _downSidePage,
-        PaginationDirection.bottom,
+        LMPaginationDirection.bottom,
         widget.paginationController.itemList.last,
       );
     } catch (e) {

@@ -38,7 +38,7 @@ class LMChatHomeFeedBloc
 
   LMChatHomeFeedBloc._() : super(LMChatHomeInitial()) {
     final DatabaseReference realTime = LMChatRealtime.instance.homeFeed();
-    realTime.onValue.listen((event) {
+    realTime.onChildChanged.listen((event) {
       add(LMChatRefreshHomeFeedEvent());
     });
     // Event handler for fetch DM Feed event
