@@ -45,7 +45,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   late User user;
   int _topPage = 1;
   int _bottomPage = 1;
-  final int _pageSize = 20;
+  final int _pageSize = 200;
   int lastConversationId = 0;
 
   ValueNotifier showConversationActions = ValueNotifier(false);
