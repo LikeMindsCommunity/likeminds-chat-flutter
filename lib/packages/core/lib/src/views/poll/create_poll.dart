@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
@@ -159,6 +158,10 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
       ValueNotifier(false);
   final StreamController<bool> _isValidatedController =
       StreamController<bool>.broadcast();
+  final CommunityConfigurations? communityConfigurations = LMChatLocalPreference
+      .instance
+      .fetchCommunityConfiguration("chat_poll")
+      ?.data;
 
   Future<DateTime?> showDateTimePicker({
     required BuildContext context,
@@ -319,7 +322,14 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
             _defPollOptionList(),
             const SizedBox(height: 16),
             // Advanced settings
-            _defAdvancedOptions(context),
+            // if community configuration allow_override is true show advanced settings
+            // else, check if community configuration no_poll_expiry is false show expiry time
+            // else hide expiry time, it will be set to infinite automatically
+            communityConfigurations?.value?['allow_override']
+                ? _defAdvancedOptions(context)
+                : communityConfigurations?.value?['no_poll_expiry'] == false
+                    ? _defExpiryTime(context)
+                    : const SizedBox(),
           ],
         ),
       ),
@@ -583,7 +593,7 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
         horizontal: 18,
       ),
       title: LMChatText(
-        'Allow Users to change their vote',
+        'Allow users to change their vote',
         style: LMChatTextStyle(
           textStyle: TextStyle(
             fontSize: 16,
@@ -660,15 +670,16 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
                             widget.expiryDateTextBuilder?.call(
                                     context, _defExpiryDateText(value)) ??
                                 _defExpiryDateText(value),
-                            LMChatIcon(
-                              type: LMChatIconType.icon,
-                              icon: Icons.mode_edit_outline_outlined,
-                              style: LMChatIconStyle(
-                                size: 20,
-                                color: theme.inActiveColor,
-                                margin: const EdgeInsets.only(right: 8),
+                            if (_expiryDateBuilder.value != null)
+                              LMChatIcon(
+                                type: LMChatIconType.icon,
+                                icon: Icons.mode_edit_outline_outlined,
+                                style: LMChatIconStyle(
+                                  size: 20,
+                                  color: theme.inActiveColor,
+                                  margin: const EdgeInsets.only(right: 8),
+                                ),
                               ),
-                            ),
                           ],
                         );
                       },
@@ -952,6 +963,10 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
 
   void onPollSubmit() {
     if (validatePoll()) {
+      final pollType = _getPollType();
+      final expiryTime = _expiryDateBuilder.value?.millisecondsSinceEpoch;
+      final noPollExpiry = expiryTime == null;
+
       // create poll
       String pollQuestion = _questionController.text.trim();
       LMChatConversationBloc.instance.add(
@@ -959,7 +974,7 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
           chatroomId: widget.chatroomId,
           text: pollQuestion,
           polls: options,
-          pollType: _getPollType(),
+          pollType: pollType,
           multipleSelectState: _multiSelectStateBuilder.value.index,
           multipleSelectNo: _multiSelectNoBuilder.value,
           isAnonymous: _isAnonymousBuilder.value,
@@ -967,6 +982,8 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
           expiryTime: _expiryDateBuilder.value?.millisecondsSinceEpoch,
           temporaryId: DateTime.now().millisecondsSinceEpoch.toString(),
           repliedConversationId: widget.repliedConversationId,
+          noPollExpiry: noPollExpiry,
+          allowVoteChange: _allowVoteChangeBuilder.value,
         ),
       );
 

@@ -392,7 +392,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         isVoteEditing = true;
         selectedOptions.clear();
         pollData.poll?.forEach((element) {
-          if (element.isSelected == true) {
+          if ((element.isSelected ?? false)) {
             selectedOptions.add(element.id!);
           }
         });
@@ -410,7 +410,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       },
       onOptionSelect: (option) {
         // if poll has ended, then do not allow to vote
-        if (LMChatPollUtils.hasPollEnded(conversation.expiryTime)) {
+        if (LMChatPollUtils.hasPollEnded(
+            conversation.expiryTime, conversation.noPollExpiry)) {
           return;
         }
         // if poll is submitted and not editing votes, then do not allow to vote
