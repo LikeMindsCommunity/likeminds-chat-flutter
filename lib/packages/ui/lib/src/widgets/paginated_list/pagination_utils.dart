@@ -10,7 +10,7 @@ typedef ItemBuilder<T> = Widget Function(
     BuildContext context, T item, int index);
 
 /// enum to represent the direction of pagination
-enum PaginationDirection {
+enum LMPaginationDirection {
   /// top side pagination
   top,
 
@@ -19,7 +19,7 @@ enum PaginationDirection {
 }
 
 /// enum to represent the direction in which pagination call will be triggered
-enum PaginationType {
+enum LMPaginationType {
   /// trigger pagination when the user scrolls to the top of the list
   top,
 

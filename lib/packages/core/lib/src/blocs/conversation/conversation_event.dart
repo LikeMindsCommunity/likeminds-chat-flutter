@@ -34,7 +34,7 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
 
   final int? minTimestamp;
   final int? maxTimestamp;
-  final PaginationDirection direction;
+  final LMPaginationDirection direction;
   final int? lastConversationId;
   final int? replyId;
   final OrderBy? orderBy;

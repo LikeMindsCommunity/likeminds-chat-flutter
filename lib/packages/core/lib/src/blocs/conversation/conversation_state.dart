@@ -17,7 +17,7 @@ class LMChatConversationLoadedState extends LMChatConversationState {
   /// The response containing the loaded conversation data.
   final GetConversationResponse getConversationResponse;
 
-  final PaginationDirection direction;
+  final LMPaginationDirection direction;
   final int page;
 
   /// Creates and returns a new instance of [LMChatConversationLoadedState]
