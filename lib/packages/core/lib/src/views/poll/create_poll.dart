@@ -311,6 +311,9 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
                     _defPostButton(isValidated);
               })
         ],
+        style: const LMChatAppBarStyle(
+          centerTitle: true,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -923,14 +926,15 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
   }
 
   LMChatText _defTitleText() {
-    return const LMChatText(
+    return  LMChatText(
       'New Poll',
       style: LMChatTextStyle(
-        textStyle: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
+          textStyle: TextStyle(
+            color: theme.onContainer,
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ),
     );
   }
 

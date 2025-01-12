@@ -175,6 +175,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   LMChatAppBar _defAppBar() {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
+        centerTitle: true,
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         gap: 3.w,
@@ -183,34 +184,13 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
           color: Colors.transparent,
         ),
       ),
-      leading: LMChatButton(
-        onTap: () {
-          Navigator.of(context).pop();
-        },
-        style: LMChatButtonStyle(
-          height: 28,
-          width: 28,
-          borderRadius: 6,
-          padding: EdgeInsets.zero,
-          icon: LMChatIcon(
-            type: LMChatIconType.icon,
-            icon: Icons.arrow_back,
-            style: LMChatIconStyle(
-              color: LMChatTheme.theme.onPrimary,
-              size: 20,
-              boxSize: 28,
-            ),
-          ),
-          backgroundColor: LMChatTheme.theme.primaryColor,
-        ),
-      ),
       title: LMChatText(
-        'Poll Results',
+        'Poll Result',
         style: LMChatTextStyle(
           textStyle: TextStyle(
             color: theme.onContainer,
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -269,11 +249,11 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const LMChatImage(
-            imageAssetPath: emptyViewImage,
-            style: LMChatImageStyle(
-              height: 100,
-              width: 100,
+          const LMChatIcon(
+            type: LMChatIconType.svg,
+            assetPath: emptyPollResult,
+            style: LMChatIconStyle(
+              size: 40,
               margin: EdgeInsets.only(bottom: 16),
             ),
           ),
@@ -283,7 +263,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: theme.inActiveColor,
+                color: theme.onContainer,
               ),
             ),
           )
