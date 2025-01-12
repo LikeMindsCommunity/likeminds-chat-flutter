@@ -844,7 +844,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     // if yes, then add the conversation to the same group by assigning view type - bottom
     if (conversationList.isNotEmpty &&
         conversationList.first.memberId == conversation.memberId) {
-      result = result.copyWith(
+      conversation = result.copyWith(
           conversationViewType: LMChatConversationViewType.bottom);
     }
 

@@ -443,9 +443,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   conversation.conversationViewType !=
                           LMChatConversationViewType.bottom
                       ? widget.avatar ?? const SizedBox()
-                      : const SizedBox(
-                          width: 39,
-                        ),
+                      : const SizedBox(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
