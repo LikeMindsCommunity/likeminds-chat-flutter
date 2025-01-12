@@ -52,6 +52,9 @@ class LMChatBubble extends StatefulWidget {
   /// The avatar of the user.
   final LMChatProfilePicture? avatar;
 
+  /// The avatar builder for the user.
+  final LMChatProfilePictureBuilder? avatarBuilder;
+
   /// The function to call when a reply is made.
   final Function(LMChatConversationViewData)? onReply;
 
@@ -161,6 +164,7 @@ class LMChatBubble extends StatefulWidget {
     this.onReply,
     this.replyIcon,
     this.avatar,
+    this.avatarBuilder,
     this.isSent,
     this.deletedText,
     this.isSelected = false,
@@ -194,6 +198,7 @@ class LMChatBubble extends StatefulWidget {
     bool? isSent,
     LMChatIcon? replyIcon,
     LMChatProfilePicture? avatar,
+    LMChatProfilePictureBuilder? avatarBuilder,
     Function(LMChatConversationViewData)? onReply,
     Function(String tag)? onTagTap,
     LMChatText? deletedText,
@@ -238,6 +243,7 @@ class LMChatBubble extends StatefulWidget {
       onTagTap: onTagTap ?? this.onTagTap,
       replyIcon: replyIcon ?? this.replyIcon,
       avatar: avatar ?? this.avatar,
+      avatarBuilder: avatarBuilder ?? this.avatarBuilder,
       deletedText: deletedText ?? this.deletedText,
       style: style ?? this.style,
       isSelected: isSelected ?? this.isSelected,
@@ -439,11 +445,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!isSent)
-                  conversation.conversationViewType !=
-                          LMChatConversationViewType.bottom
-                      ? widget.avatar ?? const SizedBox()
-                      : const SizedBox(),
+                widget.avatarBuilder?.call(
+                      context,
+                      _defAvatar(!isSent),
+                    ) ??
+                    const SizedBox.shrink(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -471,6 +477,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           ),
                           color:
                               inStyle.backgroundColor ?? _themeData.container,
+                          // painter: LMChatBubblePainter(
+                          //   conversationViewType:
+                          //       conversation.conversationViewType ??
+                          //           LMChatConversationViewType.top,
+                          //   isSent: isSent,
+                          //   bubbleColor: inStyle.backgroundColor ??
+                          //       _themeData.container,
+                          // ),
                           child: Padding(
                             padding: isSent
                                 ? EdgeInsets.only(
@@ -690,7 +704,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                         ),
                   ],
                 ),
-                if (isSent) widget.avatar ?? const SizedBox(),
+                widget.avatarBuilder?.call(
+                      context,
+                      _defAvatar(isSent),
+                    ) ??
+                    const SizedBox.shrink(),
               ],
             ),
           ),
@@ -900,6 +918,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     } else {
       _voiceNoteDurationNotifier.value = duration;
     }
+  }
+
+  LMChatProfilePicture? _defAvatar(bool toShowAvatar) {
+    if (toShowAvatar) return widget.avatar;
+    return null;
   }
 }
 

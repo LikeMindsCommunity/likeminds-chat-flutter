@@ -557,6 +557,15 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           boxShape: BoxShape.circle,
         ),
       ),
+      avatarBuilder: (context, avatar) {
+        if (conversation.conversationViewType ==
+            LMChatConversationViewType.bottom) {
+          return const SizedBox(
+            width: 39,
+          );
+        }
+        return avatar;
+      },
       isSelected: _selectedIds.contains(conversation.id) ||
           _animateToChatId == conversation.id,
       onLongPress: (value, state) {
