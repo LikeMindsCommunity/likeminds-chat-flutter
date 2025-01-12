@@ -644,8 +644,12 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             return conv;
           }).toList() ??
           [];
-      conversationData = addTimeStampInConversationList(conversationData,
-          LMChatLocalPreference.instance.getCommunityData()!.id);
+      if (state.page == 1) {
+        conversationData = groupConversationsAndAddDates(conversationData);
+      } else {
+        conversationData = updatePaginationConversationsViewType(
+            pagedListController.itemList, conversationData);
+      }
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
           state.getConversationResponse.conversationData!.length > _pageSize) {
@@ -774,6 +778,14 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       );
     }
 
+    // check if the new conversation is by the same user as last conversation
+    // if yes, then add the conversation to the same group by assigning view type - bottom
+    if (conversationList.isNotEmpty &&
+        conversationList.first.memberId == conversation.memberId) {
+      result = result.copyWith(
+          conversationViewType: LMChatConversationViewType.bottom);
+    }
+
     conversationList.insert(0, result);
     if (isOtherUserChatbot) {
       conversationList.removeWhere((element) => element.id == -1);
@@ -827,6 +839,15 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
+
+    // check if the new conversation is by the same user as last conversation
+    // if yes, then add the conversation to the same group by assigning view type - bottom
+    if (conversationList.isNotEmpty &&
+        conversationList.first.memberId == conversation.memberId) {
+      result = result.copyWith(
+          conversationViewType: LMChatConversationViewType.bottom);
+    }
+
     if (index != -1) {
       conversationList[index] = conversation;
     } else if (conversationList.isNotEmpty) {
@@ -1173,6 +1194,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       allConversations.addAll(bottomConversationsVewData.reversed);
       // add top conversation
       allConversations.addAll(topConversationsViewData);
+      // update conversation view type
+      allConversations = groupConversationsAndAddDates(allConversations);
       // add the new conversation to pagedList
       pagedListController.addAll(allConversations);
       // reset the pages

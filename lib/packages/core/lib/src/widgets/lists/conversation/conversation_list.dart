@@ -708,17 +708,17 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         }
         return conv;
       }).toList();
-      conversationData = addTimeStampInConversationList(conversationData,
-          LMChatLocalPreference.instance.getCommunityData()!.id);
+
       if (state.direction == PaginationDirection.top) {
         conversationData = conversationData?.reversed.toList();
       }
-      int? previousUserId;
-      if (pagedListController.itemList.isNotEmpty) {
-        previousUserId = pagedListController.itemList.first.memberId;
+      if (state.page == 1) {
+        conversationData =
+            groupConversationsAndAddDates(conversationData ?? []);
+      } else {
+        conversationData = updatePaginationConversationsViewType(
+            pagedListController.itemList, conversationData ?? []);
       }
-      conversationData = updateConversationsViewType(conversationData ?? [],
-          previousUserId: previousUserId);
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
           state.getConversationResponse.conversationData!.length > _pageSize) {
@@ -852,6 +852,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       );
     }
 
+    // check if the new conversation is by the same user as last conversation
+    // if yes, then add the conversation to the same group by assigning view type - bottom
+    if (conversationList.isNotEmpty &&
+        conversationList.first.memberId == conversation.memberId) {
+      result = result.copyWith(
+          conversationViewType: LMChatConversationViewType.bottom);
+    }
+
     // Add the actual conversation
     conversationList.insert(0, result);
     if (conversationList.length >= _pageSize) {
@@ -860,15 +868,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     if (!userMeta.containsKey(user.id)) {
       userMeta[user.id] = user;
     }
-
-    // Update conversation view types
-    int? previousUserId;
-    if (pagedListController.itemList.isNotEmpty) {
-      previousUserId = pagedListController.itemList.first.memberId;
-    }
-    conversationList = updateConversationsViewType(conversationList,
-        previousUserId: previousUserId);
-
     pagedListController.itemList = conversationList;
     rebuildConversationList.value = !rebuildConversationList.value;
   }
@@ -905,6 +904,13 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             conversationAttachmentsMeta[conversation.id.toString()],
       );
     }
+    // check if the new conversation is by the same user as last conversation
+    // if yes, then add the conversation to the same group by assigning view type - bottom
+    if (conversationList.isNotEmpty &&
+        conversationList.first.memberId == conversation.memberId) {
+      result = result.copyWith(
+          conversationViewType: LMChatConversationViewType.bottom);
+    }
     if (index != -1) {
       conversationList[index] = result;
     } else if (conversationList.isNotEmpty) {
@@ -931,6 +937,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           ).toConversationViewData(),
         );
       }
+      // add the actual conversation
       conversationList.insert(0, result);
       if (conversationList.length >= _pageSize) {
         conversationList.removeLast();
@@ -939,23 +946,13 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         userMeta[user.id] = user;
       }
     }
-
-    // Update conversation view types
-    int? previousUserId;
-    if (pagedListController.itemList.isNotEmpty) {
-      previousUserId = pagedListController.itemList.first.memberId;
-    }
-
-    conversationList = updateConversationsViewType(conversationList,
-        previousUserId: previousUserId);
-
     pagedListController.itemList = conversationList;
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 
   void _updateDeletedConversation(LMChatConversationViewData conversation) {
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     // Update the deleted conversation
     int index =
@@ -1264,7 +1261,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       // add top conversation
       allConversations.addAll(topConversationsViewData);
       // update conversation view type
-      allConversations = updateConversationsViewType(allConversations);
+      allConversations = groupConversationsAndAddDates(allConversations);
       // add the new conversation to pagedList
       pagedListController.addAll(allConversations);
       // reset the pages
@@ -1310,27 +1307,5 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     // again setting [_animateToChatId] to null for removing selection state
     _animateToChatId = null;
     rebuildConversationList.value = !rebuildConversationList.value;
-  }
-
-  List<LMChatConversationViewData> updateConversationsViewType(
-      List<LMChatConversationViewData> conversations,
-      {int? previousUserId}) {
-    List<LMChatConversationViewData> updatedConversations = [];
-    for (int index = 0; index < conversations.length; index++) {
-      int? userId = previousUserId;
-      final conversation = conversations[index];
-      if (index + 1 < conversations.length) {
-        userId = conversations[index + 1].memberId;
-      }
-      if (conversation.memberId == userId) {
-        updatedConversations.add(conversation.copyWith(
-            conversationViewType: LMChatConversationViewType.bottom));
-      } else {
-        userId = conversation.memberId;
-        updatedConversations.add(conversation.copyWith(
-            conversationViewType: LMChatConversationViewType.top));
-      }
-    }
-    return updatedConversations;
   }
 }

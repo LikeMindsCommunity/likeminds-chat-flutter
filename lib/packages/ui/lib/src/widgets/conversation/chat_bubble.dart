@@ -440,8 +440,8 @@ class _LMChatBubbleState extends State<LMChatBubble> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (!isSent)
-                  conversation.conversationViewType ==
-                          LMChatConversationViewType.top
+                  conversation.conversationViewType !=
+                          LMChatConversationViewType.bottom
                       ? widget.avatar ?? const SizedBox()
                       : const SizedBox(
                           width: 39,
@@ -473,14 +473,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           ),
                           color:
                               inStyle.backgroundColor ?? _themeData.container,
-                          // painter: LMChatBubblePainter(
-                          //   conversationViewType:
-                          //       conversation.conversationViewType ??
-                          //           LMChatConversationViewType.top,
-                          //   isSent: isSent,
-                          //   bubbleColor: inStyle.backgroundColor ??
-                          //       _themeData.container,
-                          // ),
                           child: Padding(
                             padding: isSent
                                 ? EdgeInsets.only(

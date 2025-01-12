@@ -18,12 +18,13 @@ class LMChatConversationLoadedState extends LMChatConversationState {
   final GetConversationResponse getConversationResponse;
 
   final PaginationDirection direction;
+  final int page;
 
   /// Creates and returns a new instance of [LMChatConversationLoadedState]
-  LMChatConversationLoadedState(this.getConversationResponse, this.direction);
+  LMChatConversationLoadedState(this.getConversationResponse, this.direction, this.page);
 
   @override
-  List<Object> get props => [getConversationResponse, direction];
+  List<Object> get props => [getConversationResponse, direction, page];
 }
 
 /// Represents an error state in the conversation.
