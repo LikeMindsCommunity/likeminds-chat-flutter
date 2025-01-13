@@ -4,7 +4,6 @@ import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-
 /// Helps us handle the state message addition to the list locally on
 /// new chatroom topic selection by creating it using the [User] and [Conversation]
 /// params - [User] loggedInUser, [Conversation] newTopic
@@ -120,8 +119,7 @@ List<LMChatConversationViewData> groupConversationsAndAddDates(
 List<LMChatConversationViewData> updateRealTimeConversationsViewType(
     LMChatConversationViewData newConversation,
     List<LMChatConversationViewData> oldConversations) {
-  List<LMChatConversationViewData> updatedConversations =
-      [];
+  List<LMChatConversationViewData> updatedConversations = [];
   int? previousMemberId =
       oldConversations.isNotEmpty ? oldConversations.first.memberId : null;
   String? previousMessageDate =
@@ -179,6 +177,9 @@ List<LMChatConversationViewData> updatePaginationConversationsViewType(
   List<LMChatConversationViewData> oldConversations,
   List<LMChatConversationViewData> newConversations,
 ) {
+  if (newConversations.isEmpty) {
+    return oldConversations;
+  }
   List<LMChatConversationViewData> updatedConversations = [];
   String? previousMessageDate =
       oldConversations.isNotEmpty ? oldConversations.last.date : null;
