@@ -26,6 +26,9 @@ enum LMChatWidgetSource {
   /// poll result screen
   pollResult,
 
+  /// create poll screen
+  createPoll,
+
   /// other screen
   other,
 }

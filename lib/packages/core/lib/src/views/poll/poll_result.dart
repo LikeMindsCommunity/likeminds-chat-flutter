@@ -3,7 +3,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
-import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/builder.dart';
 
 /// {@template lm_chat_poll_result_screen}
 /// A screen to display poll results.
@@ -46,8 +45,8 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   int initialIndex = 0;
   late TabController _tabController;
   late PageController _pagingController;
-  final LMChatPollBuilderDelegate _screenBuilder =
-      LMChatCore.config.pollConfig.builder;
+  final LMChatPollResultBuilderDelegate _screenBuilder =
+      LMChatCore.config.pollConfig.pollResultBuilder;
 
   @override
   initState() {
