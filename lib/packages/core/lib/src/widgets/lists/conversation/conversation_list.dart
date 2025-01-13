@@ -15,13 +15,23 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:intl/intl.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+/// {@template lm_chat_conversation_list}
+/// A widget that displays a list of conversations.
+/// {@endtemplate}
 class LMChatConversationList extends StatefulWidget {
+  /// The chatroom id.
   final int chatroomId;
 
+  /// The selected conversations.
   final List<int>? selectedConversations;
 
+  /// The conversation helper.
+  final LMChatConversationActionInterface? conversationHelper;
+
+  /// The app bar notifier.
   final ValueNotifier<bool>? appBarNotifier;
 
+  /// The paginated list controller.
   final LMDualSidePaginationController<LMChatConversationViewData>?
       paginatedListController;
 
@@ -30,6 +40,7 @@ class LMChatConversationList extends StatefulWidget {
     super.key,
     required this.chatroomId,
     this.selectedConversations,
+    this.conversationHelper,
     this.appBarNotifier,
     this.paginatedListController,
   });
@@ -191,12 +202,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         minTimestamp: replyConversation == null
             ? null
             : direction == LMPaginationDirection.bottom
-                ? replyConversation!.createdEpoch
+                ? replyConversation.createdEpoch
                 : null,
         maxTimestamp: replyConversation == null
             ? null
             : direction == LMPaginationDirection.top
-                ? replyConversation!.createdEpoch
+                ? replyConversation.createdEpoch
                 : null,
         chatroomId: widget.chatroomId,
         page: pageKey,
@@ -230,6 +241,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
+      actionHelper: widget.conversationHelper,
       onReplyTap: () {
         _onReplyTap(conversation, pagedListController, widget.chatroomId);
       },
@@ -474,6 +486,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   LMChatBubble _defaultReceivedChatBubble(
       LMChatConversationViewData conversation) {
     return LMChatBubble(
+      actionHelper: widget.conversationHelper,
       onReplyTap: () {
         _onReplyTap(conversation, pagedListController, widget.chatroomId);
       },

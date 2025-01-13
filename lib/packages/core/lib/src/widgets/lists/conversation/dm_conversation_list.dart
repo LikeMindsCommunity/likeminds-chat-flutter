@@ -9,19 +9,30 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:intl/intl.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+/// {@template lm_chat_dm_conversation_list}
+/// A widget that displays a list of direct messages.
+/// {@endtemplate}
 class LMChatDMConversationList extends StatefulWidget {
+  /// The chatroom id.
   final int chatroomId;
 
+  /// The selected conversations.
   final List<int>? selectedConversations;
 
+  /// The app bar notifier.
   final ValueNotifier<bool>? appBarNotifier;
 
+  /// The flag to check if the other user is an AI chatbot.
   final bool? isOtherUserAIChatbot;
 
+  /// The paginated list controller.
   final LMDualSidePaginationController<LMChatConversationViewData>?
       paginatedListController;
 
-  /// Creates a new instance of LMChatConversationList
+  /// The conversation helper.
+  final LMChatConversationActionInterface? conversationHelper;
+
+  /// Creates a new instance of LMChatDMConversationList
   const LMChatDMConversationList({
     super.key,
     required this.chatroomId,
@@ -29,6 +40,7 @@ class LMChatDMConversationList extends StatefulWidget {
     this.appBarNotifier,
     this.paginatedListController,
     this.isOtherUserAIChatbot,
+    this.conversationHelper,
   });
 
   @override
@@ -240,6 +252,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
+      actionHelper: widget.conversationHelper,
       onReplyTap: () {
         _onReplyTap(conversation, pagedListController, widget.chatroomId);
       },
@@ -389,6 +402,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   LMChatBubble _defaultReceivedChatBubble(
       LMChatConversationViewData conversation) {
     return LMChatBubble(
+      actionHelper: widget.conversationHelper,
       onReplyTap: () {
         _onReplyTap(conversation, pagedListController, widget.chatroomId);
       },
@@ -658,8 +672,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           pagedListController.appendLastPageToEnd(conversationData ?? []);
         } else {
           _topPage++;
-          pagedListController.appendFirstPageToStart(
-              conversationData?.reversed.toList() ?? []);
+          pagedListController
+              .appendFirstPageToStart(conversationData.reversed.toList() ?? []);
         }
       } else {
         if (state.direction == LMPaginationDirection.top) {
@@ -669,7 +683,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         } else {
           _topPage++;
           pagedListController.appendPageToStart(
-              conversationData?.reversed.toList() ?? [], _topPage);
+              conversationData.reversed.toList() ?? [], _topPage);
         }
       }
     }

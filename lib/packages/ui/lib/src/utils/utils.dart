@@ -9,6 +9,8 @@ export 'constants/assets.dart';
 export 'helpers/tagging_helper.dart';
 export 'helpers/text_helper.dart';
 
+export 'helpers/conversation_helper.dart';
+
 export 'conversation/conversation_utils.dart';
 
 export 'media/media_utils.dart';

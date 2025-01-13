@@ -146,6 +146,9 @@ class LMChatBubble extends StatefulWidget {
   /// Callback for reply tap
   final VoidCallback? onReplyTap;
 
+  /// The action helper for the chat bubble
+  final LMChatConversationActionInterface? actionHelper;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -186,6 +189,7 @@ class LMChatBubble extends StatefulWidget {
     this.replyBuilder,
     this.onReactionsTap,
     this.onReplyTap,
+    this.actionHelper,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -409,7 +413,32 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           });
           widget.onLongPress?.call(_isSelected, this);
           reactionBarController.showMenu();
-          _showContextMenu(context);
+
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final Offset bubblePosition = renderBox.localToGlobal(Offset.zero);
+          final Size bubbleSize = renderBox.size;
+
+          // Calculate menu position based on bubble width and alignment
+          const double menuWidth = 180.0; // Fixed menu width
+          double menuX;
+
+          if (isSent) {
+            // For sent messages (right aligned), position from right edge
+            menuX = bubblePosition.dx + bubbleSize.width - menuWidth;
+          } else {
+            // For received messages (left aligned), position from left edge
+            menuX = bubblePosition.dx;
+          }
+
+          final Offset offset = Offset(
+            menuX,
+            bubblePosition.dy + bubbleSize.height + 4, // 4px gap below bubble
+          );
+
+          widget.actionHelper?.showSelectionMenu(
+            context,
+            offset,
+          );
         }
       },
       onTap: () {
@@ -918,67 +947,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
       _voiceNoteDurationNotifier.value = initialDuration;
     } else {
       _voiceNoteDurationNotifier.value = duration;
-    }
-  }
-
-  // Method to show the context menu
-  void _showContextMenu(BuildContext context) {
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    // Get the position of the chat bubble
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final Offset offset = renderBox.localToGlobal(Offset.zero);
-
-    showMenu(
-      context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromPoints(
-          offset,
-          offset,
-        ),
-        Offset.zero & overlay.size,
-      ),
-      items: [
-        const PopupMenuItem(
-          value: 'copy',
-          child: Text('Copy'),
-        ),
-        const PopupMenuItem(
-          value: 'reply',
-          child: Text('Reply'),
-        ),
-        const PopupMenuItem(
-          value: 'edit',
-          child: Text('Edit'),
-        ),
-        const PopupMenuItem(
-          value: 'delete',
-          child: Text('Delete'),
-        ),
-      ],
-    ).then((value) {
-      if (value != null) {
-        _handleMenuAction(value);
-      }
-    });
-  }
-
-  // Handle the selected action from the context menu
-  void _handleMenuAction(String action) {
-    switch (action) {
-      case 'copy':
-        // Implement copy action
-        break;
-      case 'reply':
-        // Implement reply action
-        break;
-      case 'edit':
-        // Implement edit action
-        break;
-      case 'delete':
-        // Implement delete action
-        break;
     }
   }
 

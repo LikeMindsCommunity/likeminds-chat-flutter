@@ -45,3 +45,19 @@ enum LMChatSpace {
   /// Show only active chatrooms
   active,
 }
+
+/// Specifies the type of selection for a chatroom
+///
+/// [appbar] - Selection is done through the app bar
+/// [floating] - Selection is done through a floating action button
+/// [bottomsheet] - Selection is done through a bottom sheet
+enum LMChatSelectionType {
+  /// Selection is done through the app bar
+  appbar,
+
+  /// Selection is done through a floating action button
+  floating,
+
+  /// Selection is done through a bottom sheet
+  bottomsheet,
+}
