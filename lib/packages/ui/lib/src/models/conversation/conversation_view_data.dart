@@ -54,6 +54,8 @@ class LMChatConversationViewData {
   final List<LMChatPollOptionViewData>? poll;
   final bool? isPollSubmitted;
   LMChatConversationViewType? conversationViewType;
+  final bool? noPollExpiry;
+  final bool? allowVoteChange;
 
   LMChatConversationViewData._({
     this.allowAddOption,
@@ -105,6 +107,8 @@ class LMChatConversationViewData {
     this.poll,
     this.isPollSubmitted,
     this.conversationViewType,
+    this.noPollExpiry,
+    this.allowVoteChange,
   });
 
   /// copyWith method is used to create a new instance of `LMChatConversationViewData` with the updated values.
@@ -159,6 +163,8 @@ class LMChatConversationViewData {
     List<LMChatPollOptionViewData>? poll,
     bool? isPollSubmitted,
     LMChatConversationViewType? conversationViewType,
+    bool? noPollExpiry,
+    bool? allowVoteChange,
   }) {
     return LMChatConversationViewData._(
       allowAddOption: allowAddOption ?? this.allowAddOption,
@@ -213,6 +219,8 @@ class LMChatConversationViewData {
       poll: poll ?? this.poll,
       isPollSubmitted: isPollSubmitted ?? this.isPollSubmitted,
       conversationViewType: conversationViewType ?? this.conversationViewType,
+      noPollExpiry: noPollExpiry ?? this.noPollExpiry,
+      allowVoteChange: allowVoteChange ?? this.allowVoteChange,
     );
   }
 }
@@ -269,6 +277,8 @@ class LMChatConversationViewDataBuilder {
   List<LMChatPollOptionViewData>? _poll;
   bool? _isPollSubmitted;
   LMChatConversationViewType? _conversationViewType;
+  bool? _noPollExpiry;
+  bool? _allowVoteChange;
 
   void allowAddOption(bool? allowAddOption) {
     _allowAddOption = allowAddOption;
@@ -468,6 +478,14 @@ class LMChatConversationViewDataBuilder {
     _conversationViewType = conversationViewType;
   }
 
+  void noPollExpiry(bool? noPollExpiry) {
+    _noPollExpiry = noPollExpiry;
+  }
+
+  void allowVoteChange(bool? allowVoteChange) {
+    _allowVoteChange = allowVoteChange;
+  }
+
   /// Builds the `LMChatConversationViewData` object using the provided values.
   LMChatConversationViewData build() {
     return LMChatConversationViewData._(
@@ -520,6 +538,8 @@ class LMChatConversationViewDataBuilder {
       poll: _poll,
       isPollSubmitted: _isPollSubmitted,
       conversationViewType: _conversationViewType,
+      noPollExpiry: _noPollExpiry,
+      allowVoteChange: _allowVoteChange,
     );
   }
 }

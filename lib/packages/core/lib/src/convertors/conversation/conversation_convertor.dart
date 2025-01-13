@@ -74,7 +74,10 @@ extension ConversationViewDataConvertor on Conversation {
               ?.map((e) => e.toPollOptionViewData(
                     userMeta: userMeta,
                   ))
-              .toList());
+              .toList())
+          ..noPollExpiry(noPollExpiry)
+          ..allowVoteChange(allowVoteChange);
+
     final polls = conversationPollsMeta?[id.toString()];
     if (polls != null) {
       polls.sort((a, b) => a.id!.compareTo(b.id!));
@@ -143,6 +146,8 @@ extension ConversationConvertor on LMChatConversationViewData {
           ?.map((LMChatReactionViewData reaction) => reaction.toReaction())
           .toList(),
       // poll: poll?.toPoll(),
+      noPollExpiry: noPollExpiry,
+      allowVoteChange: allowVoteChange,
     );
   }
 }

@@ -21,7 +21,9 @@ void postPollConversationHandler(
         ..isAnonymous(event.isAnonymous)
         ..allowAddOption(event.allowAddOption)
         ..expiryTime(event.expiryTime)
-        ..temporaryId(event.temporaryId);
+        ..temporaryId(event.temporaryId)
+        ..noPollExpiry(event.noPollExpiry)
+        ..allowVoteChange(event.allowVoteChange);
   if (event.repliedConversationId != null) {
     requestBuilder.repliedConversationId(event.repliedConversationId!);
   }

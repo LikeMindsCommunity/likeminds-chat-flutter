@@ -8,10 +8,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/animation.dart';
 import 'dart:math' as math;
 import 'package:flutter_sound/flutter_sound.dart';
 
@@ -34,16 +31,11 @@ class LMChatroomBar extends StatefulWidget {
   /// If true, users can tag other users in their messages.
   final bool? enableTagging;
 
-  /// [createPollWidgetBuilder] is the builder to create the poll widget.
-  final Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
-      createPollWidgetBuilder;
-
   /// {@macro lm_chatroom_bar}
   const LMChatroomBar({
     super.key,
     required this.chatroom,
     required this.scrollToBottom,
-    this.createPollWidgetBuilder,
     this.controller,
     this.enableTagging,
   });
@@ -53,13 +45,10 @@ class LMChatroomBar extends StatefulWidget {
       VoidCallback? scrollToBottom,
       TextEditingController? controller,
       bool? enableTagging,
-      Widget Function(BuildContext, LMChatCreatePollBottomSheet)?
-          createPollWidgetBuilder}) {
+      }) {
     return LMChatroomBar(
       chatroom: chatroom ?? this.chatroom,
       scrollToBottom: scrollToBottom ?? this.scrollToBottom,
-      createPollWidgetBuilder:
-          createPollWidgetBuilder ?? this.createPollWidgetBuilder,
       controller: controller ?? this.controller,
       enableTagging: enableTagging ?? this.enableTagging,
     );
@@ -1344,29 +1333,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           assetPath: kPollIcon,
           label: 'Poll',
           onTap: () async {
+            // hide pop up menu
             _popupMenuController.hideMenu();
+            // close keyboard if opened
             _focusNode.unfocus();
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              useSafeArea: true,
-              builder: (context) => DraggableScrollableSheet(
-                expand: false,
-                initialChildSize: 0.9,
-                minChildSize: 0.5,
-                snap: true,
-                builder: (context, controller) =>
-                    widget.createPollWidgetBuilder?.call(
-                      context,
-                      LMChatCreatePollBottomSheet(
-                        chatroomId: widget.chatroom.id,
-                        scrollController: controller,
-                      ),
-                    ) ??
-                    LMChatCreatePollBottomSheet(
-                      chatroomId: widget.chatroom.id,
-                      scrollController: controller,
-                    ),
+            // navigate to create poll screen
+            context.push(
+              LMChatCreatePollScreen(
+                chatroomId: widget.chatroom.id,
               ),
             );
           },

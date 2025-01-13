@@ -804,7 +804,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         chatroomId: widget.chatroomId,
         page: 1,
         pageSize: 200,
-        direction: LMPaginationDirection.bottom,
+        direction: LMPaginationDirection.top,
         lastConversationId: lastConversationId,
       ));
       pagedListController.clear();
