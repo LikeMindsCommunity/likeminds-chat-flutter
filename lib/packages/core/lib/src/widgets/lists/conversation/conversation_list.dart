@@ -15,13 +15,23 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:intl/intl.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+/// {@template lm_chat_conversation_list}
+/// A widget that displays a list of conversations.
+/// {@endtemplate}
 class LMChatConversationList extends StatefulWidget {
+  /// The chatroom id.
   final int chatroomId;
 
+  /// The selected conversations.
   final List<int>? selectedConversations;
 
+  /// The conversation helper.
+  final LMChatConversationActionInterface? conversationHelper;
+
+  /// The app bar notifier.
   final ValueNotifier<bool>? appBarNotifier;
 
+  /// The paginated list controller.
   final LMDualSidePaginationController<LMChatConversationViewData>?
       paginatedListController;
 
@@ -30,6 +40,7 @@ class LMChatConversationList extends StatefulWidget {
     super.key,
     required this.chatroomId,
     this.selectedConversations,
+    this.conversationHelper,
     this.appBarNotifier,
     this.paginatedListController,
   });
@@ -191,12 +202,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         minTimestamp: replyConversation == null
             ? null
             : direction == LMPaginationDirection.bottom
-                ? replyConversation!.createdEpoch
+                ? replyConversation.createdEpoch
                 : null,
         maxTimestamp: replyConversation == null
             ? null
             : direction == LMPaginationDirection.top
-                ? replyConversation!.createdEpoch
+                ? replyConversation.createdEpoch
                 : null,
         chatroomId: widget.chatroomId,
         page: pageKey,
@@ -230,6 +241,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
   LMChatBubble _defaultSentChatBubble(LMChatConversationViewData conversation) {
     return LMChatBubble(
+      actionHelper: widget.conversationHelper,
       onReplyTap: () {
         _onReplyTap(conversation, pagedListController, widget.chatroomId);
       },
@@ -474,6 +486,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   LMChatBubble _defaultReceivedChatBubble(
       LMChatConversationViewData conversation) {
     return LMChatBubble(
+      actionHelper: widget.conversationHelper,
       onReplyTap: () {
         _onReplyTap(conversation, pagedListController, widget.chatroomId);
       },
@@ -731,7 +744,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       }
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
-          state.getConversationResponse.conversationData!.length > _pageSize) {
+          state.getConversationResponse.conversationData!.length < _pageSize) {
         if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
           pagedListController.appendLastPageToEnd(conversationData);
@@ -1277,6 +1290,13 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       // reset the pages
       _topPage = 2;
       _bottomPage = 2;
+      // set last page reached to true in case of no more data
+      if (bottomConversationsVewData.length < _pageSize) {
+        pagedListController.isLastPageToTopReached = true;
+      }
+      if (topConversationsViewData.length < _pageSize) {
+        pagedListController.isLastPageToBottomReached = true;
+      }
       rebuildConversationList.value = !rebuildConversationList.value;
       // find index of the conversation in the list and scroll to it
       int index = pagedListController.itemList
@@ -1313,7 +1333,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     _animateToChatId = replyId;
     rebuildConversationList.value = !rebuildConversationList.value;
     // it is essential for showing an animation with better visibility
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 1500));
     // again setting [_animateToChatId] to null for removing selection state
     _animateToChatId = null;
     rebuildConversationList.value = !rebuildConversationList.value;

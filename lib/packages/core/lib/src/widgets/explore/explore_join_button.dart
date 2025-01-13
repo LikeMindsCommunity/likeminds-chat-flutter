@@ -42,8 +42,8 @@ class LMChatJoinButton extends StatelessWidget {
                         ),
                         content: LMChatText(
                           chatroom.isSecret != null && chatroom.isSecret!
-                              ? 'Are you sure you want to leave this private group? To join back, you\'ll need to reach out to the admin'
-                              : 'Are you sure you want to leave this group?',
+                              ? 'Are you sure you want to leave this private chatroom? To join back, you\'ll need to reach out to the admin'
+                              : 'Are you sure you want to leave this chatroom?',
                           style: LMChatTextStyle(
                             textStyle: TextStyle(
                               fontSize: 14,
@@ -54,7 +54,9 @@ class LMChatJoinButton extends StatelessWidget {
                         actions: [
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 2.0),
+                              horizontal: 8.0,
+                              vertical: 2.0,
+                            ),
                             child: LMChatText(
                               "CANCEL",
                               style: LMChatTextStyle(
@@ -74,9 +76,11 @@ class LMChatJoinButton extends StatelessWidget {
                             child: LMChatText(
                               "CONFIRM",
                               style: LMChatTextStyle(
+                                backgroundColor: LMChatTheme.theme.primaryColor,
+                                padding: const EdgeInsets.all(6),
                                 textStyle: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: LMChatTheme.theme.primaryColor,
+                                  color: LMChatTheme.theme.onPrimary,
                                 ),
                               ),
                               onTap: () {
@@ -94,7 +98,7 @@ class LMChatJoinButton extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   color: isJoined
-                      ? LMChatTheme.theme.disabledColor
+                      ? LMChatTheme.theme.disabledColor.withOpacity(0.5)
                       : LMChatTheme.theme.primaryColor,
                   borderRadius: BorderRadius.circular(8),
                 ),

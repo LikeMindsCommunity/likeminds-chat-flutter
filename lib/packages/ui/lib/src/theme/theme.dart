@@ -437,10 +437,11 @@ class LMChatThemeData {
           LMChatAppBarStyle.basic(LMChatDefaultDarkTheme.container),
       pollStyle: pollStyle ??
           LMChatPollStyle.basic(
-            primaryColor: primaryColor,
-            containerColor: container,
-            onContainer: onContainer,
-            inActiveColor: inActiveColor,
+            primaryColor: primaryColor ?? LMChatDefaultDarkTheme.primaryColor,
+            containerColor: container ?? LMChatDefaultDarkTheme.container,
+            onContainer: onContainer ?? LMChatDefaultDarkTheme.onContainer,
+            inActiveColor:
+                inActiveColor ?? LMChatDefaultDarkTheme.inactiveColor,
           ),
       reactionBarStyle: reactionBarStyle ?? LMChatReactionBarStyle.basic(),
       reactionBottomSheetStyle:
@@ -759,7 +760,7 @@ class LMChatDefaultTheme {
   static const Color shadowColor = Color.fromRGBO(0, 0, 0, 0.239);
 
   /// Default disabled color
-  static const Color disabledColor = Color.fromRGBO(208, 216, 226, 1);
+  static const Color disabledColor = Color.fromRGBO(155, 155, 155, 1);
 
   /// Default error color
   static const Color errorColor = Color.fromRGBO(251, 22, 9, 1);
@@ -953,7 +954,7 @@ class LMChatDefaultDarkTheme {
   static const Color shadowColor = Color.fromRGBO(0, 0, 0, 0.5);
 
   /// Default disabled color for dark theme
-  static const Color disabledColor = Color.fromRGBO(66, 66, 66, 1);
+  static const Color disabledColor = Color.fromRGBO(128, 128, 128, 1);
 
   /// Default error color for dark theme
   static const Color errorColor = Color.fromRGBO(255, 82, 82, 1);

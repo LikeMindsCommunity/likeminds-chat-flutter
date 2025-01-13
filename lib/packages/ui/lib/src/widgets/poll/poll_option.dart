@@ -210,13 +210,14 @@ class LMChatPollOption extends StatelessWidget {
   LMChatText _defPollOptionText() {
     return LMChatText(option.text,
         style: style?.pollOptionTextStyle ??
-            const LMChatTextStyle(
+            LMChatTextStyle(
               maxLines: 1,
               textStyle: TextStyle(
                 overflow: TextOverflow.ellipsis,
                 height: 1.50,
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
+                color: LMChatTheme.theme.onContainer,
               ),
             ));
   }

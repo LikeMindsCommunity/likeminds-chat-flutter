@@ -177,7 +177,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         assetPath: exploreIcon,
         style: LMChatIconStyle(
           color: LMChatTheme.theme.primaryColor,
-          size: 28,
+          size: 18,
           boxSize: 32,
         ),
       ),
@@ -241,8 +241,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         style: LMChatTextStyle(
           textStyle: TextStyle(
             color: LMChatTheme.theme.onPrimary,
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
           ),
         ),
       ),

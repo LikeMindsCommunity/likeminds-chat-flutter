@@ -155,9 +155,9 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         'Explore Chatrooms',
         style: LMChatTextStyle(
           textStyle: TextStyle(
-            color: LMChatTheme.theme.primaryColor,
+            color: LMChatTheme.theme.onContainer,
             fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ),

@@ -59,6 +59,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
         height: 120,
+        gap: 8,
         backgroundColor: LMChatTheme.theme.container,
       ),
       leading: const SizedBox.shrink(),
@@ -68,7 +69,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
           fallbackText: user.name,
           imageUrl: user.imageUrl,
           style: const LMChatProfilePictureStyle(
-            size: 42,
+            size: 32,
           ),
         ),
         const SizedBox(width: 8),

@@ -146,6 +146,9 @@ class LMChatBubble extends StatefulWidget {
   /// Callback for reply tap
   final VoidCallback? onReplyTap;
 
+  /// The action helper for the chat bubble
+  final LMChatConversationActionInterface? actionHelper;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -186,6 +189,7 @@ class LMChatBubble extends StatefulWidget {
     this.replyBuilder,
     this.onReactionsTap,
     this.onReplyTap,
+    this.actionHelper,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
@@ -409,6 +413,32 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           });
           widget.onLongPress?.call(_isSelected, this);
           reactionBarController.showMenu();
+
+          final RenderBox renderBox = context.findRenderObject() as RenderBox;
+          final Offset bubblePosition = renderBox.localToGlobal(Offset.zero);
+          final Size bubbleSize = renderBox.size;
+
+          // Calculate menu position based on bubble width and alignment
+          const double menuWidth = 180.0; // Fixed menu width
+          double menuX;
+
+          if (isSent) {
+            // For sent messages (right aligned), position from right edge
+            menuX = bubblePosition.dx + bubbleSize.width - menuWidth;
+          } else {
+            // For received messages (left aligned), position from left edge
+            menuX = bubblePosition.dx;
+          }
+
+          final Offset offset = Offset(
+            menuX,
+            bubblePosition.dy + bubbleSize.height + 4, // 4px gap below bubble
+          );
+
+          widget.actionHelper?.showSelectionMenu(
+            context,
+            offset,
+          );
         }
       },
       onTap: () {
@@ -431,7 +461,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         children: [
           AnimatedContainer(
             duration: const Duration(
-              milliseconds: 500,
+              milliseconds: 300,
             ),
             foregroundDecoration: BoxDecoration(
               color: _isSelected
