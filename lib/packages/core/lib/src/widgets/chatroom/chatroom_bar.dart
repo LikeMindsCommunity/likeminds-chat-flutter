@@ -8,10 +8,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_header.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/animation.dart';
 import 'dart:math' as math;
 import 'package:flutter_sound/flutter_sound.dart';
 
@@ -48,8 +45,7 @@ class LMChatroomBar extends StatefulWidget {
       VoidCallback? scrollToBottom,
       TextEditingController? controller,
       bool? enableTagging,
-      Widget Function(BuildContext, LMChatCreatePollScreen)?
-          createPollWidgetBuilder}) {
+      }) {
     return LMChatroomBar(
       chatroom: chatroom ?? this.chatroom,
       scrollToBottom: scrollToBottom ?? this.scrollToBottom,

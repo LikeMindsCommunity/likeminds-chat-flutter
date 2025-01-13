@@ -138,7 +138,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         builder: (context, value, child) {
           return LMDualSidePagedList<LMChatConversationViewData>(
             paginationType: LMChatConversationBloc.replyConversation == null
-                ? LMPaginationType.bottom
+                ? LMPaginationType.top
                 : LMPaginationType.both,
             initialPage: 1,
             onPaginationTriggered: _onPaginationTriggered,
@@ -190,12 +190,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       LMChatFetchConversationsEvent(
         minTimestamp: replyConversation == null
             ? null
-            : direction == LMPaginationDirection.top
+            : direction == LMPaginationDirection.bottom
                 ? replyConversation!.createdEpoch
                 : null,
         maxTimestamp: replyConversation == null
             ? null
-            : direction == LMPaginationDirection.bottom
+            : direction == LMPaginationDirection.top
                 ? replyConversation!.createdEpoch
                 : null,
         chatroomId: widget.chatroomId,
@@ -204,7 +204,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         direction: direction,
         lastConversationId: lastConversationId,
         replyId: replyId,
-        orderBy: direction == LMPaginationDirection.top
+        orderBy: direction == LMPaginationDirection.bottom
             ? OrderBy.ascending
             : OrderBy.descending,
       ),
@@ -719,7 +719,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         return conv;
       }).toList();
 
-      if (state.direction == LMPaginationDirection.top) {
+      if (state.direction == LMPaginationDirection.bottom) {
         conversationData = conversationData?.reversed.toList();
       }
       if (state.page == 1) {
@@ -732,7 +732,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
           state.getConversationResponse.conversationData!.length > _pageSize) {
-        if (state.direction == LMPaginationDirection.bottom) {
+        if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
           pagedListController.appendLastPageToEnd(conversationData);
         } else {
@@ -741,7 +741,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               .appendFirstPageToStart(conversationData.reversed.toList());
         }
       } else {
-        if (state.direction == LMPaginationDirection.bottom) {
+        if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
           pagedListController.appendPageToEnd(conversationData, _bottomPage);
         } else {
