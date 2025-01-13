@@ -117,11 +117,33 @@ class LMChatLocalPreference {
     return LMChatCore.client.clearCache();
   }
 
+  /// This function is used to store the community configuration in the local preferences.
+  Future<LMResponse> storeCommunityConfiguration(
+      CommunityConfigurations communityConfiguration) async {
+    return await LMChatCore.client
+        .insertOrUpdateCommunityConfigurationsDB([communityConfiguration]);
+  }
+
+  /// This function is used to fetch the community configuration from the local preferences.
+  LMResponse<CommunityConfigurations>? fetchCommunityConfiguration(
+      String type) {
+    LMResponse<CommunityConfigurations> response =
+        LMChatCore.client.getCommunityConfigurationDB(type);
+
+    return response;
+  }
+
+  /// This function is used to clear the community configuration from the local preferences.
+  Future<LMResponse> clearCommunityConfiguration() {
+    return LMChatCore.client.clearCommunityConfigurationDB();
+  }
+
   /// This function is used to clear the local data from the local preferences.
   Future<void> clearLocalData() async {
     await clearUserData();
     await clearMemberRights();
     await clearCommunityData();
     await clearCache();
+    await clearCommunityConfiguration();
   }
 }

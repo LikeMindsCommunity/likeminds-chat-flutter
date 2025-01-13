@@ -1,51 +1,8 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-
-List<LMChatConversationViewData>? addTimeStampInConversationList(
-    List<LMChatConversationViewData>? conversationList, int communityId) {
-  if (conversationList == null) {
-    return conversationList;
-  }
-  LinkedHashMap<String, List<LMChatConversationViewData>> mappedConversations =
-      LinkedHashMap<String, List<LMChatConversationViewData>>();
-
-  for (LMChatConversationViewData conversation in conversationList) {
-    if (conversation.isTimeStamp == null || !conversation.isTimeStamp!) {
-      if (mappedConversations.containsKey(conversation.date)) {
-        mappedConversations[conversation.date]!.add(conversation);
-      } else {
-        mappedConversations[conversation.date!] = <LMChatConversationViewData>[
-          conversation
-        ];
-      }
-    }
-  }
-  List<LMChatConversationViewData> conversationListWithTimeStamp =
-      <LMChatConversationViewData>[];
-  mappedConversations.forEach(
-    (key, value) {
-      conversationListWithTimeStamp.addAll(value);
-      conversationListWithTimeStamp.add(
-        Conversation(
-          isTimeStamp: true,
-          answer: key,
-          communityId: communityId,
-          chatroomId: 0,
-          createdAt: key,
-          header: key,
-          id: 0,
-          pollAnswerText: key,
-        ).toConversationViewData(),
-      );
-    },
-  );
-  return conversationListWithTimeStamp;
-}
 
 /// Helps us handle the state message addition to the list locally on
 /// new chatroom topic selection by creating it using the [User] and [Conversation]
@@ -102,4 +59,149 @@ Map<String, List<Reaction>> convertListToMapReaction(List<Reaction> reaction) {
     }
   }
   return mappedReactions;
+}
+
+/// Return list of [LMChatConversationViewData] with [LMChatConversationViewType] top and bottom
+/// based on the member id and date of the conversation
+/// and add date conversation in between if the date is different
+/// should be used when we are fetching the conversations for the first time, i.e page 1
+List<LMChatConversationViewData> groupConversationsAndAddDates(
+    List<LMChatConversationViewData> conversations) {
+  List<LMChatConversationViewData> updatedConversations = [];
+
+  for (int index = 0; index < conversations.length; index++) {
+    LMChatConversationViewData conversation = conversations[index];
+    int? nextMemberId;
+    bool isNextDateConversation = false;
+
+    if (index + 1 < conversations.length) {
+      nextMemberId = conversations[index + 1].memberId;
+      isNextDateConversation =
+          conversations[index + 1].date != conversation.date;
+    } else {
+      nextMemberId = null;
+    }
+
+    if (isNextDateConversation || (conversation.memberId != nextMemberId)) {
+      conversation = conversation.copyWith(
+          conversationViewType: LMChatConversationViewType.top);
+    } else {
+      conversation = conversation.copyWith(
+          conversationViewType: LMChatConversationViewType.bottom);
+    }
+
+    updatedConversations.add(conversation);
+
+    if (isNextDateConversation) {
+      updatedConversations.add(
+        Conversation(
+          isTimeStamp: true,
+          answer: conversation.date ?? '',
+          communityId: conversation.communityId,
+          chatroomId: conversation.chatroomId,
+          createdAt: conversation.date ?? '',
+          header: conversation.date,
+          id: 0,
+          pollAnswerText: conversation.date,
+        ).toConversationViewData(),
+      );
+      isNextDateConversation = false;
+    }
+  }
+
+  return updatedConversations;
+}
+
+/// Return list of [LMChatConversationViewData] with [LMChatConversationViewType] top and bottom
+/// based on the member id and date of the conversation
+/// and add date conversation in between if the date is different
+/// should be used when a new conversation is being added to the list
+List<LMChatConversationViewData> updateRealTimeConversationsViewType(
+    LMChatConversationViewData newConversation,
+    List<LMChatConversationViewData> oldConversations) {
+  List<LMChatConversationViewData> updatedConversations = [];
+  int? previousMemberId =
+      oldConversations.isNotEmpty ? oldConversations.first.memberId : null;
+  String? previousMessageDate =
+      oldConversations.isNotEmpty ? oldConversations.first.date : null;
+  bool isNextDateConversation = previousMessageDate != newConversation.date;
+
+  if (previousMemberId == newConversation.memberId) {
+    if (isNextDateConversation) {
+      updatedConversations.add(
+        Conversation(
+          isTimeStamp: true,
+          answer: newConversation.date ?? '',
+          communityId: newConversation.communityId,
+          chatroomId: newConversation.chatroomId,
+          createdAt: newConversation.date ?? '',
+          header: newConversation.date,
+          id: 0,
+          pollAnswerText: newConversation.date,
+        ).toConversationViewData(),
+      );
+      newConversation = newConversation.copyWith(
+          conversationViewType: LMChatConversationViewType.top);
+    } else {
+      newConversation = newConversation.copyWith(
+          conversationViewType: LMChatConversationViewType.bottom);
+    }
+  } else {
+    if (isNextDateConversation) {
+      updatedConversations.add(
+        Conversation(
+          isTimeStamp: true,
+          answer: newConversation.date ?? '',
+          communityId: newConversation.communityId,
+          chatroomId: newConversation.chatroomId,
+          createdAt: newConversation.date ?? '',
+          header: newConversation.date,
+          id: 0,
+          pollAnswerText: newConversation.date,
+        ).toConversationViewData(),
+      );
+    }
+    newConversation = newConversation.copyWith(
+        conversationViewType: LMChatConversationViewType.top);
+  }
+
+  updatedConversations.add(newConversation);
+  return updatedConversations;
+}
+
+/// Return list of [LMChatConversationViewData] with [LMChatConversationViewType] top and bottom
+/// based on the member id and date of the conversation
+/// and add date conversation in between if the date is different
+/// should be used when we are fetching the conversations with page > 1
+List<LMChatConversationViewData> updatePaginationConversationsViewType(
+  List<LMChatConversationViewData> oldConversations,
+  List<LMChatConversationViewData> newConversations,
+) {
+  if (newConversations.isEmpty) {
+    return oldConversations;
+  }
+  List<LMChatConversationViewData> updatedConversations = [];
+  String? previousMessageDate =
+      oldConversations.isNotEmpty ? oldConversations.last.date : null;
+  bool isPreviousMessageInSameDate =
+      previousMessageDate == newConversations.first.date;
+
+  if (isPreviousMessageInSameDate) {
+    oldConversations.removeLast();
+  }
+
+  int? previousMemberId =
+      oldConversations.isNotEmpty ? oldConversations.last.memberId : null;
+
+  if (previousMemberId == newConversations.first.memberId) {
+    oldConversations.last = oldConversations.last
+        .copyWith(conversationViewType: LMChatConversationViewType.bottom);
+    updatedConversations
+        .addAll(groupConversationsAndAddDates(newConversations));
+  } else {
+    updatedConversations
+        .addAll(groupConversationsAndAddDates(newConversations));
+  }
+
+  return updatedConversations;
 }

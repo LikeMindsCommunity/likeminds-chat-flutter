@@ -3,7 +3,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
-import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/builder.dart';
 
 /// {@template lm_chat_poll_result_screen}
 /// A screen to display poll results.
@@ -46,8 +45,8 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   int initialIndex = 0;
   late TabController _tabController;
   late PageController _pagingController;
-  final LMChatPollBuilderDelegate _screenBuilder =
-      LMChatCore.config.pollConfig.builder;
+  final LMChatPollResultBuilderDelegate _screenBuilder =
+      LMChatCore.config.pollConfig.pollResultBuilder;
 
   @override
   initState() {
@@ -175,6 +174,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   LMChatAppBar _defAppBar() {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
+        centerTitle: true,
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         gap: 3.w,
@@ -183,34 +183,13 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
           color: Colors.transparent,
         ),
       ),
-      leading: LMChatButton(
-        onTap: () {
-          Navigator.of(context).pop();
-        },
-        style: LMChatButtonStyle(
-          height: 28,
-          width: 28,
-          borderRadius: 6,
-          padding: EdgeInsets.zero,
-          icon: LMChatIcon(
-            type: LMChatIconType.icon,
-            icon: Icons.arrow_back,
-            style: LMChatIconStyle(
-              color: LMChatTheme.theme.onPrimary,
-              size: 20,
-              boxSize: 28,
-            ),
-          ),
-          backgroundColor: LMChatTheme.theme.primaryColor,
-        ),
-      ),
       title: LMChatText(
-        'Poll Results',
+        'Poll Result',
         style: LMChatTextStyle(
           textStyle: TextStyle(
             color: theme.onContainer,
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -269,11 +248,11 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const LMChatImage(
-            imageAssetPath: emptyViewImage,
-            style: LMChatImageStyle(
-              height: 100,
-              width: 100,
+          const LMChatIcon(
+            type: LMChatIconType.svg,
+            assetPath: emptyPollResult,
+            style: LMChatIconStyle(
+              size: 40,
               margin: EdgeInsets.only(bottom: 16),
             ),
           ),
@@ -283,7 +262,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: theme.inActiveColor,
+                color: theme.onContainer,
               ),
             ),
           )

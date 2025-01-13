@@ -19,7 +19,8 @@ Future<void> submitVote(
       );
       return;
     }
-    if (LMChatPollUtils.hasPollEnded(conversationData.expiryTime)) {
+    if (LMChatPollUtils.hasPollEnded(
+        conversationData.expiryTime, conversationData.noPollExpiry)) {
       toast(
         "Poll ended. Vote can not be submitted now.",
       );
@@ -27,7 +28,7 @@ Future<void> submitVote(
       return;
     }
     if (LMChatPollUtils.isPollSubmitted(conversationData.poll!) &&
-        LMChatPollUtils.isInstantPoll(conversationData.pollType!)) {
+        !(conversationData.allowVoteChange ?? false)) {
       return;
     } else {
       if (LMChatPollUtils.isMultiChoicePoll(conversationData.multipleSelectNo,
@@ -124,7 +125,7 @@ Future<void> addOption(
   }
 }
 
-/// Handles the poll option deletion logic
+/// Handles the poll vote text tap logic
 void onVoteTextTap(BuildContext context,
     LMChatConversationViewData conversationData, LMChatWidgetSource source,
     {LMChatPollOptionViewData? option}) {
@@ -157,7 +158,8 @@ void onVoteTextTap(BuildContext context,
       ),
     );
   } else if (conversationData.toShowResults! ||
-      LMChatPollUtils.hasPollEnded(conversationData.expiryTime)) {
+      LMChatPollUtils.hasPollEnded(
+          conversationData.expiryTime, conversationData.noPollExpiry)) {
     Navigator.push(
       context,
       MaterialPageRoute(

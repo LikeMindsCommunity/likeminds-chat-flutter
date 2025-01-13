@@ -7,14 +7,16 @@ class LMChatPollUtils {
   /// Determines whether to show the edit vote button.
   static bool showEditVote(
       LMChatConversationViewData conversationData, bool isVoteEditing) {
-    if (hasPollEnded(conversationData.expiryTime)) {
+    if (hasPollEnded(
+        conversationData.expiryTime, conversationData.noPollExpiry)) {
       return false;
     }
     if (isVoteEditing) {
       return false;
     }
     if (isPollSubmitted(conversationData.poll ?? []) &&
-        conversationData.pollType == LMChatPollType.deferred) {
+        (conversationData.pollType == LMChatPollType.deferred ||
+            (conversationData.allowVoteChange ?? false))) {
       return true;
     }
     return false;
@@ -23,7 +25,8 @@ class LMChatPollUtils {
   /// Determines whether to show the add option button.
   static bool showAddOption(LMChatConversationViewData conversationData) {
     // return false if poll has ended.
-    if (hasPollEnded(conversationData.expiryTime)) {
+    if (hasPollEnded(
+        conversationData.expiryTime, conversationData.noPollExpiry)) {
       return false;
     }
     // if allowAddOption is true check if the poll is submitted or not
@@ -81,7 +84,8 @@ class LMChatPollUtils {
     if ((conversationData.pollType != null &&
             isInstantPoll(conversationData.pollType!) &&
             isPollSubmitted(conversationData.poll!)) ||
-        hasPollEnded(conversationData.expiryTime)) {
+        hasPollEnded(
+            conversationData.expiryTime, conversationData.noPollExpiry)) {
       return false;
     } else if (!isMultiChoicePoll(conversationData.multipleSelectNo,
         conversationData.multipleSelectState)) {
@@ -97,7 +101,11 @@ class LMChatPollUtils {
   }
 
   /// Checks if the poll has ended based on the expiry time.
-  static bool hasPollEnded(int? expiryTime) {
+  static bool hasPollEnded(int? expiryTime, [bool? noPollExpiry = false]) {
+    // if noPollExpiry is true, the poll will never expire.
+    if (noPollExpiry ?? false) {
+      return false;
+    }
     return expiryTime != null &&
         DateTime.now().millisecondsSinceEpoch > expiryTime;
   }

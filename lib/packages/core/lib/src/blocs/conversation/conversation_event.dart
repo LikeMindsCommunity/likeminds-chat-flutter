@@ -209,13 +209,23 @@ class LMChatPostPollConversationEvent extends LMChatConversationEvent {
   final bool allowAddOption;
 
   /// The expiry time of the poll.
-  final int expiryTime;
+  final int? expiryTime;
 
   /// A temporary ID for the conversation.
   final String temporaryId;
 
   /// The ID of the replied conversation, if any.
   final String? repliedConversationId;
+
+  /// Indicates if the poll has no expiry.
+  /// If true, the poll will not expire.
+  final bool? noPollExpiry;
+
+  /// Indicates if the vote can be changed.
+  /// If true, the user can change their vote.
+  /// in case of open and instant polls, the user can change their vote.
+  /// in case of deferred polls, it is set to true.
+  final bool? allowVoteChange;
 
   /// {@macro lm_chat_post_poll_conversation_event}
   LMChatPostPollConversationEvent({
@@ -228,9 +238,11 @@ class LMChatPostPollConversationEvent extends LMChatConversationEvent {
     required this.multipleSelectNo,
     required this.isAnonymous,
     required this.allowAddOption,
-    required this.expiryTime,
+    this.expiryTime,
     required this.temporaryId,
     this.repliedConversationId,
+    this.noPollExpiry,
+    this.allowVoteChange,
   });
 
   @override
@@ -244,8 +256,10 @@ class LMChatPostPollConversationEvent extends LMChatConversationEvent {
         multipleSelectNo,
         isAnonymous,
         allowAddOption,
-        expiryTime,
+        expiryTime ?? -1,
         temporaryId,
         repliedConversationId ?? -1,
+        noPollExpiry ?? false,
+        allowVoteChange ?? false,
       ];
 }

@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
@@ -117,7 +118,7 @@ class LMChatPoll extends StatefulWidget {
   ///
   /// - [context]: The build context in which the widget is built.
   /// - [timeLeftText]: An optional [LMChatText] object containing the time left text.
-  final Widget Function(BuildContext, LMChatText)? timeLeftTextBuilder;
+  final Widget Function(BuildContext, LMChatText?)? timeLeftTextBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the poll question
   final Widget Function(BuildContext, LMChatExpandableText)?
@@ -165,7 +166,7 @@ class LMChatPoll extends StatefulWidget {
     Widget Function(BuildContext)? pollHeaderSeparatorBuilder,
     Widget Function(BuildContext, LMChatText)? voteTypeTextBuilder,
     Widget Function(BuildContext, LMChatIcon)? pollIconBuilder,
-    Widget Function(BuildContext, LMChatText)? timeLeftTextBuilder,
+    Widget Function(BuildContext, LMChatText?)? timeLeftTextBuilder,
     Widget Function(BuildContext, LMChatExpandableText)? pollQuestionBuilder,
     Widget Function(BuildContext, LMChatText)? pollSelectionTextBuilder,
     Widget Function(
@@ -295,7 +296,8 @@ class _LMChatPollState extends State<LMChatPoll> {
                           context,
                           _defTimeLeftText(),
                         ) ??
-                        _defTimeLeftText(),
+                        _defTimeLeftText() ??
+                        const SizedBox.shrink(),
                   ],
                 ),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
@@ -367,20 +369,22 @@ class _LMChatPollState extends State<LMChatPoll> {
     );
   }
 
-  LMChatText _defTimeLeftText() {
-    return LMChatText(
-      LMChatPollUtils.getTimeLeftInPoll(widget.pollData.expiryTime),
-      style: LMChatTextStyle(
-        borderRadius: 100,
-        backgroundColor: theme.primaryColor,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        textStyle: TextStyle(
-          height: 1.33,
-          fontSize: 14,
-          color: theme.container,
-        ),
-      ),
-    );
+  LMChatText? _defTimeLeftText() {
+    return widget.pollData.expiryTime != null
+        ? LMChatText(
+            LMChatPollUtils.getTimeLeftInPoll(widget.pollData.expiryTime),
+            style: LMChatTextStyle(
+              borderRadius: 100,
+              backgroundColor: theme.primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              textStyle: TextStyle(
+                height: 1.33,
+                fontSize: 14,
+                color: theme.container,
+              ),
+            ),
+          )
+        : null;
   }
 
   LMChatIcon _defPollIcon() {
