@@ -798,18 +798,36 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   }
 
   void _scrollToBottom() {
-    scrollController
-        .animateTo(
-      scrollController.position.minScrollExtent,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    )
-        .then(
-      (value) {
-        rebuildChatTopic.value = !rebuildChatTopic.value;
-        showChatTopic = true;
-      },
-    );
+    if (LMChatConversationBloc.replyConversation != null) {
+      LMChatConversationBloc.replyConversation = null;
+      _conversationBloc.add(LMChatFetchConversationsEvent(
+        chatroomId: widget.chatroomId,
+        page: 1,
+        pageSize: 200,
+        direction: LMPaginationDirection.bottom,
+        lastConversationId: lastConversationId,
+      ));
+      pagedListController.clear();
+      LMChatConversationBloc.instance.stream.listen((event) {
+        if (event is LMChatConversationLoadedState) {
+          rebuildConversationList.value = !rebuildConversationList.value;
+          _scrollToBottom();
+        }
+      });
+    } else {
+      scrollController
+          .animateTo(
+        scrollController.position.minScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      )
+          .then(
+        (value) {
+          rebuildChatTopic.value = !rebuildChatTopic.value;
+          showChatTopic = true;
+        },
+      );
+    }
   }
 
   void _showScrollToBottomButton() {

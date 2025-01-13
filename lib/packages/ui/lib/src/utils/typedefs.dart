@@ -305,3 +305,16 @@ typedef LMChatIconBuilder = Widget Function(
   BuildContext context,
   LMChatIcon icon,
 );
+
+/// {@template lm_chat_profile_picture_builder}
+/// The profile picture builder function for the chat screen.
+/// This function is called to build the profile picture for the chat screen.
+/// The [LMChatProfilePictureBuilder] function takes two parameters:
+/// - [BuildContext] context: The context.
+/// - [LMChatProfilePicture] profilePicture: The profile picture.
+/// The function returns a [Widget].
+/// {@endtemplate}
+typedef LMChatProfilePictureBuilder = Widget? Function(
+  BuildContext context,
+  LMChatProfilePicture? profilePicture,
+);
