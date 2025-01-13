@@ -432,7 +432,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         children: [
           AnimatedContainer(
             duration: const Duration(
-              milliseconds: 500,
+              milliseconds: 300,
             ),
             foregroundDecoration: BoxDecoration(
               color: _isSelected

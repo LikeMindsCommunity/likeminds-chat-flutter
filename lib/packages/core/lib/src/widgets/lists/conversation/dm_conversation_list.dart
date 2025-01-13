@@ -1246,7 +1246,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     _animateToChatId = replyId;
     rebuildConversationList.value = !rebuildConversationList.value;
     // it is essential for showing an animation with better visibility
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 1500));
     // again setting [_animateToChatId] to null for removing selection state
     _animateToChatId = null;
     rebuildConversationList.value = !rebuildConversationList.value;
