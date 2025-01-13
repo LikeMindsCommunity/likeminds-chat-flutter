@@ -731,7 +731,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       }
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
-          state.getConversationResponse.conversationData!.length > _pageSize) {
+          state.getConversationResponse.conversationData!.length < _pageSize) {
         if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
           pagedListController.appendLastPageToEnd(conversationData);
@@ -1277,6 +1277,13 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       // reset the pages
       _topPage = 2;
       _bottomPage = 2;
+      // set last page reached to true in case of no more data
+      if (bottomConversationsVewData.length < _pageSize) {
+        pagedListController.isLastPageToTopReached = true;
+      }
+      if (topConversationsViewData.length < _pageSize) {
+        pagedListController.isLastPageToBottomReached = true;
+      }
       rebuildConversationList.value = !rebuildConversationList.value;
       // find index of the conversation in the list and scroll to it
       int index = pagedListController.itemList

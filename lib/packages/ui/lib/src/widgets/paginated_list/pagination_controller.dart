@@ -27,16 +27,10 @@ class LMDualSidePaginationController<T> {
   bool isLoadingBottom = false;
 
   /// Whether the last page has been reached.
-  bool _isLastPageToBottomReached = false;
+  bool isLastPageToBottomReached = false;
 
   /// Whether the first page has been reached.
-  bool _isLastPageToTopReached = false;
-
-  /// Whether the last page has been reached.
-  bool get isLastPageToBottomReached => _isLastPageToBottomReached;
-
-  /// Whether the first page has been reached.
-  bool get isLastPageToTopReached => _isLastPageToTopReached;
+  bool isLastPageToTopReached = false;
 
   /// The list controller to control the list view.
   ListController get listController => _listController;
@@ -57,11 +51,11 @@ class LMDualSidePaginationController<T> {
   /// the next page's key.
   void appendPageToEnd(List<T> newItems, int? nextPageKey) {
     if (nextPageKey == null) {
-      _isLastPageToBottomReached = true;
+      isLastPageToBottomReached = true;
     }
     isFirstPageLoadedController.add(true);
     downSidePage.add(nextPageKey ?? 0);
-    itemList.addAll(newItems);
+    itemList.addAll([...newItems]);
     isLoadingBottom = false;
   }
 
@@ -73,11 +67,11 @@ class LMDualSidePaginationController<T> {
   /// the previous page's key.
   void appendPageToStart(List<T> newItems, int? previousPageKey) {
     if (previousPageKey == null) {
-      _isLastPageToTopReached = true;
+      isLastPageToTopReached = true;
     }
 
     upSidePage.add(previousPageKey ?? 0);
-    itemList.insertAll(0, newItems);
+    itemList.insertAll(0, [...newItems]);
     isLoadingTop = false;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       // isLoadingTop = true;
@@ -104,8 +98,8 @@ class LMDualSidePaginationController<T> {
     itemList = [];
     upSidePage.add(0);
     downSidePage.add(0);
-    _isLastPageToBottomReached = false;
-    _isLastPageToTopReached = false;
+    isLastPageToBottomReached = false;
+    isLastPageToTopReached = false;
   }
 
   /// Appends [newItems] to the previously loaded ones.
