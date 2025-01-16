@@ -195,6 +195,7 @@ class LMChatBubble extends StatefulWidget {
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
   /// If the new values are null, then the old values are used.
   LMChatBubble copyWith({
+    LMChatConversationActionInterface? actionHelper,
     LMChatConversationViewData? conversation,
     LMChatUserViewData? currentUser,
     LMChatUserViewData? conversationUser,
@@ -238,6 +239,7 @@ class LMChatBubble extends StatefulWidget {
     VoidCallback? onReplyTap,
   }) {
     return LMChatBubble(
+      actionHelper: actionHelper ?? this.actionHelper,
       conversation: conversation ?? this.conversation,
       currentUser: currentUser ?? this.currentUser,
       conversationUser: conversationUser ?? this.conversationUser,
