@@ -17,6 +17,11 @@ class LMChatDMFeedList extends StatefulWidget {
     super.key,
   });
 
+  /// Creates a copy of this [LMChatDMFeedList] but with the given fields replaced with the new values.
+  LMChatDMFeedList copyWith() {
+    return const LMChatDMFeedList();
+  }
+
   @override
   State<LMChatDMFeedList> createState() => _LMChatDMFeedListState();
 }
