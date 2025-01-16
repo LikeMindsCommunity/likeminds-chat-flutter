@@ -110,12 +110,21 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
         helpText: 'Start date',
         builder: (context, child) {
           return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: theme.primaryColor,
-                  onPrimary: theme.onPrimary,
-                ),
-              ),
+              data: LMChatTheme.isThemeDark
+                  ? Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.dark(
+                        primary: theme.primaryColor,
+                        onPrimary: theme.onPrimary,
+                        secondary: theme.secondaryColor,
+                      ),
+                    )
+                  : Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: theme.primaryColor,
+                        onPrimary: theme.onPrimary,
+                        secondary: theme.secondaryColor,
+                      ),
+                    ),
               child: child!);
         });
 
@@ -129,10 +138,17 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
       builder: (context, child) {
         return Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: theme.primaryColor,
-                onPrimary: theme.onPrimary,
-              ),
+              colorScheme: LMChatTheme.isThemeDark
+                  ? ColorScheme.dark(
+                      primary: theme.primaryColor,
+                      onPrimary: theme.onPrimary,
+                      secondary: theme.secondaryColor,
+                    )
+                  : ColorScheme.light(
+                      primary: theme.primaryColor,
+                      onPrimary: theme.onPrimary,
+                      secondary: theme.secondaryColor,
+                    ),
             ),
             child: child!);
       },
@@ -268,8 +284,9 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
               return _defPostButton(isValidated);
             })
       ],
-      style: const LMChatAppBarStyle(
+      style: LMChatAppBarStyle(
         centerTitle: true,
+        backgroundColor: LMChatTheme.theme.container,
       ),
     );
   }
@@ -858,7 +875,9 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
       },
       decoration: widget.pollQuestionStyle?.inputDecoration ??
           InputDecoration(
-            fillColor: const Color.fromRGBO(242, 244, 247, 1),
+            fillColor: LMChatTheme.isThemeDark
+                ? theme.backgroundColor
+                : theme.textFieldStyle.backgroundColor,
             filled: true,
             hintText: 'Ask a question',
             hintStyle: TextStyle(
@@ -893,9 +912,10 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
       'Question*',
       style: LMChatTextStyle(
         textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: theme.primaryColor),
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: theme.primaryColor,
+        ),
         padding: const EdgeInsets.only(bottom: 8),
       ),
     );
@@ -1048,13 +1068,14 @@ class _LMChatOptionTileState extends State<LMChatOptionTile> {
         ),
         decoration: widget.optionStyle?.inputDecoration ??
             InputDecoration(
-              fillColor: const Color.fromRGBO(242, 244, 247, 1),
+              fillColor: LMChatTheme.isThemeDark
+                  ? theme.backgroundColor
+                  : theme.textFieldStyle.backgroundColor,
               filled: true,
               hintText: 'Option ${widget.index + 1}',
               hintStyle: TextStyle(
                 color: theme.inActiveColor,
               ),
-              border: InputBorder.none,
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
