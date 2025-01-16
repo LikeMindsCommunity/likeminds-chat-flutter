@@ -561,7 +561,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         );
       },
       isSent: false,
-      style: LMChatBubbleStyle.basic(),
+      style: LMChatBubbleStyle.basic().copyWith(
+        showHeader: conversation.conversationViewType !=
+            LMChatConversationViewType.bottom,
+      ),
       avatar: LMChatProfilePicture(
         fallbackText: conversation.member!.name,
         imageUrl: conversation.member!.imageUrl,
