@@ -65,6 +65,9 @@ updateConversationsEventHandler(
           conversationViewData: realTimeConversation.toConversationViewData(
             conversationPollsMeta: conversationResponse.conversationPollsMeta,
             userMeta: conversationResponse.userMeta,
+            attachmentMeta: conversationResponse.conversationAttachmentsMeta,
+            reactionMeta: conversationResponse.conversationReactionMeta,
+            conversationMeta: conversationResponse.conversationMeta,
           ),
           attachments: attachments,
           shouldUpdate: event.shouldUpdate,
