@@ -1145,6 +1145,11 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           conversationPollsMeta:
               replyConversationResponse.data!.conversationPollsMeta,
           userMeta: replyConversationResponse.data!.userMeta,
+          attachmentMeta:
+              replyConversationResponse.data!.conversationAttachmentsMeta,
+          reactionMeta:
+              replyConversationResponse.data!.conversationReactionMeta,
+          conversationMeta: replyConversationResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1175,6 +1180,10 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           conversationPollsMeta:
               bottomToReplyResponse.data!.conversationPollsMeta,
           userMeta: bottomToReplyResponse.data!.userMeta,
+          attachmentMeta:
+              bottomToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: bottomToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: bottomToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1198,6 +1207,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         return e.toConversationViewData(
           conversationPollsMeta: topToReplyResponse.data!.conversationPollsMeta,
           userMeta: topToReplyResponse.data!.userMeta,
+          attachmentMeta: topToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: topToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: topToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 

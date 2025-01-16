@@ -725,6 +725,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           conversationPollsMeta:
               state.getConversationResponse.conversationPollsMeta,
           userMeta: state.getConversationResponse.userMeta,
+          attachmentMeta: state.getConversationResponse.conversationAttachmentsMeta,
+          reactionMeta: state.getConversationResponse.conversationReactionMeta,
+          conversationMeta: state.getConversationResponse.conversationMeta,
         );
         // Add attachments to the conversation object explicitly
         if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
@@ -1222,6 +1225,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           conversationPollsMeta:
               replyConversationResponse.data!.conversationPollsMeta,
           userMeta: replyConversationResponse.data!.userMeta,
+          attachmentMeta: replyConversationResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: replyConversationResponse.data!.conversationReactionMeta,
+          conversationMeta: replyConversationResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1253,6 +1259,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           conversationPollsMeta:
               bottomToReplyResponse.data!.conversationPollsMeta,
           userMeta: bottomToReplyResponse.data!.userMeta,
+          attachmentMeta: bottomToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: bottomToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: bottomToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1276,6 +1285,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         return e.toConversationViewData(
           conversationPollsMeta: topToReplyResponse.data!.conversationPollsMeta,
           userMeta: topToReplyResponse.data!.userMeta,
+          attachmentMeta: topToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: topToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: topToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 
