@@ -684,33 +684,13 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
                             ),
                             if (_expiryDateBuilder.value != null) ...[
                               const Spacer(),
-                              LMChatIcon(
-                                type: LMChatIconType.icon,
-                                icon: Icons.mode_edit_outline_outlined,
-                                style: LMChatIconStyle(
-                                  size: 20,
-                                  color: theme.inActiveColor,
-                                  margin: const EdgeInsets.only(right: 8),
-                                ),
+                              _screenBuilder.editExpiryTimeIconBuilder(
+                                context,
+                                _defEditExpiryIcon(),
                               ),
-                              LMChatButton(
-                                onTap: () {
-                                  // set expiry date to null
-                                  _expiryDateBuilder.value = null;
-                                },
-                                style: LMChatButtonStyle(
-                                  backgroundColor: Colors.transparent,
-                                  icon: LMChatIcon(
-                                    type: LMChatIconType.icon,
-                                    icon: Icons.delete_outline,
-                                    style: LMChatIconStyle(
-                                      size: 20,
-                                      color: theme.errorColor,
-                                      margin: const EdgeInsets.only(
-                                          right: 8, left: 8),
-                                    ),
-                                  ),
-                                ),
+                              _screenBuilder.expiryDeleteButtonBuilder(
+                                context,
+                                _defDeleteExpiryTimeButton(),
                               )
                             ]
                           ],
@@ -723,6 +703,39 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  LMChatIcon _defEditExpiryIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.mode_edit_outline_outlined,
+      style: LMChatIconStyle(
+        size: 20,
+        color: theme.inActiveColor,
+        margin: const EdgeInsets.only(right: 8),
+      ),
+    );
+  }
+
+  LMChatButton _defDeleteExpiryTimeButton() {
+    return LMChatButton(
+      onTap: () {
+        // set expiry date to null
+        _expiryDateBuilder.value = null;
+      },
+      style: LMChatButtonStyle(
+        backgroundColor: Colors.transparent,
+        icon: LMChatIcon(
+          type: LMChatIconType.icon,
+          icon: Icons.delete_outline,
+          style: LMChatIconStyle(
+            size: 20,
+            color: theme.errorColor,
+            margin: const EdgeInsets.only(right: 8, left: 8),
+          ),
+        ),
       ),
     );
   }
