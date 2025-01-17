@@ -223,6 +223,20 @@ class LMChatCreatePollBuilderDelegate {
     return icon;
   }
 
+  Widget editExpiryTimeIconBuilder(
+    BuildContext context,
+    LMChatIcon icon,
+  ) {
+    return icon;
+  }
+
+  Widget expiryDeleteButtonBuilder(
+    BuildContext context,
+    LMChatButton button,
+  ) {
+    return button;
+  }
+
   Widget expiryTimeTextBuilder(
     BuildContext context,
     LMChatText text,
