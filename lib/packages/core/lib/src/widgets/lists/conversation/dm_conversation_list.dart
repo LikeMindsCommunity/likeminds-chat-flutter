@@ -678,21 +678,20 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           state.getConversationResponse.conversationData!.length < _pageSize) {
         if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
-          pagedListController.appendLastPageToEnd(conversationData ?? []);
+          pagedListController.appendLastPageToEnd(conversationData);
         } else {
           _topPage++;
           pagedListController
-              .appendFirstPageToStart(conversationData.reversed.toList() ?? []);
+              .appendFirstPageToStart(conversationData.reversed.toList());
         }
       } else {
         if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
-          pagedListController.appendPageToEnd(
-              conversationData ?? [], _bottomPage);
+          pagedListController.appendPageToEnd(conversationData, _bottomPage);
         } else {
           _topPage++;
           pagedListController.appendPageToStart(
-              conversationData.reversed.toList() ?? [], _topPage);
+              conversationData.reversed.toList(), _topPage);
         }
       }
       rebuildConversationList.value = !rebuildConversationList.value;
@@ -761,7 +760,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       LMChatConversationViewData conversation) {
     LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     if (conversation.replyId != null &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
@@ -837,7 +836,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   void addConversationToPagedList(LMChatConversationViewData conversation) {
     LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     bool isSelf = conversation.memberId == user.id;
     if (conversationList.first.id == -1 && !isSelf && isOtherUserChatbot) {
@@ -920,7 +919,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
   void _updateDeletedConversation(LMChatConversationViewData conversation) {
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     // Update the deleted conversation
     int index =

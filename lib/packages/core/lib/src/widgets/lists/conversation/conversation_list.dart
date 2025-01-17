@@ -1038,7 +1038,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   void _updateEditedConversation(
       LMChatConversationViewData editedConversation) {
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
     int index = conversationList
         .indexWhere((element) => element.id == editedConversation.id);
     if (index != -1) {
@@ -1162,7 +1162,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       conversationReactionsMeta[conversationIdStr] = [reaction];
     }
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
     int index =
         conversationList.indexWhere((element) => element.id == conversationId);
     if (index != -1) {
@@ -1184,7 +1184,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       }
     }
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
     int index = conversationList
         .indexWhere((element) => element.id == reaction.conversationId);
     if (index != -1) {
