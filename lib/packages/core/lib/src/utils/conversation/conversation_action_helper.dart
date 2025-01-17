@@ -89,9 +89,13 @@ class LMChatConversationActionHelper extends LMChatConversationActionInterface {
               ),
             ),
           ),
-          content: const LMChatText(
+          content: LMChatText(
             "Are you sure you want to delete this message? This action cannot be reversed.",
-            style: LMChatTextStyle(),
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                color: LMChatTheme.theme.onContainer,
+              ),
+            ),
           ),
           actions: [
             Padding(
@@ -115,9 +119,11 @@ class LMChatConversationActionHelper extends LMChatConversationActionInterface {
               child: LMChatText(
                 "DELETE",
                 style: LMChatTextStyle(
+                  backgroundColor: LMChatTheme.theme.primaryColor,
+                  padding: const EdgeInsets.all(6),
                   textStyle: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: LMChatTheme.theme.primaryColor,
+                    color: LMChatTheme.theme.onPrimary,
                   ),
                 ),
                 onTap: () {

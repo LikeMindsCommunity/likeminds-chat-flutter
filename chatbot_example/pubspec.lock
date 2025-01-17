@@ -842,14 +842,14 @@ packages:
       path: "../lib/packages/core"
       relative: true
     source: path
-    version: "0.11.0"
+    version: "0.12.0"
   likeminds_chat_flutter_ui:
     dependency: "direct overridden"
     description:
       path: "../lib/packages/ui"
       relative: true
     source: path
-    version: "0.11.0"
+    version: "0.12.0"
   lints:
     dependency: transitive
     description:
