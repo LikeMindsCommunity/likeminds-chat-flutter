@@ -696,7 +696,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   LMChatButton _defaultScrollButton() {
     return LMChatButton(
       onTap: () {
-        _scrollToBottom();
+        _scrollToBottom(false);
       },
       style: LMChatButtonStyle.basic().copyWith(
         height: 42,
@@ -720,21 +720,35 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     );
   }
 
-  void _scrollToBottom() {
+  void _scrollToBottom(bool isPostingNewConversation) {
     if (LMChatConversationBloc.replyConversation != null) {
-      LMChatConversationBloc.replyConversation = null;
-      _conversationBloc.add(LMChatFetchConversationsEvent(
-        chatroomId: widget.chatroomId,
-        page: 1,
-        pageSize: 200,
-        direction: LMPaginationDirection.top,
-        lastConversationId: lastConversationId,
-      ));
-      pagedListController.clear();
-      LMChatConversationBloc.instance.stream.listen((event) {
-        if (event is LMChatConversationLoadedState) {
-          rebuildConversationList.value = !rebuildConversationList.value;
-          _scrollToBottom();
+      if (!isPostingNewConversation) {
+        _conversationBloc.add(LMChatFetchConversationsEvent(
+          chatroomId: widget.chatroomId,
+          page: 1,
+          pageSize: 100,
+          direction: LMPaginationDirection.top,
+          lastConversationId: lastConversationId,
+          reInitialize: true,
+        ));
+      }
+      LMChatConversationBloc.instance.stream.listen((state) async {
+        if (state is LMChatConversationPostedState) {
+          _conversationBloc.add(LMChatFetchConversationsEvent(
+            chatroomId: widget.chatroomId,
+            page: 1,
+            pageSize: 100,
+            direction: LMPaginationDirection.top,
+            lastConversationId: lastConversationId,
+            reInitialize: true,
+          ));
+          _scrollToBottom(isPostingNewConversation);
+        }
+        if (state is LMChatConversationLoadedState) {
+          if (state.reInitialize) {
+            LMChatConversationBloc.replyConversation = null;
+            _scrollToBottom(isPostingNewConversation);
+          }
         }
       });
     } else {

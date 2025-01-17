@@ -84,6 +84,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             listController: ListController(),
             scrollController: ScrollController(),
           );
+  LMChatConversationViewData? localConversation;
 
   @override
   void initState() {
@@ -658,6 +659,14 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             return conv;
           }).toList() ??
           [];
+      if (state.reInitialize) {
+        pagedListController.clear();
+        _topPage = 1;
+        if (localConversation != null) {
+          conversationData?.insert(0, localConversation!);
+          localConversation = null;
+        }
+      }
       if (state.page == 1) {
         conversationData = groupConversationsAndAddDates(conversationData);
       } else {
@@ -686,12 +695,21 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
               conversationData.reversed.toList() ?? [], _topPage);
         }
       }
+      rebuildConversationList.value = !rebuildConversationList.value;
     }
     if (state is LMChatConversationPostedState) {
+      if (LMChatConversationBloc.replyConversation != null) {
+        localConversation = state.conversationViewData;
+        return;
+      }
       addConversationToPagedList(
         state.conversationViewData,
       );
     } else if (state is LMChatLocalConversationState) {
+      if (LMChatConversationBloc.replyConversation != null) {
+        localConversation = state.conversationViewData;
+        return;
+      }
       addLocalConversationToPagedList(state.conversationViewData);
     } else if (state is LMChatConversationErrorState) {
       toast(state.message);

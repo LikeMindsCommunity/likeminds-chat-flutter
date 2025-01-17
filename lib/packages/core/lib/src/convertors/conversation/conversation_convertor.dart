@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/poll/poll_option_convertor.dart';
@@ -43,15 +41,12 @@ extension ConversationViewDataConvertor on Conversation {
     final List<LMChatAttachmentViewData>? attachments =
         attachmentMeta?[id.toString()]
             ?.map((e) => e.toAttachmentViewData())
-            .toList()
-            .cast<LMChatAttachmentViewData>();
-
+            .toList();
     // get reactions from reactionMeta
     final List<LMChatReactionViewData>? conversationReactions =
         reactionMeta?[id.toString()]
             ?.map((e) => e.toReactionViewData())
-            .toList()
-            .cast<LMChatReactionViewData>();
+            .toList();
 
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()

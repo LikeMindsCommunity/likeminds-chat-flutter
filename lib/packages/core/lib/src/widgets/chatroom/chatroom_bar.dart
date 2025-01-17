@@ -21,7 +21,7 @@ class LMChatroomBar extends StatefulWidget {
   final LMChatRoomViewData chatroom;
 
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
-  final VoidCallback scrollToBottom;
+  final void Function(bool) scrollToBottom;
 
   /// [controller] is an optional [TextEditingController] that can be used to control the text input field.
   /// If provided, it allows external management of the text input, such as setting the text or listening for changes.
@@ -42,7 +42,7 @@ class LMChatroomBar extends StatefulWidget {
 
   LMChatroomBar copyWith(
       {LMChatRoomViewData? chatroom,
-      VoidCallback? scrollToBottom,
+      void Function(bool)? scrollToBottom,
       TextEditingController? controller,
       bool? enableTagging,
       }) {
@@ -1637,7 +1637,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           editConversation!.replyConversationObject?.toConversation(),
     ));
     _updateLinkPreviewState();
-    widget.scrollToBottom();
+    widget.scrollToBottom(true);
   }
 
   void _handleNewMessage() {
@@ -1667,7 +1667,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ),
       );
       _updateLinkPreviewState();
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
       chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
     } else {
       String? extractedLink = showLinkPreview
@@ -1685,7 +1685,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ),
       );
       _updateLinkPreviewState();
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
       chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
     }
   }
@@ -1722,7 +1722,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     tags = [];
     result = "";
     if (editConversation == null) {
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
     }
     if (replyToConversation != null) {
       chatActionBloc.add(LMChatReplyRemoveEvent());
@@ -1884,7 +1884,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       if (replyToConversation != null) {
         chatActionBloc.add(LMChatReplyRemoveEvent());
       }
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
     } catch (e) {
       debugPrint('Error sending voice note: $e');
       toast("Error sending voice note");
