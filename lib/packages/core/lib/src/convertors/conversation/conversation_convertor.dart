@@ -12,17 +12,49 @@ extension ConversationViewDataConvertor on Conversation {
   /// Converts [Conversation] to [LMChatConversationViewData]
   LMChatConversationViewData toConversationViewData({
     Map<String, List<PollOption>>? conversationPollsMeta,
+    Map<String, List<Attachment>>? attachmentMeta,
+    Map<String, Conversation>? conversationMeta,
+    Map<String, List<Reaction>>? reactionMeta,
     Map<int, User>? userMeta,
   }) {
+    // get member from userMeta
     final LMChatUserViewData? member =
         this.member?.toUserViewData() ?? userMeta?[memberId]?.toUserViewData();
+
+    // get replyConversationObject from conversationMeta
+    final LMChatConversationViewData? replyConversation =
+        replyConversationObject?.toConversationViewData(
+              conversationPollsMeta: conversationPollsMeta,
+              userMeta: userMeta,
+              attachmentMeta: attachmentMeta,
+              reactionMeta: reactionMeta,
+              conversationMeta: conversationMeta,
+            ) ??
+            conversationMeta?[replyId.toString()]?.toConversationViewData(
+              conversationPollsMeta: conversationPollsMeta,
+              userMeta: userMeta,
+              attachmentMeta: attachmentMeta,
+              reactionMeta: reactionMeta,
+              conversationMeta: conversationMeta,
+            );
+    // get attachments from attachmentMeta
+    final List<LMChatAttachmentViewData>? attachments =
+        attachmentMeta?[id.toString()]
+            ?.map((e) => e.toAttachmentViewData())
+            .toList();
+    // get reactions from reactionMeta
+    final List<LMChatReactionViewData>? conversationReactions =
+        reactionMeta?[id.toString()]
+            ?.map((e) => e.toReactionViewData())
+            .toList();
+
     final LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
           ..allowAddOption(allowAddOption)
           ..answer(answer)
           ..attachmentCount(attachmentCount)
-          ..attachments(
-              attachments?.map((e) => e.toAttachmentViewData()).toList())
+          ..attachments(attachments ??
+              this.attachments?.map((e) => e.toAttachmentViewData()).toList())
           ..attachmentsUploaded(attachmentsUploaded)
           ..chatroomId(chatroomId)
           ..communityId(communityId)
@@ -59,16 +91,24 @@ extension ConversationViewDataConvertor on Conversation {
           ..submitTypeText(submitTypeText)
           ..isTimeStamp(isTimeStamp)
           ..member(member)
-          ..replyConversation(replyConversation)
+          ..replyConversation(this.replyConversation)
           ..replyConversationObject(
-              replyConversationObject?.toConversationViewData(
+            replyConversation ??
+                replyConversationObject?.toConversationViewData(
                   conversationPollsMeta: conversationPollsMeta,
-                  userMeta: userMeta))
+                  userMeta: userMeta,
+                  attachmentMeta: attachmentMeta,
+                  reactionMeta: reactionMeta,
+                  conversationMeta: conversationMeta,
+                ),
+          )
           ..ogTags(ogTags?.toLMChatOGTagViewData())
           ..hasReactions(hasReactions)
-          ..conversationReactions(conversationReactions
-              ?.map((r) => r.toReactionViewData())
-              .toList())
+          ..conversationReactions(conversationReactions ??
+              this
+                  .conversationReactions
+                  ?.map((e) => e.toReactionViewData())
+                  .toList())
           ..poll(this
               .polls
               ?.map((e) => e.toPollOptionViewData(

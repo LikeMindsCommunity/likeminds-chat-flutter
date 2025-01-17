@@ -10,6 +10,7 @@ import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.da
 import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_menu.dart';
 
 /// {@template lm_chatroom_builder}
 /// [LMChatroomBuilderDelegate] is a class which is used to build the chatroom
@@ -22,6 +23,24 @@ class LMChatroomBuilderDelegate {
   /// chatWidgetBuilder
   static final LMChatWidgetBuilderDelegate _chatWidgetBuilderDelegate =
       LMChatCore.config.widgetBuilderDelegate;
+
+  /// Builder for the attachment menu
+  Widget attachmentMenuBuilder(
+    BuildContext context,
+    List<LMAttachmentMenuItemData> items,
+    LMAttachmentMenu defaultMenu,
+  ) {
+    return defaultMenu;
+  }
+
+  /// Builder for individual attachment menu items
+  Widget attachmentMenuItemBuilder(
+    BuildContext context,
+    LMAttachmentMenuItemData item,
+    LMAttachmentMenuItem defaultMenuItem,
+  ) {
+    return defaultMenuItem;
+  }
 
   /// Builds the scaffold for the screen
   /// Builds a [Scaffold] widget with the given parameters.

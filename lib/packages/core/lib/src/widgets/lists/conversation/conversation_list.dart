@@ -83,6 +83,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           );
   final LMChatThemeData theme = LMChatTheme.theme;
   int? replyId;
+  LMChatConversationViewData? localConversation;
 
   @override
   void initState() {
@@ -93,8 +94,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     _selectedIds = widget.selectedConversations ?? [];
     rebuildAppBar = widget.appBarNotifier ?? ValueNotifier(false);
     // setting the reply conversation to null
-    // to avoid any previous reply conversation
-    LMChatConversationBloc.replyConversation = null;
   }
 
   @override
@@ -561,7 +560,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         );
       },
       isSent: false,
-      style: LMChatBubbleStyle.basic(),
+      style: LMChatBubbleStyle.basic().copyWith(
+        showHeader: conversation.conversationViewType !=
+            LMChatConversationViewType.bottom,
+      ),
       avatar: LMChatProfilePicture(
         fallbackText: conversation.member!.name,
         imageUrl: conversation.member!.imageUrl,
@@ -722,6 +724,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           conversationPollsMeta:
               state.getConversationResponse.conversationPollsMeta,
           userMeta: state.getConversationResponse.userMeta,
+          attachmentMeta:
+              state.getConversationResponse.conversationAttachmentsMeta,
+          reactionMeta: state.getConversationResponse.conversationReactionMeta,
+          conversationMeta: state.getConversationResponse.conversationMeta,
         );
         // Add attachments to the conversation object explicitly
         if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
@@ -734,6 +740,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
       if (state.direction == LMPaginationDirection.bottom) {
         conversationData = conversationData?.reversed.toList();
+      }
+      if (state.reInitialize) {
+        pagedListController.clear();
+        _topPage = 1;
+        if (localConversation != null) {
+          conversationData?.insert(0, localConversation!);
+          localConversation = null;
+        }
       }
       if (state.page == 1) {
         conversationData =
@@ -763,12 +777,21 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               conversationData.toList(), _topPage);
         }
       }
+      rebuildConversationList.value = !rebuildConversationList.value;
     }
     if (state is LMChatConversationPostedState) {
+      if (LMChatConversationBloc.replyConversation != null) {
+        localConversation = state.conversationViewData;
+        return;
+      }
       addConversationToPagedList(
         state.conversationViewData,
       );
     } else if (state is LMChatLocalConversationState) {
+      if (LMChatConversationBloc.replyConversation != null) {
+        localConversation = state.conversationViewData;
+        return;
+      }
       addLocalConversationToPagedList(state.conversationViewData);
     } else if (state is LMChatConversationErrorState) {
       toast(state.message);
@@ -1015,7 +1038,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   void _updateEditedConversation(
       LMChatConversationViewData editedConversation) {
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
     int index = conversationList
         .indexWhere((element) => element.id == editedConversation.id);
     if (index != -1) {
@@ -1139,7 +1162,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       conversationReactionsMeta[conversationIdStr] = [reaction];
     }
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
     int index =
         conversationList.indexWhere((element) => element.id == conversationId);
     if (index != -1) {
@@ -1161,7 +1184,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       }
     }
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
     int index = conversationList
         .indexWhere((element) => element.id == reaction.conversationId);
     if (index != -1) {
@@ -1193,9 +1216,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       _scrollToConversation(index, replyId, pagedListController);
     } else {
       // handle if index is -1
-      // clear page list and fetch the conversation
-      // with the reply id
-      pagedListController.clear();
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       // fetch reply conversation
       final GetConversationRequestBuilder replyConversationBuilder =
@@ -1211,7 +1231,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       // [Data Layer] function call
       final replyConversationResponse = await LMChatCore.client
           .getConversation(replyConversationBuilder.build());
-
       // convert [Conversation] list to [LMChatConversationViewData] list
       final replyConversationsVewData =
           replyConversationResponse.data!.conversationData!.map((e) {
@@ -1219,6 +1238,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           conversationPollsMeta:
               replyConversationResponse.data!.conversationPollsMeta,
           userMeta: replyConversationResponse.data!.userMeta,
+          attachmentMeta:
+              replyConversationResponse.data!.conversationAttachmentsMeta,
+          reactionMeta:
+              replyConversationResponse.data!.conversationReactionMeta,
+          conversationMeta: replyConversationResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1250,6 +1274,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           conversationPollsMeta:
               bottomToReplyResponse.data!.conversationPollsMeta,
           userMeta: bottomToReplyResponse.data!.userMeta,
+          attachmentMeta:
+              bottomToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: bottomToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: bottomToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1273,12 +1301,17 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         return e.toConversationViewData(
           conversationPollsMeta: topToReplyResponse.data!.conversationPollsMeta,
           userMeta: topToReplyResponse.data!.userMeta,
+          attachmentMeta: topToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: topToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: topToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 
+      // clear page list and fetch the conversation
+      // with the reply id
+      pagedListController.clear();
       // add all the conversations to the list
       List<LMChatConversationViewData> allConversations = [];
-
       // add bottom conversation in reversed order
       allConversations.addAll(bottomConversationsVewData.reversed);
       // add top conversation

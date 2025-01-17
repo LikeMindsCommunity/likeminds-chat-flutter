@@ -38,8 +38,79 @@ void main() async {
       ConversationState.memberLeftSecretChatroom,
       ConversationState.memberAddedToChatroom,
     ],
+    // theme: LMChatThemeData.dark(),
+    // config: LMChatConfig(
+    //   chatRoomConfig: LMChatroomConfig(
+    //     builder: CustomBuilder(),
+    //     setting: const LMChatroomSetting(
+    //       selectionType: LMChatSelectionType.floating,
+    //     ),
+    //   ),
+    // ),
   );
   runApp(const LMChatSampleApp());
+}
+
+class CustomBuilder extends LMChatroomBuilderDelegate {
+  @override
+  Widget sentChatBubbleBuilder(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatBubble bubble,
+  ) {
+    return bubble.copyWith(
+      onLongPress: (isSelected, state) {
+        debugPrint("Long pressed");
+        bubble.onLongPress?.call(isSelected, state);
+      },
+      reactionBarBuilder: (reaction) {
+        return Container();
+      },
+    );
+  }
+
+  @override
+  Widget receivedChatBubbleBuilder(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatBubble bubble,
+  ) {
+    return bubble.copyWith(
+      onLongPress: (isSelected, state) {
+        debugPrint("Long pressed");
+        bubble.onLongPress?.call(isSelected, state);
+      },
+    );
+  }
+
+  @override
+  Widget attachmentMenuBuilder(
+    BuildContext context,
+    List<LMAttachmentMenuItemData> items,
+    LMAttachmentMenu defaultMenu,
+  ) {
+    return defaultMenu.copyWith(
+      style: defaultMenu.style.copyWith(
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  @override
+  Widget attachmentMenuItemBuilder(
+    BuildContext context,
+    LMAttachmentMenuItemData item,
+    LMAttachmentMenuItem defaultMenuItem,
+  ) {
+    return defaultMenuItem.copyWith(
+      style: defaultMenuItem.style.copyWith(
+        backgroundColor: Colors.yellow,
+        labelTextStyle: const TextStyle(
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+    );
+  }
 }
 
 /// Setup notifications

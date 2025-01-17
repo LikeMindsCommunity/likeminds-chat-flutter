@@ -11,6 +11,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_right
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_menu.dart';
 
 /// {@template lm_chatroom_bar}
 /// A widget to display the chatroom bar.
@@ -21,7 +22,7 @@ class LMChatroomBar extends StatefulWidget {
   final LMChatRoomViewData chatroom;
 
   /// [scrollToBottom] is the function to scroll to the bottom of the chat.
-  final VoidCallback scrollToBottom;
+  final void Function(bool) scrollToBottom;
 
   /// [controller] is an optional [TextEditingController] that can be used to control the text input field.
   /// If provided, it allows external management of the text input, such as setting the text or listening for changes.
@@ -40,12 +41,20 @@ class LMChatroomBar extends StatefulWidget {
     this.enableTagging,
   });
 
-  LMChatroomBar copyWith(
-      {LMChatRoomViewData? chatroom,
-      VoidCallback? scrollToBottom,
-      TextEditingController? controller,
-      bool? enableTagging,
-      }) {
+  /// Creates a copy of this [LMChatroomBar] with the given fields replaced with new values.
+  ///
+  /// The [chatroom] parameter sets a new chatroom view data.
+  /// The [scrollToBottom] parameter sets a new scroll to bottom callback function.
+  /// The [controller] parameter sets a new text editing controller.
+  /// The [enableTagging] parameter sets whether tagging is enabled.
+  ///
+  /// Returns a new [LMChatroomBar] instance with the updated values.
+  LMChatroomBar copyWith({
+    LMChatRoomViewData? chatroom,
+    void Function(bool)? scrollToBottom,
+    TextEditingController? controller,
+    bool? enableTagging,
+  }) {
     return LMChatroomBar(
       chatroom: chatroom ?? this.chatroom,
       scrollToBottom: scrollToBottom ?? this.scrollToBottom,
@@ -700,9 +709,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                           builder: (context, duration, child) {
                             return Text(
                               "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
+                                color: LMChatTheme.theme.onContainer,
                               ),
                             );
                           },
@@ -901,9 +911,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
               return Text(
                 "${position.inMinutes.toString().padLeft(2, '0')}:${(position.inSeconds % 60).toString().padLeft(2, '0')} / "
                 "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               );
             },
@@ -1207,71 +1218,37 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   Widget _defAttachmentMenu() {
     // First determine which buttons should be visible based on conditions
-    final List<AttachmentMenuItem> menuItems = _getVisibleMenuItems();
+    final List<LMAttachmentMenuItemData> menuItems = _getVisibleMenuItems();
 
-    // Calculate grid layout
-    final int itemCount = menuItems.length;
-    // Use 3 columns for both 3 items and 5 items cases
-    final int columns = (itemCount == 3 || itemCount == 5) ? 3 : 2;
-    final int rows = (itemCount / columns).ceil();
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 1.h),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          width: 100.w,
-          color: LMChatTheme.theme.container,
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 2.h,
-              horizontal: 12.w,
-            ),
-            child: Column(
-              children: List.generate(rows, (rowIndex) {
-                // Calculate items for this row
-                final int startIndex = rowIndex * columns;
-                final int endIndex = math.min(startIndex + columns, itemCount);
-                final int itemsInRow = endIndex - startIndex;
-
-                return Padding(
-                  padding:
-                      EdgeInsets.only(bottom: rowIndex < rows - 1 ? 2.h : 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ...List.generate(itemsInRow, (index) {
-                        final item = menuItems[startIndex + index];
-                        return Expanded(
-                          child: _buildMenuItem(item),
-                        );
-                      }),
-                      // Add spacers if needed to maintain grid alignment
-                      if (itemsInRow < columns)
-                        ...List.generate(
-                          columns - itemsInRow,
-                          (index) => const Spacer(),
-                        ),
-                    ],
-                  ),
-                );
-              }),
-            ),
+    return LMChatCore.config.chatRoomConfig.builder.attachmentMenuBuilder(
+      context,
+      menuItems,
+      LMAttachmentMenu(
+        items: menuItems,
+        style: LMAttachmentMenuStyle(
+          backgroundColor: _themeData.container,
+          menuItemStyle: LMAttachmentMenuItemStyle(
+            iconColor: _themeData.container,
+            backgroundColor: _themeData.primaryColor,
+            labelTextStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: _themeData.onContainer,
+                    ) ??
+                const TextStyle(),
           ),
         ),
       ),
     );
   }
 
-  List<AttachmentMenuItem> _getVisibleMenuItems() {
+  List<LMAttachmentMenuItemData> _getVisibleMenuItems() {
     final bool isAIChatbot =
         widget.chatroom.type == 10 && isOtherUserAIChatbot(widget.chatroom);
     final bool showDocuments = !isAIChatbot;
     final bool showPoll = widget.chatroom.type != 10;
     final bool showGIF = !isAIChatbot;
 
-    final List<AttachmentMenuItem> items = [
-      AttachmentMenuItem(
+    final List<LMAttachmentMenuItemData> items = [
+      LMAttachmentMenuItemData(
         icon: Icons.camera_alt_outlined,
         label: 'Camera',
         onTap: () async {
@@ -1284,7 +1261,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           }
         },
       ),
-      AttachmentMenuItem(
+      LMAttachmentMenuItemData(
         icon: Icons.photo_outlined,
         label: 'Gallery',
         onTap: () async {
@@ -1300,7 +1277,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         },
       ),
       if (showDocuments)
-        AttachmentMenuItem(
+        LMAttachmentMenuItemData(
           icon: Icons.insert_drive_file_outlined,
           label: 'Documents',
           onTap: () async {
@@ -1314,7 +1291,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           },
         ),
       if (showGIF)
-        AttachmentMenuItem(
+        LMAttachmentMenuItemData(
           icon: Icons.gif_box_outlined,
           label: 'GIF',
           onTap: () async {
@@ -1328,7 +1305,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           },
         ),
       if (showPoll)
-        AttachmentMenuItem(
+        LMAttachmentMenuItemData(
           iconType: LMChatIconType.svg,
           assetPath: kPollIcon,
           label: 'Poll',
@@ -1350,49 +1327,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     return items;
   }
 
-  Widget _buildMenuItem(AttachmentMenuItem item) {
-    return Column(
-      children: [
-        LMChatButton(
-          onTap: item.onTap,
-          icon: LMChatIcon(
-            type: item.iconType ?? LMChatIconType.icon,
-            icon: item.icon,
-            assetPath: item.assetPath,
-            style: LMChatIconStyle(
-              color: LMChatTheme.theme.container,
-              size: item.iconType == LMChatIconType.svg ? 38 : 30,
-              boxSize: 48,
-              boxBorderRadius: item.iconType == LMChatIconType.svg ? 100 : 0,
-              boxPadding: item.iconType == LMChatIconType.svg
-                  ? const EdgeInsets.all(12)
-                  : EdgeInsets.zero,
-              backgroundColor: item.iconType == LMChatIconType.svg
-                  ? _themeData.primaryColor
-                  : null,
-            ),
-          ),
-          style: LMChatButtonStyle(
-            height: 48,
-            width: 48,
-            borderRadius: 24,
-            backgroundColor: LMChatTheme.theme.primaryColor,
-          ),
-        ),
-        const SizedBox(height: 4),
-        LMChatText(
-          item.label,
-          style: LMChatTextStyle(
-            textStyle: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: LMChatTheme.theme.onContainer),
-          ),
-        ),
-      ],
-    );
-  }
-
   LMChatIcon _defAttachmentIcon() {
     return LMChatIcon(
       type: LMChatIconType.icon,
@@ -1404,7 +1338,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           bottom: 6,
           left: 6,
         ),
-        color: LMChatTheme.theme.inActiveColor,
+        color: _themeData.inActiveColor,
       ),
     );
   }
@@ -1637,7 +1571,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           editConversation!.replyConversationObject?.toConversation(),
     ));
     _updateLinkPreviewState();
-    widget.scrollToBottom();
+    widget.scrollToBottom(true);
   }
 
   void _handleNewMessage() {
@@ -1667,7 +1601,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ),
       );
       _updateLinkPreviewState();
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
       chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
     } else {
       String? extractedLink = showLinkPreview
@@ -1685,7 +1619,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ),
       );
       _updateLinkPreviewState();
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
       chatActionBloc.add(LMChatLinkPreviewRemovedEvent());
     }
   }
@@ -1722,7 +1656,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     tags = [];
     result = "";
     if (editConversation == null) {
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
     }
     if (replyToConversation != null) {
       chatActionBloc.add(LMChatReplyRemoveEvent());
@@ -1884,7 +1818,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       if (replyToConversation != null) {
         chatActionBloc.add(LMChatReplyRemoveEvent());
       }
-      widget.scrollToBottom();
+      widget.scrollToBottom(true);
     } catch (e) {
       debugPrint('Error sending voice note: $e');
       toast("Error sending voice note");
@@ -2035,20 +1969,4 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       _isPlaying.value = false;
     }
   }
-}
-
-class AttachmentMenuItem {
-  final IconData? icon;
-  final String label;
-  final VoidCallback onTap;
-  final LMChatIconType? iconType;
-  final String? assetPath;
-
-  AttachmentMenuItem({
-    this.icon,
-    required this.label,
-    required this.onTap,
-    this.iconType,
-    this.assetPath,
-  });
 }

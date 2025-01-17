@@ -134,11 +134,12 @@ void onVoteTextTap(BuildContext context,
       context: context,
       builder: (context) => Theme(
         data: Theme.of(context).copyWith(
-          useMaterial3: false,
+          dialogBackgroundColor: LMChatTheme.theme.container,
         ),
-        child: const SimpleDialog(
+        child: SimpleDialog(
+          backgroundColor: LMChatTheme.theme.container,
           surfaceTintColor: Colors.transparent,
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             vertical: 30,
             horizontal: 8,
           ),
@@ -150,6 +151,7 @@ void onVoteTextTap(BuildContext context,
                 textAlign: TextAlign.center,
                 textStyle: TextStyle(
                   fontSize: 16,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               ),
             )

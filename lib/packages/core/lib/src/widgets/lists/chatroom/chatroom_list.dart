@@ -14,7 +14,20 @@ class LMChatHomeFeedList extends StatefulWidget {
   /// {@macro lm_chat_home_feed_list}
   const LMChatHomeFeedList({
     super.key,
+    this.chatroomTag,
   });
+
+  /// Tag to filter chatrooms, takes priority over the tag from config
+  final String? chatroomTag;
+
+  /// Creates a copy of this [LMChatHomeFeedList] but with the given fields replaced with the new values.
+  LMChatHomeFeedList copyWith({
+    String? chatroomTag,
+  }) {
+    return LMChatHomeFeedList(
+      chatroomTag: chatroomTag ?? this.chatroomTag,
+    );
+  }
 
   @override
   State<LMChatHomeFeedList> createState() => _LMChatHomeFeedListState();
@@ -42,6 +55,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             LMChatHomeFeedListStyle.basic(),
           ) ??
           LMChatHomeFeedListStyle.basic();
+
+  String get _tag => widget.chatroomTag ?? _homeScreenSettings.tag ?? '';
 
   @override
   void initState() {
@@ -160,8 +175,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             builder: (context) => const LMChatExplorePage(),
           ),
         ).then((val) {
-          feedBloc
-              .add(LMChatRefreshHomeFeedEvent(tag: _homeScreenSettings.tag));
+          feedBloc.add(LMChatRefreshHomeFeedEvent(tag: _tag));
         });
       },
       style: LMChatTileStyle.basic().copyWith(
@@ -254,7 +268,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       (pageKey) {
         feedBloc.add(LMChatFetchHomeFeedEvent(
           page: pageKey,
-          tag: _homeScreenSettings.tag,
+          tag: _tag,
         ));
       },
     );
@@ -332,8 +346,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           },
         );
         Navigator.of(context).push(route).whenComplete(
-              () => feedBloc.add(
-                  LMChatRefreshHomeFeedEvent(tag: _homeScreenSettings.tag)),
+              () => feedBloc.add(LMChatRefreshHomeFeedEvent(tag: _tag)),
             );
       },
       leading: LMChatProfilePicture(

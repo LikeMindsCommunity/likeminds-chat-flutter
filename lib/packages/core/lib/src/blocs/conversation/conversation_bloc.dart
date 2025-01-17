@@ -71,6 +71,7 @@ class LMChatConversationBloc
   @override
   Future<void> close() {
     _currentChatroomId = null;
+    LMChatConversationBloc.replyConversation = null;
     return super.close();
   }
 

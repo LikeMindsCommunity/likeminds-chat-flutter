@@ -47,3 +47,9 @@
 
 - Added support for chatbot
 - Added support for custom user roles
+
+### 0.12.0
+
+- Added support for poll configuration
+- Added support for dark theme
+- Added loads of UI/UX improvements

@@ -3,6 +3,7 @@ export 'lists/chatroom/dm_chatroom_list.dart';
 
 export 'chatroom/chatroom_bar_header.dart';
 export 'chatroom/chatroom_bar.dart';
+export 'chatroom/chatroom_bar_menu.dart';
 export 'chatroom/chatroom_menu.dart';
 
 export 'lists/conversation/conversation_list.dart';

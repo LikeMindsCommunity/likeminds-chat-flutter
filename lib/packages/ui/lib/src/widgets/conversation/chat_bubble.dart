@@ -195,6 +195,7 @@ class LMChatBubble extends StatefulWidget {
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
   /// If the new values are null, then the old values are used.
   LMChatBubble copyWith({
+    LMChatConversationActionInterface? actionHelper,
     LMChatConversationViewData? conversation,
     LMChatUserViewData? currentUser,
     LMChatUserViewData? conversationUser,
@@ -238,6 +239,7 @@ class LMChatBubble extends StatefulWidget {
     VoidCallback? onReplyTap,
   }) {
     return LMChatBubble(
+      actionHelper: actionHelper ?? this.actionHelper,
       conversation: conversation ?? this.conversation,
       currentUser: currentUser ?? this.currentUser,
       conversationUser: conversationUser ?? this.conversationUser,
@@ -469,7 +471,15 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       const Color.fromRGBO(0, 96, 86, 0.3)
                   : null,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 1.8.w, vertical: 0.6.h),
+            padding: EdgeInsets.only(
+              left: 1.8.w,
+              right: 1.8.w,
+              top: conversation.conversationViewType !=
+                      LMChatConversationViewType.bottom
+                  ? 0.8.h
+                  : 0,
+              bottom: 0.6.h,
+            ),
             child: Row(
               mainAxisAlignment:
                   isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -507,14 +517,6 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                           ),
                           color:
                               inStyle.backgroundColor ?? _themeData.container,
-                          // painter: LMChatBubblePainter(
-                          //   conversationViewType:
-                          //       conversation.conversationViewType ??
-                          //           LMChatConversationViewType.top,
-                          //   isSent: isSent,
-                          //   bubbleColor: inStyle.backgroundColor ??
-                          //       _themeData.container,
-                          // ),
                           child: Padding(
                             padding: isSent
                                 ? EdgeInsets.only(

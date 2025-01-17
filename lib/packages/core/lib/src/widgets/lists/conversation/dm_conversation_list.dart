@@ -84,6 +84,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             listController: ListController(),
             scrollController: ScrollController(),
           );
+  LMChatConversationViewData? localConversation;
 
   @override
   void initState() {
@@ -658,6 +659,14 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
             return conv;
           }).toList() ??
           [];
+      if (state.reInitialize) {
+        pagedListController.clear();
+        _topPage = 1;
+        if (localConversation != null) {
+          conversationData?.insert(0, localConversation!);
+          localConversation = null;
+        }
+      }
       if (state.page == 1) {
         conversationData = groupConversationsAndAddDates(conversationData);
       } else {
@@ -669,29 +678,37 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           state.getConversationResponse.conversationData!.length < _pageSize) {
         if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
-          pagedListController.appendLastPageToEnd(conversationData ?? []);
+          pagedListController.appendLastPageToEnd(conversationData);
         } else {
           _topPage++;
           pagedListController
-              .appendFirstPageToStart(conversationData.reversed.toList() ?? []);
+              .appendFirstPageToStart(conversationData.reversed.toList());
         }
       } else {
         if (state.direction == LMPaginationDirection.top) {
           _bottomPage++;
-          pagedListController.appendPageToEnd(
-              conversationData ?? [], _bottomPage);
+          pagedListController.appendPageToEnd(conversationData, _bottomPage);
         } else {
           _topPage++;
           pagedListController.appendPageToStart(
-              conversationData.reversed.toList() ?? [], _topPage);
+              conversationData.reversed.toList(), _topPage);
         }
       }
+      rebuildConversationList.value = !rebuildConversationList.value;
     }
     if (state is LMChatConversationPostedState) {
+      if (LMChatConversationBloc.replyConversation != null) {
+        localConversation = state.conversationViewData;
+        return;
+      }
       addConversationToPagedList(
         state.conversationViewData,
       );
     } else if (state is LMChatLocalConversationState) {
+      if (LMChatConversationBloc.replyConversation != null) {
+        localConversation = state.conversationViewData;
+        return;
+      }
       addLocalConversationToPagedList(state.conversationViewData);
     } else if (state is LMChatConversationErrorState) {
       toast(state.message);
@@ -743,7 +760,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       LMChatConversationViewData conversation) {
     LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     if (conversation.replyId != null &&
         !conversationMeta.containsKey(conversation.replyId.toString())) {
@@ -819,7 +836,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
   void addConversationToPagedList(LMChatConversationViewData conversation) {
     LMChatConversationViewData? result;
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     bool isSelf = conversation.memberId == user.id;
     if (conversationList.first.id == -1 && !isSelf && isOtherUserChatbot) {
@@ -902,7 +919,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
   void _updateDeletedConversation(LMChatConversationViewData conversation) {
     List<LMChatConversationViewData> conversationList =
-        pagedListController.itemList ?? <LMChatConversationViewData>[];
+        pagedListController.itemList;
 
     // Update the deleted conversation
     int index =
@@ -1145,6 +1162,11 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           conversationPollsMeta:
               replyConversationResponse.data!.conversationPollsMeta,
           userMeta: replyConversationResponse.data!.userMeta,
+          attachmentMeta:
+              replyConversationResponse.data!.conversationAttachmentsMeta,
+          reactionMeta:
+              replyConversationResponse.data!.conversationReactionMeta,
+          conversationMeta: replyConversationResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1175,6 +1197,10 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           conversationPollsMeta:
               bottomToReplyResponse.data!.conversationPollsMeta,
           userMeta: bottomToReplyResponse.data!.userMeta,
+          attachmentMeta:
+              bottomToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: bottomToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: bottomToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 
@@ -1198,6 +1224,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         return e.toConversationViewData(
           conversationPollsMeta: topToReplyResponse.data!.conversationPollsMeta,
           userMeta: topToReplyResponse.data!.userMeta,
+          attachmentMeta: topToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: topToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: topToReplyResponse.data!.conversationMeta,
         );
       }).toList();
 

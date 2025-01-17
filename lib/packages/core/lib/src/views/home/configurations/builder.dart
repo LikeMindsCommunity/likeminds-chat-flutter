@@ -143,7 +143,7 @@ class LMChatHomeBuilderDelegate {
     return tile;
   }
 
-/// Builds a home feed explore tile
+  /// Builds a home feed explore tile
   Widget homeFeedExploreTileBuilder(
     BuildContext context,
     LMChatTile tile,

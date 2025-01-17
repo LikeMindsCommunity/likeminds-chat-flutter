@@ -75,11 +75,15 @@ class LMDualSidePaginationController<T> {
     isLoadingTop = false;
     SchedulerBinding.instance.addPostFrameCallback((_) {
       // isLoadingTop = true;
-      listController.jumpToItem(
-        index: newItems.length,
-        scrollController: scrollController,
-        alignment: 0.0,
-      );
+      try {
+        listController.jumpToItem(
+          index: newItems.length,
+          scrollController: scrollController,
+          alignment: 0.0,
+        );
+      } on Exception catch (e) {
+        debugPrint(e.toString());
+      }
       isScrollingNotifier.value = !isScrollingNotifier.value;
     });
     // isLoadingTop = false;
