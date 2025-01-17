@@ -22,7 +22,11 @@ class LMChatTheme {
 
   /// Sets the theme data
   static void setTheme(LMChatThemeData theme) {
-    instance.themeData = theme;
+    final instance = LMChatTheme.instance;
+    instance.initialise(
+      theme: theme,
+      isDark: theme.isDark,
+    );
   }
 
   /// Sets the theme data
@@ -39,7 +43,7 @@ class LMChatTheme {
   late TextTheme textTheme;
 
   /// Whether the current theme is dark
-  late final bool isDark;
+  late bool isDark;
 
   /// Initializes the theme with optional parameters
   void initialise({

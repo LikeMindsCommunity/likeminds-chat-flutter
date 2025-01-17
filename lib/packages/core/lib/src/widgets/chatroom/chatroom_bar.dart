@@ -709,9 +709,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                           builder: (context, duration, child) {
                             return Text(
                               "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
+                                color: LMChatTheme.theme.onContainer,
                               ),
                             );
                           },
@@ -910,9 +911,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
               return Text(
                 "${position.inMinutes.toString().padLeft(2, '0')}:${(position.inSeconds % 60).toString().padLeft(2, '0')} / "
                 "${duration.inMinutes.toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               );
             },
