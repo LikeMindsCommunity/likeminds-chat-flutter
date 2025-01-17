@@ -948,11 +948,6 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     }
 
     pagedListController.itemList = conversationList;
-    scrollController.animateTo(
-      scrollController.position.pixels + 10,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeOut,
-    );
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 

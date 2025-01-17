@@ -616,7 +616,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         conversationViewData,
         LMChatButton(
           onTap: () {
-            _conversationActionHelper.onDelete(context, _selectedIds);
+            _conversationActionHelper.onDelete(context, [... _selectedIds]);
           },
           style: LMChatButtonStyle.basic().copyWith(
             icon: LMChatIcon(
