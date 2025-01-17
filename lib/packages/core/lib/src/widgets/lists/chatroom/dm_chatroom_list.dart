@@ -17,6 +17,11 @@ class LMChatDMFeedList extends StatefulWidget {
     super.key,
   });
 
+  /// Creates a copy of this [LMChatDMFeedList] but with the given fields replaced with the new values.
+  LMChatDMFeedList copyWith() {
+    return const LMChatDMFeedList();
+  }
+
   @override
   State<LMChatDMFeedList> createState() => _LMChatDMFeedListState();
 }
@@ -240,7 +245,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
         fallbackText: chatroomUser.name,
         imageUrl: chatroomUser.imageUrl,
         style: _style.profilePictureStyle ??
-            const LMChatProfilePictureStyle(size: 48),
+            LMChatProfilePictureStyle.basic().copyWith(size: 48),
       ),
       title: LMChatText(
         chatroomUser.name,
@@ -396,7 +401,7 @@ class LMChatDMFeedListStyle {
         left: 4,
         right: 8,
       ),
-      profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
+      profilePictureStyle: LMChatProfilePictureStyle.basic().copyWith(size: 48),
       unreadCountTextStyle: LMChatTextStyle(
         padding: const EdgeInsets.only(
           left: 7,

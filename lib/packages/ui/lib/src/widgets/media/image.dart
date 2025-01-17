@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
+import 'package:photo_view/photo_view.dart';
 
 /// {@template lm_chat_image}
 /// A widget to display an image in a post.
@@ -72,29 +75,25 @@ class LMChatImage extends StatefulWidget {
 class _LMImageState extends State<LMChatImage> {
   LMChatImageStyle? style;
 
+  /// Initializes the state of the widget by setting up the style
   @override
   void initState() {
     super.initState();
     style = widget.style ?? LMChatTheme.theme.imageStyle;
   }
 
-  @override
-  void didUpdateWidget(covariant LMChatImage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    style = widget.style ?? LMChatTheme.theme.imageStyle;
-  }
-
+  /// Builds the widget tree for the image widget
+  /// Returns a GestureDetector that handles tap events
   @override
   Widget build(BuildContext context) {
-    return AbsorbPointer(
-      absorbing: widget.onTap == null,
-      child: GestureDetector(
-        onTap: () => widget.onTap?.call(),
-        child: _buildImageWidget(),
-      ),
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: _buildImageWidget(),
     );
   }
 
+  /// Determines which type of image to build based on the provided source
+  /// Returns the appropriate image widget for URL, File, or Asset images
   Widget _buildImageWidget() {
     if (widget.imageUrl != null) {
       return _buildNetworkImage();
@@ -108,6 +107,42 @@ class _LMImageState extends State<LMChatImage> {
     return const SizedBox();
   }
 
+  /// Builds a PhotoView widget with proper scaling based on image dimensions
+  ///
+  /// Parameters:
+  /// - imageProvider: The provider for the image source
+  /// - context: The build context
+  /// - imageWidth: The width of the image
+  /// - imageHeight: The height of the image
+  ///
+  /// Returns a PhotoView widget with calculated scaling parameters
+  Widget _buildPhotoView({
+    required ImageProvider imageProvider,
+    required BuildContext context,
+    required double imageWidth,
+    required double imageHeight,
+  }) {
+    // Calculate container dimensions
+    final containerWidth = style?.width ?? 100.w;
+    final containerHeight = style?.height ?? 80.h;
+
+    // Calculate scale to fit
+    final double scaleX = containerWidth / imageWidth;
+    final double scaleY = containerHeight / imageHeight;
+    final double minScale = scaleX < scaleY ? scaleX : scaleY;
+
+    return PhotoView(
+      imageProvider: imageProvider,
+      maxScale: 3.0,
+      minScale: minScale,
+      initialScale: minScale,
+      tightMode: true,
+    );
+  }
+
+  /// Builds a widget for displaying network images
+  /// Uses CachedNetworkImage for efficient loading and caching
+  /// Returns a Container with the network image
   Widget _buildNetworkImage() {
     return Container(
       padding: style?.padding,
@@ -124,8 +159,38 @@ class _LMImageState extends State<LMChatImage> {
         imageUrl: widget.imageUrl!,
         fit: style?.boxFit ?? BoxFit.contain,
         fadeInDuration: const Duration(milliseconds: 100),
+        imageBuilder: (context, imageProvider) {
+          ImageStream stream = imageProvider.resolve(ImageConfiguration.empty);
+          late ImageInfo imageInfo;
+
+          return FutureBuilder(
+            future: Future(() async {
+              Completer<void> completer = Completer();
+              stream.addListener(
+                ImageStreamListener((info, _) {
+                  imageInfo = info;
+                  completer.complete();
+                }),
+              );
+              await completer.future;
+              return imageInfo;
+            }),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final imageInfo = snapshot.data as ImageInfo;
+              return _buildPhotoView(
+                imageProvider: imageProvider,
+                context: context,
+                imageWidth: imageInfo.image.width.toDouble(),
+                imageHeight: imageInfo.image.height.toDouble(),
+              );
+            },
+          );
+        },
         errorWidget: (context, url, error) {
-          // Log the error for debugging
           debugPrint('Error loading image: $error');
           if (widget.onError != null) {
             widget.onError!(error.toString(), StackTrace.empty);
@@ -142,6 +207,9 @@ class _LMImageState extends State<LMChatImage> {
     );
   }
 
+  /// Builds a widget for displaying images from local files
+  /// Uses FutureBuilder to handle async loading of image dimensions
+  /// Returns a Container with the file image
   Widget _buildFileImage() {
     return Container(
       padding: style?.padding,
@@ -150,15 +218,27 @@ class _LMImageState extends State<LMChatImage> {
         borderRadius: style!.borderRadius ?? BorderRadius.zero,
         color: style?.backgroundColor,
       ),
-      child: Image.file(
-        widget.imageFile!,
-        height: style!.height,
-        width: style!.width,
-        fit: style!.boxFit ?? BoxFit.contain,
+      child: FutureBuilder<ui.Image>(
+        future: _getImageDimensions(FileImage(widget.imageFile!)),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return _buildPhotoView(
+            imageProvider: FileImage(widget.imageFile!),
+            context: context,
+            imageWidth: snapshot.data!.width.toDouble(),
+            imageHeight: snapshot.data!.height.toDouble(),
+          );
+        },
       ),
     );
   }
 
+  /// Builds a widget for displaying images from assets
+  /// Uses FutureBuilder to handle async loading of image dimensions
+  /// Returns a Container with the asset image
   Widget _buildAssetImage() {
     return Container(
       padding: style?.padding,
@@ -167,15 +247,44 @@ class _LMImageState extends State<LMChatImage> {
         borderRadius: style!.borderRadius ?? BorderRadius.zero,
         color: style?.backgroundColor,
       ),
-      child: Image.asset(
-        widget.imageAssetPath!,
-        height: style!.height,
-        width: style!.width,
-        fit: style!.boxFit ?? BoxFit.contain,
+      child: FutureBuilder<ui.Image>(
+        future: _getImageDimensions(AssetImage(widget.imageAssetPath!)),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return _buildPhotoView(
+            imageProvider: AssetImage(widget.imageAssetPath!),
+            context: context,
+            imageWidth: snapshot.data!.width.toDouble(),
+            imageHeight: snapshot.data!.height.toDouble(),
+          );
+        },
       ),
     );
   }
 
+  /// Helper function to get image dimensions asynchronously
+  ///
+  /// Parameters:
+  /// - provider: The ImageProvider to get dimensions from
+  ///
+  /// Returns a Future that resolves to the image dimensions
+  Future<ui.Image> _getImageDimensions(ImageProvider provider) async {
+    final Completer<ui.Image> completer = Completer<ui.Image>();
+    final ImageStream stream = provider.resolve(ImageConfiguration.empty);
+
+    final listener = ImageStreamListener((ImageInfo info, bool _) {
+      completer.complete(info.image);
+    });
+
+    stream.addListener(listener);
+    return completer.future;
+  }
+
+  /// Builds a default error widget to display when image loading fails
+  /// Returns a Container with error icon and message
   Widget _defaultErrorWidget() {
     return Container(
       color: Colors.grey,

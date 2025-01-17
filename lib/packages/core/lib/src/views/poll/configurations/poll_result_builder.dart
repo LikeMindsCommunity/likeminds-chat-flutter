@@ -2,13 +2,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
-/// {@template lm_chat_poll_builder}
-/// [LMChatPollBuilderDelegate] is a class which is used to build the chatroom
+/// {@template lm_chat_poll_result_builder}
+/// [LMChatPollResultBuilderDelegate] is a class which is used to build the chatroom
 /// screen. It is used to customize the chatroom screen.
 /// {@endtemplate}
-class LMChatPollBuilderDelegate {
-  /// {@macro lm_chat_poll_builder}
-  const LMChatPollBuilderDelegate();
+class LMChatPollResultBuilderDelegate {
+  /// {@macro lm_chat_poll_result_builder}
+  const LMChatPollResultBuilderDelegate();
 
   /// chatWidgetBuilder
   static final LMChatWidgetBuilderDelegate _chatWidgetBuilderDelegate =

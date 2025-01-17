@@ -14,7 +14,20 @@ class LMChatHomeFeedList extends StatefulWidget {
   /// {@macro lm_chat_home_feed_list}
   const LMChatHomeFeedList({
     super.key,
+    this.chatroomTag,
   });
+
+  /// Tag to filter chatrooms, takes priority over the tag from config
+  final String? chatroomTag;
+
+  /// Creates a copy of this [LMChatHomeFeedList] but with the given fields replaced with the new values.
+  LMChatHomeFeedList copyWith({
+    String? chatroomTag,
+  }) {
+    return LMChatHomeFeedList(
+      chatroomTag: chatroomTag ?? this.chatroomTag,
+    );
+  }
 
   @override
   State<LMChatHomeFeedList> createState() => _LMChatHomeFeedListState();
@@ -36,11 +49,14 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
 
   final LMChatHomeBuilderDelegate _screenBuilder =
       LMChatCore.config.homeConfig.builder;
+  final _homeScreenSettings = LMChatCore.config.homeConfig.setting;
   final LMChatHomeFeedListStyle _style =
       LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
             LMChatHomeFeedListStyle.basic(),
           ) ??
           LMChatHomeFeedListStyle.basic();
+
+  String get _tag => widget.chatroomTag ?? _homeScreenSettings.tag ?? '';
 
   @override
   void initState() {
@@ -159,7 +175,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
             builder: (context) => const LMChatExplorePage(),
           ),
         ).then((val) {
-          feedBloc.add(LMChatRefreshHomeFeedEvent());
+          feedBloc.add(LMChatRefreshHomeFeedEvent(tag: _tag));
         });
       },
       style: LMChatTileStyle.basic().copyWith(
@@ -175,7 +191,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         assetPath: exploreIcon,
         style: LMChatIconStyle(
           color: LMChatTheme.theme.primaryColor,
-          size: 28,
+          size: 18,
           boxSize: 32,
         ),
       ),
@@ -239,8 +255,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         style: LMChatTextStyle(
           textStyle: TextStyle(
             color: LMChatTheme.theme.onPrimary,
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
           ),
         ),
       ),
@@ -250,7 +266,10 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   _addPaginationListener() {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
-        feedBloc.add(LMChatFetchHomeFeedEvent(page: pageKey));
+        feedBloc.add(LMChatFetchHomeFeedEvent(
+          page: pageKey,
+          tag: _tag,
+        ));
       },
     );
   }
@@ -327,14 +346,14 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           },
         );
         Navigator.of(context).push(route).whenComplete(
-              () => feedBloc.add(LMChatRefreshHomeFeedEvent()),
+              () => feedBloc.add(LMChatRefreshHomeFeedEvent(tag: _tag)),
             );
       },
       leading: LMChatProfilePicture(
         fallbackText: chatroom.header,
         imageUrl: chatroom.chatroomImageUrl,
         style: _style.profilePictureStyle ??
-            const LMChatProfilePictureStyle(size: 48),
+            LMChatProfilePictureStyle.basic().copyWith(size: 48),
       ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
@@ -342,12 +361,13 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           Flexible(
             child: LMChatText(
               chatroom.header,
-              style: const LMChatTextStyle(
+              style: LMChatTextStyle(
                 maxLines: 1,
                 textStyle: TextStyle(
                   overflow: TextOverflow.ellipsis,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               ),
             ),
@@ -438,7 +458,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
       type: LMChatIconType.icon,
       icon: Icons.volume_off_outlined,
       style: LMChatIconStyle(
-        backgroundColor: LMChatTheme.theme.scaffold,
+        backgroundColor: LMChatTheme.theme.container,
+        color: LMChatTheme.theme.onContainer,
         boxSize: 36,
         boxPadding: const EdgeInsets.only(
           left: 6,
@@ -487,7 +508,8 @@ class LMChatHomeFeedListStyle {
           right: 8,
           left: 4,
         ),
-        profilePictureStyle: const LMChatProfilePictureStyle(size: 48),
+        profilePictureStyle:
+            LMChatProfilePictureStyle.basic().copyWith(size: 48),
         unReadCountTextStyle: LMChatTextStyle(
           maxLines: 1,
           backgroundColor: LMChatTheme.theme.primaryColor,

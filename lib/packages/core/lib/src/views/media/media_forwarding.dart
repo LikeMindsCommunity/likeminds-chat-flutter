@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
@@ -85,7 +86,10 @@ class _LMChatMediaForwardingScreenState
       onPopInvoked: (p0) {
         LMChatMediaHandler.instance.clearPickedMedia();
       },
-      backgroundColor: LMChatTheme.theme.scaffold,
+      systemUiOverlay: SystemUiOverlayStyle.light,
+      backgroundColor: LMChatTheme.isThemeDark
+          ? LMChatTheme.theme.container
+          : LMChatTheme.theme.onContainer,
       appBar: _screenBuilder.appBarBuilder(
         context,
         _defAppBar(),
@@ -148,7 +152,9 @@ class _LMChatMediaForwardingScreenState
   Widget _buildPreviewBar() {
     return Container(
       decoration: BoxDecoration(
-        color: LMChatTheme.theme.container,
+        color: LMChatTheme.isThemeDark
+            ? LMChatTheme.theme.container.withOpacity(0.5)
+            : LMChatTheme.theme.onContainer.withOpacity(0.5),
         border: Border(
           top: BorderSide(
             color: LMChatTheme.theme.disabledColor,
@@ -169,7 +175,9 @@ class _LMChatMediaForwardingScreenState
 
   Widget _defChatBar() {
     return Container(
-      color: LMChatTheme.theme.shadowColor.withOpacity(0.1),
+      color: LMChatTheme.isThemeDark
+          ? LMChatTheme.theme.onContainer.withOpacity(0.1)
+          : LMChatTheme.theme.container.withOpacity(0.1),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: 2.h,
@@ -212,7 +220,9 @@ class _LMChatMediaForwardingScreenState
             maxHeight: 24.h,
           ),
           decoration: BoxDecoration(
-            color: LMChatTheme.theme.container,
+            color: LMChatTheme.isThemeDark
+                ? LMChatTheme.theme.container.withOpacity(0.8)
+                : LMChatTheme.theme.onContainer.withOpacity(0.8),
             borderRadius: replyConversation != null
                 ? const BorderRadius.only(
                     bottomLeft: Radius.circular(24),
@@ -232,7 +242,11 @@ class _LMChatMediaForwardingScreenState
                   child: LMChatTextField(
                     isDown: false,
                     chatroomId: widget.chatroomId,
-                    style: Theme.of(context).textTheme.bodyMedium!,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: LMChatTheme.isThemeDark
+                              ? LMChatTheme.theme.onContainer
+                              : LMChatTheme.theme.container,
+                        ),
                     onChange: (value) {
                       // Handle text change if needed
                     },
@@ -253,7 +267,12 @@ class _LMChatMediaForwardingScreenState
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintMaxLines: 1,
-                      hintStyle: Theme.of(context).textTheme.bodyMedium,
+                      hintStyle:
+                          Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: LMChatTheme.isThemeDark
+                                    ? LMChatTheme.theme.onContainer
+                                    : LMChatTheme.theme.container,
+                              ),
                       hintText: "Type something..",
                     ),
                     controller: _textEditingController,
@@ -279,9 +298,14 @@ class _LMChatMediaForwardingScreenState
 
   LMChatButton _defAttachmentButton() {
     return LMChatButton(
-      icon: const LMChatIcon(
+      icon: LMChatIcon(
         type: LMChatIconType.icon,
         icon: Icons.attachment,
+        style: LMChatIconStyle(
+          color: LMChatTheme.isThemeDark
+              ? LMChatTheme.theme.onContainer.withOpacity(0.5)
+              : LMChatTheme.theme.container.withOpacity(0.5),
+        ),
       ),
       style: LMChatButtonStyle(
         height: 4.h,
@@ -345,6 +369,9 @@ class _LMChatMediaForwardingScreenState
       style: LMChatAppBarStyle(
         height: 60,
         gap: 12,
+        backgroundColor: LMChatTheme.isThemeDark
+            ? LMChatTheme.theme.container.withOpacity(0.5)
+            : LMChatTheme.theme.onContainer.withOpacity(0.5),
         padding: EdgeInsets.symmetric(horizontal: 4.w),
       ),
       leading: LMChatButton(
@@ -352,9 +379,14 @@ class _LMChatMediaForwardingScreenState
           LMChatMediaHandler.instance.clearPickedMedia();
           Navigator.pop(context);
         },
-        icon: const LMChatIcon(
+        icon: LMChatIcon(
           type: LMChatIconType.icon,
           icon: Icons.arrow_back,
+          style: LMChatIconStyle(
+            color: LMChatTheme.isThemeDark
+                ? LMChatTheme.theme.onContainer
+                : LMChatTheme.theme.container,
+          ),
         ),
       ),
       title: LMChatText(
@@ -362,10 +394,12 @@ class _LMChatMediaForwardingScreenState
         style: LMChatTextStyle(
           maxLines: 1,
           padding: const EdgeInsets.only(top: 2),
-          textStyle: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w500),
+          textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: LMChatTheme.isThemeDark
+                    ? LMChatTheme.theme.onContainer
+                    : LMChatTheme.theme.container,
+              ),
         ),
       ),
     );
@@ -391,7 +425,9 @@ class _LMChatMediaForwardingScreenState
           size: 28,
           boxSize: 36,
           boxPadding: const EdgeInsets.only(left: 2),
-          color: LMChatTheme.theme.container,
+          color: LMChatTheme.isThemeDark
+              ? LMChatTheme.theme.container
+              : LMChatTheme.theme.onContainer,
         ),
       ),
     );
@@ -576,7 +612,11 @@ class _LMChatMediaForwardingScreenState
       subtitle: LMChatText(
         LMChatTaggingHelper.convertRouteToTag(replyConversation?.answer) ?? "",
         style: LMChatTextStyle(
-          textStyle: Theme.of(context).textTheme.bodySmall,
+          textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: LMChatTheme.isThemeDark
+                    ? LMChatTheme.theme.onContainer
+                    : LMChatTheme.theme.container,
+              ),
         ),
       ),
     );

@@ -13,10 +13,10 @@ class LMChatDocumentPreview extends StatefulWidget {
 
   ///{@macro lm_chat_document_preview}
   const LMChatDocumentPreview({
-    Key? key,
+    super.key,
     required this.media,
     this.style,
-  }) : super(key: key);
+  });
 
   /// Creates a copy of this [LMChatDocumentPreview] but with the given fields replaced with the new values.
   LMChatDocumentPreview copyWith({
@@ -97,10 +97,10 @@ class LMChatDocumentTilePreview extends StatefulWidget {
 
   ///{@macro lm_chat_document_tile_preview}
   const LMChatDocumentTilePreview({
-    Key? key,
+    super.key,
     required this.mediaList,
     this.style,
-  }) : super(key: key);
+  });
 
   @override
   State<LMChatDocumentTilePreview> createState() =>
@@ -158,7 +158,7 @@ class LMChatDocumentTilePreviewState extends State<LMChatDocumentTilePreview> {
                       onTap: onMoreButtonTap,
                       behavior: HitTestBehavior.translucent,
                       child: SizedBox(
-                        width: 72,
+                        width: 64,
                         height: 24,
                         child: LMChatText(
                           '+ ${mediaList!.length - 2} more',

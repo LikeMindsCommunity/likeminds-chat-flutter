@@ -20,25 +20,63 @@ class LMChatTheme {
   /// Gets the text theme
   static TextTheme get text => instance.textTheme;
 
+  /// Sets the theme data
+  static void setTheme(LMChatThemeData theme) {
+    final instance = LMChatTheme.instance;
+    instance.initialise(
+      theme: theme,
+      isDark: theme.isDark,
+    );
+  }
+
+  /// Sets the theme data
+  static void setTextTheme(TextTheme theme) {
+    instance.textTheme = theme;
+  }
+
   LMChatTheme._();
 
   /// The theme data for the chat
-  late final LMChatThemeData themeData;
+  late LMChatThemeData themeData;
 
   /// The text theme for the chat
-  late final TextTheme textTheme;
+  late TextTheme textTheme;
+
+  /// Whether the current theme is dark
+  late bool isDark;
 
   /// Initializes the theme with optional parameters
   void initialise({
     LMChatThemeData? theme,
     TextTheme? textTheme,
+    bool? isDark,
   }) {
-    themeData = theme ?? LMChatThemeData.light();
-    textTheme = textTheme;
+    // If theme is provided, use its type, otherwise use isDark parameter or default to false
+    this.isDark = theme != null ? theme.isDark : (isDark ?? false);
+
+    // Initialize theme based on isDark if not provided
+    themeData = theme ??
+        (this.isDark ? LMChatThemeData.dark() : LMChatThemeData.light());
+    this.textTheme = textTheme ?? ThemeData.light().textTheme;
+  }
+
+  /// Static helper to check if current theme is dark
+  static bool get isThemeDark => instance.isDark;
+
+  /// Static helper to toggle between light and dark themes
+  static void toggleTheme() {
+    final instance = LMChatTheme.instance;
+    instance.initialise(
+      theme: instance.isDark ? LMChatThemeData.light() : LMChatThemeData.dark(),
+      isDark: !instance.isDark,
+    );
   }
 }
 
 class LMChatThemeData {
+  /// boolean to figure out which theme we are running
+  final bool isDark;
+
   /// Style for buttons in the chat
   final LMChatButtonStyle buttonStyle;
 
@@ -154,6 +192,7 @@ class LMChatThemeData {
   final Color scaffold;
 
   const LMChatThemeData({
+    this.isDark = false,
     required this.primaryColor,
     required this.backgroundColor,
     required this.secondaryColor,
@@ -207,6 +246,7 @@ class LMChatThemeData {
       container: theme.colorScheme.primaryContainer,
       onContainer: theme.colorScheme.onPrimaryContainer,
       onPrimary: theme.colorScheme.onPrimary,
+      scaffold: theme.colorScheme.surface,
     );
   }
 
@@ -287,11 +327,14 @@ class LMChatThemeData {
         voiceNoteStyle: voiceNoteStyle ?? LMChatVoiceNoteStyle.basic(),
         replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
         bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
-        contentStyle: contentStyle ?? LMChatBubbleContentStyle.basic(),
+        contentStyle: contentStyle ??
+            LMChatBubbleContentStyle.basic(
+                onContainer: LMChatDefaultTheme.onContainer),
         chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
         stateBubbleStyle:
             stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
-        appBarStyle: appBarStyle ?? LMChatAppBarStyle.basic(),
+        appBarStyle: appBarStyle ??
+            LMChatAppBarStyle.basic(LMChatDefaultTheme.container),
         pollStyle: pollStyle ??
             LMChatPollStyle.basic(
               primaryColor: primaryColor,
@@ -306,6 +349,112 @@ class LMChatThemeData {
             bubbleReactionsStyle ?? LMChatBubbleReactionsStyle.basic(),
         reactionKeyboardStyle:
             reactionKeyboardStyle ?? LMChatReactionKeyboardStyle.basic());
+  }
+
+  /// Creates a dark theme data with optional parameters
+  factory LMChatThemeData.dark({
+    Color? primaryColor,
+    Color? backgroundColor,
+    Color? secondaryColor,
+    Color? shadowColor,
+    Color? disabledColor,
+    Color? errorColor,
+    Color? inActiveColor,
+    Color? tagColor,
+    Color? hashTagColor,
+    Color? linkColor,
+    Color? scaffold,
+    Color? container,
+    Color? onContainer,
+    Color? onPrimary,
+    LMChatButtonStyle? buttonStyle,
+    LMChatIconStyle? iconStyle,
+    LMChatTextFieldStyle? textFieldStyle,
+    LMChatDialogStyle? dialogStyle,
+    LMChatPopUpMenuStyle? popUpMenuStyle,
+    LMChatLoaderStyle? loaderStyle,
+    LMChatBottomSheetStyle? bottomSheetStyle,
+    LMChatSnackBarStyle? snackBarTheme,
+    LMChatImageStyle? imageStyle,
+    LMChatVideoStyle? videoStyle,
+    LMChatDocumentStyle? documentStyle,
+    LMChatGIFStyle? gifStyle,
+    LMChatVoiceNoteStyle? voiceNoteStyle,
+    LMChatBubbleReplyStyle? replyStyle,
+    LMChatBubbleStyle? bubbleStyle,
+    LMChatBubbleContentStyle? contentStyle,
+    LMChatTileStyle? chatTileStyle,
+    LMChatStateBubbleStyle? stateBubbleStyle,
+    LMChatAppBarStyle? appBarStyle,
+    LMChatReactionBarStyle? reactionBarStyle,
+    LMChatReactionBottomSheetStyle? reactionBottomSheetStyle,
+    LMChatBubbleReactionsStyle? bubbleReactionsStyle,
+    LMChatReactionKeyboardStyle? reactionKeyboardStyle,
+    LMChatPollStyle? pollStyle,
+  }) {
+    return LMChatThemeData(
+      isDark: true,
+      buttonStyle: buttonStyle ?? LMChatButtonStyle.basic(),
+      iconStyle: iconStyle ?? LMChatIconStyle.basic(),
+      backgroundColor:
+          backgroundColor ?? LMChatDefaultDarkTheme.backgroundColor,
+      primaryColor: primaryColor ?? LMChatDefaultDarkTheme.primaryColor,
+      secondaryColor: secondaryColor ?? LMChatDefaultDarkTheme.secondaryColor,
+      shadowColor: shadowColor ?? LMChatDefaultDarkTheme.shadowColor,
+      disabledColor: disabledColor ?? LMChatDefaultDarkTheme.disabledColor,
+      errorColor: errorColor ?? LMChatDefaultDarkTheme.errorColor,
+      inActiveColor: inActiveColor ?? LMChatDefaultDarkTheme.inactiveColor,
+      container: container ?? LMChatDefaultDarkTheme.container,
+      scaffold: scaffold ?? LMChatDefaultDarkTheme.container,
+      onContainer: onContainer ?? LMChatDefaultDarkTheme.onContainer,
+      onPrimary: onPrimary ?? LMChatDefaultDarkTheme.onPrimary,
+      hashTagColor: hashTagColor ?? LMChatDefaultDarkTheme.hashTagColor,
+      linkColor: linkColor ?? LMChatDefaultDarkTheme.linkColor,
+      tagColor: tagColor ?? LMChatDefaultDarkTheme.tagColor,
+      textFieldStyle: textFieldStyle ?? LMChatTextFieldStyle.basic(),
+      dialogStyle: dialogStyle ?? const LMChatDialogStyle(),
+      popUpMenuStyle: popUpMenuStyle ?? const LMChatPopUpMenuStyle(),
+      loaderStyle: LMChatLoaderStyle(
+        color: primaryColor ?? LMChatDefaultDarkTheme.primaryColor,
+      ),
+      bottomSheetStyle: bottomSheetStyle ?? const LMChatBottomSheetStyle(),
+      snackBarTheme: snackBarTheme ??
+          LMChatSnackBarStyle(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor:
+                primaryColor ?? LMChatDefaultDarkTheme.primaryColor,
+          ),
+      imageStyle: imageStyle ?? LMChatImageStyle.basic(),
+      videoStyle: videoStyle ?? LMChatVideoStyle.basic(),
+      documentStyle: documentStyle ?? LMChatDocumentStyle.basic(),
+      gifStyle: gifStyle ?? LMChatGIFStyle.basic(),
+      voiceNoteStyle: voiceNoteStyle ?? LMChatVoiceNoteStyle.basic(),
+      replyStyle: replyStyle ?? const LMChatBubbleReplyStyle(),
+      bubbleStyle: bubbleStyle ?? LMChatBubbleStyle(),
+      contentStyle: contentStyle ??
+          LMChatBubbleContentStyle.basic(
+              onContainer: LMChatDefaultDarkTheme.onContainer),
+      chatTileStyle: chatTileStyle ?? LMChatTileStyle.basic(),
+      stateBubbleStyle:
+          stateBubbleStyle ?? LMChatStateBubbleStyle.basic(onContainer),
+      appBarStyle: appBarStyle ??
+          LMChatAppBarStyle.basic(LMChatDefaultDarkTheme.container),
+      pollStyle: pollStyle ??
+          LMChatPollStyle.basic(
+            primaryColor: primaryColor ?? LMChatDefaultDarkTheme.primaryColor,
+            containerColor: container ?? LMChatDefaultDarkTheme.container,
+            onContainer: onContainer ?? LMChatDefaultDarkTheme.onContainer,
+            inActiveColor:
+                inActiveColor ?? LMChatDefaultDarkTheme.inactiveColor,
+          ),
+      reactionBarStyle: reactionBarStyle ?? LMChatReactionBarStyle.basic(),
+      reactionBottomSheetStyle:
+          reactionBottomSheetStyle ?? LMChatReactionBottomSheetStyle.basic(),
+      bubbleReactionsStyle:
+          bubbleReactionsStyle ?? LMChatBubbleReactionsStyle.basic(),
+      reactionKeyboardStyle:
+          reactionKeyboardStyle ?? LMChatReactionKeyboardStyle.basic(),
+    );
   }
 
   /// Creates a copy of the theme data with optional modifications
@@ -606,7 +755,7 @@ class LMChatDefaultTheme {
   static const Color backgroundColor = Color.fromRGBO(208, 216, 226, 1);
 
   /// Default primary color
-  static const Color primaryColor = Color.fromARGB(255, 37, 64, 110);
+  static const Color primaryColor = Color.fromARGB(255, 50, 105, 200);
 
   /// Default secondary color
   static const Color secondaryColor = Color.fromARGB(255, 223, 103, 34);
@@ -615,7 +764,7 @@ class LMChatDefaultTheme {
   static const Color shadowColor = Color.fromRGBO(0, 0, 0, 0.239);
 
   /// Default disabled color
-  static const Color disabledColor = Color.fromRGBO(208, 216, 226, 1);
+  static const Color disabledColor = Color.fromRGBO(155, 155, 155, 1);
 
   /// Default error color
   static const Color errorColor = Color.fromRGBO(251, 22, 9, 1);
@@ -792,4 +941,96 @@ class ScreenSize {
     safeBlockHorizontal = (width - _safeAreaHorizontal) / 100;
     safeBlockVertical = (height - _safeAreaVertical) / 100;
   }
+}
+
+/// Default dark theme colors and values for the LMChat UI
+class LMChatDefaultDarkTheme {
+  /// Default background color for dark theme
+  static const Color backgroundColor = Color.fromRGBO(18, 18, 18, 1);
+
+  /// Default primary color for dark theme
+  static const Color primaryColor = Color.fromARGB(255, 50, 105, 200);
+
+  /// Default secondary color for dark theme
+  static const Color secondaryColor = Color.fromARGB(255, 255, 122, 48);
+
+  /// Default shadow color for dark theme
+  static const Color shadowColor = Color.fromRGBO(0, 0, 0, 0.5);
+
+  /// Default disabled color for dark theme
+  static const Color disabledColor = Color.fromRGBO(128, 128, 128, 1);
+
+  /// Default error color for dark theme
+  static const Color errorColor = Color.fromRGBO(255, 82, 82, 1);
+
+  /// Default inactive color for dark theme
+  static const Color inactiveColor = Color.fromRGBO(97, 97, 97, 1);
+
+  /// Default white color for dark theme (darker shade for contrast)
+  static const Color whiteColor = Color.fromRGBO(242, 242, 242, 1);
+
+  /// Default grey color for dark theme
+  static const Color greyColor = Color.fromRGBO(189, 189, 189, 1);
+
+  /// Default black color for dark theme
+  static const Color blackColor = Color.fromRGBO(18, 18, 18, 1);
+
+  /// Default tag color for dark theme
+  static const Color tagColor = Color.fromRGBO(33, 150, 243, 1);
+
+  /// Default hashtag color for dark theme
+  static const Color hashTagColor = Color.fromRGBO(33, 150, 243, 1);
+
+  /// Default link color for dark theme
+  static const Color linkColor = Color.fromRGBO(33, 150, 243, 1);
+
+  /// Default heading color for dark theme
+  static const Color headingColor = Color.fromRGBO(242, 242, 242, 1);
+
+  /// Default container color for dark theme
+  static const Color container = Color.fromRGBO(30, 30, 30, 1);
+
+  /// Default on-container color for dark theme
+  static const Color onContainer = whiteColor;
+
+  /// Default on-primary color for dark theme
+  static const Color onPrimary = whiteColor;
+
+  // Reuse the same sizing constants from LMChatDefaultTheme
+  static const double kFontSmall = LMChatDefaultTheme.kFontSmall;
+  static const double kButtonFontSize = LMChatDefaultTheme.kButtonFontSize;
+  static const double kFontXSmall = LMChatDefaultTheme.kFontXSmall;
+  static const double kFontSmallMed = LMChatDefaultTheme.kFontSmallMed;
+  static const double kFontMedium = LMChatDefaultTheme.kFontMedium;
+  static const double kPaddingXSmall = LMChatDefaultTheme.kPaddingXSmall;
+  static const double kPaddingSmall = LMChatDefaultTheme.kPaddingSmall;
+  static const double kPaddingMedium = LMChatDefaultTheme.kPaddingMedium;
+  static const double kPaddingLarge = LMChatDefaultTheme.kPaddingLarge;
+  static const double kPaddingXLarge = LMChatDefaultTheme.kPaddingXLarge;
+  static const double kBorderRadiusXSmall =
+      LMChatDefaultTheme.kBorderRadiusXSmall;
+  static const double kBorderRadiusMedium =
+      LMChatDefaultTheme.kBorderRadiusMedium;
+
+  // Reuse the same spacing widgets from LMChatDefaultTheme
+  static const SizedBox kHorizontalPaddingXLarge =
+      LMChatDefaultTheme.kHorizontalPaddingXLarge;
+  static const SizedBox kHorizontalPaddingSmall =
+      LMChatDefaultTheme.kHorizontalPaddingSmall;
+  static const SizedBox kHorizontalPaddingXSmall =
+      LMChatDefaultTheme.kHorizontalPaddingXSmall;
+  static const SizedBox kHorizontalPaddingLarge =
+      LMChatDefaultTheme.kHorizontalPaddingLarge;
+  static const SizedBox kHorizontalPaddingMedium =
+      LMChatDefaultTheme.kHorizontalPaddingMedium;
+  static const SizedBox kVerticalPaddingXLarge =
+      LMChatDefaultTheme.kVerticalPaddingXLarge;
+  static const SizedBox kVerticalPaddingSmall =
+      LMChatDefaultTheme.kVerticalPaddingSmall;
+  static const SizedBox kVerticalPaddingXSmall =
+      LMChatDefaultTheme.kVerticalPaddingXSmall;
+  static const SizedBox kVerticalPaddingLarge =
+      LMChatDefaultTheme.kVerticalPaddingLarge;
+  static const SizedBox kVerticalPaddingMedium =
+      LMChatDefaultTheme.kVerticalPaddingMedium;
 }

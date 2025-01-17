@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
@@ -7,27 +8,14 @@ import 'package:overlay_support/overlay_support.dart';
 /// Create Poll widget
 /// responsible for creating the poll
 /// {@endtemplate}
-class LMChatCreatePollBottomSheet extends StatefulWidget {
+class LMChatCreatePollScreen extends StatefulWidget {
   /// {@macro lm_chat_create_poll_bottom_sheet}
-  const LMChatCreatePollBottomSheet({
+  const LMChatCreatePollScreen({
     super.key,
     required this.chatroomId,
     this.repliedConversationId,
     this.pollQuestionStyle,
-    this.pollQuestionBuilder,
     this.optionStyle,
-    this.optionBuilder,
-    this.advancedButtonBuilder,
-    this.postButtonBuilder,
-    this.addOptionButtonBuilder,
-    this.scrollController,
-    this.expiryDateTitleBuilder,
-    this.expiryDateTextBuilder,
-    this.titleTextBuilder,
-    this.cancelButtonBuilder,
-    this.questionTitleBuilder,
-    this.answerTitleBuilder,
-    this.headerBuilder,
   });
 
   /// [chatroomId] chatroomId for which poll is created
@@ -39,105 +27,31 @@ class LMChatCreatePollBottomSheet extends StatefulWidget {
   /// [LMChatTextFieldStyle] for poll question
   final LMChatTextFieldStyle? pollQuestionStyle;
 
-  /// [pollQuestionBuilder] Builder for poll question
-  final Widget Function(BuildContext, TextEditingController)?
-      pollQuestionBuilder;
-
   /// [LMChatTextFieldStyle] for poll options
   final LMChatTextFieldStyle? optionStyle;
 
-  /// [optionBuilder] Builder for poll options
-  final Widget Function(BuildContext, LMChatOptionTile, int index)?
-      optionBuilder;
-
-  /// [LMChatButtonBuilder] Builder for advanced settings button
-  final LMChatButtonBuilder? advancedButtonBuilder;
-
-  /// [LMChatButtonBuilder] Builder for post button
-  final LMChatButtonBuilder? postButtonBuilder;
-
-  /// [LMChatButtonBuilder] Builder for add option button
-  final Widget Function(BuildContext, LMChatTile)? addOptionButtonBuilder;
-
-  /// [ScrollController] scrollController for the widget
-  final ScrollController? scrollController;
-
-  /// [LMChatTextBuilder] Builder for expiry date title
-  final LMChatTextBuilder? expiryDateTitleBuilder;
-
-  /// [LMChatTextBuilder] Builder for expiry date text
-  final LMChatTextBuilder? expiryDateTextBuilder;
-
-  /// [LMChatTextBuilder] Builder for title
-  final LMChatTextBuilder? titleTextBuilder;
-
-  /// [LMChatButton] Builder for cancel button
-  final LMChatButtonBuilder? cancelButtonBuilder;
-
-  /// [LMChatTextBuilder] Builder for Question title text
-  final LMChatTextBuilder? questionTitleBuilder;
-
-  /// [LMChatTextBuilder] Builder for Answer title text
-  final LMChatTextBuilder? answerTitleBuilder;
-
-  /// [LMChatContextWidgetBuilder] Builder for header
-  final LMChatContextWidgetBuilder? headerBuilder;
-
-  /// Creates a copy of this [LMChatCreatePollBottomSheet] but with the given fields replaced with the new values.
-  LMChatCreatePollBottomSheet copyWith({
+  /// Creates a copy of this [LMChatCreatePollScreen] but with the given fields replaced with the new values.
+  LMChatCreatePollScreen copyWith({
     Key? key,
     int? chatroomId,
     String? repliedConversationId,
     LMChatTextFieldStyle? pollQuestionStyle,
-    Widget Function(BuildContext, TextEditingController)? pollQuestionBuilder,
     LMChatTextFieldStyle? optionStyle,
-    Widget Function(BuildContext, LMChatOptionTile, int index)? optionBuilder,
-    LMChatButtonBuilder? advancedButtonBuilder,
-    LMChatButtonBuilder? postButtonBuilder,
-    Widget Function(BuildContext, LMChatTile)? addOptionButtonBuilder,
-    ScrollController? scrollController,
-    LMChatTextBuilder? expiryDateTitleBuilder,
-    LMChatTextBuilder? expiryDateTextBuilder,
-    LMChatTextBuilder? titleTextBuilder,
-    LMChatButtonBuilder? cancelButtonBuilder,
-    LMChatTextBuilder? questionTitleBuilder,
-    LMChatTextBuilder? answerTitleBuilder,
-    LMChatContextWidgetBuilder? headerBuilder,
   }) {
-    return LMChatCreatePollBottomSheet(
+    return LMChatCreatePollScreen(
       key: key ?? this.key,
       chatroomId: chatroomId ?? this.chatroomId,
       repliedConversationId:
           repliedConversationId ?? this.repliedConversationId,
       pollQuestionStyle: pollQuestionStyle ?? this.pollQuestionStyle,
-      pollQuestionBuilder: pollQuestionBuilder ?? this.pollQuestionBuilder,
-      optionStyle: optionStyle ?? this.optionStyle,
-      optionBuilder: optionBuilder ?? this.optionBuilder,
-      advancedButtonBuilder:
-          advancedButtonBuilder ?? this.advancedButtonBuilder,
-      postButtonBuilder: postButtonBuilder ?? this.postButtonBuilder,
-      addOptionButtonBuilder:
-          addOptionButtonBuilder ?? this.addOptionButtonBuilder,
-      scrollController: scrollController ?? this.scrollController,
-      expiryDateTitleBuilder:
-          expiryDateTitleBuilder ?? this.expiryDateTitleBuilder,
-      expiryDateTextBuilder:
-          expiryDateTextBuilder ?? this.expiryDateTextBuilder,
-      titleTextBuilder: titleTextBuilder ?? this.titleTextBuilder,
-      cancelButtonBuilder: cancelButtonBuilder ?? this.cancelButtonBuilder,
-      questionTitleBuilder: questionTitleBuilder ?? this.questionTitleBuilder,
-      answerTitleBuilder: answerTitleBuilder ?? this.answerTitleBuilder,
-      headerBuilder: headerBuilder ?? this.headerBuilder,
     );
   }
 
   @override
-  State<LMChatCreatePollBottomSheet> createState() =>
-      _LMChatCreatePollBottomSheetState();
+  State<LMChatCreatePollScreen> createState() => _LMChatCreatePollScreenState();
 }
 
-class _LMChatCreatePollBottomSheetState
-    extends State<LMChatCreatePollBottomSheet> {
+class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
   late Size screenSize;
   LMChatThemeData theme = LMChatTheme.theme;
   LMChatUserViewData? user =
@@ -146,7 +60,6 @@ class _LMChatCreatePollBottomSheetState
   final ValueNotifier<bool> _optionBuilder = ValueNotifier(false);
   String exactlyDialogKey = 'exactly';
   int exactlyValue = 1;
-  final ValueNotifier<bool> _advancedBuilder = ValueNotifier(false);
   final TextEditingController _questionController = TextEditingController();
   final ValueNotifier<DateTime?> _expiryDateBuilder = ValueNotifier(null);
   final ValueNotifier<LMChatPollMultiSelectState> _multiSelectStateBuilder =
@@ -154,9 +67,27 @@ class _LMChatCreatePollBottomSheetState
   final ValueNotifier<bool> _rebuildMultiSelectStateBuilder =
       ValueNotifier(false);
   final ValueNotifier<int> _multiSelectNoBuilder = ValueNotifier(1);
-  final ValueNotifier<bool> _pollTypeBuilder = ValueNotifier(false);
+  final ValueNotifier<bool> _showResultsWithoutVoteBuilder =
+      ValueNotifier(false);
+  final ValueNotifier<bool> _hideResultsUntilPollEndBuilder =
+      ValueNotifier(false);
   final ValueNotifier<bool> _isAnonymousBuilder = ValueNotifier(false);
   final ValueNotifier<bool> _allowAddOptionBuilder = ValueNotifier(false);
+  final ValueNotifier<bool> _allowVoteChangeBuilder = ValueNotifier(false);
+  final ValueNotifier<bool> _rebuildAdvancedOptionsBuilder =
+      ValueNotifier(false);
+  final StreamController<bool> _isValidatedController =
+      StreamController<bool>.broadcast();
+  final CommunityConfigurations? communityConfigurations = LMChatLocalPreference
+      .instance
+      .fetchCommunityConfiguration("chat_poll")
+      ?.data;
+  final _screenBuilder = LMChatCore.config.pollConfig.createPollBuilder;
+  final _screenStyle = LMChatCore.config.pollConfig.style;
+  late LMChatTextFieldStyle? pollQuestionStyle =
+      widget.pollQuestionStyle ?? _screenStyle.pollQuestionStyle;
+  late LMChatTextFieldStyle? optionStyle =
+      widget.optionStyle ?? _screenStyle.optionStyle;
 
   Future<DateTime?> showDateTimePicker({
     required BuildContext context,
@@ -179,13 +110,21 @@ class _LMChatCreatePollBottomSheetState
         helpText: 'Start date',
         builder: (context, child) {
           return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: theme.primaryColor,
-                  onPrimary: theme.onPrimary,
-                ),
-                useMaterial3: false,
-              ),
+              data: LMChatTheme.isThemeDark
+                  ? Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.dark(
+                        primary: theme.primaryColor,
+                        onPrimary: theme.onPrimary,
+                        secondary: theme.secondaryColor,
+                      ),
+                    )
+                  : Theme.of(context).copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: theme.primaryColor,
+                        onPrimary: theme.onPrimary,
+                        secondary: theme.secondaryColor,
+                      ),
+                    ),
               child: child!);
         });
 
@@ -199,11 +138,17 @@ class _LMChatCreatePollBottomSheetState
       builder: (context, child) {
         return Theme(
             data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: theme.primaryColor,
-                onPrimary: theme.onPrimary,
-              ),
-              useMaterial3: false,
+              colorScheme: LMChatTheme.isThemeDark
+                  ? ColorScheme.dark(
+                      primary: theme.primaryColor,
+                      onPrimary: theme.onPrimary,
+                      secondary: theme.secondaryColor,
+                    )
+                  : ColorScheme.light(
+                      primary: theme.primaryColor,
+                      onPrimary: theme.onPrimary,
+                      secondary: theme.secondaryColor,
+                    ),
             ),
             child: child!);
       },
@@ -238,19 +183,19 @@ class _LMChatCreatePollBottomSheetState
     toast(message);
   }
 
-  bool checkForUniqueOptions() {
+  bool checkForUniqueOptions(bool showError) {
     Set<String> uniqueOptions = options.toSet();
     if (uniqueOptions.length != options.length) {
-      showSnackBar('Options should be unique');
+      if (showError) showSnackBar('Options should be unique');
       return false;
     }
     return true;
   }
 
-  bool validatePoll() {
+  bool validatePoll({bool showError = true}) {
     // check if question is empty
     if (_questionController.text.trim().isEmpty) {
-      showSnackBar('Question cannot be empty');
+      if (showError) showSnackBar('Question cannot be empty');
       return false;
     }
 
@@ -258,23 +203,61 @@ class _LMChatCreatePollBottomSheetState
     for (int i = 0; i < options.length; i++) {
       options[i] = options[i].trim();
       if (options[i].isEmpty) {
-        showSnackBar('Option ${i + 1} cannot be empty');
+        if (showError) showSnackBar('Option ${i + 1} cannot be empty');
         return false;
       }
     }
 
     // check if options are unique
-    if (!checkForUniqueOptions()) {
+    if (!checkForUniqueOptions(showError)) {
       return false;
     }
 
-    // check if expiry date is empty and in future
-    if (_expiryDateBuilder.value == null) {
-      showSnackBar('Expiry date cannot be empty');
+    // check if expiry date is empty only when poll type is deferred = {showResultsWithoutVoting == false && hideResultUtilPollEnds == true }
+    // in other cases expiry date can be empty and poll expiry will be set to infinite by `no_poll_expiry : true` flag
+    // if expiry date is set then it should be in future
+    if (_showResultsWithoutVoteBuilder.value == false &&
+        _hideResultsUntilPollEndBuilder.value == true &&
+        _expiryDateBuilder.value == null) {
+      if (showError) showSnackBar('Expiry date cannot be empty');
       return false;
-    } else if (_expiryDateBuilder.value!.isBefore(DateTime.now())) {
-      showSnackBar('Expiry date cannot be in the past');
+    }
+
+    // check if expiry date is required and expiry date is empty
+    if (_isExpiryTimeRequired() && _expiryDateBuilder.value == null) {
+      if (showError) showSnackBar('Expiry date cannot be empty');
       return false;
+    }
+
+    // check if expiry date is in past
+    if (_expiryDateBuilder.value != null &&
+        _expiryDateBuilder.value!.isBefore(DateTime.now())) {
+      if (showError) showSnackBar('Expiry date cannot be in the past');
+      return false;
+    }
+
+    // check if multiple select state and number is set accordingly the community configuration
+    // if community configuration allow_override is false then only check for multi select state and number
+    final isAllowOverride =
+        communityConfigurations?.value?['allow_override'] == true;
+
+    if (!isAllowOverride) {
+      final multiSelectState =
+          communityConfigurations?.value?['multiple_select_state'];
+      final multiSelectNo =
+          communityConfigurations?.value?['multiple_select_no'];
+
+      // check if multi select state is exactly or at least
+      //then options length should be equal to or greater than multi select number
+      if (multiSelectState == 'exactly' || multiSelectState == 'at_least') {
+        if (options.length < multiSelectNo) {
+          if (showError) {
+            showSnackBar(
+                'There should be minimum $multiSelectNo options as per community configuration');
+          }
+          return false;
+        }
+      }
     }
 
     return true;
@@ -282,284 +265,381 @@ class _LMChatCreatePollBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: theme.shadowColor,
-              offset: const Offset(0, 4),
-              blurRadius: 8,
+    return _screenBuilder.scaffold(
+      backgroundColor: theme.container,
+      appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context),
+          _isValidatedController, validatePoll, onPollSubmit),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _screenBuilder.userTileBuilder(
+              context,
+              _defUserTile(),
             ),
-          ]),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          widget.headerBuilder?.call(context) ?? _defHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              controller: widget.scrollController,
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                children: [
-                  widget.pollQuestionBuilder
-                          ?.call(context, _questionController) ??
-                      _defPollQuestionContainer(),
-                  const SizedBox(height: 16),
-                  _defPollOptionList(),
-                  const SizedBox(height: 16),
-                  _defExpiryTime(context),
-                  const SizedBox(height: 16),
-                  // Advanced settings
-                  _defAdvancedOptions(),
-                  widget.postButtonBuilder?.call(_defPostButton()) ??
-                      _defPostButton(),
-                ],
-              ),
+            _screenBuilder.pollQuestionContainerBuilder(
+              context,
+              _questionController,
+              _defPollQuestionContainer(),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            _screenBuilder.pollOptionsListBuilder(
+              context,
+              _defPollOptionList(),
+            ),
+            const SizedBox(height: 16),
+            // Advanced settings
+            // if community configuration allow_override is true show advanced settings
+            // else, check if community configuration no_poll_expiry is false show expiry time
+            // else hide expiry time, it will be set to infinite automatically
+            communityConfigurations?.value?['allow_override']
+                ? _screenBuilder.advancedOptionBuilder(
+                    context, _defAdvancedOptions(context))
+                : communityConfigurations?.value?['no_poll_expiry'] == false
+                    ? _defExpiryTime(context)
+                    : const SizedBox(),
+          ],
+        ),
       ),
     );
   }
 
-  ValueListenableBuilder<bool> _defAdvancedOptions() {
+  LMChatAppBar _defAppBar(BuildContext context) {
+    return LMChatAppBar(
+      title: _defTitleText(),
+      trailing: [
+        StreamBuilder(
+            stream: _isValidatedController.stream,
+            builder: (context, snapshot) {
+              final bool isValidated = snapshot.data ?? false;
+              return _defPostButton(isValidated);
+            })
+      ],
+      style: LMChatAppBarStyle(
+        centerTitle: true,
+        backgroundColor: LMChatTheme.theme.container,
+      ),
+    );
+  }
+
+  Widget _defAdvancedOptions(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: _advancedBuilder,
-        builder: (context, value, child) {
-          return Column(
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: value
-                    ? Container(
-                        color: theme.container,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ValueListenableBuilder(
-                                valueListenable: _allowAddOptionBuilder,
-                                builder: (context, value, child) {
-                                  return SwitchListTile(
-                                    value: value,
-                                    onChanged: (value) {
-                                      _allowAddOptionBuilder.value = value;
-                                    },
-                                    activeColor: theme.primaryColor,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 18,
-                                    ),
-                                    title: LMChatText(
-                                      'Allow voters to add options',
-                                      style: LMChatTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                          color: theme.onContainer,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                            Divider(
-                              color: theme.inActiveColor,
-                              height: 0,
-                            ),
-                            ValueListenableBuilder(
-                                valueListenable: _isAnonymousBuilder,
-                                builder: (context, value, child) {
-                                  return SwitchListTile(
-                                    value: value,
-                                    onChanged: (value) {
-                                      _isAnonymousBuilder.value = value;
-                                    },
-                                    activeColor: theme.primaryColor,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 18,
-                                    ),
-                                    title: LMChatText(
-                                      'Anonymous poll',
-                                      style: LMChatTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                          color: theme.onContainer,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                            Divider(
-                              color: theme.inActiveColor,
-                              height: 0,
-                            ),
-                            ValueListenableBuilder(
-                                valueListenable: _pollTypeBuilder,
-                                builder: (context, value, child) {
-                                  return SwitchListTile(
-                                    value: value,
-                                    onChanged: (value) {
-                                      _pollTypeBuilder.value = value;
-                                    },
-                                    activeColor: theme.primaryColor,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 18,
-                                    ),
-                                    title: LMChatText(
-                                      'Don\'t show live results',
-                                      style: LMChatTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                          color: theme.onContainer,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                            Divider(
-                              color: theme.inActiveColor,
-                              height: 0,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 12,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  LMChatText(
-                                    'User can vote for',
-                                    style: LMChatTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: theme.inActiveColor,
-                                      ),
-                                    ),
+        valueListenable: _rebuildAdvancedOptionsBuilder,
+        builder: (context, _, __) {
+          return AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ValueListenableBuilder(
+                    valueListenable: _showResultsWithoutVoteBuilder,
+                    builder: (context, value, child) {
+                      return _screenBuilder.showResultsWithoutVotingTileBuilder(
+                        context,
+                        _defShowResultsTile(value),
+                        value,
+                      );
+                    }),
+                // if show results without voting is false only then show poll type switch
+                if (_showResultsWithoutVoteBuilder.value == false)
+                  ValueListenableBuilder(
+                      valueListenable: _hideResultsUntilPollEndBuilder,
+                      builder: (context, value, child) {
+                        return _screenBuilder.hideResultsTileBuilder(
+                          context,
+                          _defHideResultsTile(value),
+                          value,
+                        );
+                      }),
+                ValueListenableBuilder(
+                    valueListenable: _allowAddOptionBuilder,
+                    builder: (context, value, child) {
+                      return _screenBuilder.allowAddOptionTileBuilder(
+                        context,
+                        _defAllowVotesTile(value),
+                        value,
+                      );
+                    }),
+                ValueListenableBuilder(
+                    valueListenable: _allowVoteChangeBuilder,
+                    builder: (context, value, child) {
+                      return _screenBuilder.allowVoteChangeTileBuilder(
+                        context,
+                        _defAllowVoteChange(value),
+                        value,
+                      );
+                    }),
+                ValueListenableBuilder(
+                    valueListenable: _isAnonymousBuilder,
+                    builder: (context, value, child) {
+                      return _screenBuilder.anonymousPollTileBuilder(
+                        context,
+                        _defAnonymousTile(value),
+                        value,
+                      );
+                    }),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 12,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _screenBuilder.multipleSelectTextBuilder(
+                        context,
+                        _defMultipleSelectText(),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ValueListenableBuilder(
+                              valueListenable: _multiSelectStateBuilder,
+                              builder: (context, value, child) {
+                                return DropdownButtonFormField<
+                                    LMChatPollMultiSelectState>(
+                                  value: value,
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      _multiSelectStateBuilder.value = value;
+                                    }
+                                  },
+                                  dropdownColor: theme.container,
+                                  iconEnabledColor: theme.onContainer,
+                                  style: TextStyle(
+                                    color: theme.onContainer,
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      ValueListenableBuilder(
-                                          valueListenable:
-                                              _multiSelectStateBuilder,
-                                          builder: (context, value, child) {
-                                            return DropdownButton<
-                                                LMChatPollMultiSelectState>(
-                                              value: value,
-                                              onChanged: (value) {
-                                                if (value != null) {
-                                                  _multiSelectStateBuilder
-                                                      .value = value;
-                                                }
-                                              },
-                                              dropdownColor: theme.container,
-                                              iconEnabledColor:
-                                                  theme.onContainer,
-                                              style: TextStyle(
-                                                color: theme.onContainer,
-                                              ),
-                                              items: [
-                                                DropdownMenuItem(
-                                                  value:
-                                                      LMChatPollMultiSelectState
-                                                          .exactly,
-                                                  child: LMChatText(
-                                                    LMChatPollMultiSelectState
-                                                        .exactly.name,
-                                                  ),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value:
-                                                      LMChatPollMultiSelectState
-                                                          .atLeast,
-                                                  child: LMChatText(
-                                                    LMChatPollMultiSelectState
-                                                        .atLeast.name,
-                                                  ),
-                                                ),
-                                                DropdownMenuItem(
-                                                  value:
-                                                      LMChatPollMultiSelectState
-                                                          .atMax,
-                                                  child: LMChatText(
-                                                    LMChatPollMultiSelectState
-                                                        .atMax.name,
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }),
-                                      LMChatText(
-                                        '=',
-                                        style: LMChatTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w400,
-                                            color: theme.inActiveColor,
-                                          ),
-                                        ),
+                                  decoration: InputDecoration(
+                                    constraints: BoxConstraints(
+                                        minWidth: 40.w, maxWidth: 40.w),
+                                  ),
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: LMChatPollMultiSelectState.exactly,
+                                      child: LMChatText(
+                                        LMChatPollMultiSelectState.exactly.name,
                                       ),
-                                      ValueListenableBuilder(
-                                          valueListenable:
-                                              _rebuildMultiSelectStateBuilder,
-                                          builder: (context, _, __) {
-                                            return ValueListenableBuilder(
-                                                valueListenable:
-                                                    _multiSelectNoBuilder,
-                                                builder:
-                                                    (context, value, child) {
-                                                  return DropdownButton<int>(
-                                                    value: value,
-                                                    items: [
-                                                      // create dropdown items based on current options length min 1 and max options.length
-                                                      for (int i = 1;
-                                                          i <= options.length;
-                                                          i++)
-                                                        DropdownMenuItem(
-                                                          value: i,
-                                                          child: LMChatText(
-                                                            '$i ${i == 1 ? 'option' : 'options'}',
-                                                          ),
-                                                        ),
-                                                    ],
-                                                    dropdownColor:
-                                                        theme.container,
-                                                    iconEnabledColor:
-                                                        theme.onContainer,
-                                                    style: TextStyle(
-                                                      color: theme.onContainer,
-                                                    ),
-                                                    onChanged: (value) {
-                                                      if (value != null) {
-                                                        _multiSelectNoBuilder
-                                                            .value = value;
-                                                      }
-                                                    },
-                                                  );
-                                                });
-                                          })
-                                    ],
-                                  )
-                                ],
+                                    ),
+                                    DropdownMenuItem(
+                                      value: LMChatPollMultiSelectState.atLeast,
+                                      child: LMChatText(
+                                        LMChatPollMultiSelectState.atLeast.name,
+                                      ),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: LMChatPollMultiSelectState.atMax,
+                                      child: LMChatText(
+                                        LMChatPollMultiSelectState.atMax.name,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                          LMChatText(
+                            '=',
+                            style: LMChatTextStyle(
+                              textStyle: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w400,
+                                color: theme.inActiveColor,
                               ),
-                            )
-                          ],
-                        ),
+                            ),
+                          ),
+                          ValueListenableBuilder(
+                              valueListenable: _rebuildMultiSelectStateBuilder,
+                              builder: (context, _, __) {
+                                return ValueListenableBuilder(
+                                    valueListenable: _multiSelectNoBuilder,
+                                    builder: (context, value, child) {
+                                      return DropdownButtonFormField<int>(
+                                        value: value,
+                                        decoration: InputDecoration(
+                                          constraints: BoxConstraints(
+                                              minWidth: 40.w, maxWidth: 40.w),
+                                        ),
+                                        items: [
+                                          // create dropdown items based on current options length min 1 and max options.length
+                                          for (int i = 1;
+                                              i <= options.length;
+                                              i++)
+                                            DropdownMenuItem(
+                                              value: i,
+                                              child: LMChatText(
+                                                '$i ${i == 1 ? 'option' : 'options'}',
+                                              ),
+                                            ),
+                                        ],
+                                        dropdownColor: theme.container,
+                                        iconEnabledColor: theme.onContainer,
+                                        style: TextStyle(
+                                          color: theme.onContainer,
+                                        ),
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            _multiSelectNoBuilder.value = value;
+                                          }
+                                        },
+                                      );
+                                    });
+                              })
+                        ],
                       )
-                    : const SizedBox.shrink(),
-              ),
-              const SizedBox(height: 24),
-              widget.advancedButtonBuilder?.call(_defAdvancedButton(value)) ??
-                  _defAdvancedButton(value),
-            ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _screenBuilder.expiryTimeContainerBuilder(
+                  context,
+                  _defExpiryTime(context),
+                ),
+              ],
+            ),
           );
         });
+  }
+
+  LMChatText _defMultipleSelectText() {
+    return LMChatText(
+      'Allow users to select:',
+      style: LMChatTextStyle(
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: theme.inActiveColor,
+        ),
+      ),
+    );
+  }
+
+  LMChatUserTile _defUserTile() {
+    return LMChatUserTile(
+      userViewData: LMChatLocalPreference.instance.getUser().toUserViewData(),
+    );
+  }
+
+  SwitchListTile _defShowResultsTile(bool value) {
+    return SwitchListTile(
+      value: value,
+      onChanged: (value) {
+        _showResultsWithoutVoteBuilder.value = value;
+        if (value == true) {
+          _hideResultsUntilPollEndBuilder.value = false;
+        }
+        _rebuildAdvancedOptionsBuilder.value =
+            !_rebuildAdvancedOptionsBuilder.value;
+        _isValidatedController.add(validatePoll(showError: false));
+      },
+      activeColor: theme.primaryColor,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+      ),
+      title: LMChatText(
+        'Show results without voting',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.inActiveColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  SwitchListTile _defHideResultsTile(bool value) {
+    return SwitchListTile(
+      value: value,
+      onChanged: (value) {
+        _hideResultsUntilPollEndBuilder.value = value;
+        _rebuildAdvancedOptionsBuilder.value =
+            !_rebuildAdvancedOptionsBuilder.value;
+        _isValidatedController.add(validatePoll(showError: false));
+      },
+      activeColor: theme.primaryColor,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+      ),
+      title: LMChatText(
+        'Hide results until poll ends',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.inActiveColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  SwitchListTile _defAnonymousTile(bool value) {
+    return SwitchListTile(
+      value: value,
+      onChanged: (value) {
+        _isAnonymousBuilder.value = value;
+      },
+      activeColor: theme.primaryColor,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+      ),
+      title: LMChatText(
+        'Anonymous poll',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.inActiveColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  SwitchListTile _defAllowVoteChange(bool value) {
+    return SwitchListTile(
+      value: value,
+      onChanged: (value) {
+        _allowVoteChangeBuilder.value = value;
+      },
+      activeColor: theme.primaryColor,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+      ),
+      title: LMChatText(
+        'Allow users to change their vote',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.inActiveColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  SwitchListTile _defAllowVotesTile(bool value) {
+    return SwitchListTile(
+      value: value,
+      onChanged: (value) {
+        _allowAddOptionBuilder.value = value;
+      },
+      activeColor: theme.primaryColor,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 18,
+      ),
+      title: LMChatText(
+        'Allow voters to add options',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: theme.inActiveColor,
+          ),
+        ),
+      ),
+    );
   }
 
   Container _defExpiryTime(BuildContext context) {
@@ -569,8 +649,10 @@ class _LMChatCreatePollBottomSheetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          widget.expiryDateTitleBuilder?.call(context, _defExpiryDateTitle()) ??
-              _defExpiryDateTitle(),
+          _screenBuilder.expiryTimeTitleBuilder(
+            context,
+            _defExpiryDateTitle(),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: GestureDetector(
@@ -582,20 +664,90 @@ class _LMChatCreatePollBottomSheetState
                 if (selectedDate != null) {
                   _expiryDateBuilder.value = selectedDate;
                 }
+                _isValidatedController.add(validatePoll(showError: false));
               },
-              child: SizedBox(
-                  width: double.infinity,
-                  child: ValueListenableBuilder(
+              child: Row(
+                children: [
+                  _screenBuilder.expiryTimeIconBuilder(
+                    context,
+                    _defExpiryDateIcon(),
+                  ),
+                  Expanded(
+                    child: ValueListenableBuilder(
                       valueListenable: _expiryDateBuilder,
                       builder: (context, value, child) {
-                        return widget.expiryDateTextBuilder
-                                ?.call(context, _defExpiryDateText(value)) ??
-                            _defExpiryDateText(value);
-                      })),
+                        return Row(
+                          children: [
+                            _screenBuilder.expiryTimeTextBuilder(
+                              context,
+                              _defExpiryDateText(value),
+                            ),
+                            if (_expiryDateBuilder.value != null) ...[
+                              const Spacer(),
+                              _screenBuilder.editExpiryTimeIconBuilder(
+                                context,
+                                _defEditExpiryIcon(),
+                              ),
+                              _screenBuilder.expiryDeleteButtonBuilder(
+                                context,
+                                _defDeleteExpiryTimeButton(),
+                              )
+                            ]
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         ],
       ),
+    );
+  }
+
+  LMChatIcon _defEditExpiryIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.mode_edit_outline_outlined,
+      style: LMChatIconStyle(
+        size: 20,
+        color: theme.inActiveColor,
+        margin: const EdgeInsets.only(right: 8),
+      ),
+    );
+  }
+
+  LMChatButton _defDeleteExpiryTimeButton() {
+    return LMChatButton(
+      onTap: () {
+        // set expiry date to null
+        _expiryDateBuilder.value = null;
+      },
+      style: LMChatButtonStyle(
+        backgroundColor: Colors.transparent,
+        icon: LMChatIcon(
+          type: LMChatIconType.icon,
+          icon: Icons.delete_outline,
+          style: LMChatIconStyle(
+            size: 20,
+            color: theme.errorColor,
+            margin: const EdgeInsets.only(right: 8, left: 8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  LMChatIcon _defExpiryDateIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.calendar_today,
+      style: LMChatIconStyle(
+          size: 15,
+          color: theme.primaryColor,
+          margin: const EdgeInsets.only(right: 8)),
     );
   }
 
@@ -606,61 +758,67 @@ class _LMChatCreatePollBottomSheetState
         textStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w400,
-          color: theme.inActiveColor,
+          color: value == null ? theme.primaryColor : theme.onContainer,
         ),
       ),
     );
   }
 
   LMChatText _defExpiryDateTitle() {
+    String labelText = 'Set expiration date and time';
     return LMChatText(
-      'Poll expires on',
+      _isExpiryTimeRequired() ? '$labelText*' : labelText,
       style: LMChatTextStyle(
         textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: theme.primaryColor),
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: theme.primaryColor,
+        ),
       ),
     );
   }
 
-  Container _defPollOptionList() {
-    return Container(
-      color: theme.container,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-            child: widget.answerTitleBuilder?.call(
-                  context,
-                  _defAnswerTitleText(),
-                ) ??
-                _defAnswerTitleText(),
-          ),
-          ValueListenableBuilder(
-              valueListenable: _optionBuilder,
-              builder: (context, _, __) {
-                return ListView.builder(
+  bool _isExpiryTimeRequired() {
+    final isExpiryTimeRequired =
+        (communityConfigurations?.value?['allow_override'] == false &&
+            communityConfigurations?.value?['no_poll_expiry'] == false);
+    return _hideResultsUntilPollEndBuilder.value || isExpiryTimeRequired;
+  }
+
+  Widget _defPollOptionList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: _screenBuilder.pollOptionTitleBuilder(
+              context,
+              _defAnswerTitleText(),
+            )),
+        ValueListenableBuilder(
+            valueListenable: _optionBuilder,
+            builder: (context, _, __) {
+              return AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: options.length,
                     itemBuilder: (context, index) {
-                      return widget.optionBuilder
-                              ?.call(context, _defPollOption(index), index) ??
-                          _defPollOption(index);
-                    });
-              }),
-          widget.addOptionButtonBuilder?.call(context, _defAddOptionTile()) ??
-              _defAddOptionTile(),
-        ],
-      ),
+                      return _screenBuilder.pollOptionTileBuilder(
+                          context, _defPollOption(index), index);
+                    }),
+              );
+            }),
+        _screenBuilder.addOptionTileBuilder(context, _defAddOptionTile())
+      ],
     );
   }
 
   LMChatText _defAnswerTitleText() {
     return LMChatText(
-      'Answer Options',
+      'Options*',
       style: LMChatTextStyle(
         textStyle: TextStyle(
             fontSize: 16,
@@ -681,6 +839,7 @@ class _LMChatCreatePollBottomSheetState
         } else {
           showSnackBar('You can add at max 10 options');
         }
+        _isValidatedController.add(validatePoll(showError: false));
       },
       style: LMChatTileStyle.basic().copyWith(
           padding: const EdgeInsets.symmetric(
@@ -689,14 +848,14 @@ class _LMChatCreatePollBottomSheetState
       )),
       leading: LMChatIcon(
         type: LMChatIconType.icon,
-        icon: Icons.add_circle_outline,
+        icon: Icons.add,
         style: LMChatIconStyle(
           size: 24,
           color: theme.primaryColor,
         ),
       ),
       title: LMChatText(
-        'Add an option...',
+        'Add option',
         style: LMChatTextStyle(
           textStyle: TextStyle(
             fontSize: 16,
@@ -723,10 +882,12 @@ class _LMChatCreatePollBottomSheetState
           if (_multiSelectNoBuilder.value > options.length) {
             _multiSelectNoBuilder.value = 1;
           }
+          _isValidatedController.add(validatePoll(showError: false));
         }
       },
       onChanged: (value) {
         options[index] = value;
+        _isValidatedController.add(validatePoll(showError: false));
       },
     );
   }
@@ -741,167 +902,140 @@ class _LMChatCreatePollBottomSheetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          widget.questionTitleBuilder?.call(
-                context,
-                _defPollQuestionTitle(),
-              ) ??
-              _defPollQuestionTitle(),
-          TextField(
-            controller: _questionController,
-            maxLines: 3,
-            minLines: 1,
-            style: TextStyle(
-              color: theme.onContainer,
-            ),
-            decoration: widget.pollQuestionStyle?.inputDecoration ??
-                InputDecoration(
-                  hintText: 'Ask a question',
-                  hintStyle: TextStyle(
-                    color: theme.inActiveColor,
-                  ),
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                ),
+          _screenBuilder.pollQuestionTitleBuilder(
+            context,
+            _defPollQuestionTitle(),
+          ),
+          _screenBuilder.pollQuestionTextFieldBuilder(
+            context,
+            _questionController,
+            _defQuestionTextField(),
           ),
         ],
       ),
+    );
+  }
+
+  TextField _defQuestionTextField() {
+    return TextField(
+      controller: _questionController,
+      maxLines: 3,
+      minLines: 3,
+      maxLength: 250,
+      buildCounter: (context,
+          {required currentLength, required isFocused, required maxLength}) {
+        return LMChatText(
+          '$currentLength/$maxLength character limit',
+          style: LMChatTextStyle(
+            padding: EdgeInsets.zero,
+            textStyle: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: theme.inActiveColor,
+            ),
+          ),
+        );
+      },
+      style: TextStyle(
+        color: theme.onContainer,
+      ),
+      onChanged: (value) {
+        _isValidatedController.add(validatePoll(showError: false));
+      },
+      decoration: widget.pollQuestionStyle?.inputDecoration ??
+          InputDecoration(
+            fillColor: LMChatTheme.isThemeDark
+                ? theme.backgroundColor
+                : theme.textFieldStyle.backgroundColor,
+            filled: true,
+            hintText: 'Ask a question',
+            hintStyle: TextStyle(
+              color: theme.inActiveColor,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
     );
   }
 
   LMChatText _defPollQuestionTitle() {
     return LMChatText(
-      'Poll question',
+      'Question*',
       style: LMChatTextStyle(
         textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: theme.primaryColor),
-      ),
-    );
-  }
-
-  LMChatButton _defAdvancedButton(bool value) {
-    return LMChatButton(
-      onTap: () {
-        _advancedBuilder.value = !_advancedBuilder.value;
-      },
-      text: LMChatText(
-        'ADVANCED',
-        style: LMChatTextStyle(
-            textStyle: TextStyle(
-          color: theme.onContainer,
-        )),
-      ),
-      isActive: value,
-      style: LMChatButtonStyle(
-        placement: LMChatIconButtonPlacement.end,
-        activeIcon: LMChatIcon(
-          type: LMChatIconType.icon,
-          icon: Icons.expand_less,
-          style: LMChatIconStyle(
-            color: theme.onContainer,
-          ),
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: theme.primaryColor,
         ),
-        icon: LMChatIcon(
-          type: LMChatIconType.icon,
-          icon: Icons.expand_more,
-          style: LMChatIconStyle(
-            color: theme.onContainer,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _defHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 16,
-      ),
-      child: Row(
-        children: [
-          widget.cancelButtonBuilder?.call(
-                _defCancelButton(),
-              ) ??
-              _defCancelButton(),
-          const Spacer(
-            flex: 1,
-          ),
-          widget.titleTextBuilder?.call(
-                context,
-                _defTitleText(),
-              ) ??
-              _defTitleText(),
-          const Spacer(
-            flex: 2,
-          ),
-        ],
-      ),
-    );
-  }
-
-  LMChatButton _defCancelButton() {
-    return LMChatButton(
-      onTap: () => Navigator.pop(context),
-      text: LMChatText(
-        "Cancel",
-        style: LMChatTextStyle(
-          textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: theme.primaryColor,
-          ),
-        ),
+        padding: const EdgeInsets.only(bottom: 8),
       ),
     );
   }
 
   LMChatText _defTitleText() {
-    return const LMChatText(
+    return LMChatText(
       'New Poll',
       style: LMChatTextStyle(
         textStyle: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
+          color: theme.onContainer,
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 
-  LMChatButton _defPostButton() {
-    return LMChatButton(
+  LMChatText _defPostButton(bool isValidated) {
+    return LMChatText(
+      "DONE",
       onTap: onPollSubmit,
-      style: LMChatButtonStyle(
-        backgroundColor: theme.primaryColor,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 56,
-          vertical: 14,
-        ),
-        margin: const EdgeInsets.only(
-          top: 48,
-          bottom: 24,
-        ),
-        borderRadius: 24,
-      ),
-      text: const LMChatText(
-        'POST',
-        style: LMChatTextStyle(
-          textStyle: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
+      style: LMChatTextStyle(
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: isValidated ? theme.primaryColor : theme.inActiveColor,
         ),
       ),
     );
+  }
+
+  int _getPollType() {
+    /// instant poll - 0 : {show results without voting == false && hideResultUtilPollEnds == false}
+    /// deferred poll - 1 : {show results without voting == false && hideResultUtilPollEnds == true}
+    /// open poll - 2 : {show results without voting == true}
+    if (_showResultsWithoutVoteBuilder.value) {
+      return 2;
+    } else if (_hideResultsUntilPollEndBuilder.value) {
+      return 1;
+    } else {
+      return 0;
+    }
   }
 
   void onPollSubmit() {
     if (validatePoll()) {
+      final pollType = _getPollType();
+      final expiryTime = _expiryDateBuilder.value?.millisecondsSinceEpoch;
+      final noPollExpiry = expiryTime == null;
+
       // create poll
       String pollQuestion = _questionController.text.trim();
       LMChatConversationBloc.instance.add(
@@ -909,14 +1043,16 @@ class _LMChatCreatePollBottomSheetState
           chatroomId: widget.chatroomId,
           text: pollQuestion,
           polls: options,
-          pollType: _pollTypeBuilder.value ? 1 : 0,
+          pollType: pollType,
           multipleSelectState: _multiSelectStateBuilder.value.index,
           multipleSelectNo: _multiSelectNoBuilder.value,
           isAnonymous: _isAnonymousBuilder.value,
           allowAddOption: _allowAddOptionBuilder.value,
-          expiryTime: _expiryDateBuilder.value!.millisecondsSinceEpoch,
+          expiryTime: _expiryDateBuilder.value?.millisecondsSinceEpoch,
           temporaryId: DateTime.now().millisecondsSinceEpoch.toString(),
           repliedConversationId: widget.repliedConversationId,
+          noPollExpiry: noPollExpiry,
+          allowVoteChange: _allowVoteChangeBuilder.value,
         ),
       );
 
@@ -991,43 +1127,50 @@ class _LMChatOptionTileState extends State<LMChatOptionTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-          child: TextField(
-            controller: _controller,
-            onChanged: widget.onChanged,
-            style: TextStyle(
-              color: theme.onContainer,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+      child: TextField(
+        controller: _controller,
+        onChanged: widget.onChanged,
+        style: TextStyle(
+          color: theme.onContainer,
+        ),
+        decoration: widget.optionStyle?.inputDecoration ??
+            InputDecoration(
+              fillColor: LMChatTheme.isThemeDark
+                  ? theme.backgroundColor
+                  : theme.textFieldStyle.backgroundColor,
+              filled: true,
+              hintText: 'Option ${widget.index + 1}',
+              hintStyle: TextStyle(
+                color: theme.inActiveColor,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              suffixIconColor: theme.inActiveColor,
+              suffixIcon: widget.isRemovable
+                  ? IconButton(
+                      isSelected: true,
+                      icon: const Icon(Icons.close),
+                      onPressed: widget.onDelete,
+                    )
+                  : null,
             ),
-            decoration: widget.optionStyle?.inputDecoration ??
-                InputDecoration(
-                  hintText: 'Option',
-                  hintStyle: TextStyle(
-                    color: theme.inActiveColor,
-                  ),
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  suffixIconColor: theme.inActiveColor,
-                  suffixIcon: widget.isRemovable
-                      ? IconButton(
-                          isSelected: true,
-                          icon: const Icon(Icons.close),
-                          onPressed: widget.onDelete,
-                        )
-                      : null,
-                ),
-          ),
-        ),
-        Divider(
-          color: theme.inActiveColor,
-          height: 0,
-        ),
-      ],
+      ),
     );
   }
 }

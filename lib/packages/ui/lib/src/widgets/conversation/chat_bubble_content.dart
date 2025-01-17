@@ -37,8 +37,9 @@ class LMChatBubbleContent extends StatelessWidget {
                   ),
               textAlign: TextAlign.left,
               style: inStyle.textStyle ??
-                  const TextStyle(
+                  TextStyle(
                     fontSize: 14,
+                    color: LMChatTheme.theme.onContainer,
                     fontWeight: FontWeight.w400,
                   ),
               linkEllipsis: true,
@@ -120,9 +121,8 @@ class LMChatBubbleContentStyle {
   factory LMChatBubbleContentStyle.basic({Color? onContainer}) =>
       LMChatBubbleContentStyle(
         textStyle: TextStyle(
-          color: onContainer ?? LMChatDefaultTheme.blackColor,
+          color: onContainer ?? LMChatDefaultTheme.onContainer,
           fontSize: 14,
-          fontFamily: 'Roboto',
           fontWeight: FontWeight.w400,
         ),
       );

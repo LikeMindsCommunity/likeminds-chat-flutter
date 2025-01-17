@@ -19,7 +19,8 @@ Future<void> submitVote(
       );
       return;
     }
-    if (LMChatPollUtils.hasPollEnded(conversationData.expiryTime)) {
+    if (LMChatPollUtils.hasPollEnded(
+        conversationData.expiryTime, conversationData.noPollExpiry)) {
       toast(
         "Poll ended. Vote can not be submitted now.",
       );
@@ -27,7 +28,7 @@ Future<void> submitVote(
       return;
     }
     if (LMChatPollUtils.isPollSubmitted(conversationData.poll!) &&
-        LMChatPollUtils.isInstantPoll(conversationData.pollType!)) {
+        !(conversationData.allowVoteChange ?? false)) {
       return;
     } else {
       if (LMChatPollUtils.isMultiChoicePoll(conversationData.multipleSelectNo,
@@ -124,7 +125,7 @@ Future<void> addOption(
   }
 }
 
-/// Handles the poll option deletion logic
+/// Handles the poll vote text tap logic
 void onVoteTextTap(BuildContext context,
     LMChatConversationViewData conversationData, LMChatWidgetSource source,
     {LMChatPollOptionViewData? option}) {
@@ -133,11 +134,12 @@ void onVoteTextTap(BuildContext context,
       context: context,
       builder: (context) => Theme(
         data: Theme.of(context).copyWith(
-          useMaterial3: false,
+          dialogBackgroundColor: LMChatTheme.theme.container,
         ),
-        child: const SimpleDialog(
+        child: SimpleDialog(
+          backgroundColor: LMChatTheme.theme.container,
           surfaceTintColor: Colors.transparent,
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             vertical: 30,
             horizontal: 8,
           ),
@@ -149,6 +151,7 @@ void onVoteTextTap(BuildContext context,
                 textAlign: TextAlign.center,
                 textStyle: TextStyle(
                   fontSize: 16,
+                  color: LMChatTheme.theme.onContainer,
                 ),
               ),
             )
@@ -157,7 +160,8 @@ void onVoteTextTap(BuildContext context,
       ),
     );
   } else if (conversationData.toShowResults! ||
-      LMChatPollUtils.hasPollEnded(conversationData.expiryTime)) {
+      LMChatPollUtils.hasPollEnded(
+          conversationData.expiryTime, conversationData.noPollExpiry)) {
     Navigator.push(
       context,
       MaterialPageRoute(

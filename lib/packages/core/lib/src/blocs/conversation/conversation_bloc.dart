@@ -38,6 +38,9 @@ class LMChatConversationBloc
   static LMChatConversationBloc? _instance;
   static int? _currentChatroomId;
 
+  /// The reply conversation if user taps on reply and is not present in the current list
+  static LMChatConversationViewData? replyConversation;
+
   /// Creates and maintains a singleton instance of this BLoC
   static LMChatConversationBloc get instance {
     if (_instance == null || _instance!.isClosed) {
@@ -68,6 +71,7 @@ class LMChatConversationBloc
   @override
   Future<void> close() {
     _currentChatroomId = null;
+    LMChatConversationBloc.replyConversation = null;
     return super.close();
   }
 

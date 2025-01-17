@@ -200,6 +200,9 @@ class LMChatRoomViewData {
 
   final LMChatConversationViewData? lastConversation;
 
+  /// A custom tag for the chatroom.
+  final String? customTag;
+
   LMChatRoomViewData._({
     required this.access,
     required this.answerText,
@@ -267,6 +270,7 @@ class LMChatRoomViewData {
     required this.isGuest,
     required this.followStatus,
     required this.lastConversation,
+    required this.customTag,
   });
 
   /// copyWith method is used to create a new instance of `LMChatRoomViewData` with the updated values.
@@ -338,6 +342,7 @@ class LMChatRoomViewData {
     int? userId,
     List<LMChatUserViewData>? lastResponseMembers,
     LMChatConversationViewData? lastConversation,
+    String? customTag,
   }) {
     return LMChatRoomViewData._(
       followStatus: followStatus ?? this.followStatus,
@@ -407,6 +412,7 @@ class LMChatRoomViewData {
       userId: userId ?? this.userId,
       lastResponseMembers: lastResponseMembers ?? this.lastResponseMembers,
       lastConversation: lastConversation ?? this.lastConversation,
+      customTag: customTag ?? this.customTag,
     );
   }
 }
@@ -480,6 +486,7 @@ class LMChatRoomViewDataBuilder {
   int? _userId;
   List<LMChatUserViewData>? _lastResponseMembers;
   LMChatConversationViewData? _lastConversation;
+  String? _customTag;
 
   /// Sets the access status of the chatroom.
   void access(bool? access) {
@@ -811,6 +818,11 @@ class LMChatRoomViewDataBuilder {
     _lastConversation = lastConversation;
   }
 
+  /// Sets a custom tag for the chatroom.
+  void customTag(String? customTag) {
+    _customTag = customTag;
+  }
+
   LMChatRoomViewData build() {
     return LMChatRoomViewData._(
       access: _access,
@@ -879,6 +891,7 @@ class LMChatRoomViewDataBuilder {
       isGuest: _isGuest,
       followStatus: _followStatus,
       lastConversation: _lastConversation,
+      customTag: _customTag,
     );
   }
 }

@@ -84,66 +84,121 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                       vertical: 2.0,
                     ),
                 child: Row(
-                  children: [
-                    leading ??
-                        (inStyle.showBackButton
-                            ? LMChatButton(
-                                onTap: () {
-                                  Navigator.of(context).pop();
-                                  backButtonCallback?.call();
-                                },
-                                style: LMChatButtonStyle(
-                                  height: 28,
-                                  width: 28,
-                                  borderRadius: 6,
-                                  padding: EdgeInsets.zero,
-                                  icon: LMChatIcon(
-                                    type: LMChatIconType.icon,
-                                    icon: Icons.arrow_back,
-                                    style: LMChatIconStyle(
-                                      color: LMChatTheme.theme.onPrimary,
-                                      size: 20,
-                                      boxSize: 28,
-                                    ),
-                                  ),
-                                  backgroundColor:
-                                      LMChatTheme.theme.primaryColor,
-                                ),
-                              )
-                            : const SizedBox.shrink()),
-                    banner != null
-                        ? SizedBox(width: inStyle.gap ?? 16)
-                        : const SizedBox.shrink(),
-                    banner ?? const SizedBox.shrink(),
-                    leading != null || inStyle.showBackButton
-                        ? SizedBox(width: inStyle.gap ?? 16)
-                        : const SizedBox.shrink(),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            constraints: BoxConstraints(
-                              minWidth: 80.w,
+                  children: inStyle.centerTitle
+                      ? [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                leading ??
+                                    (inStyle.showBackButton
+                                        ? LMChatButton(
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                              backButtonCallback?.call();
+                                            },
+                                            style: LMChatButtonStyle(
+                                              height: 28,
+                                              width: 28,
+                                              borderRadius: 6,
+                                              padding: EdgeInsets.zero,
+                                              icon: LMChatIcon(
+                                                type: LMChatIconType.icon,
+                                                icon: Icons.arrow_back,
+                                                style: LMChatIconStyle(
+                                                  color: LMChatTheme
+                                                      .theme.onContainer,
+                                                  size: 24,
+                                                  boxSize: 28,
+                                                ),
+                                              ),
+                                              backgroundColor: LMChatTheme
+                                                  .theme.container,
+                                            ),
+                                          )
+                                        : const SizedBox.shrink()),
+                              ],
                             ),
-                            child: titleBuilder
-                                    ?.call(title ?? const SizedBox.shrink()) ??
-                                title ??
-                                const SizedBox.shrink(),
                           ),
-                          (subtitleBuilder != null || subtitle != null)
-                              ? const SizedBox(height: 0)
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                titleBuilder?.call(
+                                        title ?? const SizedBox.shrink()) ??
+                                    title ??
+                                    const SizedBox.shrink(),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: trailing != null
+                                  ? trailing!
+                                  : [const SizedBox.shrink()],
+                            ),
+                          )
+                        ]
+                      : [
+                          leading ??
+                              (inStyle.showBackButton
+                                  ? LMChatButton(
+                                      onTap: () {
+                                        Navigator.of(context).pop();
+                                        backButtonCallback?.call();
+                                      },
+                                      style: LMChatButtonStyle(
+                                        height: 28,
+                                        width: 28,
+                                        borderRadius: 6,
+                                        padding: EdgeInsets.zero,
+                                        icon: LMChatIcon(
+                                          type: LMChatIconType.icon,
+                                          icon: Icons.arrow_back,
+                                          style: LMChatIconStyle(
+                                            color: LMChatTheme.theme.onContainer,
+                                            size: 24,
+                                            boxSize: 28,
+                                          ),
+                                        ),
+                                        backgroundColor:
+                                            LMChatTheme.theme.container,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()),
+                          banner != null
+                              ? SizedBox(width: inStyle.gap ?? 16)
                               : const SizedBox.shrink(),
-                          subtitleBuilder
-                                  ?.call(subtitle ?? const SizedBox.shrink()) ??
-                              subtitle ??
-                              const SizedBox.shrink(),
+                          banner ?? const SizedBox.shrink(),
+                          leading != null || inStyle.showBackButton
+                              ? SizedBox(width: inStyle.gap ?? 16)
+                              : const SizedBox.shrink(),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  constraints: BoxConstraints(
+                                    minWidth: 80.w,
+                                  ),
+                                  child: titleBuilder?.call(
+                                          title ?? const SizedBox.shrink()) ??
+                                      title ??
+                                      const SizedBox.shrink(),
+                                ),
+                                (subtitleBuilder != null || subtitle != null)
+                                    ? const SizedBox(height: 0)
+                                    : const SizedBox.shrink(),
+                                subtitleBuilder?.call(
+                                        subtitle ?? const SizedBox.shrink()) ??
+                                    subtitle ??
+                                    const SizedBox.shrink(),
+                              ],
+                            ),
+                          ),
+                          if (trailing != null) ...trailing!
                         ],
-                      ),
-                    ),
-                    if (trailing != null) ...trailing!
-                  ],
                 ),
               ),
               if (bottom != null) const SizedBox(height: 12),
@@ -256,9 +311,9 @@ class LMChatAppBarStyle {
   }
 
   /// A basic style for the AppBar.
-  factory LMChatAppBarStyle.basic() {
-    return const LMChatAppBarStyle(
-      backgroundColor: LMChatDefaultTheme.container,
+  factory LMChatAppBarStyle.basic(Color? backgroundColor) {
+    return LMChatAppBarStyle(
+      backgroundColor: backgroundColor ?? LMChatDefaultTheme.container,
       width: double.infinity,
     );
   }

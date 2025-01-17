@@ -4,7 +4,7 @@ import 'package:shimmer/shimmer.dart';
 
 /// [LMChatSkeletonChatPage] is a skeleton screen for the chat page.
 class LMChatSkeletonChatPage extends StatelessWidget {
-  const LMChatSkeletonChatPage({Key? key}) : super(key: key);
+  const LMChatSkeletonChatPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +56,9 @@ class LMChatSkeletonAppBar extends StatelessWidget {
               child: Container(
                 width: 28,
                 height: 28,
-                decoration: const BoxDecoration(
-                  color: LMChatDefaultTheme.greyColor,
-                  borderRadius: BorderRadius.all(
+                decoration: BoxDecoration(
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                  borderRadius: const BorderRadius.all(
                     Radius.circular(8),
                   ),
                 ),
@@ -69,9 +69,9 @@ class LMChatSkeletonAppBar extends StatelessWidget {
               child: Container(
                 width: 42,
                 height: 42,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: LMChatDefaultTheme.greyColor,
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                 ),
               ),
             ),
@@ -84,9 +84,9 @@ class LMChatSkeletonAppBar extends StatelessWidget {
                     child: Container(
                       width: 140,
                       height: 16,
-                      decoration: const BoxDecoration(
-                        color: LMChatDefaultTheme.greyColor,
-                        borderRadius: BorderRadius.all(
+                      decoration: BoxDecoration(
+                        color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(2),
                         ),
                       ),
@@ -97,9 +97,9 @@ class LMChatSkeletonAppBar extends StatelessWidget {
                     child: Container(
                       width: 100,
                       height: 12,
-                      decoration: const BoxDecoration(
-                        color: LMChatDefaultTheme.greyColor,
-                        borderRadius: BorderRadius.all(
+                      decoration: BoxDecoration(
+                        color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(2),
                         ),
                       ),
@@ -140,7 +140,7 @@ class LMChatSkeletonChatBar extends StatelessWidget {
                   width: 90.w,
                   height: 6.h,
                   decoration: BoxDecoration(
-                    color: LMChatDefaultTheme.greyColor,
+                    color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                     borderRadius: BorderRadius.all(
                       Radius.circular(2.5.h),
                     ),
@@ -154,7 +154,7 @@ class LMChatSkeletonChatBar extends StatelessWidget {
                 width: 6.h,
                 height: 6.h,
                 decoration: BoxDecoration(
-                  color: LMChatDefaultTheme.greyColor,
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                   borderRadius: BorderRadius.all(
                     Radius.circular(3.h),
                   ),
@@ -234,9 +234,9 @@ class LMChatSkeletonChatroom extends StatelessWidget {
               child: Container(
                 width: 42,
                 height: 42,
-                decoration: const BoxDecoration(
-                  color: LMChatDefaultTheme.greyColor,
-                  borderRadius: BorderRadius.all(
+                decoration: BoxDecoration(
+                  color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                  borderRadius: const BorderRadius.all(
                     Radius.circular(21),
                   ),
                 ),
@@ -251,9 +251,9 @@ class LMChatSkeletonChatroom extends StatelessWidget {
                     child: Container(
                       width: 60.w,
                       height: 14,
-                      decoration: const BoxDecoration(
-                        color: LMChatDefaultTheme.greyColor,
-                        borderRadius: BorderRadius.all(
+                      decoration: BoxDecoration(
+                        color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(6),
                         ),
                       ),
@@ -264,9 +264,9 @@ class LMChatSkeletonChatroom extends StatelessWidget {
                     child: Container(
                       width: 40.w,
                       height: 10,
-                      decoration: const BoxDecoration(
-                        color: LMChatDefaultTheme.greyColor,
-                        borderRadius: BorderRadius.all(
+                      decoration: BoxDecoration(
+                        color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+                        borderRadius: const BorderRadius.all(
                           Radius.circular(4),
                         ),
                       ),
@@ -285,9 +285,9 @@ class LMChatSkeletonChatroom extends StatelessWidget {
 class LMChatSkeletonChatBubble extends StatelessWidget {
   final bool isSent;
   const LMChatSkeletonChatBubble({
-    Key? key,
+    super.key,
     required this.isSent,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +309,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                     width: 4.5.h,
                     height: 4.5.h,
                     decoration: BoxDecoration(
-                      color: LMChatDefaultTheme.greyColor,
+                      color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                       borderRadius: BorderRadius.all(
                         Radius.circular(3.h),
                       ),
@@ -319,7 +319,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
               LMChatDefaultTheme.kHorizontalPaddingMedium,
               Container(
                 decoration: BoxDecoration(
-                  color: LMChatDefaultTheme.whiteColor,
+                  color: LMChatTheme.theme.container.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 constraints: BoxConstraints(
@@ -332,7 +332,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: LMChatDefaultTheme.whiteColor.withOpacity(0.5),
+                      color: LMChatTheme.theme.container.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(1.h),
                     ),
                   ),
@@ -345,7 +345,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                     width: 4.5.h,
                     height: 4.5.h,
                     decoration: BoxDecoration(
-                      color: LMChatDefaultTheme.greyColor,
+                      color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                       borderRadius: BorderRadius.all(
                         Radius.circular(3.h),
                       ),
@@ -368,11 +368,11 @@ class LMChatSkeletonAnimation extends StatelessWidget {
   final Curve? curve;
 
   const LMChatSkeletonAnimation({
-    Key? key,
+    super.key,
     required this.child,
     this.duration,
     this.curve,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

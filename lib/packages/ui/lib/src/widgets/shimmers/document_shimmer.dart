@@ -17,19 +17,22 @@ class LMChatDocumentShimmer extends StatelessWidget {
     final style = this.style ?? LMChatDocumentShimmerStyle.basic();
     return Container(
       height: style.height ?? 80, // Default height
-      width: style.width ?? 60.w, // Default width
+      width: style.width ?? 55.w, // Default width
       margin: style.margin,
       decoration: BoxDecoration(
         border: Border.all(
-          color: style.borderColor ?? LMChatDefaultTheme.greyColor,
+          color: style.borderColor ??
+              LMChatTheme.theme.onContainer.withOpacity(0.5),
           width: style.borderWidth ?? 1,
         ),
         borderRadius: style.borderRadius,
       ),
       padding: style.padding,
       child: Shimmer.fromColors(
-        baseColor: style.baseColor ?? Colors.black26,
-        highlightColor: style.highlightColor ?? Colors.black12,
+        baseColor:
+            style.baseColor ?? LMChatTheme.theme.onContainer.withOpacity(0.2),
+        highlightColor: style.highlightColor ??
+            LMChatTheme.theme.onContainer.withOpacity(0.5),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
@@ -45,7 +48,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
               children: [
                 Container(
                   height: style.titleHeight ?? 16, // Default title height
-                  width: style.titleWidth ?? 120, // Default title width
+                  width: style.titleWidth ?? 28.w, // Default title width
                   color: LMChatTheme.theme.container,
                 ),
                 kVerticalPaddingMedium,
@@ -56,7 +59,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
                       height:
                           style.subtitleHeight ?? 12, // Default subtitle height
                       width:
-                          style.subtitleWidth ?? 60, // Default subtitle width
+                          style.subtitleWidth ?? 16.w, // Default subtitle width
                       color: LMChatTheme.theme.container,
                     ),
                     kHorizontalPaddingXSmall,

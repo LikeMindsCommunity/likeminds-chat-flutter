@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/shimmers/document_shimmer.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 ///{@template lm_chat_document}
 /// A widget that displays a thumbnail for a document.
@@ -97,18 +95,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                 widget.media.mediaUrl == null && widget.media.mediaFile == null,
             child: InkWell(
               onTap: () async {
-                if (widget.media.mediaUrl != null ||
-                    widget.media.mediaFile != null) {
-                  Uri fileUrl = Uri.parse(
-                    widget.media.mediaUrl ?? widget.media.mediaFile!.path,
-                  );
-                  launchUrl(
-                    fileUrl,
-                    mode: Platform.isIOS
-                        ? LaunchMode.inAppBrowserView
-                        : LaunchMode.externalApplication,
-                  );
-                }
+                OpenFilex.open((snapshot.data as File).path);
               },
               child: Stack(
                 children: [
@@ -124,7 +111,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                               style: style?.overlayStyle ??
                                   LMChatDocumentTileStyle(
                                     padding: EdgeInsets.zero,
-                                    width: 54.w,
+                                    width: 52.w,
                                     backgroundColor:
                                         LMChatTheme.theme.container,
                                   ),
@@ -155,7 +142,8 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
     } else {
       final String url = widget.media.mediaUrl!;
       // _fileName = basenameWithoutExtension(url);
-      file = await DefaultCacheManager().getSingleFile(url);
+      final path = await downloadFile(fileUrl: url);
+      file = File(path);
     }
 
     // _fileSize = getFileSizeString(bytes: widget.media.size ?? 0);
@@ -175,7 +163,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                 ),
           ),
           child: FittedBox(
-            fit: BoxFit.cover,
+            fit: BoxFit.fitWidth,
             child: textureBuilder(
               allowAntialiasingIOS: true,
               backgroundFill: true,
