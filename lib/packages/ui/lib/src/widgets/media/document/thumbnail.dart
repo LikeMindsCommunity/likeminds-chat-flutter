@@ -97,7 +97,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
               onTap: () async {
                 // get the file path and open the file
                 final filePath = (snapshot.data as File).path;
-                OpenFile.open(filePath);
+                OpenFile.open(filePath, type: 'application/pdf');
               },
               child: Stack(
                 children: [
