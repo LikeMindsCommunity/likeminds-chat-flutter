@@ -5,7 +5,6 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/material/field/text_field_configuration.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/keyboard_suggestion_selection_notifier.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/should_refresh_suggestion_focus_index_notifier.dart';
@@ -603,10 +602,11 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
   // Will have a value if the typeahead is inside a scrollable widget
   ScrollPosition? _scrollPosition;
 
-  // Keyboard detection
-  final Stream<bool>? _keyboardVisibility =
-      (supportedPlatform) ? KeyboardVisibilityController().onChange : null;
-  late StreamSubscription<bool>? _keyboardVisibilitySubscription;
+  // state of the keyboard
+  bool _isKeyboardVisible = false;
+  // stream to trigger the keyboard visibility
+  StreamController<bool> _keyboardVisibilityController =
+      StreamController<bool>.broadcast();
 
   bool _areSuggestionsFocused = false;
   late final _shouldRefreshSuggestionsFocusIndex =
@@ -615,6 +615,17 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
 
   @override
   void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    // The 'viewInsets' describe parts of the display that are overlaid, typically by the system UI (e.g. keyboard).
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+
+    // If bottomInset > 0, we assume keyboard is open.
+    bool newValue = bottomInset > 0.0;
+    if (newValue != _isKeyboardVisible) {
+      _isKeyboardVisible = newValue;
+      _keyboardVisibilityController.add(_isKeyboardVisible);
+    }
     // Catch keyboard event and orientation change; resize suggestions list
     this._suggestionsBox!.onChangeMetrics();
   }
@@ -624,13 +635,12 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
     this._suggestionsBox!.close();
     this._suggestionsBox!.widgetMounted = false;
     WidgetsBinding.instance.removeObserver(this);
-    _keyboardVisibilitySubscription?.cancel();
     _effectiveFocusNode!.removeListener(_focusNodeListener);
     _focusNode?.dispose();
     _resizeOnScrollTimer?.cancel();
     _scrollPosition?.removeListener(_scrollResizeListener);
     _textEditingController?.dispose();
-    _keyboardSuggestionSelectionNotifier.dispose();
+    _keyboardVisibilityController.close();
     super.dispose();
   }
 
@@ -696,10 +706,10 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
 
     this._effectiveFocusNode!.addListener(_focusNodeListener);
 
-    // hide suggestions box on keyboard closed
-    this._keyboardVisibilitySubscription =
-        _keyboardVisibility?.listen((bool isVisible) {
-      if (widget.hideSuggestionsOnKeyboardHide && !isVisible) {
+    // listen for the keyboard visibility
+    // close the suggestion box when the keyboard is hidden
+    _keyboardVisibilityController.stream.listen((bool isVisible) {
+      if (!isVisible && widget.hideSuggestionsOnKeyboardHide) {
         _effectiveFocusNode!.unfocus();
       }
     });

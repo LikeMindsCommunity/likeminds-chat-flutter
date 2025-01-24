@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:likeminds_chat_flutter_ui/src/widgets/shimmers/document_shimmer.dart';
 import 'dart:io';
-import 'package:open_filex/open_filex.dart';
+import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
@@ -102,7 +101,9 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
               snapshot.hasData) {
             return InkWell(
               onTap: () async {
-                OpenFilex.open((snapshot.data as File).path);
+                // get the file path and open the file
+                final filePath = (snapshot.data as File).path;
+                OpenFile.open(filePath, type: 'application/pdf');
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(

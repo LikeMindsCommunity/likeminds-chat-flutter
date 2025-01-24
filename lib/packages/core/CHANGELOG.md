@@ -53,3 +53,8 @@
 - Added support for poll configuration
 - Added support for dark theme
 - Added loads of UI/UX improvements
+
+### 0.12.1
+
+- Replaced `open_filex` with `open_file` plugin
+- Removed `flutter_keyboard_visibility` plugin

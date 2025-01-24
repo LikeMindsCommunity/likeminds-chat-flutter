@@ -52,9 +52,9 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   final _homeScreenSettings = LMChatCore.config.homeConfig.setting;
   final LMChatHomeFeedListStyle _style =
       LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
-            LMChatHomeFeedListStyle.basic(),
+            LMChatHomeFeedListStyle.basic(LMChatTheme.theme.scaffold),
           ) ??
-          LMChatHomeFeedListStyle.basic();
+          LMChatHomeFeedListStyle.basic(LMChatTheme.theme.scaffold);
 
   String get _tag => widget.chatroomTag ?? _homeScreenSettings.tag ?? '';
 
@@ -501,9 +501,9 @@ class LMChatHomeFeedListStyle {
   });
 
   /// Default style for the home feed list
-  factory LMChatHomeFeedListStyle.basic() {
+  factory LMChatHomeFeedListStyle.basic(Color? scaffold) {
     return LMChatHomeFeedListStyle(
-        backgroundColor: _themeData.scaffold,
+        backgroundColor: scaffold,
         padding: const EdgeInsets.only(
           right: 8,
           left: 4,
