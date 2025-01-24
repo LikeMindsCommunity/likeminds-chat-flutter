@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:core';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/cupertino/field/cupertino_text_field_configuration.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_controller.dart';
@@ -345,14 +344,25 @@ class _CupertinoTypeAheadFieldState<T> extends State<CupertinoTypeAheadField<T>>
 
   // Will have a value if the typeahead is inside a scrollable widget
   ScrollPosition? _scrollPosition;
-
-  // Keyboard detection
-  final Stream<bool>? _keyboardVisibility =
-      (supportedPlatform) ? KeyboardVisibilityController().onChange : null;
-  late StreamSubscription<bool>? _keyboardVisibilitySubscription;
+  // state of the keyboard
+  bool _isKeyboardVisible = false;
+  // create a stream of bool to check if the keyboard is open
+  StreamController<bool> _keyboardVisibilityController =
+      StreamController<bool>.broadcast();
 
   @override
   void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    // The 'viewInsets' describe parts of the display that are overlaid, typically by the system UI (e.g. keyboard).
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+
+    // If bottomInset > 0, we assume keyboard is open.
+    bool newValue = bottomInset > 0.0;
+    if (newValue != _isKeyboardVisible) {
+      _isKeyboardVisible = newValue;
+      _keyboardVisibilityController.add(_isKeyboardVisible);
+    }
     // Catch keyboard event and orientation change; resize suggestions list
     this._suggestionsBox!.onChangeMetrics();
   }
@@ -362,12 +372,12 @@ class _CupertinoTypeAheadFieldState<T> extends State<CupertinoTypeAheadField<T>>
     this._suggestionsBox!.close();
     this._suggestionsBox!.widgetMounted = false;
     WidgetsBinding.instance.removeObserver(this);
-    _keyboardVisibilitySubscription?.cancel();
     _effectiveFocusNode!.removeListener(_focusNodeListener);
     _focusNode?.dispose();
     _resizeOnScrollTimer?.cancel();
     _scrollPosition?.removeListener(_scrollResizeListener);
     _textEditingController?.dispose();
+    _keyboardVisibilityController.close();
     super.dispose();
   }
 
@@ -404,15 +414,13 @@ class _CupertinoTypeAheadFieldState<T> extends State<CupertinoTypeAheadField<T>>
     };
 
     this._effectiveFocusNode!.addListener(_focusNodeListener);
-
-    // hide suggestions box on keyboard closed
-    this._keyboardVisibilitySubscription =
-        _keyboardVisibility?.listen((bool isVisible) {
-      if (widget.hideSuggestionsOnKeyboardHide && !isVisible) {
+    // listen for the keyboard visibility
+    // close the suggestion box when the keyboard is hidden
+    _keyboardVisibilityController.stream.listen((bool isVisible) {
+      if (!isVisible && widget.hideSuggestionsOnKeyboardHide) {
         _effectiveFocusNode!.unfocus();
       }
     });
-
     WidgetsBinding.instance.addPostFrameCallback((duration) {
       if (mounted) {
         this._initOverlayEntry();

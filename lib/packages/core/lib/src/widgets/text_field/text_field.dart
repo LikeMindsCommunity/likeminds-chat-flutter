@@ -349,8 +349,11 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
               LMChatText(
                 opt.name,
                 style: effectiveStyle.suggestionItemTextStyle ??
-                    const LMChatTextStyle(
-                      textStyle: TextStyle(fontSize: 14),
+                    LMChatTextStyle(
+                      textStyle: TextStyle(
+                        fontSize: 14,
+                        color: LMChatTheme.theme.onContainer,
+                      ),
                     ),
               ),
             ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:pdf_render/pdf_render_widgets.dart';
 
 ///{@template lm_chat_document}
@@ -95,7 +95,9 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                 widget.media.mediaUrl == null && widget.media.mediaFile == null,
             child: InkWell(
               onTap: () async {
-                OpenFilex.open((snapshot.data as File).path);
+                // get the file path and open the file
+                final filePath = (snapshot.data as File).path;
+                OpenFile.open(filePath, type: 'application/pdf');
               },
               child: Stack(
                 children: [
