@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/observer.dart';
@@ -616,7 +615,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         conversationViewData,
         LMChatButton(
           onTap: () {
-            _conversationActionHelper.onDelete(context, [... _selectedIds]);
+            _conversationActionHelper.onDelete(context, [..._selectedIds]);
           },
           style: LMChatButtonStyle.basic().copyWith(
             icon: LMChatIcon(

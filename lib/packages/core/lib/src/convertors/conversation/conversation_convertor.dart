@@ -1,9 +1,5 @@
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/attachment/attachment_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/poll/poll_option_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/og_tag/og_tag_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/reaction/reaction_convertor.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// [ConversationViewDataConvertor] is an extension on [Conversation] class.
@@ -16,6 +12,7 @@ extension ConversationViewDataConvertor on Conversation {
     Map<String, Conversation>? conversationMeta,
     Map<String, List<Reaction>>? reactionMeta,
     Map<int, User>? userMeta,
+    Map<String, LMWidgetData>? widgets,
   }) {
     // get member from userMeta
     final LMChatUserViewData? member =
@@ -29,6 +26,7 @@ extension ConversationViewDataConvertor on Conversation {
               attachmentMeta: attachmentMeta,
               reactionMeta: reactionMeta,
               conversationMeta: conversationMeta,
+              widgets: widgets,
             ) ??
             conversationMeta?[replyId.toString()]?.toConversationViewData(
               conversationPollsMeta: conversationPollsMeta,
@@ -36,6 +34,7 @@ extension ConversationViewDataConvertor on Conversation {
               attachmentMeta: attachmentMeta,
               reactionMeta: reactionMeta,
               conversationMeta: conversationMeta,
+              widgets: widgets,
             );
     // get attachments from attachmentMeta
     final List<LMChatAttachmentViewData>? attachments =
@@ -48,7 +47,7 @@ extension ConversationViewDataConvertor on Conversation {
             ?.map((e) => e.toReactionViewData())
             .toList();
 
-    final LMChatConversationViewDataBuilder conversationBuilder =
+    LMChatConversationViewDataBuilder conversationBuilder =
         LMChatConversationViewDataBuilder()
           ..allowAddOption(allowAddOption)
           ..answer(answer)
@@ -100,6 +99,7 @@ extension ConversationViewDataConvertor on Conversation {
                   attachmentMeta: attachmentMeta,
                   reactionMeta: reactionMeta,
                   conversationMeta: conversationMeta,
+                  widgets: widgets,
                 ),
           )
           ..ogTags(ogTags?.toLMChatOGTagViewData())
@@ -117,6 +117,17 @@ extension ConversationViewDataConvertor on Conversation {
               .toList())
           ..noPollExpiry(noPollExpiry)
           ..allowVoteChange(allowVoteChange);
+
+    String? widgetId = this.widgetId;
+    LMChatWidgetViewData? widget;
+
+    if (widgetId != null) {
+      LMChatWidgetViewData? widgetsViewDataMeta =
+          widgets?[widgetId]?.toWidgetViewData();
+
+      conversationBuilder.widgetId(widgetId);
+      conversationBuilder.widget(widgetsViewDataMeta);
+    }
 
     final polls = conversationPollsMeta?[id.toString()];
     if (polls != null) {
@@ -188,6 +199,7 @@ extension ConversationConvertor on LMChatConversationViewData {
       // poll: poll?.toPoll(),
       noPollExpiry: noPollExpiry,
       allowVoteChange: allowVoteChange,
+      widgetId: widgetId,
     );
   }
 }

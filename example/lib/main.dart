@@ -11,9 +11,42 @@ import 'package:likeminds_chat_flutter_sample/utils/firebase_options.dart';
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('LM_DEBUG_ENV');
 
+/// A global key that provides access to the ScaffoldMessengerState.
+///
+/// This key can be used to show SnackBars or other material banners
+/// from anywhere in the app. It is typically used in conjunction with
+/// the `ScaffoldMessenger` widget to display messages to the user.
+///
+/// Example usage:
+///
+/// ```dart
+/// rootScaffoldMessenger.currentState?.showSnackBar(
+///   SnackBar(content: Text('Hello, world!')),
+/// );
+/// ```
+///
+/// Ensure that the `ScaffoldMessenger` widget is properly initialized
+/// in your widget tree, typically at the root of your app.
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
+/// A global key used to access the root navigator of the application.
+///
+/// This key can be used to perform navigation operations such as pushing
+/// new routes or popping the current route from anywhere in the app.
+///
+/// Example usage:
+///
+/// ```dart
+/// // Push a new route
+/// rootNavigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => NewPage()));
+///
+/// // Pop the current route
+/// rootNavigatorKey.currentState?.pop();
+/// ```
+///
+/// Ensure that this key is assigned to the `navigatorKey` property of the
+/// `MaterialApp` or `CupertinoApp` widget.
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// First level notification handler
@@ -38,79 +71,8 @@ void main() async {
       ConversationState.memberLeftSecretChatroom,
       ConversationState.memberAddedToChatroom,
     ],
-    // theme: LMChatThemeData.dark(),
-    // config: LMChatConfig(
-    //   chatRoomConfig: LMChatroomConfig(
-    //     builder: CustomBuilder(),
-    //     setting: const LMChatroomSetting(
-    //       selectionType: LMChatSelectionType.floating,
-    //     ),
-    //   ),
-    // ),
   );
   runApp(const LMChatSampleApp());
-}
-
-class CustomBuilder extends LMChatroomBuilderDelegate {
-  @override
-  Widget sentChatBubbleBuilder(
-    BuildContext context,
-    LMChatConversationViewData conversation,
-    LMChatBubble bubble,
-  ) {
-    return bubble.copyWith(
-      onLongPress: (isSelected, state) {
-        debugPrint("Long pressed");
-        bubble.onLongPress?.call(isSelected, state);
-      },
-      reactionBarBuilder: (reaction) {
-        return Container();
-      },
-    );
-  }
-
-  @override
-  Widget receivedChatBubbleBuilder(
-    BuildContext context,
-    LMChatConversationViewData conversation,
-    LMChatBubble bubble,
-  ) {
-    return bubble.copyWith(
-      onLongPress: (isSelected, state) {
-        debugPrint("Long pressed");
-        bubble.onLongPress?.call(isSelected, state);
-      },
-    );
-  }
-
-  @override
-  Widget attachmentMenuBuilder(
-    BuildContext context,
-    List<LMAttachmentMenuItemData> items,
-    LMAttachmentMenu defaultMenu,
-  ) {
-    return defaultMenu.copyWith(
-      style: defaultMenu.style.copyWith(
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  @override
-  Widget attachmentMenuItemBuilder(
-    BuildContext context,
-    LMAttachmentMenuItemData item,
-    LMAttachmentMenuItem defaultMenuItem,
-  ) {
-    return defaultMenuItem.copyWith(
-      style: defaultMenuItem.style.copyWith(
-        backgroundColor: Colors.yellow,
-        labelTextStyle: const TextStyle(
-          fontStyle: FontStyle.italic,
-        ),
-      ),
-    );
-  }
 }
 
 /// Setup notifications

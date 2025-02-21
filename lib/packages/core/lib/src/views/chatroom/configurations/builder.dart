@@ -115,6 +115,12 @@ class LMChatroomBuilderDelegate {
     return appBar;
   }
 
+  /// Builds the chat bubble for conversation having custom widget
+  Widget customChatBubbleBuilder(
+      BuildContext context, LMChatConversationViewData conversation) {
+    return const SizedBox.shrink();
+  }
+
   /// Builds the sent chat bubble.
   Widget sentChatBubbleBuilder(
     BuildContext context,

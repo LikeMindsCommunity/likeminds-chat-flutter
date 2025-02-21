@@ -87,7 +87,6 @@ class LMChatAttachmentViewData {
   }
 }
 
-
 /// `LMChatAttachmentViewDataBuilder` is a builder class that helps in building the `LMChatAttachmentViewData` object.
 class LMChatAttachmentViewDataBuilder {
   int? _answerId;
@@ -180,7 +179,6 @@ class LMChatAttachmentViewDataBuilder {
   void width(dynamic width) {
     _width = width;
   }
-
 
   /// build method is used to create a new instance of `LMChatAttachmentViewData` with the provided values.
   LMChatAttachmentViewData build() {
