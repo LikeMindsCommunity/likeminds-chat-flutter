@@ -182,7 +182,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                 );
               }
               return conversationWithCustomWidget(item)
-                  ? _screenBuilder.customChatBubbleBuilder(context, item)
+                  ? _screenBuilder.customChatBubbleBuilder(
+                      context, item, widget.chatroomId)
                   : item.memberId == user.id
                       ? _screenBuilder.sentChatBubbleBuilder(
                           context, item, _defaultSentChatBubble(item))
@@ -1373,6 +1374,6 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   /// This function checks if the conversation
   /// has custom widget or not
   bool conversationWithCustomWidget(LMChatConversationViewData conversation) {
-    return conversation.widgetId != null && conversation.widgetId != null;
+    return conversation.widgetId != null && conversation.widget != null;
   }
 }

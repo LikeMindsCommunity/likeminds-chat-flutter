@@ -111,8 +111,8 @@ class LMChatConversationViewData {
     this.conversationViewType,
     this.noPollExpiry,
     this.allowVoteChange,
-    required this.widgetId,
-    required this.widget,
+    this.widgetId,
+    this.widget,
   });
 
   /// copyWith method is used to create a new instance of `LMChatConversationViewData` with the updated values.

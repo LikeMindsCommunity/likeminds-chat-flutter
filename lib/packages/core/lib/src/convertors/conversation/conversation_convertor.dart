@@ -119,7 +119,6 @@ extension ConversationViewDataConvertor on Conversation {
           ..allowVoteChange(allowVoteChange);
 
     String? widgetId = this.widgetId;
-    LMChatWidgetViewData? widget;
 
     if (widgetId != null) {
       LMChatWidgetViewData? widgetsViewDataMeta =

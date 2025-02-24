@@ -8,28 +8,28 @@ class LMChatWidgetViewData {
   Map<String, dynamic>? lmMeta;
 
   /// Timestamp representing when the widget was created.
-  int createdAt;
+  int? createdAt;
 
   /// Additional metadata for the widget.
   Map<String, dynamic> metadata;
 
   /// Identifier for the parent entity of the widget.
-  String parentEntityId;
+  String? parentEntityId;
 
   /// Type of the parent entity of the widget.
-  String parentEntityType;
+  String? parentEntityType;
 
   /// Timestamp representing when the widget was last updated.
-  int updatedAt;
+  int? updatedAt;
 
   LMChatWidgetViewData._({
     required this.id,
     this.lmMeta,
-    required this.createdAt,
+    this.createdAt,
     required this.metadata,
-    required this.parentEntityId,
-    required this.parentEntityType,
-    required this.updatedAt,
+    this.parentEntityId,
+    this.parentEntityType,
+    this.updatedAt,
   });
 
   /// copyWith method is used to create a new instance of `LMChatWidgetViewData` with the updated values.
@@ -119,30 +119,15 @@ class LMWidgetViewDataBuilder {
     if (_id == null) {
       throw Exception("Missing required parameter: id");
     }
-    if (_createdAt == null) {
-      throw Exception("Missing required parameter: createdAt");
-    }
-    if (_metadata == null) {
-      throw Exception("Missing required parameter: metadata");
-    }
-    if (_parentEntityId == null) {
-      throw Exception("Missing required parameter: parentEntityId");
-    }
-    if (_parentEntityType == null) {
-      throw Exception("Missing required parameter: parentEntityType");
-    }
-    if (_updatedAt == null) {
-      throw Exception("Missing required parameter: updatedAt");
-    }
 
     return LMChatWidgetViewData._(
       id: _id!,
       lmMeta: _lmMeta,
-      createdAt: _createdAt!,
-      metadata: _metadata!,
-      parentEntityId: _parentEntityId!,
-      parentEntityType: _parentEntityType!,
-      updatedAt: _updatedAt!,
+      createdAt: _createdAt,
+      metadata: _metadata ?? {},
+      parentEntityId: _parentEntityId,
+      parentEntityType: _parentEntityType,
+      updatedAt: _updatedAt,
     );
   }
 }
