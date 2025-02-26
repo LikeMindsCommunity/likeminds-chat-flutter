@@ -58,3 +58,7 @@
 
 - Replaced `open_filex` with `open_file` plugin
 - Removed `flutter_keyboard_visibility` plugin
+
+### 0.13.0
+
+- Added Custom Widget support in Chatroom
