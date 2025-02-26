@@ -181,11 +181,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                   _defaultStateBubble(stateMessage),
                 );
               }
-              return item.memberId == user.id
-                  ? _screenBuilder.sentChatBubbleBuilder(
-                      context, item, _defaultSentChatBubble(item))
-                  : _screenBuilder.receivedChatBubbleBuilder(
-                      context, item, _defaultReceivedChatBubble(item));
+              return conversationWithCustomWidget(item)
+                  ? _screenBuilder.customChatBubbleBuilder(
+                      context, item, widget.chatroomId)
+                  : item.memberId == user.id
+                      ? _screenBuilder.sentChatBubbleBuilder(
+                          context, item, _defaultSentChatBubble(item))
+                      : _screenBuilder.receivedChatBubbleBuilder(
+                          context, item, _defaultReceivedChatBubble(item));
             },
           );
         },
@@ -728,6 +731,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               state.getConversationResponse.conversationAttachmentsMeta,
           reactionMeta: state.getConversationResponse.conversationReactionMeta,
           conversationMeta: state.getConversationResponse.conversationMeta,
+          widgets: state.getConversationResponse.widgets,
         );
         // Add attachments to the conversation object explicitly
         if (conversationAttachmentsMeta.containsKey(conv.id.toString())) {
@@ -1365,5 +1369,11 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     // again setting [_animateToChatId] to null for removing selection state
     _animateToChatId = null;
     rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  /// This function checks if the conversation
+  /// has custom widget or not
+  bool conversationWithCustomWidget(LMChatConversationViewData conversation) {
+    return conversation.widgetId != null && conversation.widget != null;
   }
 }

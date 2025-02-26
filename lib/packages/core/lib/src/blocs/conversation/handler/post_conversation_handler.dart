@@ -9,25 +9,6 @@ postConversationEventHandler(
   final tempId = "-${dateTime.millisecondsSinceEpoch.toString()}";
   try {
     User user = LMChatLocalPreference.instance.getUser();
-    LMChatConversationViewData conversationViewData =
-        (LMChatConversationViewDataBuilder()
-              ..answer(event.text)
-              ..chatroomId(event.chatroomId)
-              ..createdAt("")
-              ..memberId(user.id)
-              ..header("")
-              ..date(DateFormat('dd MMM yyyy').format(dateTime))
-              ..attachmentsUploaded(false)
-              ..replyId(event.replyId)
-              ..replyConversationObject(event.repliedTo)
-              ..hasFiles(event.hasFiles ?? false)
-              ..member(user.toUserViewData())
-              ..temporaryId(tempId)
-              ..createdEpoch(dateTime.millisecondsSinceEpoch)
-              ..id(1))
-            .build();
-
-    emit(LMChatLocalConversationState(conversationViewData));
 
     final PostConversationRequestBuilder postConversationRequest =
         PostConversationRequestBuilder()
@@ -37,6 +18,42 @@ postConversationEventHandler(
           ..triggerBot(event.triggerBot ?? false)
           ..hasFiles(event.hasFiles ?? false)
           ..temporaryId(tempId);
+
+    LMChatConversationViewDataBuilder conversationViewDataBuilder =
+        LMChatConversationViewDataBuilder()
+          ..answer(event.text)
+          ..chatroomId(event.chatroomId)
+          ..createdAt("")
+          ..memberId(user.id)
+          ..header("")
+          ..date(DateFormat('dd MMM yyyy').format(dateTime))
+          ..attachmentsUploaded(false)
+          ..replyId(event.replyId)
+          ..replyConversationObject(event.repliedTo)
+          ..hasFiles(event.hasFiles ?? false)
+          ..member(user.toUserViewData())
+          ..temporaryId(tempId)
+          ..createdEpoch(dateTime.millisecondsSinceEpoch)
+          ..id(1);
+
+    if (event.metadata != null) {
+      postConversationRequest.metadata(event.metadata!);
+
+      LMChatWidgetViewData widgetViewData = (LMWidgetViewDataBuilder()
+            ..id(tempId)
+            ..metadata(event.metadata))
+          .build();
+
+      conversationViewDataBuilder
+        ..widget(widgetViewData)
+        ..widgetId(tempId);
+    }
+
+    LMChatConversationViewData conversationViewData =
+        conversationViewDataBuilder.build();
+
+    emit(LMChatLocalConversationState(conversationViewData));
+
     if (event.replyId == null &&
         event.shareLink != null &&
         event.shareLink!.isNotEmpty) {
