@@ -5,12 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
-import 'package:likeminds_chat_flutter_core/src/convertors/poll/poll_option_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/services/media_service.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/media/media_handler.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 part 'conversation_event.dart';
 part 'conversation_state.dart';
@@ -33,10 +29,21 @@ class LMChatConversationBloc
   /// Last conversation id for this instance of [LMChatConversationBloc]
   int? lastConversationId;
 
+  /// A reference to the real-time database for the chatroom.
+  ///
+  /// This is an instance of [DatabaseReference] obtained from the
+  /// [LMChatRealtime] singleton. It is used to interact with the
+  /// real-time chatroom data in the Firebase Realtime Database.
   final DatabaseReference realTime = LMChatRealtime.instance.chatroom();
 
   static LMChatConversationBloc? _instance;
-  static int? _currentChatroomId;
+
+  /// The ID of the current chatroom.
+  ///
+  /// This is a static variable that holds the ID of the chatroom that is
+  /// currently active or being interacted with. It can be `null` if no
+  /// chatroom is currently selected.
+  static int? currentChatroomId;
 
   /// The reply conversation if user taps on reply and is not present in the current list
   static LMChatConversationViewData? replyConversation;
@@ -70,28 +77,42 @@ class LMChatConversationBloc
 
   @override
   Future<void> close() {
-    _currentChatroomId = null;
+    currentChatroomId = null;
     LMChatConversationBloc.replyConversation = null;
     return super.close();
   }
 
+  /// Handles the initialization of conversation events.
+  ///
+  /// This method sets the current chatroom ID and the last conversation ID
+  /// from the provided event. It also listens for real-time updates on child
+  /// changes and triggers an update event if a new conversation is detected.
+  ///
+  /// Parameters:
+  /// - `event`: The event containing the chatroom ID and conversation ID to initialize.
+  /// - `emit`: The emitter used to emit new states.
+  ///
+  /// Listens to:
+  /// - `realTime.onChildChanged`: Listens for changes in the real-time database.
+  ///   If a change is detected and it is not the same as the last conversation ID,
+  ///   an update event is added to the conversation bloc.
   initialiseConversationsEventHandler(
     LMChatInitialiseConversationsEvent event,
     Emitter<LMChatConversationState> emit,
   ) async {
-    _currentChatroomId = event.chatroomId;
+    currentChatroomId = event.chatroomId;
     lastConversationId = event.conversationId;
 
     realTime.onChildChanged.listen(
       (event) {
-        if (event.snapshot.value != null && _currentChatroomId != null) {
+        if (event.snapshot.value != null && currentChatroomId != null) {
           final response = event.snapshot.value as Map;
           final conversationId = int.tryParse(response["answer_id"]);
           if (lastConversationId != null &&
               conversationId != lastConversationId &&
               conversationId != null) {
             LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
-              chatroomId: _currentChatroomId!,
+              chatroomId: currentChatroomId!,
               conversationId: conversationId,
             ));
           }
