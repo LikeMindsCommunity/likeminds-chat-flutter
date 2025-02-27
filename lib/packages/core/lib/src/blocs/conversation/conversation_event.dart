@@ -32,12 +32,31 @@ class LMChatFetchConversationsEvent extends LMChatConversationEvent {
   /// Number of conversations to be fetched
   final int pageSize;
 
+  /// Minimum timestamp for filtering conversations.
+  /// If provided, only conversations after this timestamp will be fetched.
   final int? minTimestamp;
+
+  /// Maximum timestamp for filtering conversations.
+  /// If provided, only conversations before this timestamp will be fetched.
   final int? maxTimestamp;
+
+  /// Direction of pagination for fetching conversations.
+  /// This determines whether to fetch newer or older conversations.
   final LMPaginationDirection direction;
+
+  /// ID of the last conversation fetched.
+  /// Used for pagination to fetch the next set of conversations.
   final int? lastConversationId;
+
+  /// ID of the conversation being replied to, if any.
   final int? replyId;
+
+  /// Order in which conversations should be fetched.
+  /// Can be ascending or descending.
   final OrderBy? orderBy;
+
+  /// Flag indicating whether to reinitialize the conversation list.
+  /// If true, the conversation list will be reinitialized.
   final bool reInitialize;
 
   /// Creates and returns a new instance of [LMChatFetchConversationsEvent]
@@ -95,6 +114,10 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
   /// Trigger bot of the conversation
   final bool? triggerBot;
 
+  /// A map containing additional metadata for the conversation event.
+  /// This can be used to store any extra information related to the event.
+  final Map<String, dynamic>? metadata;
+
   /// Creates and returns a new instance of [LMChatPostConversationEvent]
   LMChatPostConversationEvent({
     required this.chatroomId,
@@ -105,6 +128,7 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
     this.attachmentCount,
     this.hasFiles,
     this.triggerBot,
+    this.metadata,
   });
 
   @override
@@ -117,12 +141,16 @@ class LMChatPostConversationEvent extends LMChatConversationEvent {
         attachmentCount,
         hasFiles,
         triggerBot,
+        metadata,
       ];
 }
 
 /// Event responsible for creating and posting a multimedia conversation
 class LMChatPostMultiMediaConversationEvent extends LMChatConversationEvent {
+  /// Request object containing the details of the conversation to be posted
   final PostConversationRequest postConversationRequest;
+
+  /// List of media files to be included in the conversation
   final List<LMChatMediaModel> mediaFiles;
 
   /// Creates and returns a new instance of [LMChatPostMultiMediaConversationEvent]
