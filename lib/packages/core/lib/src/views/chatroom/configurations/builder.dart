@@ -1,16 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/widget_source.dart';
-import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_menu.dart';
 
 /// {@template lm_chatroom_builder}
 /// [LMChatroomBuilderDelegate] is a class which is used to build the chatroom
@@ -159,6 +149,7 @@ class LMChatroomBuilderDelegate {
   }
 
   /// Builds the floating action button for chatroom
+  /// it is used to display scroll to bottom button
   Widget floatingActionButton(LMChatButton floatingActionButton) {
     return floatingActionButton;
   }
