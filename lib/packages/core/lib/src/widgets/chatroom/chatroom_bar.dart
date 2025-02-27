@@ -501,7 +501,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       clipBehavior: Clip.none,
       children: [
         _defaultLockRecordingOverlay(),
-        _defVoiceButton(context),
+        _defVoiceButtonBuilder(context),
       ],
     );
   }
@@ -1060,145 +1060,149 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     );
   }
 
-  Widget _defVoiceButton(BuildContext context) {
+  Widget _defVoiceButtonBuilder(BuildContext context) {
     return ValueListenableBuilder<bool>(
       valueListenable: _isVoiceButtonHeld,
       builder: (context, isHeld, child) {
-        return LMChatButton(
-          gesturesEnabled: true,
-          onTap: () {
-            HapticFeedback.lightImpact();
-            toast(
-              "Hold to start recording",
-              duration: const Duration(milliseconds: 300),
-            );
-          },
-          onLongPress: () {
-            // Set held state before starting recording
-            _isVoiceButtonHeld.value = true;
-            _startRecording();
-          },
-          onHorizontalDragUpdate: (details) {
-            if (_isVoiceButtonHeld.value) {
-              if (details.delta.dx < -120) {
-                if (!_cancelAnimationController.isAnimating) {
-                  // Let the voice button return to original position immediately
-                  // but keep recording container visible until animation completes
-                  _cancelAnimationController.forward().then((_) {
-                    // Only update voice button held state after animation
-                    _isVoiceButtonHeld.value = false;
-                    HapticFeedback.lightImpact();
-                    _stopRecordingTimer();
-                    _handleDeleteRecording();
-                    _cancelAnimationController.reset();
-                    toast(
-                      "Voice recording cancelled",
-                      duration: const Duration(milliseconds: 300),
-                    );
-                  });
-                }
-              }
-            }
-          },
-          onVerticalDragUpdate: (details) {
-            if (_isVoiceButtonHeld.value) {
-              // Calculate the progress based on drag distance
-              // Assuming 75 is the threshold for locking
-              final progress = math.min(1.0, -details.delta.dy / 75);
-              _lockSlideController.value = progress;
+        return _screenBuilder.voiceNotesButton(context, _defVoiceNoteButton());
+      },
+    );
+  }
 
-              if (details.delta.dy < -75) {
+  LMChatButton _defVoiceNoteButton() {
+    return LMChatButton(
+      gesturesEnabled: true,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        toast(
+          "Hold to start recording",
+          duration: const Duration(milliseconds: 300),
+        );
+      },
+      onLongPress: () {
+        // Set held state before starting recording
+        _isVoiceButtonHeld.value = true;
+        _startRecording();
+      },
+      onHorizontalDragUpdate: (details) {
+        if (_isVoiceButtonHeld.value) {
+          if (details.delta.dx < -120) {
+            if (!_cancelAnimationController.isAnimating) {
+              // Let the voice button return to original position immediately
+              // but keep recording container visible until animation completes
+              _cancelAnimationController.forward().then((_) {
+                // Only update voice button held state after animation
+                _isVoiceButtonHeld.value = false;
                 HapticFeedback.lightImpact();
-                _isRecordingLocked.value = true;
+                _stopRecordingTimer();
+                _handleDeleteRecording();
+                _cancelAnimationController.reset();
                 toast(
-                  "Voice recording locked",
+                  "Voice recording cancelled",
                   duration: const Duration(milliseconds: 300),
                 );
-                _overlayPortalController.hide();
-              }
+              });
             }
-          },
-          onLongPressEnd: (details) async {
-            _overlayPortalController.hide();
-            _lockSlideController.value = 0.0; // Reset the animation
+          }
+        }
+      },
+      onVerticalDragUpdate: (details) {
+        if (_isVoiceButtonHeld.value) {
+          // Calculate the progress based on drag distance
+          // Assuming 75 is the threshold for locking
+          final progress = math.min(1.0, -details.delta.dy / 75);
+          _lockSlideController.value = progress;
 
-            // If recording is locked or animation is playing, don't stop recording
-            if (_isRecordingLocked.value ||
-                _cancelAnimationController.isAnimating) {
+          if (details.delta.dy < -75) {
+            HapticFeedback.lightImpact();
+            _isRecordingLocked.value = true;
+            toast(
+              "Voice recording locked",
+              duration: const Duration(milliseconds: 300),
+            );
+            _overlayPortalController.hide();
+          }
+        }
+      },
+      onLongPressEnd: (details) async {
+        _overlayPortalController.hide();
+        _lockSlideController.value = 0.0; // Reset the animation
+
+        // If recording is locked or animation is playing, don't stop recording
+        if (_isRecordingLocked.value ||
+            _cancelAnimationController.isAnimating) {
+          return;
+        }
+
+        if (!_isVoiceButtonHeld.value) return;
+
+        try {
+          final audioHandler = LMChatCoreAudioHandler.instance;
+          HapticFeedback.mediumImpact();
+
+          final recordedDuration = _recordingDuration.value;
+          _stopRecordingTimer();
+
+          final recordingPath = await audioHandler.stopRecording(
+            recordedDuration: recordedDuration,
+          );
+
+          if (recordingPath != null) {
+            if (recordedDuration.inSeconds < 1) {
+              toast("Voice recording too short");
+              _handleDeleteRecording();
               return;
             }
 
-            if (!_isVoiceButtonHeld.value) return;
+            _recordedFilePath = recordingPath;
+            _isReviewingRecording.value = true;
+            _isVoiceButtonHeld.value = false;
 
-            try {
-              final audioHandler = LMChatCoreAudioHandler.instance;
-              HapticFeedback.mediumImpact();
+            _playbackProgress.value = PlaybackProgress(
+              duration: recordedDuration,
+              position: Duration.zero,
+            );
 
-              final recordedDuration = _recordingDuration.value;
-              _stopRecordingTimer();
-
-              final recordingPath = await audioHandler.stopRecording(
-                recordedDuration: recordedDuration,
-              );
-
-              if (recordingPath != null) {
-                if (recordedDuration.inSeconds < 1) {
-                  toast("Voice recording too short");
-                  _handleDeleteRecording();
-                  return;
-                }
-
-                _recordedFilePath = recordingPath;
-                _isReviewingRecording.value = true;
-                _isVoiceButtonHeld.value = false;
-
+            audioHandler.getProgressStream(recordingPath).listen(
+              (progress) {
                 _playbackProgress.value = PlaybackProgress(
                   duration: recordedDuration,
-                  position: Duration.zero,
+                  position: progress.position,
+                  isCompleted: progress.isCompleted,
                 );
-
-                audioHandler.getProgressStream(recordingPath).listen(
-                  (progress) {
-                    _playbackProgress.value = PlaybackProgress(
-                      duration: recordedDuration,
-                      position: progress.position,
-                      isCompleted: progress.isCompleted,
-                    );
-                    if (progress.isCompleted == true) {
-                      _isPlaying.value = false;
-                    }
-                  },
-                  onError: (error) {
-                    debugPrint('Playback error: $error');
-                    _handleRecordingError();
-                  },
-                );
-              } else {
-                _resetRecordingState();
-              }
-            } catch (e) {
-              debugPrint('Voice recording error: $e');
-              _handleRecordingError();
-            }
-          },
-          style: LMChatButtonStyle(
-            backgroundColor: _themeData.primaryColor,
-            borderRadius: 100,
-            height: 6.h,
-            width: 6.h,
-            scaleOnLongPress: 1.6,
-          ),
-          icon: LMChatIcon(
-            type: LMChatIconType.icon,
-            icon: Icons.mic,
-            style: LMChatIconStyle(
-              size: 28,
-              boxSize: 28,
-              color: _themeData.container,
-            ),
-          ),
-        );
+                if (progress.isCompleted == true) {
+                  _isPlaying.value = false;
+                }
+              },
+              onError: (error) {
+                debugPrint('Playback error: $error');
+                _handleRecordingError();
+              },
+            );
+          } else {
+            _resetRecordingState();
+          }
+        } catch (e) {
+          debugPrint('Voice recording error: $e');
+          _handleRecordingError();
+        }
       },
+      style: LMChatButtonStyle(
+        backgroundColor: _themeData.primaryColor,
+        borderRadius: 100,
+        height: 6.h,
+        width: 6.h,
+        scaleOnLongPress: 1.6,
+      ),
+      icon: LMChatIcon(
+        type: LMChatIconType.icon,
+        icon: Icons.mic,
+        style: LMChatIconStyle(
+          size: 28,
+          boxSize: 28,
+          color: _themeData.container,
+        ),
+      ),
     );
   }
 

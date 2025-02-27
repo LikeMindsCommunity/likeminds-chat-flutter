@@ -235,7 +235,7 @@ class LMChatroomBuilderDelegate {
     return oldLinkPreviewBar;
   }
 
-  /// Builds the chatroom menu.
+  /// Builds the send button for chatroom
   Widget sendButton(
     BuildContext context,
     TextEditingController textController,
@@ -243,6 +243,15 @@ class LMChatroomBuilderDelegate {
     LMChatButton sendButton,
   ) {
     return sendButton;
+  }
+
+  /// Builds the start voice recording button for chatroom
+  /// This button is used to start voice recording
+  Widget voiceNotesButton(
+    BuildContext context,
+    LMChatButton voiceNotesButton,
+  ) {
+    return voiceNotesButton;
   }
 
   /// Builds the chatroom menu
