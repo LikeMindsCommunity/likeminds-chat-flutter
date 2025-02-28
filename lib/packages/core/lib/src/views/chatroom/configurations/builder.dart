@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
@@ -197,7 +198,20 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     LMChatroomBar chatBar,
   ) {
-    return chatBar;
+    return chatBar.copyWith();
+  }
+
+  /// Builds the whole container for the bottom bar
+  /// which includes the chatroom text field, voice notes button and send button
+  Widget chatroomBottomBarContainer(
+    BuildContext context,
+    Container chatroomBottomBar,
+    LMChatButton sendButton,
+    Widget voiceNotesButton,
+    LMChatTextField chatroomTextField,
+    CustomPopupMenu? attachmentMenu,
+  ) {
+    return chatroomBottomBar;
   }
 
   /// Builds the chatroom text field.
@@ -205,6 +219,7 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     TextEditingController textController,
     LMChatTextField chatroomTextField,
+     CustomPopupMenu? attachmentMenu,
   ) {
     return chatroomTextField;
   }
@@ -252,6 +267,16 @@ class LMChatroomBuilderDelegate {
     LMChatButton voiceNotesButton,
   ) {
     return voiceNotesButton;
+  }
+
+  /// Builds the lock icon during voice recording
+  /// This icon is displayed when voice recording is in progress
+  Widget voiceNotesLockIcon(
+    BuildContext context,
+    LMChatIcon voiceNotesLockIcon,
+    double animationValue,
+  ) {
+    return voiceNotesLockIcon;
   }
 
   /// Builds the chatroom menu
