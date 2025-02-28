@@ -232,6 +232,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                           chatroom,
                           chatroomState.participantCount,
                         ),
+                        chatroomState.participantCount,
                       ),
                     ),
                     Expanded(

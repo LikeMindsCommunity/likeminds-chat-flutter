@@ -102,6 +102,8 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     LMChatRoomViewData chatroom,
     LMChatAppBar appBar,
+    int participantsCount,
+    
   ) {
     return appBar;
   }
