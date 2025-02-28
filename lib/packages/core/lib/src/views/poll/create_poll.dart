@@ -946,7 +946,7 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
           InputDecoration(
             fillColor: LMChatTheme.isThemeDark
                 ? theme.backgroundColor
-                : theme.textFieldStyle.backgroundColor,
+                : theme.textFieldStyle.inputDecoration?.fillColor,
             filled: true,
             hintText: 'Ask a question',
             hintStyle: TextStyle(
@@ -1139,7 +1139,7 @@ class _LMChatOptionTileState extends State<LMChatOptionTile> {
             InputDecoration(
               fillColor: LMChatTheme.isThemeDark
                   ? theme.backgroundColor
-                  : theme.textFieldStyle.backgroundColor,
+                  : theme.textFieldStyle.inputDecoration?.fillColor,
               filled: true,
               hintText: 'Option ${widget.index + 1}',
               hintStyle: TextStyle(
