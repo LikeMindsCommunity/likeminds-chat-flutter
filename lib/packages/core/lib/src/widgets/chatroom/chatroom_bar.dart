@@ -11,7 +11,6 @@ import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_right
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_menu.dart';
 
 /// {@template lm_chatroom_bar}
 /// A widget to display the chatroom bar.
@@ -362,71 +361,77 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           bloc: chatActionBloc,
           listener: _blocListener,
           builder: (context, state) {
-            return Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.only(
-                    left: 2.w,
-                    right: 2.w,
-                    top: 1.5.h,
-                    bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : 1.5.h,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      ValueListenableBuilder<bool>(
-                        valueListenable: _isVoiceButtonHeld,
-                        builder: (context, isHeld, child) {
-                          return isHeld || _isReviewingRecording.value
-                              ? _defRecordingContainer(context)
-                              : _isRespondingAllowed()
-                                  ? _defTextField(context)
-                                  : _defDisabledTextField(context);
-                        },
-                      ),
-                      _isRespondingAllowed()
-                          ? ValueListenableBuilder<bool>(
-                              valueListenable: _isRecordingLocked,
-                              builder: (context, isLocked, child) {
-                                return ValueListenableBuilder<bool>(
-                                  valueListenable: _isReviewingRecording,
-                                  builder: (context, isReviewing, child) {
-                                    return ValueListenableBuilder<String>(
-                                      valueListenable: _textInputNotifier,
-                                      builder: (context, text, child) {
-                                        final shouldShowSendButton =
-                                            text.trim().isNotEmpty ||
-                                                isReviewing ||
-                                                isLocked ||
-                                                (widget.chatroom.type == 10 &&
-                                                    isOtherUserAIChatbot(
-                                                        widget.chatroom));
-
-                                        return shouldShowSendButton
-                                            ? _screenBuilder.sendButton(
-                                                context,
-                                                _textEditingController,
-                                                _onSend,
-                                                _defSendButton(context),
-                                              )
-                                            : _defVoiceOverlayLayout(context);
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                ),
-              ],
+            return _screenBuilder.chatroomBottomBarContainer(
+              context,
+              _defTextFieldContainer(),
+              _defSendButton(context),
+              _defVoiceOverlayLayout(context),
+              _defInnerTextField(context),
+              _defAttachmentButton(),
             );
           },
         ),
       ],
+    );
+  }
+
+  Container _defTextFieldContainer() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(
+        left: 2.w,
+        right: 2.w,
+        top: 1.5.h,
+        bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : 1.5.h,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          ValueListenableBuilder<bool>(
+            valueListenable: _isVoiceButtonHeld,
+            builder: (context, isHeld, child) {
+              return isHeld || _isReviewingRecording.value
+                  ? _defRecordingContainer(context)
+                  : _isRespondingAllowed()
+                      ? _defTextField(context)
+                      : _defDisabledTextField(context);
+            },
+          ),
+          _isRespondingAllowed()
+              ? ValueListenableBuilder<bool>(
+                  valueListenable: _isRecordingLocked,
+                  builder: (context, isLocked, child) {
+                    return ValueListenableBuilder<bool>(
+                      valueListenable: _isReviewingRecording,
+                      builder: (context, isReviewing, child) {
+                        return ValueListenableBuilder<String>(
+                          valueListenable: _textInputNotifier,
+                          builder: (context, text, child) {
+                            final shouldShowSendButton =
+                                text.trim().isNotEmpty ||
+                                    isReviewing ||
+                                    isLocked ||
+                                    (widget.chatroom.type == 10 &&
+                                        isOtherUserAIChatbot(widget.chatroom));
+
+                            return shouldShowSendButton
+                                ? _screenBuilder.sendButton(
+                                    context,
+                                    _textEditingController,
+                                    _onSend,
+                                    _defSendButton(context),
+                                  )
+                                : _defVoiceOverlayLayout(context);
+                          },
+                        );
+                      },
+                    );
+                  },
+                )
+              : const SizedBox.shrink(),
+        ],
+      ),
     );
   }
 
@@ -459,18 +464,23 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          _lockSlideAnimation.value > 0.7
-                              ? Icons.lock_outline
-                              : Icons.lock_open_outlined,
-                          key: ValueKey(_lockSlideAnimation.value > 0.7),
-                          color: _themeData.onContainer.withOpacity(
-                            0.3 + (_lockSlideAnimation.value * 0.7),
-                          ),
-                          size: 24,
-                        ),
-                      ),
+                          duration: const Duration(milliseconds: 200),
+                          child: _screenBuilder.voiceNotesLockIcon(
+                              context,
+                              LMChatIcon(
+                                type: LMChatIconType.icon,
+                                icon: _lockSlideAnimation.value > 0.7
+                                    ? Icons.lock_outline
+                                    : Icons.lock_open_outlined,
+                                key: ValueKey(_lockSlideAnimation.value > 0.7),
+                                style: LMChatIconStyle(
+                                  color: _themeData.onContainer.withOpacity(
+                                    0.3 + (_lockSlideAnimation.value * 0.7),
+                                  ),
+                                  size: 24,
+                                ),
+                              ),
+                              _lockSlideAnimation.value)),
                       const SizedBox(height: 8),
                       Container(
                         height: 48,
@@ -536,36 +546,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             minHeight: 5.2.h,
             maxHeight: 24.h,
           ),
-          decoration: BoxDecoration(
-            color: _themeData.container,
-            borderRadius: editConversation == null &&
-                    replyToConversation == null &&
-                    !isActiveLink
-                ? BorderRadius.circular(24)
-                : const BorderRadius.vertical(
-                    bottom: Radius.circular(24),
-                  ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 12,
-              right: 12,
-              top: 2,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: _screenBuilder.chatroomTextField(
-                    context,
-                    _textEditingController,
-                    _defInnerTextField(context),
-                  ),
-                ),
-                const SizedBox(width: 2),
-                _defAttachmentButton(),
-              ],
-            ),
+          child: _screenBuilder.chatroomTextField(
+            context,
+            _textEditingController,
+            _defInnerTextField(context),
+            _defAttachmentButton(),
           ),
         ),
       ],
@@ -641,7 +626,36 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       onChange: _onTextChanged,
       controller: _textEditingController,
       decoration: InputDecoration(
-        border: InputBorder.none,
+        border: OutlineInputBorder(
+          borderRadius: editConversation == null &&
+                  replyToConversation == null &&
+                  !isActiveLink
+              ? BorderRadius.circular(24)
+              : const BorderRadius.vertical(
+                  bottom: Radius.circular(24),
+                ),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: editConversation == null &&
+                  replyToConversation == null &&
+                  !isActiveLink
+              ? BorderRadius.circular(24)
+              : const BorderRadius.vertical(
+                  bottom: Radius.circular(24),
+                ),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: editConversation == null &&
+                  replyToConversation == null &&
+                  !isActiveLink
+              ? BorderRadius.circular(24)
+              : const BorderRadius.vertical(
+                  bottom: Radius.circular(24),
+                ),
+          borderSide: BorderSide.none,
+        ),
         enabled: true,
         hintMaxLines: 1,
         hintStyle: TextStyle(
@@ -649,6 +663,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           color: LMChatTheme.theme.onContainer.withOpacity(0.5),
         ),
         hintText: _getChatBarHintText(),
+        suffixIcon: _defAttachmentButton(),
+        fillColor: _themeData.container,
+        filled: true,
       ),
       focusNode: _focusNode,
     );
@@ -1206,7 +1223,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     );
   }
 
-  Widget _defAttachmentButton() {
+  CustomPopupMenu? _defAttachmentButton() {
     return _isRespondingAllowed()
         ? CustomPopupMenu(
             controller: _popupMenuController,
@@ -1217,7 +1234,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             pressType: PressType.singleClick,
             child: _defAttachmentIcon(),
           )
-        : const SizedBox();
+        : null;
   }
 
   Widget _defAttachmentMenu() {
@@ -1338,10 +1355,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       style: LMChatIconStyle(
         size: 24,
         boxSize: 48,
-        boxPadding: const EdgeInsets.only(
-          bottom: 6,
-          left: 6,
-        ),
         color: _themeData.inActiveColor,
       ),
     );
