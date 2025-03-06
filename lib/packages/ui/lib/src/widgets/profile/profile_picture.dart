@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -23,9 +24,15 @@ class LMChatProfilePicture extends StatelessWidget {
   final LMChatProfilePictureStyle? style;
   final Widget? overlay;
 
+  // Determines if the image is an SVG image based on the file extension of the URL
+  bool _isSvgImage() {
+    return imageUrl != null && imageUrl!.endsWith('.svg');
+  }
+
   @override
   Widget build(BuildContext context) {
     final inStyle = style ?? LMChatProfilePictureStyle.basic();
+    final isSvgImage = _isSvgImage();
     return AbsorbPointer(
       absorbing: onTap == null,
       child: GestureDetector(
@@ -58,35 +65,46 @@ class LMChatProfilePicture extends StatelessWidget {
                         image: FileImage(File(filePath!)),
                         fit: BoxFit.cover,
                       )
-                    : imageUrl != null && imageUrl!.isNotEmpty
+                    : imageUrl != null && imageUrl!.isNotEmpty && !isSvgImage
                         ? DecorationImage(
                             image: NetworkImage(imageUrl!),
                             fit: BoxFit.cover,
                           )
                         : null,
               ),
-              padding: inStyle.textPadding ?? const EdgeInsets.all(5),
-              child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
+              padding: !isSvgImage
+                  ? inStyle.textPadding ?? const EdgeInsets.all(5)
+                  : EdgeInsets.zero,
+              child: isSvgImage ||
+                      (imageUrl == null || imageUrl!.isEmpty) &&
+                          filePath == null
                   ? Center(
-                      child: LMChatText(
-                        getInitials(fallbackText).toUpperCase(),
-                        style: inStyle.fallbackTextStyle ??
-                            LMChatTextStyle(
-                              maxLines: 1,
-                              minLines: 1,
-                              textAlign: TextAlign.center,
-                              textStyle: TextStyle(
-                                overflow: TextOverflow.clip,
-                                color: LMChatTheme.isThemeDark
-                                    ? LMChatTheme.theme.onContainer
-                                    : LMChatTheme.theme.onPrimary,
-                                fontSize: inStyle.size != null
-                                    ? inStyle.size! / 2
-                                    : 24,
-                                fontWeight: FontWeight.w600,
-                              ),
+                      child: _isSvgImage()
+                          ? SvgPicture.network(
+                              imageUrl!,
+                              fit: BoxFit.cover,
+                              height: inStyle.size,
+                              width: inStyle.size,
+                            )
+                          : LMChatText(
+                              getInitials(fallbackText).toUpperCase(),
+                              style: inStyle.fallbackTextStyle ??
+                                  LMChatTextStyle(
+                                    maxLines: 1,
+                                    minLines: 1,
+                                    textAlign: TextAlign.center,
+                                    textStyle: TextStyle(
+                                      overflow: TextOverflow.clip,
+                                      color: LMChatTheme.isThemeDark
+                                          ? LMChatTheme.theme.onContainer
+                                          : LMChatTheme.theme.onPrimary,
+                                      fontSize: inStyle.size != null
+                                          ? inStyle.size! / 2
+                                          : 24,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                             ),
-                      ),
                     )
                   : null,
             ),
