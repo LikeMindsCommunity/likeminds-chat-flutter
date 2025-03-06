@@ -103,7 +103,6 @@ class LMChatroomBuilderDelegate {
     LMChatRoomViewData chatroom,
     LMChatAppBar appBar,
     int participantsCount,
-    
   ) {
     return appBar;
   }
@@ -221,7 +220,7 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     TextEditingController textController,
     LMChatTextField chatroomTextField,
-     CustomPopupMenu? attachmentMenu,
+    CustomPopupMenu? attachmentMenu,
   ) {
     return chatroomTextField;
   }

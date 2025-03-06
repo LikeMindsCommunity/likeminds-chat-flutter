@@ -386,7 +386,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           ValueListenableBuilder<bool>(
             valueListenable: _isVoiceButtonHeld,
@@ -415,14 +414,27 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                                     (widget.chatroom.type == 10 &&
                                         isOtherUserAIChatbot(widget.chatroom));
 
-                            return shouldShowSendButton
-                                ? _screenBuilder.sendButton(
-                                    context,
-                                    _textEditingController,
-                                    _onSend,
-                                    _defSendButton(context),
-                                  )
-                                : _defVoiceOverlayLayout(context);
+                            return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              transitionBuilder: (child, animation) {
+                                // combine the scale with a fade
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: ScaleTransition(
+                                    scale: animation,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: shouldShowSendButton
+                                  ? _screenBuilder.sendButton(
+                                      context,
+                                      _textEditingController,
+                                      _onSend,
+                                      _defSendButton(context),
+                                    )
+                                  : _defVoiceOverlayLayout(context),
+                            );
                           },
                         );
                       },
@@ -660,7 +672,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         hintMaxLines: 1,
         hintStyle: TextStyle(
           fontSize: 14,
-          color: LMChatTheme.theme.onContainer.withOpacity(0.5),
+          color: _themeData.inActiveColor,
         ),
         hintText: _getChatBarHintText(),
         suffixIcon: _defAttachmentButton(),
@@ -1061,15 +1073,15 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       style: LMChatButtonStyle(
         backgroundColor: _themeData.primaryColor,
         borderRadius: 100,
-        height: 6.h,
-        width: 6.h,
+        height: 50,
+        width: 50,
       ),
       icon: LMChatIcon(
         type: LMChatIconType.icon,
         icon: Icons.send,
         style: LMChatIconStyle(
-          size: 28,
-          boxSize: 28,
+          size: 26,
+          boxSize: 26,
           boxPadding: const EdgeInsets.only(left: 2),
           color: _themeData.container,
         ),
@@ -1207,16 +1219,16 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       style: LMChatButtonStyle(
         backgroundColor: _themeData.primaryColor,
         borderRadius: 100,
-        height: 6.h,
-        width: 6.h,
+        height: 50,
+        width: 50,
         scaleOnLongPress: 1.6,
       ),
       icon: LMChatIcon(
         type: LMChatIconType.icon,
         icon: Icons.mic,
         style: LMChatIconStyle(
-          size: 28,
-          boxSize: 28,
+          size: 26,
+          boxSize: 26,
           color: _themeData.container,
         ),
       ),
