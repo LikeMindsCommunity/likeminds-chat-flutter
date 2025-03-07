@@ -1,16 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
-import 'package:likeminds_chat_flutter_core/src/core/configurations/widget_source.dart';
-import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/text_field/text_field.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_menu.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_bar_menu.dart';
 
 /// {@template lm_chatroom_builder}
 /// [LMChatroomBuilderDelegate] is a class which is used to build the chatroom
@@ -111,6 +101,7 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     LMChatRoomViewData chatroom,
     LMChatAppBar appBar,
+    int participantsCount,
   ) {
     return appBar;
   }
@@ -165,6 +156,7 @@ class LMChatroomBuilderDelegate {
   }
 
   /// Builds the floating action button for chatroom
+  /// it is used to display scroll to bottom button
   Widget floatingActionButton(LMChatButton floatingActionButton) {
     return floatingActionButton;
   }
@@ -206,7 +198,20 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     LMChatroomBar chatBar,
   ) {
-    return chatBar;
+    return chatBar.copyWith();
+  }
+
+  /// Builds the whole container for the bottom bar
+  /// which includes the chatroom text field, voice notes button and send button
+  Widget chatroomBottomBarContainer(
+    BuildContext context,
+    Container chatroomBottomBar,
+    LMChatButton sendButton,
+    Widget voiceNotesButton,
+    LMChatTextField chatroomTextField,
+    CustomPopupMenu? attachmentMenu,
+  ) {
+    return chatroomBottomBar;
   }
 
   /// Builds the chatroom text field.
@@ -214,6 +219,7 @@ class LMChatroomBuilderDelegate {
     BuildContext context,
     TextEditingController textController,
     LMChatTextField chatroomTextField,
+    CustomPopupMenu? attachmentMenu,
   ) {
     return chatroomTextField;
   }
@@ -244,7 +250,7 @@ class LMChatroomBuilderDelegate {
     return oldLinkPreviewBar;
   }
 
-  /// Builds the chatroom menu.
+  /// Builds the send button for chatroom
   Widget sendButton(
     BuildContext context,
     TextEditingController textController,
@@ -252,6 +258,25 @@ class LMChatroomBuilderDelegate {
     LMChatButton sendButton,
   ) {
     return sendButton;
+  }
+
+  /// Builds the start voice recording button for chatroom
+  /// This button is used to start voice recording
+  Widget voiceNotesButton(
+    BuildContext context,
+    LMChatButton voiceNotesButton,
+  ) {
+    return voiceNotesButton;
+  }
+
+  /// Builds the lock icon during voice recording
+  /// This icon is displayed when voice recording is in progress
+  Widget voiceNotesLockIcon(
+    BuildContext context,
+    LMChatIcon voiceNotesLockIcon,
+    double animationValue,
+  ) {
+    return voiceNotesLockIcon;
   }
 
   /// Builds the chatroom menu

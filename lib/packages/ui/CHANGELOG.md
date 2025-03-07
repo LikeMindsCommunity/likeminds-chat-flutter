@@ -63,3 +63,8 @@
 ### 0.13.0
 
 - Added Custom Widget support in Chatroom
+
+### 0.14.0
+
+- Fixed Customization misses across the SDK
+- Added support for .svg `fileUrl` in `LMChatImage`

@@ -13,6 +13,7 @@ class LMChatroomMenu extends StatefulWidget {
   final List<ChatroomAction> chatroomActions;
   final CustomPopupMenuController? controller;
   final LMChatCustomPopupMenuStyle? style;
+  final LMChatIconBuilder? iconBuilder;
 
   const LMChatroomMenu({
     super.key,
@@ -20,16 +21,20 @@ class LMChatroomMenu extends StatefulWidget {
     required this.chatroom,
     required this.chatroomActions,
     this.style,
+    this.iconBuilder,
   });
   LMChatroomMenu copyWith({
     CustomPopupMenuController? controller,
     LMChatCustomPopupMenuStyle? style,
+    List<ChatroomAction>? chatroomActions,
+    LMChatIconBuilder? iconBuilder,
   }) {
     return LMChatroomMenu(
-      controller: controller ?? this.controller,
       chatroom: chatroom,
-      chatroomActions: chatroomActions,
+      controller: controller ?? this.controller,
       style: style ?? this.style,
+      chatroomActions: chatroomActions ?? this.chatroomActions,
+      iconBuilder: iconBuilder ?? this.iconBuilder,
     );
   }
 
@@ -89,13 +94,21 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           ),
         ),
       ),
-      child: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.more_vert_rounded,
-        style: LMChatIconStyle(
-          size: 28,
-          color: LMChatTheme.theme.onContainer,
-        ),
+      child: widget.iconBuilder?.call(
+            context,
+            _defIcon(),
+          ) ??
+          _defIcon(),
+    );
+  }
+
+  LMChatIcon _defIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.more_vert_rounded,
+      style: LMChatIconStyle(
+        size: 28,
+        color: LMChatTheme.theme.onContainer,
       ),
     );
   }

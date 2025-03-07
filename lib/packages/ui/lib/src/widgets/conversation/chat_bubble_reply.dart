@@ -186,4 +186,26 @@ class LMChatBubbleReplyStyle {
     this.margin,
     this.padding,
   });
+
+  LMChatBubbleReplyStyle copyWith({
+    Color? backgroundColor,
+    Color? highlightColor,
+    double? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    LMChatTextStyle? titleStyle,
+    LMChatTextStyle? subtitleStyle,
+    LMChatImageStyle? mediaStyle,
+  }) {
+    return LMChatBubbleReplyStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      highlightColor: highlightColor ?? this.highlightColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      titleStyle: titleStyle ?? this.titleStyle,
+      subtitleStyle: subtitleStyle ?? this.subtitleStyle,
+      mediaStyle: mediaStyle ?? this.mediaStyle,
+    );
+  }
 }

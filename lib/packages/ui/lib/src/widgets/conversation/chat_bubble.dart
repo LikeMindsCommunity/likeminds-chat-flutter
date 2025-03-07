@@ -148,6 +148,9 @@ class LMChatBubble extends StatefulWidget {
   /// The action helper for the chat bubble
   final LMChatConversationActionInterface? actionHelper;
 
+  final Widget Function(BuildContext context, Widget container)?
+      chatBubbleContainerBuilder;
+
   /// The [LMChatBubble] widget constructor.
   /// used to display the chat bubble.
   const LMChatBubble({
@@ -189,16 +192,18 @@ class LMChatBubble extends StatefulWidget {
     this.onReactionsTap,
     this.onReplyTap,
     this.actionHelper,
+    this.chatBubbleContainerBuilder,
   });
 
   /// Creates a copy of this [LMChatBubble] but with the given fields replaced with the new values.
   /// If the new values are null, then the old values are used.
   LMChatBubble copyWith({
-    LMChatConversationActionInterface? actionHelper,
     LMChatConversationViewData? conversation,
     LMChatUserViewData? currentUser,
     LMChatUserViewData? conversationUser,
     List<LMChatAttachmentViewData>? attachments,
+    List<LMChatReactionViewData>? reactions,
+    Map<int, LMChatUserViewData>? userMeta,
     bool? isSent,
     LMChatIcon? replyIcon,
     LMChatProfilePicture? avatar,
@@ -212,43 +217,52 @@ class LMChatBubble extends StatefulWidget {
     void Function()? onMediaTap,
     Function(bool isSelected, State<LMChatBubble> state)? onLongPress,
     bool Function()? isSelectableOnTap,
-    Widget Function(BuildContext context, LMChatBubbleContent content)?
-        contentBuilder,
     Widget Function(BuildContext context, LMChatBubbleHeader header)?
         headerBuilder,
+    Widget Function(BuildContext context, LMChatBubbleContent content)?
+        contentBuilder,
     Widget Function(BuildContext context, LMChatBubbleFooter footer)?
         footerBuilder,
     Widget Function(BuildContext context, LMChatText text)? deletedTextBuilder,
+    bool? isDM,
     Widget Function(
-      BuildContext context,
-      List<LMChatAttachmentViewData>? attachments,
-      LMChatBubbleMedia media,
-    )? mediaBuilder,
+            BuildContext context,
+            List<LMChatAttachmentViewData>? attachments,
+            LMChatBubbleMedia media)?
+        mediaBuilder,
     Function(String reaction)? onReaction,
+    Function(String reaction)? onRemoveReaction,
+    Function(LMChatConversationViewData reply, LMChatBubbleReply oldWidget)?
+        replyBuilder,
     Widget Function(LMChatOGTagsViewData ogTags,
             LMChatLinkPreview oldLinkPreviewWidget)?
         linkPreviewBuilder,
-    bool? isDM,
-    LMChatPoll? poll,
-    LMChatPollBuilder? pollBuilder,
     Widget Function(List<LMChatReactionViewData> reactions,
             LMChatBubbleReactions oldWidget)?
         bubbleReactionsBuilder,
     Widget Function(LMChatReactionBar oldWidget)? reactionBarBuilder,
+    VoidCallback? onReactionsTap,
+    LMChatPoll? poll,
+    LMChatPollBuilder? pollBuilder,
+    LMChatAudioHandler? audioHandler,
     VoidCallback? onReplyTap,
+    LMChatConversationActionInterface? actionHelper,
+    Widget Function(BuildContext context, Widget container)?
+        chatBubbleContainerBuilder,
   }) {
     return LMChatBubble(
-      actionHelper: actionHelper ?? this.actionHelper,
       conversation: conversation ?? this.conversation,
       currentUser: currentUser ?? this.currentUser,
       conversationUser: conversationUser ?? this.conversationUser,
       attachments: attachments ?? this.attachments,
+      reactions: reactions ?? this.reactions,
+      userMeta: userMeta ?? this.userMeta,
       isSent: isSent ?? this.isSent,
-      onReply: onReply ?? this.onReply,
-      onTagTap: onTagTap ?? this.onTagTap,
       replyIcon: replyIcon ?? this.replyIcon,
       avatar: avatar ?? this.avatar,
       avatarBuilder: avatarBuilder ?? this.avatarBuilder,
+      onReply: onReply ?? this.onReply,
+      onTagTap: onTagTap ?? this.onTagTap,
       deletedText: deletedText ?? this.deletedText,
       style: style ?? this.style,
       isSelected: isSelected ?? this.isSelected,
@@ -256,20 +270,27 @@ class LMChatBubble extends StatefulWidget {
       onMediaTap: onMediaTap ?? this.onMediaTap,
       onLongPress: onLongPress ?? this.onLongPress,
       isSelectableOnTap: isSelectableOnTap ?? this.isSelectableOnTap,
-      contentBuilder: contentBuilder ?? this.contentBuilder,
       headerBuilder: headerBuilder ?? this.headerBuilder,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       deletedTextBuilder: deletedTextBuilder ?? this.deletedTextBuilder,
+      isDM: isDM ?? this.isDM,
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       onReaction: onReaction ?? this.onReaction,
+      onRemoveReaction: onRemoveReaction ?? this.onRemoveReaction,
+      replyBuilder: replyBuilder ?? this.replyBuilder,
       linkPreviewBuilder: linkPreviewBuilder ?? this.linkPreviewBuilder,
-      isDM: isDM ?? this.isDM,
-      poll: poll ?? this.poll,
-      pollBuilder: pollBuilder ?? this.pollBuilder,
       bubbleReactionsBuilder:
           bubbleReactionsBuilder ?? this.bubbleReactionsBuilder,
       reactionBarBuilder: reactionBarBuilder ?? this.reactionBarBuilder,
+      onReactionsTap: onReactionsTap ?? this.onReactionsTap,
+      poll: poll ?? this.poll,
+      pollBuilder: pollBuilder ?? this.pollBuilder,
+      audioHandler: audioHandler ?? this.audioHandler,
       onReplyTap: onReplyTap ?? this.onReplyTap,
+      actionHelper: actionHelper ?? this.actionHelper,
+      chatBubbleContainerBuilder:
+          chatBubbleContainerBuilder ?? this.chatBubbleContainerBuilder,
     );
   }
 
@@ -362,7 +383,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
     final inStyle = widget.style ?? LMChatTheme.theme.bubbleStyle;
     return _isDeleted
-        ? _defChatBubble(inStyle, context, finalWidth)
+        ? _defChatBubbleBuilder(inStyle, context, finalWidth)
         : Swipeable(
             dismissThresholds: const {SwipeDirection.startToEnd: 0.0},
             movementDuration: const Duration(milliseconds: 50),
@@ -398,11 +419,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
               ),
             ),
             direction: SwipeDirection.startToEnd,
-            child: _defChatBubble(inStyle, context, finalWidth),
+            child: _defChatBubbleBuilder(inStyle, context, finalWidth),
           );
   }
 
-  Widget _defChatBubble(
+  Widget _defChatBubbleBuilder(
       LMChatBubbleStyle inStyle, BuildContext context, double finalWidth) {
     return GestureDetector(
       onLongPress: () {
@@ -484,266 +505,264 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   isSent ? MainAxisAlignment.end : MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                widget.avatarBuilder?.call(
+                if (!isSent) ...[
+                  widget.avatarBuilder?.call(
+                        context,
+                        _defAvatar(!isSent),
+                      ) ??
+                      const SizedBox.shrink(),
+                  // create a space between the bubble and the avatar
+                  SizedBox(width: inStyle.gap),
+                ],
+                widget.chatBubbleContainerBuilder?.call(
                       context,
-                      _defAvatar(!isSent),
+                      _defChatContainer(inStyle, context, finalWidth),
                     ) ??
-                    const SizedBox.shrink(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AbsorbPointer(
-                      absorbing: _isDeleted,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          minHeight: 2.h,
-                          minWidth: conversation.answer.split('\n').length > 4
-                              ? 40.w
-                              : 5.w,
-                          maxWidth: (widget.attachments != null &&
-                                  widget.attachments!.isNotEmpty)
-                              ? 60.w
-                              : conversation.state == 10
-                                  ? 70.w
-                                  : 65.w,
-                        ),
-                        child: PhysicalShape(
-                          clipper: LMChatBubbleClipper(
-                            isSent: isSent,
-                            conversationViewType:
-                                conversation.conversationViewType ??
-                                    LMChatConversationViewType.top,
-                          ),
-                          color:
-                              inStyle.backgroundColor ?? _themeData.container,
-                          child: Padding(
-                            padding: isSent
-                                ? EdgeInsets.only(
-                                    top: _isDeleted ? 0.8.h : 1.h,
-                                    bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 3.w,
-                                    right: 3.w + 10,
-                                  )
-                                : EdgeInsets.only(
-                                    top: _isDeleted ? 0.8.h : 1.h,
-                                    bottom: _isDeleted ? 1.2.h : 1.h,
-                                    left: 3.w + 10,
-                                    right: 3.w,
-                                  ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (inStyle.showHeader ?? true)
-                                  widget.headerBuilder?.call(
-                                          context,
-                                          LMChatBubbleHeader(
-                                            conversationUser:
-                                                widget.conversationUser,
-                                          )) ??
-                                      LMChatBubbleHeader(
-                                        conversationUser:
-                                            widget.conversationUser,
-                                      ),
-                                // poll widget
-                                if (conversation.state == 10 &&
-                                    !_isDeleted) ...[
-                                  widget.pollBuilder?.call(
-                                        context,
-                                        widget.poll ??
-                                            LMChatPoll(
-                                              pollData: conversation,
-                                            ),
-                                        conversation,
-                                      ) ??
-                                      widget.poll ??
-                                      LMChatPoll(
-                                        pollData: conversation,
-                                      ),
-                                ],
-                                // link preview widget
-                                if (conversation.ogTags != null &&
-                                    conversation.deletedByUserId == null)
-                                  widget.linkPreviewBuilder?.call(
-                                        conversation.ogTags!,
-                                        _defLinkPreviewWidget(
-                                            conversation.ogTags!),
-                                      ) ??
-                                      _defLinkPreviewWidget(
-                                          conversation.ogTags!),
-                                if (conversation.replyConversationObject !=
-                                        null &&
-                                    conversation.deletedByUserId == null) ...[
-                                  widget.replyBuilder?.call(
-                                          conversation.replyConversationObject!,
-                                          _defReplyWidget()) ??
-                                      _defReplyWidget(),
-                                  const SizedBox(height: 4),
-                                ],
-                                AbsorbPointer(
-                                  absorbing: _isSelected,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (widget.attachments != null) {
-                                        widget.onMediaTap?.call();
-                                      }
-                                    },
-                                    child: !_isDeleted
-                                        ? widget.mediaBuilder?.call(
-                                              context,
-                                              widget.attachments ?? [],
-                                              LMChatBubbleMedia(
-                                                audioHandler:
-                                                    widget.audioHandler,
-                                                conversation: conversation,
-                                                attachments:
-                                                    widget.attachments ?? [],
-                                                count: conversation
-                                                        .attachments?.length ??
-                                                    0,
-                                                attachmentUploaded: conversation
-                                                        .attachmentsUploaded ??
-                                                    false,
-                                                onVoiceNoteDurationUpdate:
-                                                    kAttachmentTypeVoiceNote ==
-                                                            widget.attachments
-                                                                ?.first.type
-                                                        ? _handleVoiceNoteDurationUpdate
-                                                        : null,
-                                              ),
-                                            ) ??
-                                            LMChatBubbleMedia(
-                                              audioHandler: widget.audioHandler,
-                                              conversation: conversation,
-                                              attachments:
-                                                  widget.attachments ?? [],
-                                              count: conversation
-                                                      .attachments?.length ??
-                                                  0,
-                                              attachmentUploaded: conversation
-                                                      .attachmentsUploaded ??
-                                                  false,
-                                              onVoiceNoteDurationUpdate:
-                                                  kAttachmentTypeVoiceNote ==
-                                                          widget.attachments
-                                                              ?.first.type
-                                                      ? _handleVoiceNoteDurationUpdate
-                                                      : null,
-                                            )
-                                        : const SizedBox.shrink(),
-                                  ),
-                                ),
-                                _isDeleted
-                                    ? widget.deletedText ??
-                                        widget.deletedTextBuilder?.call(
-                                          context,
-                                          _defDeletedWidget(),
-                                        ) ??
-                                        _defDeletedWidget()
-                                    : conversation.state == 10
-                                        ? const SizedBox.shrink()
-                                        : widget.contentBuilder?.call(
-                                              context,
-                                              LMChatBubbleContent(
-                                                conversation: widget.attachments
-                                                            ?.first.type ==
-                                                        "gif"
-                                                    ? conversation.copyWith(
-                                                        answer: _getGIFText())
-                                                    : conversation,
-                                                onTagTap: widget.onTagTap,
-                                              ),
-                                            ) ??
-                                            LMChatBubbleContent(
-                                              conversation: widget.attachments
-                                                          ?.first.type ==
-                                                      "gif"
-                                                  ? conversation.copyWith(
-                                                      answer: _getGIFText())
-                                                  : conversation,
-                                              onTagTap: widget.onTagTap,
-                                            ),
-                                if (conversation.deletedByUserId == null &&
-                                    inStyle.showFooter == true)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4.0),
-                                    child: kAttachmentTypeVoiceNote ==
-                                            widget.attachments?.first.type
-                                        ? ValueListenableBuilder<Duration>(
-                                            valueListenable:
-                                                _voiceNoteDurationNotifier,
-                                            builder: (context, duration, _) {
-                                              final footerWidget =
-                                                  LMChatBubbleFooter(
-                                                conversation: conversation,
-                                                textWidth: finalWidth,
-                                                voiceDuration: LMChatText(
-                                                  formatDuration(
-                                                      duration.inSeconds),
-                                                  style: LMChatTextStyle(
-                                                    textStyle: TextStyle(
-                                                      fontSize: 12,
-                                                      color: LMChatTheme
-                                                          .theme.onContainer
-                                                          .withOpacity(0.6),
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-
-                                              return widget.footerBuilder?.call(
-                                                    context,
-                                                    footerWidget,
-                                                  ) ??
-                                                  footerWidget;
-                                            },
-                                          )
-                                        : widget.footerBuilder?.call(
-                                              context,
-                                              LMChatBubbleFooter(
-                                                conversation: conversation,
-                                                textWidth: finalWidth,
-                                              ),
-                                            ) ??
-                                            LMChatBubbleFooter(
-                                              conversation: conversation,
-                                              textWidth: finalWidth,
-                                            ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    widget.bubbleReactionsBuilder?.call(
-                            reactions ?? [],
-                            LMChatBubbleReactions(
-                              conversation: conversation,
-                              currentUser: currentUser,
-                              userMeta: widget.userMeta ?? {},
-                              onRemoveReaction: widget.onRemoveReaction,
-                              reactions: reactions,
-                              onReactionsTap: widget.onReactionsTap,
-                            )) ??
-                        LMChatBubbleReactions(
-                          conversation: conversation,
-                          currentUser: currentUser,
-                          userMeta: widget.userMeta ?? {},
-                          onRemoveReaction: widget.onRemoveReaction,
-                          reactions: reactions,
-                          onReactionsTap: widget.onReactionsTap,
-                        ),
-                  ],
-                ),
-                widget.avatarBuilder?.call(
-                      context,
-                      _defAvatar(isSent),
-                    ) ??
-                    const SizedBox.shrink(),
+                    _defChatContainer(inStyle, context, finalWidth),
+                if (isSent) ...[
+                  // create a space between the bubble and the avatar
+                  SizedBox(width: inStyle.gap),
+                  widget.avatarBuilder?.call(
+                        context,
+                        _defAvatar(isSent),
+                      ) ??
+                      const SizedBox.shrink(),
+                ]
               ],
             ),
           ),
           _buildReactionButton(),
+        ],
+      ),
+    );
+  }
+
+  Column _defChatContainer(
+      LMChatBubbleStyle inStyle, BuildContext context, double finalWidth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AbsorbPointer(
+          absorbing: _isDeleted,
+          child: Container(
+            decoration: inStyle.decoration ??
+                BoxDecoration(
+                  color:
+                      !inStyle.enableClipper ? inStyle.backgroundColor : null,
+                ),
+            constraints: BoxConstraints(
+              minHeight: 2.h,
+              minWidth: conversation.answer.split('\n').length > 4 ? 40.w : 5.w,
+              maxWidth:
+                  (widget.attachments != null && widget.attachments!.isNotEmpty)
+                      ? 60.w
+                      : conversation.state == 10
+                          ? 70.w
+                          : 65.w,
+            ),
+            child: inStyle.enableClipper
+                ? PhysicalShape(
+                    clipper: inStyle.clipper ??
+                        LMChatBubbleClipper(
+                          isSent: isSent,
+                          conversationViewType:
+                              conversation.conversationViewType ??
+                                  LMChatConversationViewType.top,
+                        ),
+                    color: inStyle.backgroundColor ?? _themeData.container,
+                    child: _defBubble(inStyle, context, finalWidth),
+                  )
+                : _defBubble(inStyle, context, finalWidth),
+          ),
+        ),
+        widget.bubbleReactionsBuilder?.call(
+                reactions ?? [],
+                LMChatBubbleReactions(
+                  conversation: conversation,
+                  currentUser: currentUser,
+                  userMeta: widget.userMeta ?? {},
+                  onRemoveReaction: widget.onRemoveReaction,
+                  reactions: reactions,
+                  onReactionsTap: widget.onReactionsTap,
+                )) ??
+            LMChatBubbleReactions(
+              conversation: conversation,
+              currentUser: currentUser,
+              userMeta: widget.userMeta ?? {},
+              onRemoveReaction: widget.onRemoveReaction,
+              reactions: reactions,
+              onReactionsTap: widget.onReactionsTap,
+            ),
+      ],
+    );
+  }
+
+  Padding _defBubble(
+      LMChatBubbleStyle inStyle, BuildContext context, double finalWidth) {
+    return Padding(
+      padding: isSent
+          ? EdgeInsets.only(
+              top: _isDeleted ? 0.8.h : 1.h,
+              bottom: _isDeleted ? 1.2.h : 1.h,
+              left: 3.w,
+              right: 3.w + (inStyle.enableClipper ? 10 : 0),
+            )
+          : EdgeInsets.only(
+              top: _isDeleted ? 0.8.h : 1.h,
+              bottom: _isDeleted ? 1.2.h : 1.h,
+              left: 3.w + (inStyle.enableClipper ? 10 : 0),
+              right: 3.w,
+            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (inStyle.showHeader ?? true)
+            widget.headerBuilder?.call(
+                    context,
+                    LMChatBubbleHeader(
+                      conversationUser: widget.conversationUser,
+                    )) ??
+                LMChatBubbleHeader(
+                  conversationUser: widget.conversationUser,
+                ),
+          // poll widget
+          if (conversation.state == 10 && !_isDeleted) ...[
+            widget.pollBuilder?.call(
+                  context,
+                  widget.poll ??
+                      LMChatPoll(
+                        pollData: conversation,
+                      ),
+                  conversation,
+                ) ??
+                widget.poll ??
+                LMChatPoll(
+                  pollData: conversation,
+                ),
+          ],
+          // link preview widget
+          if (conversation.ogTags != null &&
+              conversation.deletedByUserId == null)
+            widget.linkPreviewBuilder?.call(
+                  conversation.ogTags!,
+                  _defLinkPreviewWidget(conversation.ogTags!),
+                ) ??
+                _defLinkPreviewWidget(conversation.ogTags!),
+          if (conversation.replyConversationObject != null &&
+              conversation.deletedByUserId == null) ...[
+            widget.replyBuilder?.call(
+                    conversation.replyConversationObject!, _defReplyWidget()) ??
+                _defReplyWidget(),
+            const SizedBox(height: 4),
+          ],
+          AbsorbPointer(
+            absorbing: _isSelected,
+            child: GestureDetector(
+              onTap: () {
+                if (widget.attachments != null) {
+                  widget.onMediaTap?.call();
+                }
+              },
+              child: !_isDeleted
+                  ? widget.mediaBuilder?.call(
+                        context,
+                        widget.attachments ?? [],
+                        LMChatBubbleMedia(
+                          audioHandler: widget.audioHandler,
+                          conversation: conversation,
+                          attachments: widget.attachments ?? [],
+                          count: conversation.attachments?.length ?? 0,
+                          attachmentUploaded:
+                              conversation.attachmentsUploaded ?? false,
+                          onVoiceNoteDurationUpdate: kAttachmentTypeVoiceNote ==
+                                  widget.attachments?.first.type
+                              ? _handleVoiceNoteDurationUpdate
+                              : null,
+                        ),
+                      ) ??
+                      LMChatBubbleMedia(
+                        audioHandler: widget.audioHandler,
+                        conversation: conversation,
+                        attachments: widget.attachments ?? [],
+                        count: conversation.attachments?.length ?? 0,
+                        attachmentUploaded:
+                            conversation.attachmentsUploaded ?? false,
+                        onVoiceNoteDurationUpdate: kAttachmentTypeVoiceNote ==
+                                widget.attachments?.first.type
+                            ? _handleVoiceNoteDurationUpdate
+                            : null,
+                      )
+                  : const SizedBox.shrink(),
+            ),
+          ),
+          _isDeleted
+              ? widget.deletedText ??
+                  widget.deletedTextBuilder?.call(
+                    context,
+                    _defDeletedWidget(),
+                  ) ??
+                  _defDeletedWidget()
+              : conversation.state == 10
+                  ? const SizedBox.shrink()
+                  : widget.contentBuilder?.call(
+                        context,
+                        LMChatBubbleContent(
+                          conversation: widget.attachments?.first.type == "gif"
+                              ? conversation.copyWith(answer: _getGIFText())
+                              : conversation,
+                          onTagTap: widget.onTagTap,
+                          style: theme.contentStyle,
+                        ),
+                      ) ??
+                      LMChatBubbleContent(
+                        conversation: widget.attachments?.first.type == "gif"
+                            ? conversation.copyWith(answer: _getGIFText())
+                            : conversation,
+                        onTagTap: widget.onTagTap,
+                        style: theme.contentStyle,
+                      ),
+          if (conversation.deletedByUserId == null &&
+              inStyle.showFooter == true)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: kAttachmentTypeVoiceNote == widget.attachments?.first.type
+                  ? ValueListenableBuilder<Duration>(
+                      valueListenable: _voiceNoteDurationNotifier,
+                      builder: (context, duration, _) {
+                        final footerWidget = LMChatBubbleFooter(
+                          conversation: conversation,
+                          textWidth: finalWidth,
+                          voiceDuration: LMChatText(
+                            formatDuration(duration.inSeconds),
+                            style: LMChatTextStyle(
+                              textStyle: TextStyle(
+                                fontSize: 12,
+                                color: LMChatTheme.theme.onContainer
+                                    .withOpacity(0.6),
+                              ),
+                            ),
+                          ),
+                        );
+
+                        return widget.footerBuilder?.call(
+                              context,
+                              footerWidget,
+                            ) ??
+                            footerWidget;
+                      },
+                    )
+                  : widget.footerBuilder?.call(
+                        context,
+                        LMChatBubbleFooter(
+                          conversation: conversation,
+                          textWidth: finalWidth,
+                        ),
+                      ) ??
+                      LMChatBubbleFooter(
+                        conversation: conversation,
+                        textWidth: finalWidth,
+                      ),
+            ),
         ],
       ),
     );
@@ -961,29 +980,15 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 /// Style configuration for the chat bubble.
 /// {@endtemplate}
 class LMChatBubbleStyle {
-  /// The width of the chat bubble.
-  final double? width;
-
-  /// The height of the chat bubble.
-  final double? height;
-
-  /// The width of the border.
-  final double? borderWidth;
-
-  /// The radius of the border.
-  final double? borderRadiusNum;
-
-  /// The border radius.
-  final BorderRadius? borderRadius;
-
-  /// The color of the border.
-  final Color? borderColor;
-
   /// The background color of the chat bubble.
+  /// It will be ignored if BoxDecoration is applied.
   final Color? backgroundColor;
 
-  /// The color of the sent message.
-  final Color? sentColor;
+  /// The decoration of the chat bubble.
+  /// If set, the background color will be ignored.
+  /// when using a decoration, make sure to set enableClipper to false.
+  /// to get the desired shape.
+  final BoxDecoration? decoration;
 
   /// The color when the chat bubble is selected.
   final Color? selectedColor;
@@ -1002,54 +1007,60 @@ class LMChatBubbleStyle {
 
   /// Whether to show the avatar.
   final bool? showAvatar;
+
+  /// The style of the link preview.
   final LMChatLinkPreviewStyle? linkPreviewStyle;
+
+  /// Whether to enable clipper, it is enabled by default.
+  /// The clipper will clip the chat bubble to the def
+  /// If set to false, the clipper will be disabled and the box decoration will be applied.
+  /// If set to true, the clipper will be enabled and the box decoration will not be applied.
+  final bool enableClipper;
+
+  /// The custom clipper for the chat bubble.
+  /// to create a custom shape for the chat bubble.
+  /// If set, the default clipper will be ignored.
+  final CustomClipper<Path>? clipper;
+
+  /// The gap between the chat bubble and the user avatar.
+  /// This is only applicable when the avatar is shown.
+  final double gap;
 
   /// {@macro lm_chat_bubble_style}
   LMChatBubbleStyle({
     this.backgroundColor,
-    this.borderColor,
-    this.borderRadius,
-    this.borderRadiusNum,
-    this.borderWidth,
-    this.height,
-    this.sentColor,
+    this.decoration,
     this.selectedColor,
     this.showActions,
-    this.width,
     this.showAvatar,
     this.showFooter,
     this.showHeader,
     this.showSides,
     this.linkPreviewStyle,
+    this.enableClipper = true,
+    this.clipper,
+    this.gap = 0,
   });
 
   /// Creates a copy of the current style with optional new values.
+  /// If the new values are null, the old values are used.
   LMChatBubbleStyle copyWith({
-    double? width,
-    double? height,
-    double? borderWidth,
-    double? borderRadiusNum,
-    BorderRadius? borderRadius,
-    Color? borderColor,
     Color? backgroundColor,
-    Color? sentColor,
+    BoxDecoration? decoration,
     Color? selectedColor,
     bool? showActions,
-    bool? showSides,
     bool? showAvatar,
-    bool? showHeader,
     bool? showFooter,
+    bool? showHeader,
+    bool? showSides,
     LMChatLinkPreviewStyle? linkPreviewStyle,
+    bool? enableClipper,
+    CustomClipper<Path>? clipper,
+    double? gap,
   }) {
     return LMChatBubbleStyle(
-      width: width ?? this.width,
-      height: height ?? this.height,
-      borderWidth: borderWidth ?? this.borderWidth,
-      borderRadiusNum: borderRadiusNum ?? this.borderRadiusNum,
-      borderRadius: borderRadius ?? this.borderRadius,
-      borderColor: borderColor ?? this.borderColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      sentColor: sentColor ?? this.sentColor,
+      decoration: decoration ?? this.decoration,
       selectedColor: selectedColor ?? this.selectedColor,
       showActions: showActions ?? this.showActions,
       showAvatar: showAvatar ?? this.showAvatar,
@@ -1057,6 +1068,9 @@ class LMChatBubbleStyle {
       showHeader: showHeader ?? this.showHeader,
       showSides: showSides ?? this.showSides,
       linkPreviewStyle: linkPreviewStyle ?? this.linkPreviewStyle,
+      enableClipper: enableClipper ?? this.enableClipper,
+      clipper: clipper ?? this.clipper,
+      gap: gap ?? this.gap,
     );
   }
 
