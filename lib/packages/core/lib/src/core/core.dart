@@ -10,6 +10,7 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 export 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 export 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+export 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 
 /// {@template lm_chat_core}
 /// The core class of the LikeMinds Chat SDK.

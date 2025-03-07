@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -74,6 +75,11 @@ class LMChatImage extends StatefulWidget {
 
 class _LMImageState extends State<LMChatImage> {
   LMChatImageStyle? style;
+
+  // Determines if the image is an SVG image based on the file extension of the URL
+  bool _isSvgImage() {
+    return widget.imageUrl != null && widget.imageUrl!.endsWith('.svg');
+  }
 
   /// Initializes the state of the widget by setting up the style
   @override
@@ -152,58 +158,80 @@ class _LMImageState extends State<LMChatImage> {
         color: style?.backgroundColor,
       ),
       clipBehavior: Clip.hardEdge,
-      child: CachedNetworkImage(
-        cacheKey: widget.imageUrl!,
-        height: style?.height,
-        width: style?.width,
-        imageUrl: widget.imageUrl!,
-        fit: style?.boxFit ?? BoxFit.contain,
-        fadeInDuration: const Duration(milliseconds: 100),
-        imageBuilder: (context, imageProvider) {
-          ImageStream stream = imageProvider.resolve(ImageConfiguration.empty);
-          late ImageInfo imageInfo;
+      child: _isSvgImage()
+          ? SvgPicture.network(
+              widget.imageUrl!,
+              height: style?.height,
+              width: style?.width,
+              fit: style?.boxFit ?? BoxFit.contain,
+              placeholderBuilder: (context) {
+                return style!.loaderWidget ??
+                    LMChatMediaShimmerWidget(
+                      height: style!.height,
+                      width: style!.width ?? 100.w,
+                    );
+              },
+              // errorBuilder: (context, error, stackTrace) {
+              //   debugPrint('Error loading image: $error');
+              //   if (widget.onError != null) {
+              //     widget.onError!(error.toString(), StackTrace.empty);
+              //   }
+              //   return style!.errorWidget ?? _defaultErrorWidget();
+              // },
+            )
+          : CachedNetworkImage(
+              cacheKey: widget.imageUrl!,
+              height: style?.height,
+              width: style?.width,
+              imageUrl: widget.imageUrl!,
+              fit: style?.boxFit ?? BoxFit.contain,
+              fadeInDuration: const Duration(milliseconds: 100),
+              imageBuilder: (context, imageProvider) {
+                ImageStream stream =
+                    imageProvider.resolve(ImageConfiguration.empty);
+                late ImageInfo imageInfo;
 
-          return FutureBuilder(
-            future: Future(() async {
-              Completer<void> completer = Completer();
-              stream.addListener(
-                ImageStreamListener((info, _) {
-                  imageInfo = info;
-                  completer.complete();
-                }),
-              );
-              await completer.future;
-              return imageInfo;
-            }),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
+                return FutureBuilder(
+                  future: Future(() async {
+                    Completer<void> completer = Completer();
+                    stream.addListener(
+                      ImageStreamListener((info, _) {
+                        imageInfo = info;
+                        completer.complete();
+                      }),
+                    );
+                    await completer.future;
+                    return imageInfo;
+                  }),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-              final imageInfo = snapshot.data as ImageInfo;
-              return _buildPhotoView(
-                imageProvider: imageProvider,
-                context: context,
-                imageWidth: imageInfo.image.width.toDouble(),
-                imageHeight: imageInfo.image.height.toDouble(),
-              );
-            },
-          );
-        },
-        errorWidget: (context, url, error) {
-          debugPrint('Error loading image: $error');
-          if (widget.onError != null) {
-            widget.onError!(error.toString(), StackTrace.empty);
-          }
-          return style!.errorWidget ?? _defaultErrorWidget();
-        },
-        progressIndicatorBuilder: (context, url, progress) =>
-            style!.shimmerWidget ??
-            LMChatMediaShimmerWidget(
-              height: style!.height,
-              width: style!.width ?? 100.w,
+                    final imageInfo = snapshot.data as ImageInfo;
+                    return _buildPhotoView(
+                      imageProvider: imageProvider,
+                      context: context,
+                      imageWidth: imageInfo.image.width.toDouble(),
+                      imageHeight: imageInfo.image.height.toDouble(),
+                    );
+                  },
+                );
+              },
+              errorWidget: (context, url, error) {
+                debugPrint('Error loading image: $error');
+                if (widget.onError != null) {
+                  widget.onError!(error.toString(), StackTrace.empty);
+                }
+                return style!.errorWidget ?? _defaultErrorWidget();
+              },
+              progressIndicatorBuilder: (context, url, progress) =>
+                  style!.shimmerWidget ??
+                  LMChatMediaShimmerWidget(
+                    height: style!.height,
+                    width: style!.width ?? 100.w,
+                  ),
             ),
-      ),
     );
   }
 

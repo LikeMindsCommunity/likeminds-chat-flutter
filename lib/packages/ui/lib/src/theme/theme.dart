@@ -586,14 +586,13 @@ class LMChatTextFieldStyle {
   /// Custom widget to show when no suggestions are found
   final Widget Function(BuildContext)? noItemsFoundBuilder;
 
-  /// Background color of the text field
-  final Color? backgroundColor;
-
   /// Duration of debounce on the text field
   final Duration? debounceDuration;
 
+  /// margin for the text field
+  final EdgeInsets? margin;
+
   const LMChatTextFieldStyle({
-    this.backgroundColor,
     this.inputDecoration,
     this.textStyle,
     this.tagColor,
@@ -609,6 +608,7 @@ class LMChatTextFieldStyle {
     this.noItemsFoundBuilder,
     this.showLoadingIndicator,
     this.debounceDuration,
+    this.margin,
   });
 
   /// Creates a copy of the text field style with optional modifications
@@ -622,14 +622,13 @@ class LMChatTextFieldStyle {
     BoxConstraints? suggestionsBoxConstraints,
     EdgeInsets? suggestionsBoxPadding,
     Color? suggestionItemColor,
-    Color? backgroundColor,
     Duration? debounceDuration,
     EdgeInsets? suggestionItemPadding,
     LMChatTextStyle? suggestionItemTextStyle,
     LMChatProfilePictureStyle? suggestionItemAvatarStyle,
+    EdgeInsets? margin,
   }) {
     return LMChatTextFieldStyle(
-      backgroundColor: backgroundColor ?? this.backgroundColor,
       inputDecoration: inputDecoration ?? this.inputDecoration,
       textStyle: textStyle ?? this.textStyle,
       tagColor: tagColor ?? this.tagColor,
@@ -650,6 +649,7 @@ class LMChatTextFieldStyle {
       suggestionItemAvatarStyle:
           suggestionItemAvatarStyle ?? this.suggestionItemAvatarStyle,
       debounceDuration: debounceDuration ?? this.debounceDuration,
+      margin: margin ?? this.margin,
     );
   }
 

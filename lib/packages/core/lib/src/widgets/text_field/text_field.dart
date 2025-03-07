@@ -239,7 +239,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 6.0, right: 6.0, bottom: 4.0),
+      padding: effectiveStyle.margin?? EdgeInsets.zero,
       child: ValueListenableBuilder(
         valueListenable: _tagComplete,
         builder: (context, value, child) {

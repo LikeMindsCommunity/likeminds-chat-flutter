@@ -100,6 +100,28 @@ class LMChatMediaForwardingBuilderDelegate {
     return currentPreview;
   }
 
+  /// Builds the whole container for the bottom bar
+  /// which includes the chatroom text field, voice notes button and send button
+  Widget chatroomBottomBarContainer(
+    BuildContext context,
+    Container chatroomBottomBar,
+    LMChatButton sendButton,
+    LMChatTextField chatroomTextField,
+    LMChatButton attachmentButton,
+  ) {
+    return chatroomBottomBar;
+  }
+
+  /// Builds the chatroom text field.
+  Widget chatroomTextField(
+    BuildContext context,
+    TextEditingController textController,
+    LMChatTextField chatroomTextField,
+    LMChatButton attachmentMenu,
+  ) {
+    return chatroomTextField;
+  }
+
   /// Builds the chatroom bar send button
   Widget sendButton(
     BuildContext context,
