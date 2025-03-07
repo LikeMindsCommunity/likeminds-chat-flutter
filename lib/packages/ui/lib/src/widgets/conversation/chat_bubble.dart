@@ -711,6 +711,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               ? conversation.copyWith(answer: _getGIFText())
                               : conversation,
                           onTagTap: widget.onTagTap,
+                          style: theme.contentStyle,
                         ),
                       ) ??
                       LMChatBubbleContent(
@@ -718,6 +719,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                             ? conversation.copyWith(answer: _getGIFText())
                             : conversation,
                         onTagTap: widget.onTagTap,
+                        style: theme.contentStyle,
                       ),
           if (conversation.deletedByUserId == null &&
               inStyle.showFooter == true)

@@ -94,13 +94,21 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           ),
         ),
       ),
-      child: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.more_vert_rounded,
-        style: LMChatIconStyle(
-          size: 28,
-          color: LMChatTheme.theme.onContainer,
-        ),
+      child: widget.iconBuilder?.call(
+            context,
+            _defIcon(),
+          ) ??
+          _defIcon(),
+    );
+  }
+
+  LMChatIcon _defIcon() {
+    return LMChatIcon(
+      type: LMChatIconType.icon,
+      icon: Icons.more_vert_rounded,
+      style: LMChatIconStyle(
+        size: 28,
+        color: LMChatTheme.theme.onContainer,
       ),
     );
   }
