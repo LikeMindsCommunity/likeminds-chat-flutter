@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// {@template lm_chat_tile}
+/// A widget to display a tile in the chat list
+/// It can be used to display a chat room or a user in the chat list
+/// It can be customized using the [LMChatTileStyle] using `style` property
+/// extra properties can be passed using the `leading`, `title`, `subtitle` and `trailing` properties
+/// {@endtemplate}
 class LMChatTile extends StatelessWidget {
+  /// {@macro lm_chat_tile}
   const LMChatTile({
     super.key,
     this.onTap,
@@ -35,13 +42,14 @@ class LMChatTile extends StatelessWidget {
         child: Container(
           height: inStyle.height,
           width: inStyle.width,
-          decoration: BoxDecoration(
-            color: inStyle.backgroundColor,
-            border: inStyle.border,
-            borderRadius: BorderRadius.all(
-              Radius.circular(inStyle.borderRadius ?? 0),
-            ),
-          ),
+          decoration: inStyle.decoration ??
+              BoxDecoration(
+                color: inStyle.backgroundColor,
+                border: inStyle.border,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(inStyle.borderRadius ?? 0),
+                ),
+              ),
           margin: inStyle.margin ?? const EdgeInsets.all(0),
           padding: inStyle.padding ?? const EdgeInsets.all(8),
           child: Row(
@@ -118,6 +126,10 @@ class LMChatTileStyle {
   /// border radius of the tile, visible when bgColor is passed
   final double? borderRadius;
 
+  /// box decoration for the tile
+  /// if passed, border radius and background color are ignored
+  final BoxDecoration? decoration;
+
   /// main axis alignment for the row inside the tile
   final MainAxisAlignment? mainAxisAlignment;
 
@@ -146,6 +158,7 @@ class LMChatTileStyle {
     this.backgroundColor,
     this.border,
     this.borderRadius,
+    this.decoration,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
     this.padding,
@@ -160,6 +173,7 @@ class LMChatTileStyle {
       {Color? backgroundColor,
       Border? border,
       double? borderRadius,
+      BoxDecoration? decoration,
       MainAxisAlignment? mainAxisAlignment,
       CrossAxisAlignment? crossAxisAlignment,
       EdgeInsets? padding,
@@ -171,6 +185,7 @@ class LMChatTileStyle {
     return LMChatTileStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       border: border ?? this.border,
+      decoration: decoration ?? this.decoration,
       borderRadius: borderRadius ?? this.borderRadius,
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
