@@ -5,14 +5,14 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 
-/// {@template lm_chat_home_feed_list}
+/// {@template lm_community_chat_screen}
 /// A widget that represents a List of Group Chatrooms on home
 /// Talks to an instance of LMChatHomeFeedBloc, and updates accordingly
 /// Allows for customizations to change the look and feel.
 /// {@endtemplate}
-class LMChatHomeFeedList extends StatefulWidget {
-  /// {@macro lm_chat_home_feed_list}
-  const LMChatHomeFeedList({
+class LMCommunityChatScreen extends StatefulWidget {
+  /// {@macro lm_community_chat_screen}
+  const LMCommunityChatScreen({
     super.key,
     this.chatroomTag,
   });
@@ -20,21 +20,21 @@ class LMChatHomeFeedList extends StatefulWidget {
   /// Tag to filter chatrooms, takes priority over the tag from config
   final String? chatroomTag;
 
-  /// Creates a copy of this [LMChatHomeFeedList] but with the given fields replaced with the new values.
-  LMChatHomeFeedList copyWith({
+  /// Creates a copy of this [LMCommunityChatScreen] but with the given fields replaced with the new values.
+  LMCommunityChatScreen copyWith({
     String? chatroomTag,
   }) {
-    return LMChatHomeFeedList(
+    return LMCommunityChatScreen(
       chatroomTag: chatroomTag ?? this.chatroomTag,
     );
   }
 
   @override
-  State<LMChatHomeFeedList> createState() => _LMChatHomeFeedListState();
+  State<LMCommunityChatScreen> createState() => _LMCommunityChatScreenState();
 }
 
-class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
-    with AutomaticKeepAliveClientMixin<LMChatHomeFeedList> {
+class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
+    with AutomaticKeepAliveClientMixin<LMCommunityChatScreen> {
   // Widget level track of page key for pagination
   int _page = 1;
 
@@ -67,7 +67,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   }
 
   @override
-  void didUpdateWidget(covariant LMChatHomeFeedList oldWidget) {
+  void didUpdateWidget(covariant LMCommunityChatScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     feedBloc = LMChatHomeFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);

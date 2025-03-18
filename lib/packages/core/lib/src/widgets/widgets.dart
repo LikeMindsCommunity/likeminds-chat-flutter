@@ -1,5 +1,5 @@
-export 'lists/chatroom/chatroom_list.dart';
-export 'lists/chatroom/dm_chatroom_list.dart';
+export '../views/home/community_chat.dart';
+export '../views/home/networking_chat.dart';
 
 export 'chatroom/chatroom_bar_header.dart';
 export 'chatroom/chatroom_bar.dart';
