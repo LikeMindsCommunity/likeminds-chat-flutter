@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/builder.dart';
 
 /// {@template lm_chat_dm_feed_list}
 /// A widget that represents a List of DM Chatrooms
@@ -39,12 +40,12 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
   // Paging controller to handle pagination, and list updation
   late PagingController<int, LMChatRoomViewData> homeFeedPagingController;
 
-  final LMChatHomeBuilderDelegate _screenBuilder =
-      LMChatCore.config.homeConfig.builder;
+  final LMNetworkingChatBuilderDelegate _screenBuilder =
+      LMChatCore.config.networkingChatConfig.builder;
 
   /// [_style] is a style object to customize the look and feel of the list
   final LMChatDMFeedListStyle _style =
-      LMChatCore.config.homeConfig.style.dmFeedListStyle?.call(
+      LMChatCore.config.networkingChatConfig.style.dmFeedListStyle?.call(
             LMChatDMFeedListStyle.basic(),
           ) ??
           LMChatDMFeedListStyle.basic();
@@ -104,39 +105,39 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
                   builderDelegate:
                       PagedChildBuilderDelegate<LMChatRoomViewData>(
                     itemBuilder: (context, chatroom, index) {
-                      return _screenBuilder.dmFeedTileBuilder(
+                      return _screenBuilder.userTileBuilder(
                         context,
                         chatroom,
                         _defaultDMChatRoomTile(chatroom),
                       );
                     },
                     firstPageErrorIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedFirstPageErrorIndicatorBuilder(
+                        _screenBuilder.firstPageErrorIndicatorBuilder(
                       context,
                       _defaultErrorView(),
                     ),
                     newPageErrorIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNewPageErrorIndicatorBuilder(
+                        _screenBuilder.newPageErrorIndicatorBuilder(
                       context,
                       _defaultErrorView(),
                     ),
                     firstPageProgressIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedFirstPageProgressIndicatorBuilder(
+                        _screenBuilder.firstPageProgressIndicatorBuilder(
                       context,
                       const LMChatSkeletonChatroomList(),
                     ),
                     newPageProgressIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNewPageProgressIndicatorBuilder(
+                        _screenBuilder.newPageProgressIndicatorBuilder(
                       context,
                       const LMChatLoader(),
                     ),
                     noItemsFoundIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNoItemsFoundIndicatorBuilder(
+                        _screenBuilder.noItemsFoundIndicatorBuilder(
                       context,
                       _defaultEmptyView(),
                     ),
                     noMoreItemsIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNoMoreItemsIndicatorBuilder(
+                        _screenBuilder.noMoreItemsIndicatorBuilder(
                       context,
                       const SizedBox(),
                     ),
@@ -280,7 +281,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
-              ? _screenBuilder.dmFeedMuteIconBuilder(
+              ? _screenBuilder.muteIconBuilder(
                   _defMuteButton(),
                 )
               : const SizedBox.shrink(),

@@ -22,7 +22,7 @@ class LMCommunityHybridChatScreen extends StatefulWidget {
 class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScreen> {
   final LMChatUserViewData user =
       LMChatLocalPreference.instance.getUser().toUserViewData();
-  final _homeScreenBuilder = LMChatCore.config.homeConfig.builder;
+  final _screenBuilder = LMChatCore.config.communityHybridChatConfig.builder;
 
   @override
   void didUpdateWidget(covariant LMCommunityHybridChatScreen oldWidget) {
@@ -35,9 +35,9 @@ class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScree
     return DefaultTabController(
       length: 2,
       child: Builder(builder: (context) {
-        return _homeScreenBuilder.scaffold(
+        return _screenBuilder.scaffold(
           backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: _homeScreenBuilder.appBarBuilder(
+          appBar: _screenBuilder.appBarBuilder(
             context,
             user,
             DefaultTabController.of(context),
@@ -73,7 +73,7 @@ class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScree
         ),
         const SizedBox(width: 8),
       ],
-      bottom: _homeScreenBuilder.tabBarBuilder(
+      bottom: _screenBuilder.tabBarBuilder(
         context,
         DefaultTabController.of(context),
         _defTabBar(),

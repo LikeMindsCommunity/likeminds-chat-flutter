@@ -1,10 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/src/core/configurations/chat_builder.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/community_chat/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/community_hybrid_chat/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
-import 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
@@ -12,7 +14,6 @@ import 'package:likeminds_chat_flutter_core/src/views/report/configurations/conf
 // export all the configurations
 export 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
-export 'package:likeminds_chat_flutter_core/src/views/home/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
@@ -29,8 +30,9 @@ class LMChatConfig {
   /// {@macro lm_chat_explore_config}
   final LMChatExploreConfig exploreConfig;
 
-  /// {@macro lm_chat_home_config}
-  final LMChatHomeConfig homeConfig;
+  final LMCommunityChatConfig communityChatConfig;
+  final LMNetworkingChatConfig networkingChatConfig;
+  final LMCommunityHybridChatConfig communityHybridChatConfig;
 
   /// {@macro lm_chat_participant_config}
   final LMChatParticipantConfig participantConfig;
@@ -57,7 +59,9 @@ class LMChatConfig {
   LMChatConfig({
     this.chatRoomConfig = const LMChatroomConfig(),
     this.exploreConfig = const LMChatExploreConfig(),
-    this.homeConfig = const LMChatHomeConfig(),
+    this.communityChatConfig = const LMCommunityChatConfig(),
+    this.networkingChatConfig = const LMNetworkingChatConfig(),
+    this.communityHybridChatConfig = const LMCommunityHybridChatConfig(),
     this.participantConfig = const LMChatParticipantConfig(),
     this.reportConfig = const LMChatReportConfig(),
     this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),

@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_flutter_core/src/views/community_chat/configurations/builder.dart';
 
 /// {@template lm_community_chat_screen}
 /// A widget that represents a List of Group Chatrooms on home
@@ -47,11 +48,11 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
   // Paging controller to handle pagination, and list updation
   late PagingController<int, LMChatRoomViewData> homeFeedPagingController;
 
-  final LMChatHomeBuilderDelegate _screenBuilder =
-      LMChatCore.config.homeConfig.builder;
-  final _homeScreenSettings = LMChatCore.config.homeConfig.setting;
+  final LMCommunityChatBuilderDelegate _screenBuilder =
+      LMChatCore.config.communityChatConfig.builder;
+  final _homeScreenSettings = LMChatCore.config.communityChatConfig.setting;
   final LMCommunityChatListStyle _style =
-      LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
+      LMChatCore.config.communityChatConfig.style.homeFeedListStyle?.call(
             LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold),
           ) ??
           LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold);
@@ -90,7 +91,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
         top: false,
         child: Column(
           children: [
-            _screenBuilder.homeFeedExploreTileBuilder(
+            _screenBuilder.exploreTileBuilder(
               context,
               _defaultExploreTile(),
             ),
@@ -114,42 +115,42 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
                             PagedChildBuilderDelegate<LMChatRoomViewData>(
                           firstPageErrorIndicatorBuilder: (context) =>
                               _screenBuilder
-                                  .homeFeedFirstPageErrorIndicatorBuilder(
+                                  .firstPageErrorIndicatorBuilder(
                             context,
                             _defaultErrorView(),
                           ),
                           newPageErrorIndicatorBuilder: (context) =>
                               _screenBuilder
-                                  .homeFeedNewPageErrorIndicatorBuilder(
+                                  .newPageErrorIndicatorBuilder(
                             context,
                             _defaultErrorView(),
                           ),
                           firstPageProgressIndicatorBuilder: (context) =>
                               _screenBuilder
-                                  .homeFeedFirstPageProgressIndicatorBuilder(
+                                  .firstPageProgressIndicatorBuilder(
                             context,
                             const LMChatSkeletonChatroomList(),
                           ),
                           newPageProgressIndicatorBuilder: (context) =>
                               _screenBuilder
-                                  .homeFeedNewPageProgressIndicatorBuilder(
+                                  .newPageProgressIndicatorBuilder(
                             context,
                             const LMChatLoader(),
                           ),
                           noItemsFoundIndicatorBuilder: (context) =>
                               _screenBuilder
-                                  .homeFeedNoItemsFoundIndicatorBuilder(
+                                  .noItemsFoundIndicatorBuilder(
                             context,
                             _defaultEmptyView(),
                           ),
                           noMoreItemsIndicatorBuilder: (context) =>
                               _screenBuilder
-                                  .homeFeedNoMoreItemsIndicatorBuilder(
+                                  .noMoreItemsIndicatorBuilder(
                             context,
                             const SizedBox(),
                           ),
                           itemBuilder: (context, item, index) {
-                            return _screenBuilder.homeFeedTileBuilder(
+                            return _screenBuilder.chatroomTileBuilder(
                               context,
                               item,
                               _defaultHomeChatRoomTile(item),
@@ -223,7 +224,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
               snapshot.hasData) {
             if (snapshot.data!.success) {
               GetExploreTabCountResponse response = snapshot.data!.data!;
-              return _screenBuilder.homeFeedExploreChipBuilder(
+              return _screenBuilder.exploreChipBuilder(
                 context,
                 _defExploreChip(response),
               );
@@ -374,7 +375,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
           ),
           const SizedBox(width: 2),
           if (chatroom.isSecret == true)
-            _screenBuilder.homeFeedSecretChatroomIconBuilder(
+            _screenBuilder.secretChatroomIconBuilder(
               _defSecretChatroomIcon(),
             ),
         ],
@@ -408,7 +409,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
-              ? _screenBuilder.homeFeedMuteIconBuilder(
+              ? _screenBuilder.muteIconBuilder(
                   _defMuteIcon(),
                 )
               : const SizedBox.shrink(),
