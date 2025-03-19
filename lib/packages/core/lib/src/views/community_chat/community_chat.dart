@@ -50,11 +50,11 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
   final LMChatHomeBuilderDelegate _screenBuilder =
       LMChatCore.config.homeConfig.builder;
   final _homeScreenSettings = LMChatCore.config.homeConfig.setting;
-  final LMChatHomeFeedListStyle _style =
+  final LMCommunityChatListStyle _style =
       LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
-            LMChatHomeFeedListStyle.basic(LMChatTheme.theme.scaffold),
+            LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold),
           ) ??
-          LMChatHomeFeedListStyle.basic(LMChatTheme.theme.scaffold);
+          LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold);
 
   String get _tag => widget.chatroomTag ?? _homeScreenSettings.tag ?? '';
 
@@ -477,8 +477,8 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
 /// {@template lm_chat_home_feed_list_style}
 /// A style object to customize the look and feel of the home feed list
 /// {@endtemplate}
-class LMChatHomeFeedListStyle {
-  /// [backgroundColor] is the background color of the list
+class LMCommunityChatListStyle {
+  /// LMChatHomeFeedListStyle[backgroundColor] is the background color of the list
   final Color? backgroundColor;
 
   /// [padding] is the padding of the list
@@ -493,7 +493,7 @@ class LMChatHomeFeedListStyle {
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_home_feed_list_style}
-  const LMChatHomeFeedListStyle({
+  const LMCommunityChatListStyle({
     this.backgroundColor,
     this.padding,
     this.profilePictureStyle,
@@ -501,8 +501,8 @@ class LMChatHomeFeedListStyle {
   });
 
   /// Default style for the home feed list
-  factory LMChatHomeFeedListStyle.basic(Color? scaffold) {
-    return LMChatHomeFeedListStyle(
+  factory LMCommunityChatListStyle.basic(Color? scaffold) {
+    return LMCommunityChatListStyle(
         backgroundColor: scaffold,
         padding: const EdgeInsets.only(
           right: 8,
@@ -528,15 +528,15 @@ class LMChatHomeFeedListStyle {
         ));
   }
 
-  /// Creates a copy of this [LMChatHomeFeedListStyle] but with the given fields replaced with the new values.
+  /// Creates a copy of this [LMCommunityChatListStyle] but with the given fields replaced with the new values.
   /// If the fields are null, the original values are retained.
-  LMChatHomeFeedListStyle copyWith({
+  LMCommunityChatListStyle copyWith({
     Color? backgroundColor,
     EdgeInsets? padding,
     LMChatProfilePictureStyle? profilePictureStyle,
     LMChatTextStyle? unReadCountTextStyle,
   }) {
-    return LMChatHomeFeedListStyle(
+    return LMCommunityChatListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
       profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,

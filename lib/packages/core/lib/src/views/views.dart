@@ -1,5 +1,5 @@
 export 'chatroom/chatroom.dart';
-export 'home/community_hybrid_chat.dart';
+export 'community_hybrid_chat/community_hybrid_chat.dart';
 export 'explore/explore.dart';
 export 'participants/participants.dart';
 export 'report/report.dart';
