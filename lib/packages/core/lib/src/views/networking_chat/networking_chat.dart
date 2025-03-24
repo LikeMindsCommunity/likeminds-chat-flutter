@@ -83,6 +83,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+      floatingActionButton: _floatingActionButton(),
       backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
@@ -336,7 +337,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LMChatExplorePage(),
+            builder: (context) => const LMChatMemberList(),
           ),
         );
       },
