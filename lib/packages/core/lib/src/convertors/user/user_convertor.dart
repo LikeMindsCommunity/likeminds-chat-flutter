@@ -6,7 +6,16 @@ import 'package:likeminds_chat_flutter_core/src/convertors/user/sdk_client_info_
 extension UserRoleConvertor on UserRole {
   /// Converts UserRole to LMChatUserRole
   LMChatUserRole toLMChatUserRole() {
-    return LMChatUserRole.values[index];
+    switch (this) {
+      case UserRole.chatbot:
+        return LMChatUserRole.chatbot;
+      case UserRole.member:
+        return LMChatUserRole.member;
+      case UserRole.admin:
+        return LMChatUserRole.admin;
+      default:
+        return LMChatUserRole.member;
+    }
   }
 }
 
@@ -14,7 +23,16 @@ extension UserRoleConvertor on UserRole {
 extension LMChatUserRoleConvertor on LMChatUserRole {
   /// Converts LMChatUserRole to UserRole
   UserRole toUserRole() {
-    return UserRole.values[index];
+    switch (this) {
+      case LMChatUserRole.chatbot:
+        return UserRole.chatbot;
+      case LMChatUserRole.member:
+        return UserRole.member;
+      case LMChatUserRole.admin:
+        return UserRole.admin;
+      default:
+        return UserRole.member;
+    }
   }
 }
 
