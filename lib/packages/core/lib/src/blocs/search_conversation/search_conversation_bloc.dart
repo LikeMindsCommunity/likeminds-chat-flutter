@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:meta/meta.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 part 'search_conversation_event.dart';
@@ -22,6 +23,6 @@ class LMChatSearchConversationBloc
   /// Private constructor to enforce singleton pattern
   LMChatSearchConversationBloc._() : super(LMChatSearchConversationInitial()) {
     // Handle search conversation event
-    on<LMChatSearchConversationEvent>(_searchConversationEventHandler);
+    on<LMChatGetSearchConversationEvent>(_searchConversationEventHandler);
   }
 }
