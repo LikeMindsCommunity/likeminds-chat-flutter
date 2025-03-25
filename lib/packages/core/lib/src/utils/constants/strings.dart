@@ -7,6 +7,7 @@ class LMChatStringConstants {
   static const String accessToken = "accessToken";
   static const String refreshToken = 'refreshToken';
   static const String dmHomeFeedTitle = "Direct Messages";
+  static const String isDMWithRequestEnabled = "isDMWithRequestEnabled";
 
   static const String groupHomeTabTitle = "Groups";
   static const String dmHomeTabTitle = "DMs";

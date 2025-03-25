@@ -169,6 +169,10 @@ class LMChatCore {
               errorMessage: communityConfigurations.errorMessage);
         }
       }
+      // set the isDMWithRequestEnabled flag in local preference
+      final isDMWithRequestEnabled =
+          initiateUserResponse.data?.community?.isDMWithRequestEnabled;
+      await storeIsDMWithRequestEnabled(isDMWithRequestEnabled ?? false);
       return initiateUserResponse;
     } else {
       return await showChatWithoutApiKey(
@@ -242,6 +246,10 @@ class LMChatCore {
       );
     }
 
+    // set the isDMWithRequestEnabled flag in local preference
+    final isDMWithRequestEnabled =
+        validateUserResponse.community?.isDMWithRequestEnabled;
+    await storeIsDMWithRequestEnabled(isDMWithRequestEnabled ?? false);
     return LMResponse(success: true, data: validateUserResponse);
   }
 

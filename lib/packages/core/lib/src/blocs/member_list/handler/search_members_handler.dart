@@ -12,8 +12,9 @@ void _searchMembersEventHandler(
 
     final request = (SearchMemberRequestBuilder()
           ..page(event.page)
-          ..memberStates([UserRole.member, UserRole.admin])
+          ..memberStates([1,4])
           ..excludeSelfUser(true)
+          ..searchType('name')
           ..search(event.query))
         .build();
     debugPrint('SearchMembersRequest: $request');

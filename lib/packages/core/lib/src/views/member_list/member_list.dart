@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/member_list/member_list_bloc.dart';
+import 'dart:async';
 
 class LMChatMemberList extends StatefulWidget {
   const LMChatMemberList({super.key});
@@ -16,9 +17,12 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
   final _screenBuilder = LMChatCore.config.memberListConfig.builder;
   final int _pageSize = 10;
   String? searchTerm;
-  
+  bool _isSearching = false;
+  Timer? _debounceTimer;
+  final TextEditingController _searchController = TextEditingController();
+
   late final PagingController<int, LMChatUserViewData> _pagingController;
-  
+
   @override
   void initState() {
     super.initState();
@@ -34,10 +38,18 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      _memberListBloc.add(LMChatGetAllMemberEvent(
-        page: pageKey,
-        pageSize: _pageSize,
-      ));
+      if (searchTerm != null && searchTerm!.isNotEmpty) {
+        _memberListBloc.add(LMChatMemberListSearchEvent(
+          query: searchTerm!,
+          page: pageKey,
+          pageSize: _pageSize,
+        ));
+      } else {
+        _memberListBloc.add(LMChatGetAllMemberEvent(
+          page: pageKey,
+          pageSize: _pageSize,
+        ));
+      }
     } catch (error) {
       _pagingController.error = error;
     }
@@ -47,9 +59,21 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
     _pagingController.refresh();
   }
 
+  void _onSearchChanged(String query) {
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 200), () {
+      setState(() {
+        searchTerm = query;
+      });
+      _pagingController.refresh();
+    });
+  }
+
   @override
   void dispose() {
     _pagingController.dispose();
+    _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -61,12 +85,44 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
     );
   }
 
-  PreferredSizeWidget _defaultAppBar() {
+  LMChatAppBar _defaultAppBar() {
     return LMChatAppBar(
-      title: const Text('Members'),
-      style: LMChatAppBarStyle(
-        backgroundColor: LMChatTheme.theme.primaryColor,
-      ),
+      title: _isSearching
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search members',
+                border: InputBorder.none,
+              ),
+              onChanged: _onSearchChanged,
+              onSubmitted: (value) {
+                setState(() {
+                  _isSearching = false;
+                });
+              },
+            )
+          : const Text('Members'),
+      trailing: [
+        LMChatButton(
+          onTap: () {
+            setState(() {
+              _isSearching = !_isSearching;
+              if (!_isSearching) {
+                _searchController.clear();
+                searchTerm = null;
+                _pagingController.refresh();
+              }
+            });
+          },
+          style: LMChatButtonStyle.basic().copyWith(
+            icon: LMChatIcon(
+              type: LMChatIconType.icon,
+              icon: _isSearching ? Icons.close : Icons.search,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -119,6 +175,114 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
     return LMChatUserTile(
       userViewData: member,
       style: LMChatTileStyle.basic(),
+      onTap: () => _handleUserTileTap(member),
     );
+  }
+
+  void _handleUserTileTap(LMChatUserViewData member) async {
+    // Get isDMWithRequestEnabled setting from local preferences
+    final bool isDMWithRequestEnabled = getIsDMWithRequestEnabled();
+
+    // Build the request body
+    final checkDMLimitRequest =
+        (CheckDmLimitRequestBuilder()..uuid(member.uuid)).build();
+    // check dm limit
+    final response = await LMChatCore.client.checkDMLimit(checkDMLimitRequest);
+    if (!response.success) {
+      // show error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(response.errorMessage ?? 'Failed to check DM limit')),
+      );
+      return;
+    }
+    // check if the user already have a chatroom with the member
+    if (response.data?.chatroomId != null) {
+      // navigate to the chatroom
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              LMChatroomScreen(chatroomId: response.data!.chatroomId!),
+        ),
+      );
+    } else {
+      if (isDMWithRequestEnabled) {
+        // check if limit is not exceeded
+        if (!(response.data?.isRequestDmLimitExceeded ?? false)) {
+          // create dm chatroom
+          final createDmChatroomRequest = (CreateDMChatroomRequestBuilder()
+                ..uuid(member.uuid)
+                ..memberId(member.id))
+              .build();
+
+          // create dm chatroom
+          final response =
+              await LMChatCore.client.createDMChatroom(createDmChatroomRequest);
+
+          if (response.success) {
+            // navigate to the chatroom
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LMChatroomScreen(
+                      chatroomId: response.data!.chatRoom!.id)),
+            );
+          } else {
+            // show error
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(
+                      response.errorMessage ?? 'Failed to create DM chatroom')),
+            );
+          }
+        } else {
+          // show error
+          // Show dialog with DM limit exceeded message
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('DM Request Limit Exceeded'),
+              content: Text(
+                'You have exceeded your DM request limit. You can send your next DM request after ${response.data?.newRequestDmTimestamp != null ? DateTime.fromMillisecondsSinceEpoch(response.data!.newRequestDmTimestamp! * 1000).toString() : 'some time'}.'
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        // create dm chatroom
+        final createDmChatroomRequest = (CreateDMChatroomRequestBuilder()
+              ..uuid(member.uuid)
+              ..memberId(member.id))
+            .build();
+
+        // create dm chatroom
+        final response =
+            await LMChatCore.client.createDMChatroom(createDmChatroomRequest);
+
+        if (response.success) {
+          // navigate to the chatroom
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LMChatroomScreen(chatroomId: response.data!.chatRoom!.id)),
+          );
+        } else {
+          // show error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(
+                    response.errorMessage ?? 'Failed to create DM chatroom')),
+          );
+        }
+      }
+    }
   }
 }
