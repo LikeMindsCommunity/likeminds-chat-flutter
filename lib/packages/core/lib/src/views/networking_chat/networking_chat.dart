@@ -50,7 +50,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
           ) ??
           LMChatDMFeedListStyle.basic();
 
-  bool _showDMFab = false;
+  final ValueNotifier<bool> _showDMFab = ValueNotifier(false);
   int? _showList;
 
   void _checkDMStatus() async {
@@ -59,11 +59,12 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
     final checkDMStatusResponse = await LMChatCore.client.checkDMStatus(
       checkDMStatusRequest,
     );
-    _showDMFab = checkDMStatusResponse.data?.showDm ?? false;
+    _showDMFab.value = checkDMStatusResponse.data?.showDm ?? false;
     final cta = checkDMStatusResponse.data?.cta;
-    final uri = Uri.parse(cta ?? '');
-    if (uri.path == '/direct_messages') {
-      _showList = int.tryParse(uri.queryParameters['show_list'] ?? '');
+    if (cta != null) {
+      Uri uri = Uri.parse(cta);
+      Map<String, String> queryParams = uri.queryParameters;
+      _showList = int.tryParse(queryParams['show_list'] ?? '');
     }
   }
 
@@ -101,7 +102,12 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      floatingActionButton: _showDMFab ? _floatingActionButton() : null,
+      floatingActionButton: ValueListenableBuilder(
+        valueListenable: _showDMFab,
+        builder: (context, value, child) {
+          return value ? _floatingActionButton() : const SizedBox();
+        },
+      ),
       backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
