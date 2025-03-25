@@ -10,9 +10,13 @@ void _getAllMembersEventHandler(
   try {
     emit(LMChatMemberListLoading());
 
+    final filterMemberRoles = event.showList == 1
+        ? [UserRole.member, UserRole.admin]
+        : [UserRole.admin];
+
     final request = (GetAllMembersRequestBuilder()
           ..page(event.page)
-          ..filterMemberRoles([UserRole.member, UserRole.admin])
+          ..filterMemberRoles(filterMemberRoles)
           ..excludeSelfUser(true))
         .build();
     debugPrint('GetAllMembersRequest: $request');
@@ -40,4 +44,4 @@ void _getAllMembersEventHandler(
       message: e.toString(),
     ));
   }
-} 
+}

@@ -6,7 +6,8 @@ import 'package:likeminds_chat_flutter_core/src/blocs/member_list/member_list_bl
 import 'dart:async';
 
 class LMChatMemberList extends StatefulWidget {
-  const LMChatMemberList({super.key});
+  const LMChatMemberList({super.key, this.showList});
+  final int? showList;
 
   @override
   State<LMChatMemberList> createState() => _LMChatMemberListState();
@@ -43,11 +44,13 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
           query: searchTerm!,
           page: pageKey,
           pageSize: _pageSize,
+          showList: widget.showList,
         ));
       } else {
         _memberListBloc.add(LMChatGetAllMemberEvent(
           page: pageKey,
           pageSize: _pageSize,
+          showList: widget.showList,
         ));
       }
     } catch (error) {
@@ -244,8 +247,7 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
             builder: (context) => AlertDialog(
               title: const Text('DM Request Limit Exceeded'),
               content: Text(
-                'You have exceeded your DM request limit. You can send your next DM request after ${response.data?.newRequestDmTimestamp != null ? DateTime.fromMillisecondsSinceEpoch(response.data!.newRequestDmTimestamp! * 1000).toString() : 'some time'}.'
-              ),
+                  'You have exceeded your DM request limit. You can send your next DM request after ${response.data?.newRequestDmTimestamp != null ? DateTime.fromMillisecondsSinceEpoch(response.data!.newRequestDmTimestamp! * 1000).toString() : 'some time'}.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),

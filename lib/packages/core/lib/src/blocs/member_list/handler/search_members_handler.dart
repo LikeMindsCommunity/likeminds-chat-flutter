@@ -10,9 +10,11 @@ void _searchMembersEventHandler(
   try {
     emit(LMChatMemberListLoading());
 
+    final memberStates = event.showList == 1 ? [1, 4] : [1];
+
     final request = (SearchMemberRequestBuilder()
           ..page(event.page)
-          ..memberStates([1,4])
+          ..memberStates(memberStates)
           ..excludeSelfUser(true)
           ..searchType('name')
           ..search(event.query))
@@ -42,4 +44,4 @@ void _searchMembersEventHandler(
       message: e.toString(),
     ));
   }
-} 
+}
