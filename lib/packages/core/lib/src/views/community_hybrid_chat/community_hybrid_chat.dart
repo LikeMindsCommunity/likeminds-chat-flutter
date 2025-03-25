@@ -103,8 +103,4 @@ class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScree
       ],
     );
   }
-
-  LMChatAIButton _floatingActionButton() {
-    return const LMChatAIButton();
-  }
 }
