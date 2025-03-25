@@ -13,6 +13,7 @@ import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_action_helper.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
@@ -454,6 +455,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       trailing: isOtherUserAIChatbot(chatroom.toChatRoomViewData())
           ? []
           : [
+              //Tdod: f
+              _screenBuilder.searchButtomBuilder(
+                context,
+                chatroom.toChatRoomViewData(),
+                _defaultSearchButton(),
+              ),
               ValueListenableBuilder(
                   valueListenable: rebuildAppBar,
                   builder: (context, _, __) {
@@ -471,6 +478,36 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                           );
                   }),
             ],
+    );
+  }
+
+  LMChatButton _defaultSearchButton() {
+    return LMChatButton(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMChatSearchConversationScreen(
+                chatRoomId: chatroom.id,
+              ),
+            ));
+      },
+      style: LMChatButtonStyle(
+        height: 28,
+        width: 28,
+        borderRadius: 6,
+        padding: EdgeInsets.zero,
+        icon: LMChatIcon(
+          type: LMChatIconType.icon,
+          icon: Icons.search,
+          style: LMChatIconStyle(
+            color: LMChatTheme.theme.onContainer,
+            size: 24,
+            boxSize: 28,
+          ),
+        ),
+        backgroundColor: LMChatTheme.theme.container,
+      ),
     );
   }
 
