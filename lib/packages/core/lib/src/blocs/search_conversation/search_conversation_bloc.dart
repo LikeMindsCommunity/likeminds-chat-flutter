@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 part 'search_conversation_event.dart';
 part 'search_conversation_state.dart';
-part 'handler/get_convo_search_handler.dart';
+part 'handler/search_conversation_handler.dart';
 
 /// [LMChatSearchConversationBloc] is responsible for handling the search functionality
 /// for conversations in a chat application.

@@ -455,7 +455,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       trailing: isOtherUserAIChatbot(chatroom.toChatRoomViewData())
           ? []
           : [
-              //Tdod: f
               _screenBuilder.searchButtomBuilder(
                 context,
                 chatroom.toChatRoomViewData(),

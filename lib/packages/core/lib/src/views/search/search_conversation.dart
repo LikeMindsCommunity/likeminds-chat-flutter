@@ -23,7 +23,7 @@ class _LMChatSearchConversationScreenState
   // Controller for the TextField
   final TextEditingController _searchController = TextEditingController();
   final LMSearchBuilderDelegate _screenBuilder =
-      LMChatCore.config.searchConfig.builder;
+      LMChatCore.config.searchConversationConfig.builder;
 
   // Clear the text in the TextField
   void _clearSearch() {

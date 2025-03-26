@@ -4,17 +4,14 @@ part of "../search_conversation_bloc.dart";
 void _searchConversationEventHandler(LMChatGetSearchConversationEvent event,
     Emitter<LMChatSearchConversationState> emit) async {
   // Emit loading state based on whether it's a new search or pagination
-  if (event.page > 1) {
-    emit(const LMChatSearchConversationPaginationLoadingState());
-  } else {
-    emit(const LMChatSearchConversationLoadingState());
-  }
+
+  emit(const LMChatSearchConversationLoadingState());
 
   try {
     // Create the search conversation request
     final ConversationSearchRequest searchRequest =
         (ConversationSearchRequestBuilder()
-              ..searchTerm(event.search!)
+              ..searchTerm(event.search)
               ..followStatus(event.followStatus)
               ..page(event.page)
               ..pageSize(event.pageSize)

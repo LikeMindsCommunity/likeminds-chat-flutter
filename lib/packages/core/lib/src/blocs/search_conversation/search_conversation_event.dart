@@ -21,7 +21,7 @@ class LMChatGetSearchConversationEvent extends LMChatSearchConversationEvent {
   final int pageSize;
 
   /// [search] is the search query to search the Conversation.
-  final String? search;
+  final String search;
 
   ///[followStatus] is the status of the follow
   final bool followStatus;
@@ -31,7 +31,7 @@ class LMChatGetSearchConversationEvent extends LMChatSearchConversationEvent {
     required this.chatroomId,
     required this.page,
     required this.pageSize,
-    this.search,
+    required this.search,
     required this.followStatus,
   });
   @override
@@ -39,7 +39,7 @@ class LMChatGetSearchConversationEvent extends LMChatSearchConversationEvent {
         chatroomId,
         page,
         pageSize,
-        search ?? '',
+        search,
         followStatus,
       ];
 }

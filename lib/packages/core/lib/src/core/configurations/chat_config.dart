@@ -49,14 +49,14 @@ class LMChatConfig {
   /// {@macro lm_chat_poll_config}
   final LMChatPollConfig pollConfig;
 
+  /// {@macro lm_search_config}
+  final LMSearchConversationConfig searchConversationConfig;
+
   /// {@macro lm_widget_builder_delegate}
   final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
   /// [globalSystemOverlayStyle] is the system overlay style for the app.
   final SystemUiOverlayStyle? globalSystemOverlayStyle;
-
-  /// {@macro lm_search_config}
-  final LMSearchConfig searchConfig;
 
   /// {@macro lm_chat_config}
   LMChatConfig({
@@ -68,8 +68,8 @@ class LMChatConfig {
     this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),
     this.mediaPreviewConfig = const LMChatMediaPreviewConfig(),
     this.pollConfig = const LMChatPollConfig(),
+    this.searchConversationConfig = const LMSearchConversationConfig(),
     this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
-    this.searchConfig = const LMSearchConfig(),
   });
 }

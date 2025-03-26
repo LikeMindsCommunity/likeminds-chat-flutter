@@ -54,9 +54,3 @@ class LMChatSearchConversationErrorState extends LMChatSearchConversationState {
   @override
   List<Object> get props => [errorMessage];
 }
-
-/// [LMChatSearchConversationPaginationLoadingState] is the state when the search results are being loaded for pagination.
-class LMChatSearchConversationPaginationLoadingState
-    extends LMChatSearchConversationState {
-  const LMChatSearchConversationPaginationLoadingState();
-}
