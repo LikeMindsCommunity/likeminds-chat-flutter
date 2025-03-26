@@ -4,9 +4,11 @@ part of "../search_conversation_bloc.dart";
 void _searchConversationEventHandler(LMChatGetSearchConversationEvent event,
     Emitter<LMChatSearchConversationState> emit) async {
   // Emit loading state based on whether it's a new search or pagination
-
-  emit(const LMChatSearchConversationLoadingState());
-
+  if (event.page > 1) {
+    emit(const LMChatSearchConversationPaginationLoadingState());
+  } else {
+    emit(const LMChatSearchConversationLoadingState());
+  }
   try {
     // Create the search conversation request
     final ConversationSearchRequest searchRequest =
@@ -21,7 +23,6 @@ void _searchConversationEventHandler(LMChatGetSearchConversationEvent event,
     // Fetch the search results from the repository
     final LMResponse<ConversationSearchResponse> response =
         await LMChatCore.client.searchConversation(searchRequest);
-
     // Check if the response is successful
     if (response.success) {
       // Extract the search results from the response
