@@ -67,3 +67,7 @@
 
 - Fixed Customization misses across the SDK
 - Added support for .svg `fileUrl` in `LMChatImage`
+
+## 0.14.1
+
+- Patch update for `likeminds_chat_fl: ^1.12.1`
