@@ -332,4 +332,11 @@ class LMChatroomBuilderDelegate {
   ) {
     return moreOptionButton;
   }
+
+  /// Builds the search button. This button is used to search messages.
+
+  Widget searchButtomBuilder(BuildContext context,
+      LMChatRoomViewData chatroomData, LMChatButton searchButton) {
+    return searchButton;
+  }
 }
