@@ -1244,7 +1244,25 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             showArrow: false,
             menuBuilder: () => _defAttachmentMenu(),
             pressType: PressType.singleClick,
-            child: _defAttachmentIcon(),
+            // Ensure popup appears above the keyboard
+            verticalMargin: 0,
+            horizontalMargin: 0,
+            // Position the popup relative to the button
+            position: PreferredPosition.top,
+            child: GestureDetector(
+              onTap: () {
+                // If keyboard is open, add a small delay
+
+                if (View.of(context).viewInsets.bottom > 0.0) {
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    _popupMenuController.showMenu();
+                  });
+                } else {
+                  _popupMenuController.showMenu();
+                }
+              },
+              child: _defAttachmentIcon(),
+            ),
           )
         : null;
   }
