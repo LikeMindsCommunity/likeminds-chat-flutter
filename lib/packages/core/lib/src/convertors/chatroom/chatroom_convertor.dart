@@ -64,7 +64,7 @@ extension ChatRoomViewDataConvertor on ChatRoom {
           ..isPinned(isPinned)
           ..externalSeen(externalSeen)
           ..chatRequestState(chatRequestState)
-          // ..chatRequestedBy(chatRequestedBy)
+          ..chatRequestedBy(chatRequestedBy?.toUserViewData())
           ..chatRequestedById(chatRequestedById)
           ..chatroomWithUser(chatroomWithUser?.toUserViewData())
           ..chatroomWithUserId(chatroomWithUserId)

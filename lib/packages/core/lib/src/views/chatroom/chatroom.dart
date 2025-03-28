@@ -79,7 +79,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     return _selectedIds.isNotEmpty;
   }
 
-  _initiateDMChatroomFlow() {}
 
   @override
   void initState() {
@@ -185,10 +184,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
             listener: (context, state) {
               if (state is LMChatroomLoadedState) {
                 chatroom = state.chatroom;
-                //check if chatroom is a dm chatroom
-                if (chatroom.type == 10) {
-                  _initiateDMChatroomFlow();
-                }
                 lastConversationId = state.lastConversationId;
                 _conversationBloc.add(LMChatInitialiseConversationsEvent(
                   chatroomId: chatroom.id,

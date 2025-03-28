@@ -170,9 +170,15 @@ class LMChatCore {
         }
       }
       // set the isDMWithRequestEnabled flag in local preference
-      final isDMWithRequestEnabled =
-          initiateUserResponse.data?.community?.isDMWithRequestEnabled;
-      await storeIsDMWithRequestEnabled(isDMWithRequestEnabled ?? false);
+      final communitySettings =
+          initiateUserResponse.data?.community?.communitySettings;
+      for (final CommunitySettings communitySetting
+          in communitySettings ?? []) {
+        if (communitySetting.settingType ==
+            'enable_dm_without_connection_request') {
+          await storeIsDMWithRequestEnabled(communitySetting.enabled);
+        }
+      }
       return initiateUserResponse;
     } else {
       return await showChatWithoutApiKey(
@@ -247,9 +253,14 @@ class LMChatCore {
     }
 
     // set the isDMWithRequestEnabled flag in local preference
-    final isDMWithRequestEnabled =
-        validateUserResponse.community?.isDMWithRequestEnabled;
-    await storeIsDMWithRequestEnabled(isDMWithRequestEnabled ?? false);
+    final communitySettings = validateUserResponse.community?.communitySettings;
+    for (final CommunitySettings communitySetting in communitySettings ?? []) {
+      if (communitySetting.settingType ==
+          'enable_dm_without_connection_request') {
+        await storeIsDMWithRequestEnabled(communitySetting.enabled);
+      }
+    }
+
     return LMResponse(success: true, data: validateUserResponse);
   }
 
