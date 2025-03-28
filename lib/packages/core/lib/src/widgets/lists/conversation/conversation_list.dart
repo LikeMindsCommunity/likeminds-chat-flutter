@@ -15,6 +15,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:intl/intl.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
+//TODO: do same change in dm file ( later)
 /// {@template lm_chat_conversation_list}
 /// A widget that displays a list of conversations.
 /// {@endtemplate}
@@ -125,6 +126,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                 _updateDeletedConversation(conversation);
               }
             }
+
             if (state is LMChatConversationEdited) {
               _updateEditedConversation(state.conversationViewData);
             }
@@ -133,6 +135,10 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                 state is LMChatDeleteReactionState ||
                 state is LMChatDeleteReactionError) {
               _updateReactions(state);
+            }
+            if (state is LMChatSearchConversationInChatroomState) {
+              _searchWithMessageId(
+                  state.messageId, pagedListController, widget.chatroomId);
             }
           },
         ),
@@ -1340,8 +1346,151 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     }
   }
 
-  void _scrollToConversation(int index, int replyId,
-      LMDualSidePaginationController pagedListController) {
+  void _searchWithMessageId(
+    int messageId,
+    LMDualSidePaginationController pagedListController,
+    int chatroomId,
+  ) async {
+    // find index of the conversation in the list
+    final int replyId = messageId;
+    // find index of reply in conversation list
+    int index = pagedListController.itemList
+        .indexWhere((element) => element.id == replyId);
+    if (index != -1) {
+      // scroll and highlight the conversation
+      _scrollToConversation(index, replyId, pagedListController);
+    } else {
+      // handle if index is -1
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+      // fetch reply conversation
+      final GetConversationRequestBuilder replyConversationBuilder =
+          GetConversationRequestBuilder()
+            ..chatroomId(chatroomId)
+            ..page(1)
+            ..pageSize(1)
+            ..isLocalDB(false)
+            ..minTimestamp(0)
+            ..maxTimestamp(currentTime)
+            ..conversationId(replyId);
+
+      // [Data Layer] function call
+      final replyConversationResponse = await LMChatCore.client
+          .getConversation(replyConversationBuilder.build());
+      // convert [Conversation] list to [LMChatConversationViewData] list
+      final replyConversationsVewData =
+          replyConversationResponse.data!.conversationData!.map((e) {
+        return e.toConversationViewData(
+          conversationPollsMeta:
+              replyConversationResponse.data!.conversationPollsMeta,
+          userMeta: replyConversationResponse.data!.userMeta,
+          attachmentMeta:
+              replyConversationResponse.data!.conversationAttachmentsMeta,
+          reactionMeta:
+              replyConversationResponse.data!.conversationReactionMeta,
+          conversationMeta: replyConversationResponse.data!.conversationMeta,
+        );
+      }).toList();
+
+      // assign replyViewData to Global replyConversation
+      if (replyConversationsVewData.isNotEmpty) {
+        LMChatConversationBloc.replyConversation =
+            replyConversationsVewData.first;
+      }
+
+      // fetch 100 conversations from the bottom of the list
+      final GetConversationRequestBuilder bottomToReplyConversationBuilder =
+          GetConversationRequestBuilder()
+            ..chatroomId(chatroomId)
+            ..page(1)
+            ..pageSize(_pageSize)
+            ..isLocalDB(false)
+            ..minTimestamp(replyConversationsVewData.first.createdEpoch!)
+            ..maxTimestamp(currentTime)
+            ..orderBy(OrderBy.ascending);
+
+      // [Data Layer] function call
+      final bottomToReplyResponse = await LMChatCore.client
+          .getConversation(bottomToReplyConversationBuilder.build());
+
+      // convert [Conversation] list to [LMChatConversationViewData] list
+      final bottomConversationsVewData =
+          bottomToReplyResponse.data!.conversationData!.map((e) {
+        return e.toConversationViewData(
+          conversationPollsMeta:
+              bottomToReplyResponse.data!.conversationPollsMeta,
+          userMeta: bottomToReplyResponse.data!.userMeta,
+          attachmentMeta:
+              bottomToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: bottomToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: bottomToReplyResponse.data!.conversationMeta,
+        );
+      }).toList();
+
+      // fetch 100 conversations from the top of the list
+      final GetConversationRequestBuilder topToReplyConversationBuilder =
+          GetConversationRequestBuilder()
+            ..chatroomId(chatroomId)
+            ..page(1)
+            ..pageSize(_pageSize)
+            ..isLocalDB(true)
+            ..minTimestamp(0)
+            ..maxTimestamp(replyConversationsVewData.first.createdEpoch!);
+
+      // [Data Layer] function call
+      final topToReplyResponse = await LMChatCore.client
+          .getConversation(topToReplyConversationBuilder.build());
+
+      // convert [Conversation] list to [LMChatConversationViewData] list
+      final topConversationsViewData =
+          topToReplyResponse.data!.conversationData!.map((e) {
+        return e.toConversationViewData(
+          conversationPollsMeta: topToReplyResponse.data!.conversationPollsMeta,
+          userMeta: topToReplyResponse.data!.userMeta,
+          attachmentMeta: topToReplyResponse.data!.conversationAttachmentsMeta,
+          reactionMeta: topToReplyResponse.data!.conversationReactionMeta,
+          conversationMeta: topToReplyResponse.data!.conversationMeta,
+        );
+      }).toList();
+
+      // clear page list and fetch the conversation
+      // with the reply id
+      pagedListController.clear();
+      // add all the conversations to the list
+      List<LMChatConversationViewData> allConversations = [];
+      // add bottom conversation in reversed order
+      allConversations.addAll(bottomConversationsVewData.reversed);
+      // add top conversation
+      allConversations.addAll(topConversationsViewData);
+      // update conversation view type
+      allConversations = groupConversationsAndAddDates(allConversations);
+      // add the new conversation to pagedList
+      pagedListController.addAll(allConversations);
+      // reset the pages
+      _topPage = 2;
+      _bottomPage = 2;
+      // set last page reached to true in case of no more data
+      if (bottomConversationsVewData.length < _pageSize) {
+        pagedListController.isLastPageToTopReached = true;
+      }
+      if (topConversationsViewData.length < _pageSize) {
+        pagedListController.isLastPageToBottomReached = true;
+      }
+      rebuildConversationList.value = !rebuildConversationList.value;
+      // find index of the conversation in the list and scroll to it
+      int index = pagedListController.itemList
+          .indexWhere((element) => element.id == replyId);
+      if (index != -1) {
+        // scroll and highlight the conversation
+        _scrollToConversation(index, replyId, pagedListController);
+      }
+    }
+  }
+
+  void _scrollToConversation(
+    int index,
+    int replyId,
+    LMDualSidePaginationController pagedListController,
+  ) {
     pagedListController.listController.animateToItem(
       index: index,
       scrollController: pagedListController.scrollController,

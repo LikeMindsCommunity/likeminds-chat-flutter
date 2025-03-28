@@ -58,5 +58,6 @@ class LMChatSearchConversationErrorState extends LMChatSearchConversationState {
 /// [LMChatSearchConversationPaginationLoadingState] is the state when the search results are being loaded for pagination.
 class LMChatSearchConversationPaginationLoadingState
     extends LMChatSearchConversationState {
+  /// [LMChatSearchConversationPaginationLoadingState] constructor to create an instance of [LMChatSearchConversationPaginationLoadingState].
   const LMChatSearchConversationPaginationLoadingState();
 }

@@ -1,10 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/rendering.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:meta/meta.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 part 'search_conversation_event.dart';
 part 'search_conversation_state.dart';
 part 'handler/search_conversation_handler.dart';
@@ -22,7 +20,8 @@ class LMChatSearchConversationBloc
       _instance ??= LMChatSearchConversationBloc._();
 
   /// Private constructor to enforce singleton pattern
-  LMChatSearchConversationBloc._() : super(LMChatSearchConversationInitial()) {
+  LMChatSearchConversationBloc._()
+      : super(const LMChatSearchConversationInitial()) {
     // Handle search conversation event
     on<LMChatGetSearchConversationEvent>(_searchConversationEventHandler);
   }

@@ -1,4 +1,6 @@
 export 'common/text/text.dart';
+export 'common/text/rich_text.dart';
+export 'common/text/text_span.dart';
 export 'common/icon/icon.dart';
 export 'common/tile/tile.dart';
 
@@ -42,7 +44,6 @@ export 'common/dialog/dialog.dart';
 export 'poll/poll.dart';
 export 'poll/poll_style.dart';
 export 'poll/poll_option.dart';
-
 
 export 'paginated_list/dual_side_paginated_list.dart';
 export 'paginated_list/pagination_controller.dart';

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/search_conversation/search_conversation_bloc.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 
 class LMChatSearchConversationScreen extends StatefulWidget {
   static const routeName = '/searchConversation';
@@ -27,6 +28,7 @@ class _LMChatSearchConversationScreenState
       LMChatSearchConversationBloc.instance;
   String searchTerm = '';
   bool followStatus = false;
+  final FocusNode _focusNode = FocusNode();
 
   final PagingController<int, LMChatConversationViewData> _pagingController =
       PagingController(firstPageKey: 1);
@@ -40,31 +42,30 @@ class _LMChatSearchConversationScreenState
   void initState() {
     super.initState();
     _addPaginationListener();
+    _focusNode.requestFocus();
   }
 
   void _addPaginationListener() {
     _pagingController.addPageRequestListener((pageKey) {
-      if (searchTerm.trim().isNotEmpty) {
-        _searchConversationBloc.add(
-          LMChatGetSearchConversationEvent(
-            chatroomId: widget.chatRoomId,
-            search: searchTerm,
-            page: pageKey,
-            followStatus: followStatus,
-            pageSize: _pageSize,
-          ),
-        );
-      }
+      _searchConversationBloc.add(
+        LMChatGetSearchConversationEvent(
+          chatroomId: widget.chatRoomId,
+          search: searchTerm,
+          page: pageKey,
+          followStatus: followStatus,
+          pageSize: _pageSize,
+        ),
+      );
     });
   }
 
   @override
   void dispose() {
-    // focusNode.dispose();
     _searchController.dispose();
-    // _showSearchBarTextField.dispose();
+
     _pagingController.dispose();
     _debounce?.cancel();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -72,7 +73,19 @@ class _LMChatSearchConversationScreenState
   void _clearSearch() {
     _searchController.clear();
     _pagingController.itemList = <LMChatConversationViewData>[];
+    searchTerm = '';
     _pagingController.nextPageKey = 1; // Reset to the first page
+
+    // Add this line to trigger the initial state
+    _searchConversationBloc.add(
+      LMChatGetSearchConversationEvent(
+        chatroomId: widget.chatRoomId,
+        search: '',
+        page: 1,
+        followStatus: followStatus,
+        pageSize: _pageSize,
+      ),
+    );
     return;
   }
 
@@ -99,7 +112,10 @@ class _LMChatSearchConversationScreenState
                   return LMChatLoader(
                     style: LMChatTheme.theme.loaderStyle,
                   );
+                } else if (state is LMChatSearchConversationInitial) {
+                  return emptyTextIndicatorBuilder();
                 }
+
                 return _buildSearchResultsList();
               },
             ),
@@ -109,9 +125,17 @@ class _LMChatSearchConversationScreenState
     );
   }
 
-  LMChatTile _defUserTile(LMChatConversationViewData conversation) {
+  LMChatTile _defUserTile(
+      LMChatConversationViewData conversation, List<String> matches) {
     return LMChatTile(
-      onTap: () {},
+      onTap: () {
+        LMChatConversationActionBloc.instance.add(
+          LMChatSearchConversationInChatroomEvent(
+            messageId: conversation.id,
+          ),
+        );
+        Navigator.of(context).pop(); // Close the search screen
+      },
       style: LMChatTileStyle(
         backgroundColor: LMChatTheme.theme.container,
         gap: 4,
@@ -140,28 +164,78 @@ class _LMChatSearchConversationScreenState
           const Spacer(),
           LMChatText(
             _formatDateFromTimestamp(int.parse(conversation.createdAt)),
-            style: LMChatTextStyle(
+            style: const LMChatTextStyle(
               textStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: LMChatTheme.theme.onContainer,
+                color: LMChatDefaultTheme.greyColor,
               ),
             ),
           ),
         ],
       ),
-      subtitle: LMChatText(
-        conversation.answer,
-        style: LMChatTextStyle(
-          textStyle: TextStyle(
-            overflow: TextOverflow.ellipsis,
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: LMChatTheme.theme.onContainer,
-          ),
+      subtitle: LMChatRichText(
+        text: LMChatTextSpan(
+          children: [
+            LMChatTextSpan(
+              text: matches[0],
+              style: const LMChatTextSpanStyle(
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: LMChatDefaultTheme.greyColor,
+                ),
+              ),
+            ),
+            LMChatTextSpan(
+              text: matches[1],
+              style: LMChatTextSpanStyle(
+                textStyle: TextStyle(
+                  color: LMChatTheme.theme.onContainer,
+                  // Grey text color
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+            LMChatTextSpan(
+              text: matches[2],
+              style: const LMChatTextSpanStyle(
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: LMChatDefaultTheme.greyColor,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  List<String> _findFirstMatch(String match, String text) {
+    String lowerCaseText = text.toLowerCase();
+    String lowerCaseMatch = match.toLowerCase();
+
+    // Find the index of the first occurrence of the match in the text
+    int index = lowerCaseText.indexOf(lowerCaseMatch);
+
+    // If no match is found, return [text, '', '']
+    if (index == -1) {
+      return [text, '', ''];
+    }
+
+    // Extract the part of the text before the match (using the original text)
+    String beforeMatch = text.substring(0, index);
+
+    // Extract the matching string (using the original text)
+    String matchingString = text.substring(index, index + match.length);
+
+    // Extract the part of the text after the match (using the original text)
+    String afterMatch = text.substring(index + match.length);
+
+    // Return the result as a list of three strings
+    return [beforeMatch, matchingString, afterMatch];
   }
 
   LMChatAppBar _defaultAppBar(BuildContext context) {
@@ -213,7 +287,7 @@ class _LMChatSearchConversationScreenState
       chatroomId: 1,
       onTagSelected: (p0) {},
       isDown: false,
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       onChange: _onSearchTextChange,
       // autofocus: true, // Automatically focus on the TextField
       decoration: const InputDecoration(
@@ -248,7 +322,7 @@ class _LMChatSearchConversationScreenState
         'Sunday'
       ][givenDate.weekday - 1];
     } else {
-      // Return the formatted date (e.g., "2023-05-10")
+      // Return the formatted date (e.g., "dd-mm-yyyy")
       return '${givenDate.month.toString().padLeft(2, '0')}-${givenDate.day.toString().padLeft(2, '0')}-${givenDate.year}';
     }
   }
@@ -261,9 +335,7 @@ class _LMChatSearchConversationScreenState
       const Duration(milliseconds: 500),
       () {
         if (value.trim().isEmpty) {
-          // Reset the pagination controller and clear the search results
-          _pagingController.itemList = <LMChatConversationViewData>[];
-          _pagingController.nextPageKey = 1; // Reset to the first page
+          _clearSearch();
           return;
         }
 
@@ -308,9 +380,7 @@ class _LMChatSearchConversationScreenState
   }
 
   void _updatePaginationState(context, state) {
-    debugPrint(state.toString());
     if (state is LMChatSearchConversationLoadedState) {
-      debugPrint(state.toString());
       if (state.results.length < _pageSize) {
         _pagingController.appendLastPage(
           state.results,
@@ -345,12 +415,38 @@ class _LMChatSearchConversationScreenState
     );
   }
 
-  Widget noItemsFoundIndicatorBuilder(
-    BuildContext context,
-  ) {
+  Widget noItemsFoundIndicatorBuilder(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const LMChatIcon(
+            type: LMChatIconType.svg,
+            assetPath: emptyResultIcon,
+            style: LMChatIconStyle(
+              size: 40,
+              margin: EdgeInsets.only(bottom: 16),
+            ),
+          ),
+          LMChatText(
+            'No results found',
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: LMChatTheme.theme.onContainer,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget emptyTextIndicatorBuilder() {
     return const Center(
       child: LMChatText(
-        'No search results found',
+        'Type to search',
         style: LMChatTextStyle(
           textStyle: TextStyle(
             fontSize: 16,
@@ -369,11 +465,12 @@ class _LMChatSearchConversationScreenState
         physics: const ClampingScrollPhysics(),
         builderDelegate: PagedChildBuilderDelegate<LMChatConversationViewData>(
           itemBuilder: (context, item, index) {
-            return _defUserTile(item);
+            List<String> matches = _findFirstMatch(searchTerm, item.answer);
+            return _defUserTile(item, matches);
           },
           // firstPageErrorIndicatorBuilder:
           //     _screenBuilder.firstPageErrorIndicatorBuilder,
-          // newPageErrorIndicatorBuilder:
+          // newPageErrorIndicatorBuilderkh:
           //     _screenBuilder.newPageErrorIndicatorBuilder,
           firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder,
           newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder,

@@ -250,7 +250,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         children: [
           const LMChatIcon(
             type: LMChatIconType.svg,
-            assetPath: emptyPollResult,
+            assetPath: emptyResultIcon,
             style: LMChatIconStyle(
               size: 40,
               margin: EdgeInsets.only(bottom: 16),
