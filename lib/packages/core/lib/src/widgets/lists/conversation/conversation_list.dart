@@ -1491,6 +1491,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     int replyId,
     LMDualSidePaginationController pagedListController,
   ) {
+    //Todo: fix this bug
     pagedListController.listController.animateToItem(
       index: index,
       scrollController: pagedListController.scrollController,
