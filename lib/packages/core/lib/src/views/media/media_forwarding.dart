@@ -237,11 +237,10 @@ class _LMChatMediaForwardingScreenState
     return LMChatTextField(
       isDown: false,
       chatroomId: widget.chatroomId,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: LMChatTheme.isThemeDark
-                ? LMChatTheme.theme.onContainer
-                : LMChatTheme.theme.container,
-          ),
+      style: Theme.of(context)
+          .textTheme
+          .bodyMedium
+          ?.copyWith(color: LMChatTheme.theme.onContainer),
       onChange: (value) {
         // Handle text change if needed
       },
