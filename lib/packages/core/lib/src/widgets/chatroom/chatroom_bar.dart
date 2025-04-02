@@ -617,6 +617,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
       isSecret: widget.chatroom.isSecret ?? false,
       chatroomId: widget.chatroom.id,
+      onKeyboardFocusChange: (bool val) {
+        if (!val) {
+          // keyboard has been closed
+          _popupMenuController.hideMenu();
+        }
+      },
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontSize: 14,
             color: LMChatTheme.theme.onContainer,
@@ -1244,25 +1250,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             showArrow: false,
             menuBuilder: () => _defAttachmentMenu(),
             pressType: PressType.singleClick,
-            // Ensure popup appears above the keyboard
-            verticalMargin: 0,
-            horizontalMargin: 0,
-            // Position the popup relative to the button
-            position: PreferredPosition.top,
-            child: GestureDetector(
-              onTap: () {
-                // If keyboard is open, add a small delay
-
-                if (View.of(context).viewInsets.bottom > 0.0) {
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    _popupMenuController.showMenu();
-                  });
-                } else {
-                  _popupMenuController.showMenu();
-                }
-              },
-              child: _defAttachmentIcon(),
-            ),
+            child: _defAttachmentIcon(),
           )
         : null;
   }
