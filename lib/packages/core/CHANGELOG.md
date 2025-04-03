@@ -71,3 +71,8 @@
 ## 0.14.1
 
 - Patch update for `likeminds_chat_fl: ^1.12.1`
+
+## 0.15.0
+
+- Fixed attachment menubar hanging issue
+- Fixed link preview bug

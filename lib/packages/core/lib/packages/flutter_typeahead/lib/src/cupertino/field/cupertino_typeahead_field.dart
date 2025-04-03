@@ -8,7 +8,6 @@ import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/c
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_list.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
-import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/utils.dart';
 
 /// A [CupertinoTextField](https://docs.flutter.io/flutter/cupertino/CupertinoTextField-class.html)
 /// that displays a list of suggestions as the user types
@@ -279,6 +278,19 @@ class CupertinoTypeAheadField<T> extends StatefulWidget {
   /// Defaults to false
   final bool hideKeyboardOnDrag;
 
+  /// A callback function that notifies the consumer about changes in the visibility of the keyboard.
+  ///
+  /// This function is invoked whenever there is a change in the keyboard's visibility state:
+  /// - If the keyboard becomes visible, the callback is triggered with `true`.
+  /// - If the keyboard is hidden, the callback is triggered with `false`.
+  ///
+  /// This can be used to perform actions based on the keyboard's visibility, such as adjusting the UI,
+  /// scrolling the view, or updating the state of related widgets.
+  ///
+  /// Note: This callback does not directly control the keyboard's visibility but serves as an observer
+  /// for visibility changes. It is optional and defaults to null if no action is required on visibility changes.
+  final void Function(bool)? onKeyboardFocusChange;
+
   /// Creates a [CupertinoTypeAheadField]
   const CupertinoTypeAheadField({
     Key? key,
@@ -308,6 +320,7 @@ class CupertinoTypeAheadField<T> extends StatefulWidget {
     this.autoFlipListDirection = true,
     this.minCharsForSuggestions = 0,
     this.hideKeyboardOnDrag = true,
+    this.onKeyboardFocusChange,
   })  : assert(animationStart >= 0.0 && animationStart <= 1.0),
         assert(
             direction == AxisDirection.down || direction == AxisDirection.up),
@@ -362,6 +375,7 @@ class _CupertinoTypeAheadFieldState<T> extends State<CupertinoTypeAheadField<T>>
     if (newValue != _isKeyboardVisible) {
       _isKeyboardVisible = newValue;
       _keyboardVisibilityController.add(_isKeyboardVisible);
+      widget.onKeyboardFocusChange?.call(_isKeyboardVisible);
     }
     // Catch keyboard event and orientation change; resize suggestions list
     this._suggestionsBox!.onChangeMetrics();
