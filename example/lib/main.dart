@@ -65,6 +65,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupNotifications();
   await LMChatCore.instance.initialize(
+    config: LMChatConfig(
+      chatRoomConfig: LMChatroomConfig(
+        builder: CustomBuilder(),
+      ),
+    ),
     excludedConversationStates: [
       ConversationState.memberJoinedOpenChatroom,
       ConversationState.memberLeftOpenChatroom,
@@ -73,6 +78,47 @@ void main() async {
     ],
   );
   runApp(const LMChatSampleApp());
+}
+
+class CustomBuilder extends LMChatroomBuilderDelegate {
+  @override
+  Widget sentChatBubbleBuilder(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatBubble bubble,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: bubble.copyWith(
+        style: bubble.style?.copyWith(
+          // backgroundColor: AppColors.colorSurfacePrimaryInvertVariant,
+          // borderColor: AppColors.colorStrokeNeutralVariant,
+          showAvatar: true,
+          showHeader: true,
+          showFooter: true,
+          showActions: true,
+          showSides: true,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget receivedChatBubbleBuilder(
+    BuildContext context,
+    LMChatConversationViewData conversation,
+    LMChatBubble bubble,
+  ) {
+    return bubble.copyWith(
+        style: bubble.style?.copyWith(
+      showAvatar: true,
+      showHeader: true,
+      showFooter: true,
+      showActions: true,
+      showSides: true,
+      // borderColor: AppColors.colorStrokeNeutralVariant
+    ));
+  }
 }
 
 /// Setup notifications
