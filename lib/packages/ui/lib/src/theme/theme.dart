@@ -43,7 +43,7 @@ class LMChatTheme {
   late TextTheme textTheme;
 
   /// Whether the current theme is dark
-  late bool isDark;
+  bool isDark = false;
 
   /// Initializes the theme with optional parameters
   void initialise({
@@ -497,6 +497,7 @@ class LMChatThemeData {
     LMChatBubbleReactionsStyle? bubbleReactionsStyle,
     LMChatReactionKeyboardStyle? reactionKeyboardStyle,
     LMChatPollStyle? pollStyle,
+    bool? isDark,
   }) {
     return LMChatThemeData(
       buttonStyle: buttonStyle ?? this.buttonStyle,
@@ -539,6 +540,7 @@ class LMChatThemeData {
       reactionKeyboardStyle:
           reactionKeyboardStyle ?? this.reactionKeyboardStyle,
       pollStyle: pollStyle ?? this.pollStyle,
+      isDark: isDark ?? this.isDark,
     );
   }
 }

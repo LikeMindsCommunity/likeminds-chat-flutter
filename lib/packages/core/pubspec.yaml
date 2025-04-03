@@ -1,6 +1,6 @@
 name: likeminds_chat_flutter_core
 description: The core package of LikeMinds Flutter Chat SDK
-version: 0.14.1
+version: 0.15.0
 homepage: https://likeminds.community
 
 environment:
@@ -13,7 +13,7 @@ dependencies:
 
   # Other LM packages
   likeminds_chat_fl: 1.12.1
-  likeminds_chat_flutter_ui: 0.14.1
+  likeminds_chat_flutter_ui: 0.15.0
   envied: ^0.5.4+1
   flutter_bloc: ^8.1.5
   equatable: ^2.0.5
