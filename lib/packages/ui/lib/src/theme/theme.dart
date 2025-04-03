@@ -43,7 +43,7 @@ class LMChatTheme {
   late TextTheme textTheme;
 
   /// Whether the current theme is dark
-  late bool isDark;
+  bool isDark = false;
 
   /// Initializes the theme with optional parameters
   void initialise({
