@@ -638,7 +638,7 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
     if (newValue != _isKeyboardVisible) {
       _isKeyboardVisible = newValue;
       _keyboardVisibilityController.add(_isKeyboardVisible);
-      widget.onKeyboardFocusChange?.call(newValue);
+      widget.onKeyboardFocusChange?.call(_isKeyboardVisible);
     }
     // Catch keyboard event and orientation change; resize suggestions list
     this._suggestionsBox!.onChangeMetrics();
