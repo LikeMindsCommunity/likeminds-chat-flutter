@@ -113,7 +113,7 @@ class _LMChatSearchConversationScreenState
                     style: LMChatTheme.theme.loaderStyle,
                   );
                 } else if (state is LMChatSearchConversationInitial) {
-                  return emptyTextIndicatorBuilder();
+                  return _screenBuilder.emptyTextIndicatorBuilder();
                 }
 
                 return _buildSearchResultsList();
@@ -397,64 +397,6 @@ class _LMChatSearchConversationScreenState
   }
 
   ///! remove them
-  Widget firstPageProgressIndicatorBuilder(
-    BuildContext context,
-  ) {
-    LMChatThemeData chatThemeData = LMChatTheme.instance.themeData;
-    return LMChatLoader(
-      style: chatThemeData.loaderStyle,
-    );
-  }
-
-  Widget newPageProgressIndicatorBuilder(
-    BuildContext context,
-  ) {
-    LMChatThemeData chatThemeData = LMChatTheme.instance.themeData;
-    return LMChatLoader(
-      style: chatThemeData.loaderStyle,
-    );
-  }
-
-  Widget noItemsFoundIndicatorBuilder(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const LMChatIcon(
-            type: LMChatIconType.svg,
-            assetPath: emptyResultIcon,
-            style: LMChatIconStyle(
-              size: 40,
-              margin: EdgeInsets.only(bottom: 16),
-            ),
-          ),
-          LMChatText(
-            'No results found',
-            style: LMChatTextStyle(
-              textStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: LMChatTheme.theme.onContainer,
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget emptyTextIndicatorBuilder() {
-    return const Center(
-      child: LMChatText(
-        'Type to search',
-        style: LMChatTextStyle(
-          textStyle: TextStyle(
-            fontSize: 16,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildSearchResultsList() {
     return Padding(
@@ -466,17 +408,21 @@ class _LMChatSearchConversationScreenState
         builderDelegate: PagedChildBuilderDelegate<LMChatConversationViewData>(
           itemBuilder: (context, item, index) {
             List<String> matches = _findFirstMatch(searchTerm, item.answer);
-            return _defUserTile(item, matches);
+            return _screenBuilder.userTile(
+                context, _defUserTile(item, matches));
           },
-          // firstPageErrorIndicatorBuilder:
-          //     _screenBuilder.firstPageErrorIndicatorBuilder,
-          // newPageErrorIndicatorBuilderkh:
-          //     _screenBuilder.newPageErrorIndicatorBuilder,
-          firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder,
-          newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder,
-          noItemsFoundIndicatorBuilder: noItemsFoundIndicatorBuilder,
-          // noMoreItemsIndicatorBuilder:
-          //     _screenBuilder.noMoreItemsIndicatorBuilder,
+          firstPageErrorIndicatorBuilder:
+              _screenBuilder.firstPageErrorIndicatorBuilder,
+          newPageErrorIndicatorBuilder:
+              _screenBuilder.newPageErrorIndicatorBuilder,
+          firstPageProgressIndicatorBuilder:
+              _screenBuilder.firstPageProgressIndicatorBuilder,
+          newPageProgressIndicatorBuilder:
+              _screenBuilder.newPageProgressIndicatorBuilder,
+          noItemsFoundIndicatorBuilder:
+              _screenBuilder.noItemsFoundIndicatorBuilder,
+          noMoreItemsIndicatorBuilder:
+              _screenBuilder.noMoreItemsIndicatorBuilder,
         ),
       ),
     );

@@ -454,27 +454,32 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       trailing: isOtherUserAIChatbot(chatroom.toChatRoomViewData())
           ? []
           : [
-              _screenBuilder.searchButtomBuilder(
-                context,
-                chatroom.toChatRoomViewData(),
-                _defaultSearchButton(),
-              ),
               ValueListenableBuilder(
-                  valueListenable: rebuildAppBar,
-                  builder: (context, _, __) {
-                    return (isAnyMessageSelected() &&
-                                _chatroomSetting.selectionType ==
-                                    LMChatSelectionType.appbar) ||
-                            (isAnyMessageSelected() && _selectedIds.length > 1)
-                        ? Row(
-                            children: _defaultSelectedChatroomMenu(),
-                          )
-                        : _screenBuilder.chatroomMenu(
-                            context,
-                            actions,
-                            _defaultChatroomMenu(),
-                          );
-                  }),
+                valueListenable: rebuildAppBar,
+                builder: (context, _, __) {
+                  return (isAnyMessageSelected() &&
+                              _chatroomSetting.selectionType ==
+                                  LMChatSelectionType.appbar) ||
+                          (isAnyMessageSelected() && _selectedIds.length > 1)
+                      ? Row(
+                          children: _defaultSelectedChatroomMenu(),
+                        )
+                      : Row(
+                          children: [
+                            _screenBuilder.searchButtomBuilder(
+                              context,
+                              chatroom.toChatRoomViewData(),
+                              _defaultSearchButton(),
+                            ),
+                            _screenBuilder.chatroomMenu(
+                              context,
+                              actions,
+                              _defaultChatroomMenu(),
+                            ),
+                          ],
+                        );
+                },
+              ),
             ],
     );
   }

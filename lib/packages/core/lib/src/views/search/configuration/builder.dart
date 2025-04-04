@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 
 /// {@template lm_search_builder}
 /// [LMSearchBuilderDelegate] is a class used to build and customize the search
@@ -103,5 +104,97 @@ class LMSearchBuilderDelegate {
     LMChatButton clearSearchButton,
   ) {
     return clearSearchButton;
+  }
+
+  /// Builds the user tile for a conversation in the search results.
+  Widget userTile(
+    BuildContext context,
+    LMChatTile userTile,
+  ) {
+    return userTile;
+  }
+
+  /// Builds the first page error indicator.
+  Widget firstPageErrorIndicatorBuilder(
+    BuildContext context,
+  ) {
+    return const SizedBox();
+  }
+
+  /// Builds the new page error indicator.
+  Widget newPageErrorIndicatorBuilder(
+    BuildContext context,
+  ) {
+    return const SizedBox();
+  }
+
+  /// Builds the progress indicator for the first page.
+  Widget firstPageProgressIndicatorBuilder(
+    BuildContext context,
+  ) {
+    LMChatThemeData chatThemeData = LMChatTheme.instance.themeData;
+    return LMChatLoader(
+      style: chatThemeData.loaderStyle,
+    );
+  }
+
+  /// Builds the progress indicator for a new page.
+  Widget newPageProgressIndicatorBuilder(
+    BuildContext context,
+  ) {
+    LMChatThemeData chatThemeData = LMChatTheme.instance.themeData;
+    return LMChatLoader(
+      style: chatThemeData.loaderStyle,
+    );
+  }
+
+  /// Builds the "no items found" indicator when no results are found.
+  Widget noItemsFoundIndicatorBuilder(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const LMChatIcon(
+            type: LMChatIconType.svg,
+            assetPath: emptyResultIcon,
+            style: LMChatIconStyle(
+              size: 40,
+              margin: EdgeInsets.only(bottom: 16),
+            ),
+          ),
+          LMChatText(
+            'No results found',
+            style: LMChatTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: LMChatTheme.theme.onContainer,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  /// Builds the "empty text" indicator when the search input is empty.
+  Widget emptyTextIndicatorBuilder() {
+    return const Center(
+      child: LMChatText(
+        'Type to search',
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds the no more items indicator.
+  Widget noMoreItemsIndicatorBuilder(
+    BuildContext context,
+  ) {
+    return const SizedBox();
   }
 }
