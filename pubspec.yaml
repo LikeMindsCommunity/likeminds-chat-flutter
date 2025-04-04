@@ -1,6 +1,6 @@
 name: likeminds_chat_flutter
 description: The monorepo for LikeMinds Chat SDK Flutter, giving access to all our packages
-version: 0.14.0
+version: 0.15.0
 homepage: "https:likeminds.community"
 
 environment:
