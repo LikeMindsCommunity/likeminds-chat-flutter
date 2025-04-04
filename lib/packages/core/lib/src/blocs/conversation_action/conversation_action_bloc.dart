@@ -18,6 +18,7 @@ part 'handler/text_change_event_handler.dart';
 part 'handler/link_preview_removed_event_handler.dart';
 part 'handler/put_reaction_handler.dart';
 part 'handler/delete_reaction_handler.dart';
+part 'handler/search_conversation_chatroom_handler.dart';
 
 /// {@template lm_chat_conversation_action_bloc}
 /// [LMChatConversationActionBloc] is responsible for handling the conversation actions.
@@ -51,5 +52,7 @@ class LMChatConversationActionBloc
     on<LMChatLinkPreviewRemovedEvent>(_linkPreviewRemovedEventHandler);
     on<LMChatPutReaction>(_putReactionHandler);
     on<LMChatDeleteReaction>(_deleteReactionHandler);
+    on<LMChatSearchConversationInChatroomEvent>(
+        _searchConversationInChatroomEventHandler);
   }
 }

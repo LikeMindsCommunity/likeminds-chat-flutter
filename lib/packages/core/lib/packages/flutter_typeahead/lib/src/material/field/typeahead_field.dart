@@ -13,7 +13,6 @@ import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/m
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box_decoration.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_list.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
-import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/src/utils.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 
 /// # Flutter TypeAhead
@@ -524,6 +523,19 @@ class TypeAheadField<T> extends StatefulWidget {
 
   final Color? tagColor;
 
+  /// A callback function that notifies the consumer about changes in the visibility of the keyboard.
+  ///
+  /// This function is invoked whenever there is a change in the keyboard's visibility state:
+  /// - If the keyboard becomes visible, the callback is triggered with `true`.
+  /// - If the keyboard is hidden, the callback is triggered with `false`.
+  ///
+  /// This can be used to perform actions based on the keyboard's visibility, such as adjusting the UI,
+  /// scrolling the view, or updating the state of related widgets.
+  ///
+  /// Note: This callback does not directly control the keyboard's visibility but serves as an observer
+  /// for visibility changes. It is optional and defaults to null if no action is required on visibility changes.
+  final void Function(bool)? onKeyboardFocusChange;
+
   // Adds a callback for the suggestion box opening or closing
   final void Function(bool)? onSuggestionsBoxToggle;
 
@@ -563,6 +575,7 @@ class TypeAheadField<T> extends StatefulWidget {
     this.minCharsForSuggestions = 0,
     this.onSuggestionsBoxToggle,
     this.hideKeyboardOnDrag = false,
+    this.onKeyboardFocusChange,
     super.key,
   })  : assert(animationStart >= 0.0 && animationStart <= 1.0),
         assert(
@@ -625,6 +638,7 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
     if (newValue != _isKeyboardVisible) {
       _isKeyboardVisible = newValue;
       _keyboardVisibilityController.add(_isKeyboardVisible);
+      widget.onKeyboardFocusChange?.call(_isKeyboardVisible);
     }
     // Catch keyboard event and orientation change; resize suggestions list
     this._suggestionsBox!.onChangeMetrics();

@@ -58,6 +58,7 @@ class LMChatConversationViewData {
   final bool? allowVoteChange;
   final String? widgetId;
   final LMChatWidgetViewData? widget;
+  final LMChatRoomViewData? chatRoomViewData;
 
   LMChatConversationViewData._({
     this.allowAddOption,
@@ -113,6 +114,7 @@ class LMChatConversationViewData {
     this.allowVoteChange,
     this.widgetId,
     this.widget,
+    this.chatRoomViewData,
   });
 
   /// copyWith method is used to create a new instance of `LMChatConversationViewData` with the updated values.
@@ -171,6 +173,7 @@ class LMChatConversationViewData {
     bool? allowVoteChange,
     String? widgetId,
     LMChatWidgetViewData? widget,
+    LMChatRoomViewData? chatRoomViewData,
   }) {
     return LMChatConversationViewData._(
       allowAddOption: allowAddOption ?? this.allowAddOption,
@@ -229,6 +232,7 @@ class LMChatConversationViewData {
       allowVoteChange: allowVoteChange ?? this.allowVoteChange,
       widgetId: widgetId ?? this.widgetId,
       widget: widget ?? this.widget,
+      chatRoomViewData: chatRoomViewData ?? this.chatRoomViewData,
     );
   }
 }
@@ -289,6 +293,7 @@ class LMChatConversationViewDataBuilder {
   bool? _allowVoteChange;
   String? _widgetId;
   LMChatWidgetViewData? _widget;
+  LMChatRoomViewData? _chatRoomViewData;
 
   void widgetId(String? widgetId) {
     _widgetId = widgetId;
@@ -504,6 +509,10 @@ class LMChatConversationViewDataBuilder {
     _allowVoteChange = allowVoteChange;
   }
 
+  void chatRoomViewData(LMChatRoomViewData? chatRoomViewData) {
+    _chatRoomViewData = chatRoomViewData;
+  }
+
   /// Builds the `LMChatConversationViewData` object using the provided values.
   LMChatConversationViewData build() {
     return LMChatConversationViewData._(
@@ -560,6 +569,7 @@ class LMChatConversationViewDataBuilder {
       allowVoteChange: _allowVoteChange,
       widgetId: _widgetId,
       widget: _widget,
+      chatRoomViewData: _chatRoomViewData,
     );
   }
 }

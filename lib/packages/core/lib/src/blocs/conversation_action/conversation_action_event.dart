@@ -189,3 +189,18 @@ class LMChatDeleteReaction extends LMChatConversationActionEvent {
         reaction,
       ];
 }
+
+/// Event responsible for searching conversations in a chatroom
+class LMChatSearchConversationInChatroomEvent
+    extends LMChatConversationActionEvent {
+  /// The message id to search for
+  final int messageId;
+
+  /// Creates and returns a new instance of [LMChatSearchConversationInChatroomEvent]
+  LMChatSearchConversationInChatroomEvent({
+    required this.messageId,
+  });
+
+  @override
+  List<Object> get props => [messageId];
+}

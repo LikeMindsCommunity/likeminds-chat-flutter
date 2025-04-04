@@ -105,17 +105,21 @@ postMultimediaConversationEventHandler(
       }
     }
 
+    final requestBuilder = (PostConversationRequestBuilder()
+      ..attachments(uploadedAttachments)
+      ..temporaryId(temporaryId)
+      ..text(event.postConversationRequest.text)
+      ..chatroomId(event.postConversationRequest.chatroomId)
+      ..hasFiles(event.postConversationRequest.hasFiles)
+      ..replyId(event.postConversationRequest.replyId)
+      ..triggerBot(event.postConversationRequest.triggerBot ?? false));
+
+    if (event.postConversationRequest.ogTags != null) {
+      requestBuilder.ogTags(event.postConversationRequest.ogTags!);
+    }
     // Post conversation to server
     final response = await LMChatCore.client.postConversation(
-      (PostConversationRequestBuilder()
-            ..attachments(uploadedAttachments)
-            ..temporaryId(temporaryId)
-            ..text(event.postConversationRequest.text)
-            ..chatroomId(event.postConversationRequest.chatroomId)
-            ..hasFiles(event.postConversationRequest.hasFiles)
-            ..replyId(event.postConversationRequest.replyId)
-            ..triggerBot(event.postConversationRequest.triggerBot ?? false))
-          .build(),
+      requestBuilder.build(),
     );
     if (response.success) {
       emit(LMChatMultiMediaConversationPostedState(

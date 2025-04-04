@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core:
 
-  likeminds_chat_flutter_core: ^0.14.0
+  likeminds_chat_flutter_core: ^0.15.0
   google_fonts: ^6.2.0
   flutter_dotenv: ^5.1.0
   firebase_messaging: ^15.0.3
