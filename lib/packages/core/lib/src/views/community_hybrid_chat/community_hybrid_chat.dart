@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-/// LMChatHomeScreen is the main screen to enter LM Chat experience.
+/// {@template lm_community_hybrid_chat_screen}
+/// LMCommunityHybridChatScreen is the main screen to enter LM Chat experience.
 ///
 /// To customize it pass appropriate builders to constructor.
-class LMChatHomeScreen extends StatefulWidget {
-  /// Constructor for LMChatHomeScreen
+/// {@endtemplate}
+class LMCommunityHybridChatScreen extends StatefulWidget {
+  /// Constructor for LMCommunityHybridChatScreen
   ///
   /// Creates a new instance of the screen widget
-  const LMChatHomeScreen({
+  const LMCommunityHybridChatScreen({
     super.key,
   });
 
   @override
-  State<LMChatHomeScreen> createState() => _LMChatHomeScreenState();
+  State<LMCommunityHybridChatScreen> createState() => _LMCommunityHybridChatScreenState();
 }
 
-class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
+class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScreen> {
   final LMChatUserViewData user =
       LMChatLocalPreference.instance.getUser().toUserViewData();
-  final _homeScreenBuilder = LMChatCore.config.homeConfig.builder;
+  final _screenBuilder = LMChatCore.config.communityHybridChatConfig.builder;
 
   @override
-  void didUpdateWidget(covariant LMChatHomeScreen oldWidget) {
+  void didUpdateWidget(covariant LMCommunityHybridChatScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
 
@@ -36,9 +35,9 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
     return DefaultTabController(
       length: 2,
       child: Builder(builder: (context) {
-        return _homeScreenBuilder.scaffold(
+        return _screenBuilder.scaffold(
           backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: _homeScreenBuilder.appBarBuilder(
+          appBar: _screenBuilder.appBarBuilder(
             context,
             user,
             DefaultTabController.of(context),
@@ -46,8 +45,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
           ),
           body: const TabBarView(
             children: [
-              LMChatHomeFeedList(),
-              LMChatDMFeedList(),
+              LMCommunityChatScreen(),
+              LMNetworkingChatScreen(),
             ],
           ),
         );
@@ -74,7 +73,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
         ),
         const SizedBox(width: 8),
       ],
-      bottom: _homeScreenBuilder.tabBarBuilder(
+      bottom: _screenBuilder.tabBarBuilder(
         context,
         DefaultTabController.of(context),
         _defTabBar(),
