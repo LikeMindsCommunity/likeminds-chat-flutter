@@ -6,6 +6,7 @@ import 'package:likeminds_chat_flutter_core/src/views/community_hybrid_chat/conf
 import 'package:likeminds_chat_flutter_core/src/views/explore/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/member_list/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/config.dart';
@@ -19,6 +20,10 @@ export 'package:likeminds_chat_flutter_core/src/views/report/configurations/conf
 export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/poll/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/member_list/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/community_hybrid_chat/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/community_chat/configurations/config.dart';
 
 /// {@template lm_chat_config}
 /// Configuration class for the Likeminds Chat SDK.
@@ -49,6 +54,9 @@ class LMChatConfig {
   /// {@macro lm_chat_poll_config}
   final LMChatPollConfig pollConfig;
 
+  /// {@macro lm_chat_member_list_config}
+  final LMChatMemberListConfig memberListConfig;
+
   /// {@macro lm_widget_builder_delegate}
   final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
@@ -67,6 +75,7 @@ class LMChatConfig {
     this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),
     this.mediaPreviewConfig = const LMChatMediaPreviewConfig(),
     this.pollConfig = const LMChatPollConfig(),
+    this.memberListConfig = const LMChatMemberListConfig(),
     this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });

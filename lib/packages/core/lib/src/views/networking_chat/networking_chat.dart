@@ -50,10 +50,29 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
           ) ??
           LMChatDMFeedListStyle.basic();
 
+  final ValueNotifier<bool> _showDMFab = ValueNotifier(false);
+  int? _showList;
+
+  void _checkDMStatus() async {
+    final checkDMStatusRequest =
+        (CheckDMStatusRequestBuilder()..reqFrom("dm_feed_v2")).build();
+    final checkDMStatusResponse = await LMChatCore.client.checkDMStatus(
+      checkDMStatusRequest,
+    );
+    _showDMFab.value = checkDMStatusResponse.data?.showDm ?? false;
+    final cta = checkDMStatusResponse.data?.cta;
+    if (cta != null) {
+      Uri uri = Uri.parse(cta);
+      Map<String, String> queryParams = uri.queryParameters;
+      _showList = int.tryParse(queryParams['show_list'] ?? '');
+    }
+  }
+
   @override
   void initState() {
     feedBloc = LMChatDMFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
+    _checkDMStatus();
     _addPaginationListener();
     LMChatAnalyticsBloc.instance.add(
       const LMChatFireAnalyticsEvent(
@@ -83,6 +102,12 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
+      floatingActionButton: ValueListenableBuilder(
+        valueListenable: _showDMFab,
+        builder: (context, value, child) {
+          return value ? _floatingActionButton() : const SizedBox();
+        },
+      ),
       backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
       body: SafeArea(
         top: false,
@@ -336,7 +361,9 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LMChatExplorePage(),
+            builder: (context) => LMChatMemberList(
+              showList: _showList,
+            ),
           ),
         );
       },

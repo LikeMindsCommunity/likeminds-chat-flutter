@@ -2,15 +2,59 @@ import 'package:likeminds_chat_flutter_ui/src/models/sdk/sdk_client_info_view_da
 import 'package:likeminds_chat_flutter_ui/src/models/widget/widget_view_data.dart';
 
 /// Enum representing different roles a user can have
+/// Enum representing different roles a user can have in a chat
+/// - [chatbot]: Represents an automated chatbot user
+/// - [member]: Represents a regular member user
+/// - [admin]: Represents an administrator user
 enum LMChatUserRole {
-  /// Represents a chatbot user role
-  chatbot,
+  /// Represents a chatbot user in the chat system
+  chatbot('chatbot'),
 
-  /// Represents a regular member user role
-  member,
+  /// Represents a regular member user in the chat system
+  member('member'),
 
-  /// Represents an administrator user role with elevated privileges
-  admin,
+  /// Represents an administrator user with elevated privileges
+  admin('admin');
+
+  /// The string value associated with the role
+  final String value;
+
+  /// Creates a new [LMChatUserRole] with the given string value
+  const LMChatUserRole(this.value);
+
+  /// Creates a [LMChatUserRole] from a JSON string representation
+  ///
+  /// The input string is case-insensitive. If an invalid role is provided,
+  /// defaults to [LMChatUserRole.member]
+  factory LMChatUserRole.fromJson(String json) {
+    switch (json.toLowerCase()) {
+      case 'chatbot':
+        return LMChatUserRole.chatbot;
+      case 'member':
+        return LMChatUserRole.member;
+      case 'admin':
+        return LMChatUserRole.admin;
+      default:
+        return LMChatUserRole.member;
+    }
+  }
+
+  /// Converts the role to its integer representation
+  ///
+  /// Returns:
+  /// - 0 for chatbot
+  /// - 1 for admin
+  /// - 4 for member
+  int toIntValue() {
+    switch (this) {
+      case LMChatUserRole.admin:
+        return 1;
+      case LMChatUserRole.chatbot:
+        return 0;
+      case LMChatUserRole.member:
+        return 4;
+    }
+  }
 }
 
 /// {@template lm_user_view_data}

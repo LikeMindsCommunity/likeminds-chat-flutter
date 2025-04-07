@@ -663,7 +663,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         pagedListController.clear();
         _topPage = 1;
         if (localConversation != null) {
-          conversationData?.insert(0, localConversation!);
+          conversationData.insert(0, localConversation!);
           localConversation = null;
         }
       }

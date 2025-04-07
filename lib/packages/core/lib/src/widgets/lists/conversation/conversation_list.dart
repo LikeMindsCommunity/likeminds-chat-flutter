@@ -1377,8 +1377,3 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     return conversation.widgetId != null && conversation.widget != null;
   }
 }
-
-
-/// BlocListener - listens to the state changes of the bloc. but did not update the UI
-/// BlocBuilder - listens to the state changes of the bloc and updates the UI
-/// BlocConsumer - BlocListener + BlocBuilder
