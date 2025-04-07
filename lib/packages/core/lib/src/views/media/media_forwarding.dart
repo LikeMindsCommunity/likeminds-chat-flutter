@@ -220,13 +220,11 @@ class _LMChatMediaForwardingScreenState
             minHeight: 5.2.h,
             maxHeight: 24.h,
           ),
-          child: Expanded(
-            child: _screenBuilder.chatroomTextField(
-              context,
-              _textEditingController,
-              _defInnerTextField(context),
-              _defAttachmentButton(),
-            ),
+          child: _screenBuilder.chatroomTextField(
+            context,
+            _textEditingController,
+            _defInnerTextField(context),
+            _defAttachmentButton(),
           ),
         ),
       ],
@@ -237,7 +235,10 @@ class _LMChatMediaForwardingScreenState
     return LMChatTextField(
       isDown: false,
       chatroomId: widget.chatroomId,
-      style: Theme.of(context).textTheme.bodyMedium,
+      style: Theme.of(context)
+          .textTheme
+          .bodyMedium
+          ?.copyWith(color: LMChatTheme.theme.onContainer),
       onChange: (value) {
         // Handle text change if needed
       },
@@ -612,9 +613,7 @@ class _LMChatMediaForwardingScreenState
         LMChatTaggingHelper.convertRouteToTag(replyConversation?.answer) ?? "",
         style: LMChatTextStyle(
           textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: LMChatTheme.isThemeDark
-                    ? LMChatTheme.theme.onContainer
-                    : LMChatTheme.theme.container,
+                color: LMChatTheme.theme.onContainer,
               ),
         ),
       ),

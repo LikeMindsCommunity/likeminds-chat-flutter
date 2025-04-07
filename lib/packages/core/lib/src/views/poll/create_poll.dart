@@ -872,7 +872,7 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
       index: index,
       isRemovable: options.length > 2,
       option: options[index],
-      optionStyle: widget.optionStyle,
+      optionStyle: widget.optionStyle ?? const LMChatTextFieldStyle(),
       onDelete: () {
         if (options.length > 2) {
           options.removeAt(index);

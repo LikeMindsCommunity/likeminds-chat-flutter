@@ -725,6 +725,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       scrollPhysics: const AlwaysScrollableScrollPhysics(),
       isSecret: widget.chatroom.isSecret ?? false,
       chatroomId: widget.chatroom.id,
+      onKeyboardFocusChange: (bool val) {
+        if (!val) {
+          // keyboard has been closed
+          _popupMenuController.hideMenu();
+        }
+      },
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontSize: 14,
             color: LMChatTheme.theme.onContainer,
