@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/tag/tag_convertor.dart';
@@ -42,21 +43,24 @@ class LMChatTextField extends StatefulWidget {
   /// Custom styling for the text field.
   final LMChatTextFieldStyle? textFieldStyle;
 
-  const LMChatTextField({
-    super.key,
-    required this.isDown,
-    required this.chatroomId,
-    required this.onTagSelected,
-    required this.controller,
-    required this.focusNode,
-    this.enabled = true,
-    this.isSecret = false,
-    this.style,
-    this.decoration,
-    this.onChange,
-    this.scrollPhysics,
-    this.textFieldStyle,
-  });
+  ///Keyboard visibility
+  final void Function(bool)? onKeyboardFocusChange;
+
+  const LMChatTextField(
+      {super.key,
+      required this.isDown,
+      required this.chatroomId,
+      required this.onTagSelected,
+      required this.controller,
+      required this.focusNode,
+      this.enabled = true,
+      this.isSecret = false,
+      this.style,
+      this.decoration,
+      this.onChange,
+      this.scrollPhysics,
+      this.textFieldStyle,
+      this.onKeyboardFocusChange});
 
   /// Creates a copy of this widget with the given fields replaced with new values.
   LMChatTextField copyWith({
@@ -72,6 +76,7 @@ class LMChatTextField extends StatefulWidget {
     bool? enabled,
     ScrollPhysics? scrollPhysics,
     LMChatTextFieldStyle? textFieldStyle,
+    void Function(bool)? onKeyboardFocusChange,
   }) {
     return LMChatTextField(
       isDown: isDown ?? this.isDown,
@@ -86,6 +91,8 @@ class LMChatTextField extends StatefulWidget {
       enabled: enabled ?? this.enabled,
       scrollPhysics: scrollPhysics ?? this.scrollPhysics,
       textFieldStyle: textFieldStyle ?? this.textFieldStyle,
+      onKeyboardFocusChange:
+          onKeyboardFocusChange ?? this.onKeyboardFocusChange,
     );
   }
 
@@ -239,7 +246,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: effectiveStyle.margin?? EdgeInsets.zero,
+      padding: effectiveStyle.margin ?? EdgeInsets.zero,
       child: ValueListenableBuilder(
         valueListenable: _tagComplete,
         builder: (context, value, child) {
@@ -249,6 +256,9 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
             tagColor: effectiveStyle.tagColor ?? LMChatTheme.theme.linkColor,
             onTagTap: (p) {
               print(p);
+            },
+            onKeyboardFocusChange: (bool change) {
+              widget.onKeyboardFocusChange?.call(change);
             },
             autoFlipListDirection: false,
             autoFlipDirection: true,

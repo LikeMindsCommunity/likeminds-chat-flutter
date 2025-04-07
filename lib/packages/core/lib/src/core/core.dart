@@ -85,8 +85,8 @@ class LMChatCore {
               ..excludedConversationStates(excludedConversationStates ?? []))
             .build();
     if (domain != null) _clientDomain = domain;
-    _lmChatConfig = config ?? LMChatConfig();
     LMChatTheme.instance.initialise(theme: theme);
+    _lmChatConfig = config ?? LMChatConfig();
     LMResponse isDBInitiated = await this.lmChatClient.initiateDB();
     if (!isDBInitiated.success) {
       return LMResponse.error(
