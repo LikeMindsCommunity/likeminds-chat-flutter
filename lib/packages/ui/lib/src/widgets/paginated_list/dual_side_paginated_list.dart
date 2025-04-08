@@ -162,7 +162,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     _loadInitialData();
     widget.paginationController.isFirstPageLoadedController.stream
         .listen((event) {
-      if (event) {
+      if (event && mounted) {
         setState(() {
           _isLoadingFirstPage = false;
         });

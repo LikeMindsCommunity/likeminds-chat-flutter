@@ -9,10 +9,10 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 /// it is used in the [LMDualSidePagedList] widget.
 /// {@endtemplate}
 class LMDualSidePaginationController<T> {
-  final StreamController<bool> isFirstPageLoadedController =
-      StreamController<bool>();
-  final StreamController<int> upSidePage = StreamController<int>();
-  final StreamController<int> downSidePage = StreamController<int>();
+  StreamController<bool> isFirstPageLoadedController =
+      StreamController<bool>.broadcast();
+  StreamController<int> upSidePage = StreamController<int>.broadcast();
+  StreamController<int> downSidePage = StreamController<int>.broadcast();
 
   /// The list of items that have been loaded so far.
   List<T> itemList = [];

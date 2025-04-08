@@ -59,7 +59,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   int _bottomPage = 1;
   final int _pageSize = 200;
   int lastConversationId = 0;
-
+  bool _isPaginatedConversationLoading = false;
   ValueNotifier showConversationActions = ValueNotifier(false);
   ValueNotifier rebuildConversationList = ValueNotifier(false);
   late ValueNotifier<bool> rebuildAppBar;
@@ -76,6 +76,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   late ScrollController scrollController;
   final LMChatroomBuilderDelegate _screenBuilder =
       LMChatCore.config.chatRoomConfig.builder;
+  // todo: change it back
   late LMDualSidePaginationController<LMChatConversationViewData>
       pagedListController = widget.paginatedListController ??
           LMDualSidePaginationController(
@@ -152,7 +153,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       child: ValueListenableBuilder(
         valueListenable: rebuildConversationList,
         builder: (context, value, child) {
-          return LMDualSidePagedList<LMChatConversationViewData>(
+          final lmDualSidePagedList =
+              LMDualSidePagedList<LMChatConversationViewData>(
             paginationType: LMChatConversationBloc.replyConversation == null
                 ? LMPaginationType.top
                 : LMPaginationType.both,
@@ -196,6 +198,22 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                       : _screenBuilder.receivedChatBubbleBuilder(
                           context, item, _defaultReceivedChatBubble(item));
             },
+          );
+          return Stack(
+            children: [
+              // The list is always in the tree
+              lmDualSidePagedList,
+              if (_isPaginatedConversationLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: LMChatTheme.theme.backgroundColor,
+                    child: _screenBuilder.loadingListWidgetBuilder(
+                      context,
+                      const LMChatSkeletonChatList(),
+                    ),
+                  ),
+                ),
+            ],
           );
         },
       ),
@@ -1360,6 +1378,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       // scroll and highlight the conversation
       _scrollToConversation(index, replyId, pagedListController);
     } else {
+      _isPaginatedConversationLoading = true;
+      rebuildConversationList.value = !rebuildConversationList.value;
+
       // handle if index is -1
       final currentTime = DateTime.now().millisecondsSinceEpoch;
       // fetch reply conversation
@@ -1475,12 +1496,14 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       if (topConversationsViewData.length < _pageSize) {
         pagedListController.isLastPageToBottomReached = true;
       }
-      rebuildConversationList.value = !rebuildConversationList.value;
+
       // find index of the conversation in the list and scroll to it
       int index = pagedListController.itemList
           .indexWhere((element) => element.id == replyId);
       if (index != -1) {
         // scroll and highlight the conversation
+        _isPaginatedConversationLoading = false;
+        rebuildConversationList.value = !rebuildConversationList.value;
         _scrollToConversation(index, replyId, pagedListController);
       }
     }
@@ -1491,20 +1514,23 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
     int replyId,
     LMDualSidePaginationController pagedListController,
   ) {
-    //Todo: fix this bug
-    pagedListController.listController.animateToItem(
-      index: index,
-      scrollController: pagedListController.scrollController,
-      alignment: 0.5,
-      duration: (estimatedDuration) {
-        return const Duration(milliseconds: 200);
-      },
-      curve: (estimatedDuration) {
-        return Curves.easeInOut;
-      },
-    );
-    // highlight the reply message
-    _highLightConversation(replyId);
+    if (pagedListController.listController.isAttached) {
+      pagedListController.listController.animateToItem(
+        index: index,
+        scrollController: pagedListController.scrollController,
+        alignment: 0.5,
+        duration: (estimatedDuration) {
+          return const Duration(milliseconds: 200);
+        },
+        curve: (estimatedDuration) {
+          return Curves.easeInOut;
+        },
+      );
+      // highlight the reply message
+      _highLightConversation(replyId);
+    } else {
+      throw Exception('ListController is not attached');
+    }
   }
 
   Future<void> _highLightConversation(int replyId) async {
