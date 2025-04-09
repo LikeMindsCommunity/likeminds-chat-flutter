@@ -259,10 +259,11 @@ class LMChatSearchConversationInChatroomState
     extends LMChatConversationActionState {
   /// The search query.
   final int messageId;
+  final LMChatConversationViewData conversation;
 
   /// Creates and returns a new instance of [LMChatSearchConversationInChatroomState]
-  LMChatSearchConversationInChatroomState(this.messageId);
+  LMChatSearchConversationInChatroomState(this.messageId, this.conversation);
 
   @override
-  List<Object> get props => [messageId];
+  List<Object> get props => [messageId, conversation];
 }

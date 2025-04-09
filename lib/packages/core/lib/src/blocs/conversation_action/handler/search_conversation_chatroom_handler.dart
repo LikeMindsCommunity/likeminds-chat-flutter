@@ -4,5 +4,6 @@ part of '../conversation_action_bloc.dart';
 void _searchConversationInChatroomEventHandler(
     LMChatSearchConversationInChatroomEvent event,
     Emitter<LMChatConversationActionState> emit) async {
-  emit(LMChatSearchConversationInChatroomState(event.messageId));
+  emit(LMChatSearchConversationInChatroomState(
+      event.messageId, event.conversation));
 }

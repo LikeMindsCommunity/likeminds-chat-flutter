@@ -138,8 +138,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               _updateReactions(state);
             }
             if (state is LMChatSearchConversationInChatroomState) {
-              _searchWithMessageId(
-                  state.messageId, pagedListController, widget.chatroomId);
+              _searchWithMessageId(state.messageId, state.conversation,
+                  pagedListController, widget.chatroomId);
             }
           },
         ),
@@ -1359,13 +1359,17 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           .indexWhere((element) => element.id == replyId);
       if (index != -1) {
         // scroll and highlight the conversation
-        _scrollToConversation(index, replyId, pagedListController);
+        rebuildConversationList.value = !rebuildConversationList.value;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToConversation(index, replyId, pagedListController);
+        });
       }
     }
   }
 
   void _searchWithMessageId(
     int messageId,
+    LMChatConversationViewData conversation,
     LMDualSidePaginationController pagedListController,
     int chatroomId,
   ) async {
@@ -1378,6 +1382,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
       // scroll and highlight the conversation
       _scrollToConversation(index, replyId, pagedListController);
     } else {
+      LMChatConversationBloc.replyConversation = conversation;
       _isPaginatedConversationLoading = true;
       rebuildConversationList.value = !rebuildConversationList.value;
 
@@ -1502,9 +1507,16 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
           .indexWhere((element) => element.id == replyId);
       if (index != -1) {
         // scroll and highlight the conversation
+        // this rebulds the SuperListView
+        // and the List controller to access the new items
+        pagedListController.isScrollingNotifier.value =
+            !pagedListController.isScrollingNotifier.value;
+
         _isPaginatedConversationLoading = false;
-        rebuildConversationList.value = !rebuildConversationList.value;
-        _scrollToConversation(index, replyId, pagedListController);
+        //   rebuildConversationList.value = !rebuildConversationList.value;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToConversation(index, replyId, pagedListController);
+        });
       }
     }
   }

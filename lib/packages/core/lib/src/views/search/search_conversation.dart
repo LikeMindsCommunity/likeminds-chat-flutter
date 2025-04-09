@@ -132,6 +132,7 @@ class _LMChatSearchConversationScreenState
         LMChatConversationActionBloc.instance.add(
           LMChatSearchConversationInChatroomEvent(
             messageId: conversation.id,
+            conversation: conversation,
           ),
         );
         Navigator.of(context).pop(); // Close the search screen
