@@ -99,6 +99,7 @@ class LMDualSidePaginationController<T> {
   /// This is useful when you want to reset the list.
   /// For example, when you want to load a new list of items.
   void clear() {
+    listController.invalidateAllExtents();
     itemList = [];
     upSidePage.add(0);
     downSidePage.add(0);
