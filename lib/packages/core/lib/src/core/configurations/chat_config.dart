@@ -8,6 +8,7 @@ import 'package:likeminds_chat_flutter_core/src/views/media/configurations/previ
 import 'package:likeminds_chat_flutter_core/src/views/participants/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/poll/configurations/config.dart';
 import 'package:likeminds_chat_flutter_core/src/views/report/configurations/config.dart';
+import 'package:likeminds_chat_flutter_core/src/views/search/configuration/config.dart';
 
 // export all the configurations
 export 'package:likeminds_chat_flutter_core/src/views/chatroom/configurations/config.dart';
@@ -18,6 +19,7 @@ export 'package:likeminds_chat_flutter_core/src/views/report/configurations/conf
 export 'package:likeminds_chat_flutter_core/src/views/media/configurations/forwarding/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/media/configurations/preview/config.dart';
 export 'package:likeminds_chat_flutter_core/src/views/poll/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/search/configuration/config.dart';
 
 /// {@template lm_chat_config}
 /// Configuration class for the Likeminds Chat SDK.
@@ -47,6 +49,9 @@ class LMChatConfig {
   /// {@macro lm_chat_poll_config}
   final LMChatPollConfig pollConfig;
 
+  /// {@macro lm_search_config}
+  final LMSearchConversationConfig searchConversationConfig;
+
   /// {@macro lm_widget_builder_delegate}
   final LMChatWidgetBuilderDelegate widgetBuilderDelegate;
 
@@ -63,6 +68,7 @@ class LMChatConfig {
     this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),
     this.mediaPreviewConfig = const LMChatMediaPreviewConfig(),
     this.pollConfig = const LMChatPollConfig(),
+    this.searchConversationConfig = const LMSearchConversationConfig(),
     this.widgetBuilderDelegate = const LMChatWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });
