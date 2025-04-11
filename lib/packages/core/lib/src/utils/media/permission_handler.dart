@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -9,7 +8,11 @@ import 'package:permission_handler/permission_handler.dart';
 /// 2 - Videos
 /// 3 - Microphone/Audio
 Future<bool> handlePermissions(int mediaType) async {
-  if (Platform.isAndroid) {
+  if (kIsWeb) {
+    return true;
+  }
+
+  if (defaultTargetPlatform == TargetPlatform.android) {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -18,7 +21,7 @@ Future<bool> handlePermissions(int mediaType) async {
     } else {
       return await _handleStoragePermission(mediaType);
     }
-  } else if (Platform.isIOS) {
+  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
     return await _handleIOSPermissions(mediaType);
   } else {
     return true;
@@ -69,6 +72,8 @@ Future<bool> _handleIOSPermissions(int mediaType) async {
 }
 
 Future<bool> _requestPermission(Permission permission) async {
+  if (kIsWeb) return true; // Skip permission_handler on web
+
   PermissionStatus permissionStatus = await permission.status;
   if (permissionStatus == PermissionStatus.granted) {
     return true;

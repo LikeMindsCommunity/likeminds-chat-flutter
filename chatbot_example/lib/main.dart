@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chatbot_flutter_sample/app.dart';
 import 'package:likeminds_chatbot_flutter_sample/utils/firebase_options.dart';
@@ -28,7 +28,10 @@ Future<void> _handleNotification(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupNotifications();
+  if (!kIsWeb) {
+    // Only setup notifications on non-web platforms
+    setupNotifications();
+  }
   await LMChatCore.instance.initialize(
     excludedConversationStates: [
       ConversationState.memberJoinedOpenChatroom,
@@ -81,6 +84,9 @@ void setupNotifications() async {
 /// 2. Get device id
 /// 3. Return device id
 Future<String> deviceId() async {
+  if (kIsWeb) {
+    return "web-device";
+  }
   final deviceInfo = await DeviceInfoPlugin().deviceInfo;
   final deviceId =
       deviceInfo.data["identifierForVendor"] ?? deviceInfo.data["id"];
@@ -110,7 +116,7 @@ Future<String?> setupMessaging() async {
     provisional: false,
     sound: true,
   );
-  if (Platform.isIOS) {
+  if (!kIsWeb && Platform.isIOS) {
     messaging.getAPNSToken();
   }
   final token = await messaging.getToken();
