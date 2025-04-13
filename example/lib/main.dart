@@ -63,7 +63,7 @@ Future<void> _handleNotification(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupNotifications();
+  await setupNotifications();
   await LMChatCore.instance.initialize(
     excludedConversationStates: [
       ConversationState.memberJoinedOpenChatroom,
@@ -82,7 +82,7 @@ void main() async {
 /// 4. Register device with LM - [LMChatNotificationHandler]
 /// 5. Listen for FG and BG notifications
 /// 6. Handle notifications - [_handleNotification]
-void setupNotifications() async {
+Future<void> setupNotifications() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -92,20 +92,33 @@ void setupNotifications() async {
     debugPrint("FCM token is null or permission declined");
     return;
   }
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification in ios
+    badge: true,
+    //  sound: true,
+  );
   // Register device with LM, and listen for notifications
-  LMChatNotificationHandler.instance.init(deviceId: devId, fcmToken: fcmToken);
+  await LMChatNotificationHandler.instance.init(
+      deviceId: devId, fcmToken: fcmToken, rootNavigatorKey: rootNavigatorKey);
   FirebaseMessaging.onBackgroundMessage(_handleNotification);
+
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     debugPrint("---The app is opened from a notification---");
     await LMChatNotificationHandler.instance
-        .handleNotification(message, false, rootNavigatorKey);
+        .handleNotification(message, rootNavigatorKey);
+  });
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    debugPrint("---Foreground notification received---");
+
+    await LMChatNotificationHandler.instance
+        .handleForegroundNotifications(message);
   });
   FirebaseMessaging.instance.getInitialMessage().then(
     (RemoteMessage? message) async {
       if (message != null) {
         debugPrint("---The terminated app is opened from a notification---");
         await LMChatNotificationHandler.instance
-            .handleNotification(message, false, rootNavigatorKey);
+            .handleNotification(message, rootNavigatorKey);
       }
     },
   );

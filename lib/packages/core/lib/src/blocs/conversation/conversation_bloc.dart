@@ -81,43 +81,4 @@ class LMChatConversationBloc
     LMChatConversationBloc.replyConversation = null;
     return super.close();
   }
-
-  /// Handles the initialization of conversation events.
-  ///
-  /// This method sets the current chatroom ID and the last conversation ID
-  /// from the provided event. It also listens for real-time updates on child
-  /// changes and triggers an update event if a new conversation is detected.
-  ///
-  /// Parameters:
-  /// - `event`: The event containing the chatroom ID and conversation ID to initialize.
-  /// - `emit`: The emitter used to emit new states.
-  ///
-  /// Listens to:
-  /// - `realTime.onChildChanged`: Listens for changes in the real-time database.
-  ///   If a change is detected and it is not the same as the last conversation ID,
-  ///   an update event is added to the conversation bloc.
-  initialiseConversationsEventHandler(
-    LMChatInitialiseConversationsEvent event,
-    Emitter<LMChatConversationState> emit,
-  ) async {
-    currentChatroomId = event.chatroomId;
-    lastConversationId = event.conversationId;
-
-    realTime.onChildChanged.listen(
-      (event) {
-        if (event.snapshot.value != null && currentChatroomId != null) {
-          final response = event.snapshot.value as Map;
-          final conversationId = int.tryParse(response["answer_id"]);
-          if (lastConversationId != null &&
-              conversationId != lastConversationId &&
-              conversationId != null) {
-            LMChatConversationBloc.instance.add(LMChatUpdateConversationsEvent(
-              chatroomId: currentChatroomId!,
-              conversationId: conversationId,
-            ));
-          }
-        }
-      },
-    );
-  }
 }
