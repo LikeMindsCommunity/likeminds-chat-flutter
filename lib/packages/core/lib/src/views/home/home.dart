@@ -33,26 +33,30 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return DefaultTabController(
-      length: 2,
-      child: Builder(builder: (context) {
-        return _homeScreenBuilder.scaffold(
-          backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: _homeScreenBuilder.appBarBuilder(
-            context,
-            user,
-            DefaultTabController.of(context),
-            _defAppBar(context),
-          ),
-          body: const TabBarView(
-            children: [
-              LMChatHomeFeedList(),
-              LMChatDMFeedList(),
-            ],
-          ),
-        );
-      }),
-    );
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifierBloc,
+        builder: (context, _, child) {
+          return DefaultTabController(
+            length: 2,
+            child: Builder(builder: (context) {
+              return _homeScreenBuilder.scaffold(
+                backgroundColor: LMChatTheme.theme.backgroundColor,
+                appBar: _homeScreenBuilder.appBarBuilder(
+                  context,
+                  user,
+                  DefaultTabController.of(context),
+                  _defAppBar(context),
+                ),
+                body: const TabBarView(
+                  children: [
+                    LMChatHomeFeedList(),
+                    LMChatDMFeedList(),
+                  ],
+                ),
+              );
+            }),
+          );
+        });
   }
 
   LMChatAppBar _defAppBar(BuildContext context) {

@@ -91,38 +91,44 @@ class _LMChatSearchConversationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      appBar: _screenBuilder.appBarBuilder(context, _defaultAppBar(context)),
-      body: SafeArea(
-          child: Column(
-        children: [
-          Expanded(
-            child: BlocConsumer<LMChatSearchConversationBloc,
-                LMChatSearchConversationState>(
-              bloc: _searchConversationBloc,
-              listener: _updatePaginationState,
-              buildWhen: (previous, current) {
-                if (current is LMChatSearchConversationPaginationLoadingState) {
-                  return false;
-                }
-                return true;
-              },
-              builder: (context, state) {
-                if (state is LMChatSearchConversationLoadingState) {
-                  return LMChatLoader(
-                    style: LMChatTheme.theme.loaderStyle,
-                  );
-                } else if (state is LMChatSearchConversationInitial) {
-                  return _screenBuilder.emptyTextIndicatorBuilder();
-                }
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifierBloc,
+        builder: (context, _, child) {
+          return _screenBuilder.scaffold(
+            appBar:
+                _screenBuilder.appBarBuilder(context, _defaultAppBar(context)),
+            body: SafeArea(
+                child: Column(
+              children: [
+                Expanded(
+                  child: BlocConsumer<LMChatSearchConversationBloc,
+                      LMChatSearchConversationState>(
+                    bloc: _searchConversationBloc,
+                    listener: _updatePaginationState,
+                    buildWhen: (previous, current) {
+                      if (current
+                          is LMChatSearchConversationPaginationLoadingState) {
+                        return false;
+                      }
+                      return true;
+                    },
+                    builder: (context, state) {
+                      if (state is LMChatSearchConversationLoadingState) {
+                        return LMChatLoader(
+                          style: LMChatTheme.theme.loaderStyle,
+                        );
+                      } else if (state is LMChatSearchConversationInitial) {
+                        return _screenBuilder.emptyTextIndicatorBuilder();
+                      }
 
-                return _buildSearchResultsList();
-              },
-            ),
-          ),
-        ],
-      )),
-    );
+                      return _buildSearchResultsList();
+                    },
+                  ),
+                ),
+              ],
+            )),
+          );
+        });
   }
 
   LMChatTile _defUserTile(
