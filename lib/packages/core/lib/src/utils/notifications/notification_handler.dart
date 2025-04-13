@@ -1,14 +1,10 @@
 import 'dart:convert'; // Import for jsonEncode/Decode
 import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
-import 'package:likeminds_chat_flutter_core/src/core/core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
-import 'package:likeminds_chat_flutter_core/src/views/views.dart';
 
 /// This class handles all the notification related logic
 /// It registers the device for notifications in the SDK
@@ -192,7 +188,6 @@ class LMChatNotificationHandler {
 
     // Extract notification details for display
     RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android; // Can be null
 
     // Ensure we have content to display
     final String title = notification?.title ??

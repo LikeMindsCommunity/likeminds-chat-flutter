@@ -134,6 +134,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void dispose() {
+    LMChatRealtime.instance.chatroomId = null;
     _chatroomBloc.close();
     _convActionBloc.close();
     _conversationBloc.close();
