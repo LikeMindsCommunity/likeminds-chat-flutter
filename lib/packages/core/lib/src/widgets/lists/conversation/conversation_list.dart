@@ -1513,7 +1513,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
             !pagedListController.isScrollingNotifier.value;
 
         _isPaginatedConversationLoading = false;
-        //   rebuildConversationList.value = !rebuildConversationList.value;
+        rebuildConversationList.value = !rebuildConversationList.value;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scrollToConversation(index, replyId, pagedListController);
         });
