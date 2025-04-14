@@ -258,12 +258,10 @@ class LMChatDeleteReactionError extends LMChatConversationActionState {
 class LMChatSearchConversationInChatroomState
     extends LMChatConversationActionState {
   /// The search query.
-  final int messageId;
   final LMChatConversationViewData conversation;
 
   /// Creates and returns a new instance of [LMChatSearchConversationInChatroomState]
-  LMChatSearchConversationInChatroomState(this.messageId, this.conversation);
-
+  LMChatSearchConversationInChatroomState(this.conversation);
   @override
-  List<Object> get props => [messageId, conversation];
+  List<Object> get props => [conversation];
 }

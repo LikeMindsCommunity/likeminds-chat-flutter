@@ -138,8 +138,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
               _updateReactions(state);
             }
             if (state is LMChatSearchConversationInChatroomState) {
-              _searchWithMessageId(state.messageId, state.conversation,
-                  pagedListController, widget.chatroomId);
+              _searchWithMessageId(
+                  state.conversation, pagedListController, widget.chatroomId);
             }
           },
         ),
@@ -1368,12 +1368,12 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
   }
 
   void _searchWithMessageId(
-    int messageId,
     LMChatConversationViewData conversation,
     LMDualSidePaginationController pagedListController,
     int chatroomId,
   ) async {
     // find index of the conversation in the list
+    final int messageId = conversation.id;
     final int replyId = messageId;
     // find index of reply in conversation list
     int index = pagedListController.itemList

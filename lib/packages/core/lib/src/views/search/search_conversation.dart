@@ -137,7 +137,6 @@ class _LMChatSearchConversationScreenState
       onTap: () {
         LMChatConversationActionBloc.instance.add(
           LMChatSearchConversationInChatroomEvent(
-            messageId: conversation.id,
             conversation: conversation,
           ),
         );
