@@ -131,7 +131,7 @@ class _LMChatSearchConversationScreenState
         });
   }
 
-  LMChatTile _defUserTile(
+  LMChatTile _defConversationTile(
       LMChatConversationViewData conversation, List<String> matches) {
     return LMChatTile(
       onTap: () {
@@ -402,8 +402,6 @@ class _LMChatSearchConversationScreenState
     }
   }
 
-  ///! remove them
-
   Widget _buildSearchResultsList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -414,8 +412,8 @@ class _LMChatSearchConversationScreenState
         builderDelegate: PagedChildBuilderDelegate<LMChatConversationViewData>(
           itemBuilder: (context, item, index) {
             List<String> matches = _findFirstMatch(searchTerm, item.answer);
-            return _screenBuilder.userTile(
-                context, _defUserTile(item, matches));
+            return _screenBuilder.conversationTile(
+                context, _defConversationTile(item, matches));
           },
           firstPageErrorIndicatorBuilder:
               _screenBuilder.firstPageErrorIndicatorBuilder,

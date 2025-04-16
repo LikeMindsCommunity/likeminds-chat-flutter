@@ -139,6 +139,16 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _convActionBloc.close();
     _conversationBloc.close();
     _chatroomActionBloc.close();
+    scrollController.removeListener(
+        _showScrollToBottomButton); // Good practice to remove listeners
+    scrollController.dispose(); // Dispose controllers owned by this state
+    _menuController.dispose(); // Dispose controllers owned by this state
+    // Dispose ValueNotifiers if they are exclusively used by this screen instance
+    rebuildConversationList.dispose();
+    rebuildChatBar.dispose();
+    rebuildChatTopic.dispose();
+    rebuildAppBar.dispose();
+    rebuildFloatingButton.dispose();
     super.dispose();
   }
 
@@ -773,7 +783,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
         _conversationBloc.add(LMChatFetchConversationsEvent(
           chatroomId: widget.chatroomId,
           page: 1,
-          pageSize: 100,
+          pageSize: 200,
           direction: LMPaginationDirection.top,
           lastConversationId: lastConversationId,
           reInitialize: true,
@@ -784,7 +794,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           _conversationBloc.add(LMChatFetchConversationsEvent(
             chatroomId: widget.chatroomId,
             page: 1,
-            pageSize: 100,
+            pageSize: 200,
             direction: LMPaginationDirection.top,
             lastConversationId: lastConversationId,
             reInitialize: true,

@@ -107,11 +107,11 @@ class LMSearchBuilderDelegate {
   }
 
   /// Builds the user tile for a conversation in the search results.
-  Widget userTile(
+  Widget conversationTile(
     BuildContext context,
-    LMChatTile userTile,
+    LMChatTile conversationTile,
   ) {
-    return userTile;
+    return conversationTile;
   }
 
   /// Builds the first page error indicator.

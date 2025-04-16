@@ -92,11 +92,7 @@ Future<void> setupNotifications() async {
     debugPrint("FCM token is null or permission declined");
     return;
   }
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true, // Required to display a heads up notification in ios
-    badge: true,
-    //  sound: true,
-  );
+
   // Register device with LM, and listen for notifications
   await LMChatNotificationHandler.instance.init(
       deviceId: devId, fcmToken: fcmToken, rootNavigatorKey: rootNavigatorKey);
@@ -107,12 +103,7 @@ Future<void> setupNotifications() async {
     await LMChatNotificationHandler.instance
         .handleNotification(message, rootNavigatorKey);
   });
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    debugPrint("---Foreground notification received---");
 
-    await LMChatNotificationHandler.instance
-        .handleForegroundNotifications(message);
-  });
   FirebaseMessaging.instance.getInitialMessage().then(
     (RemoteMessage? message) async {
       if (message != null) {
@@ -146,8 +137,8 @@ Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
   messaging.setForegroundNotificationPresentationOptions(
     // alert: true,
-    badge: true,
-    sound: true,
+    badge: false,
+    sound: false,
   );
   await messaging.requestPermission(
     alert: true,
