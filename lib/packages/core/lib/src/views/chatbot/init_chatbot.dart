@@ -140,31 +140,35 @@ class _LMChatAIBotInitiationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: LMChatTheme.theme.container,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Lottie.network(
-                widget.animationToShow ?? aiChatbotLoadingAnimation,
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, _, child) {
+          return Scaffold(
+            backgroundColor: LMChatTheme.theme.container,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Lottie.network(
+                      widget.animationToShow ?? aiChatbotLoadingAnimation,
+                    ),
+                  ),
+                  widget.previewText?.call(
+                        context,
+                        const LMChatText(
+                          "Setting up AI Chatbot...",
+                        ),
+                      ) ??
+                      const LMChatText(
+                        "Setting up AI Chatbot...",
+                      ),
+                  const SizedBox(height: 28),
+                ],
               ),
             ),
-            widget.previewText?.call(
-                  context,
-                  const LMChatText(
-                    "Setting up AI Chatbot...",
-                  ),
-                ) ??
-                const LMChatText(
-                  "Setting up AI Chatbot...",
-                ),
-            const SizedBox(height: 28),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   @override

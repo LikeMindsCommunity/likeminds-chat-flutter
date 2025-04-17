@@ -33,26 +33,30 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return DefaultTabController(
-      length: 2,
-      child: Builder(builder: (context) {
-        return _homeScreenBuilder.scaffold(
-          backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: _homeScreenBuilder.appBarBuilder(
-            context,
-            user,
-            DefaultTabController.of(context),
-            _defAppBar(context),
-          ),
-          body: const TabBarView(
-            children: [
-              LMChatHomeFeedList(),
-              LMChatDMFeedList(),
-            ],
-          ),
-        );
-      }),
-    );
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, _, child) {
+          return DefaultTabController(
+            length: 2,
+            child: Builder(builder: (context) {
+              return _homeScreenBuilder.scaffold(
+                backgroundColor: LMChatTheme.theme.backgroundColor,
+                appBar: _homeScreenBuilder.appBarBuilder(
+                  context,
+                  user,
+                  DefaultTabController.of(context),
+                  _defAppBar(context),
+                ),
+                body: const TabBarView(
+                  children: [
+                    LMChatHomeFeedList(),
+                    LMChatDMFeedList(),
+                  ],
+                ),
+              );
+            }),
+          );
+        });
   }
 
   LMChatAppBar _defAppBar(BuildContext context) {
@@ -64,6 +68,14 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       ),
       leading: const SizedBox.shrink(),
       trailing: [
+        // toggle button for theme switch
+        Switch(
+          value: LMChatTheme.theme.isDark,
+          onChanged: (value) {
+            LMChatTheme.setTheme(
+                value ? LMChatThemeData.dark() : LMChatThemeData.light());
+          },
+        ),
         const SizedBox(width: 8),
         LMChatProfilePicture(
           fallbackText: user.name,

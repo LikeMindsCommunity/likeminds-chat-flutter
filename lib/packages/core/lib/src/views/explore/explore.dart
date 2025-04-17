@@ -90,14 +90,19 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      backgroundColor: LMChatTheme.theme.scaffold,
-      appBar: _screenBuilder.appBarBuilder(context, _defaultExploreAppBar()),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 2.w),
-        child: _defaultExploreBody(),
-      ),
-    );
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, _, child) {
+          return _screenBuilder.scaffold(
+            backgroundColor: LMChatTheme.theme.scaffold,
+            appBar:
+                _screenBuilder.appBarBuilder(context, _defaultExploreAppBar()),
+            body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 2.w),
+              child: _defaultExploreBody(),
+            ),
+          );
+        });
   }
 
   Column _defaultExploreBody() {

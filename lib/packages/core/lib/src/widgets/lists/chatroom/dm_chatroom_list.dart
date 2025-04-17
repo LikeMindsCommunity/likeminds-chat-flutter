@@ -65,6 +65,11 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void didUpdateWidget(covariant LMChatDMFeedList oldWidget) {
     feedBloc = LMChatDMFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
@@ -82,70 +87,75 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
-      body: SafeArea(
-        top: false,
-        child: BlocListener<LMChatDMFeedBloc, LMChatDMFeedState>(
-          bloc: feedBloc,
-          listener: (_, state) {
-            _updatePagingControllers(state);
-          },
-          child: ValueListenableBuilder(
-              valueListenable: rebuildFeedList,
-              builder: (context, _, __) {
-                return PagedListView<int, LMChatRoomViewData>(
-                  pagingController: homeFeedPagingController,
-                  padding: _style.padding ??
-                      const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 4,
+    return ValueListenableBuilder(
+      valueListenable: LMChatTheme.themeNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
+          body: SafeArea(
+            top: false,
+            child: BlocListener<LMChatDMFeedBloc, LMChatDMFeedState>(
+              bloc: feedBloc,
+              listener: (_, state) {
+                _updatePagingControllers(state);
+              },
+              child: ValueListenableBuilder(
+                  valueListenable: rebuildFeedList,
+                  builder: (context, _, __) {
+                    return PagedListView<int, LMChatRoomViewData>(
+                      pagingController: homeFeedPagingController,
+                      padding: _style.padding ??
+                          const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 4,
+                          ),
+                      physics: const ClampingScrollPhysics(),
+                      builderDelegate:
+                          PagedChildBuilderDelegate<LMChatRoomViewData>(
+                        itemBuilder: (context, chatroom, index) {
+                          return _screenBuilder.dmFeedTileBuilder(
+                            context,
+                            chatroom,
+                            _defaultDMChatRoomTile(chatroom),
+                          );
+                        },
+                        firstPageErrorIndicatorBuilder: (context) =>
+                            _screenBuilder.dmFeedFirstPageErrorIndicatorBuilder(
+                          context,
+                          _defaultErrorView(),
+                        ),
+                        newPageErrorIndicatorBuilder: (context) =>
+                            _screenBuilder.dmFeedNewPageErrorIndicatorBuilder(
+                          context,
+                          _defaultErrorView(),
+                        ),
+                        firstPageProgressIndicatorBuilder: (context) =>
+                            _screenBuilder.dmFeedFirstPageProgressIndicatorBuilder(
+                          context,
+                          const LMChatSkeletonChatroomList(),
+                        ),
+                        newPageProgressIndicatorBuilder: (context) =>
+                            _screenBuilder.dmFeedNewPageProgressIndicatorBuilder(
+                          context,
+                          const LMChatLoader(),
+                        ),
+                        noItemsFoundIndicatorBuilder: (context) =>
+                            _screenBuilder.dmFeedNoItemsFoundIndicatorBuilder(
+                          context,
+                          _defaultEmptyView(),
+                        ),
+                        noMoreItemsIndicatorBuilder: (context) =>
+                            _screenBuilder.dmFeedNoMoreItemsIndicatorBuilder(
+                          context,
+                          const SizedBox(),
+                        ),
                       ),
-                  physics: const ClampingScrollPhysics(),
-                  builderDelegate:
-                      PagedChildBuilderDelegate<LMChatRoomViewData>(
-                    itemBuilder: (context, chatroom, index) {
-                      return _screenBuilder.dmFeedTileBuilder(
-                        context,
-                        chatroom,
-                        _defaultDMChatRoomTile(chatroom),
-                      );
-                    },
-                    firstPageErrorIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedFirstPageErrorIndicatorBuilder(
-                      context,
-                      _defaultErrorView(),
-                    ),
-                    newPageErrorIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNewPageErrorIndicatorBuilder(
-                      context,
-                      _defaultErrorView(),
-                    ),
-                    firstPageProgressIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedFirstPageProgressIndicatorBuilder(
-                      context,
-                      const LMChatSkeletonChatroomList(),
-                    ),
-                    newPageProgressIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNewPageProgressIndicatorBuilder(
-                      context,
-                      const LMChatLoader(),
-                    ),
-                    noItemsFoundIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNoItemsFoundIndicatorBuilder(
-                      context,
-                      _defaultEmptyView(),
-                    ),
-                    noMoreItemsIndicatorBuilder: (context) =>
-                        _screenBuilder.dmFeedNoMoreItemsIndicatorBuilder(
-                      context,
-                      const SizedBox(),
-                    ),
-                  ),
-                );
-              }),
-        ),
-      ),
+                    );
+                  }),
+            ),
+          ),
+        );
+      }
     );
   }
 

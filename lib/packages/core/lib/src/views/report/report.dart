@@ -72,52 +72,57 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    return _screenBuilder.scaffold(
-      backgroundColor: theme.container,
-      source: _widgetSource,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context)),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 20,
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, _, child) {
+          return _screenBuilder.scaffold(
+            backgroundColor: theme.container,
+            source: _widgetSource,
+            appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context)),
+            body: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          widget.reportContentBuilder
+                                  ?.call(context, _defReportContentWidget()) ??
+                              _defReportContentWidget(),
+                          const SizedBox(
+                            height: 24,
+                          ),
+                          _defChipListBuilder(),
+                          if (_selectedReportTag?.name.toLowerCase() ==
+                                  'others' ||
+                              _selectedReportTag?.name.toLowerCase() == 'other')
+                            _screenBuilder.otherReasonTextFieldBuilder(
+                              context,
+                              _reportReasonController,
+                              _defOtherReasonTextField(),
+                            )
+                        ],
+                      ),
                     ),
-                    widget.reportContentBuilder
-                            ?.call(context, _defReportContentWidget()) ??
-                        _defReportContentWidget(),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    _defChipListBuilder(),
-                    if (_selectedReportTag?.name.toLowerCase() == 'others' ||
-                        _selectedReportTag?.name.toLowerCase() == 'other')
-                      _screenBuilder.otherReasonTextFieldBuilder(
-                        context,
-                        _reportReasonController,
-                        _defOtherReasonTextField(),
-                      )
-                  ],
-                ),
+                  ),
+                  _screenBuilder.submitButtonBuilder(
+                    context,
+                    widget.entityId,
+                    _selectedReportTag?.id,
+                    _reportReasonController.text.trim(),
+                    _defSubmitButton(context),
+                  ),
+                ],
               ),
             ),
-            _screenBuilder.submitButtonBuilder(
-              context,
-              widget.entityId,
-              _selectedReportTag?.id,
-              _reportReasonController.text.trim(),
-              _defSubmitButton(context),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   Widget _defOtherReasonTextField() {
