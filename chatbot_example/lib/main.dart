@@ -72,12 +72,7 @@ Future<void> setupNotifications() async {
     await LMChatNotificationHandler.instance
         .handleNotification(message, rootNavigatorKey);
   });
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    debugPrint("---Foreground notification received---");
 
-    await LMChatNotificationHandler.instance
-        .handleForegroundNotifications(message);
-  });
   FirebaseMessaging.instance.getInitialMessage().then(
     (RemoteMessage? message) async {
       if (message != null) {
