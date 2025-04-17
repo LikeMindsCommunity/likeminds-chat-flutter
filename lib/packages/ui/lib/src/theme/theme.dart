@@ -22,7 +22,7 @@ class LMChatTheme {
 
   // late ValueNotifier<LMChatTheme> themeNotifier;
 
-  static ValueNotifier<LMChatTheme> themeNotifierBloc =
+  static ValueNotifier<LMChatTheme> themeNotifier =
       ValueNotifier<LMChatTheme>(instance);
 
   /// Sets the theme data
@@ -33,6 +33,7 @@ class LMChatTheme {
       theme: theme,
       isDark: theme.isDark,
     );
+    themeNotifier.value = instance;
   }
 
   /// Sets the theme data
@@ -64,8 +65,6 @@ class LMChatTheme {
     themeData = theme ??
         (this.isDark ? LMChatThemeData.dark() : LMChatThemeData.light());
     this.textTheme = textTheme ?? ThemeData.light().textTheme;
-
-    themeNotifierBloc.value = this;
   }
 
   /// Static helper to check if current theme is dark
@@ -78,6 +77,7 @@ class LMChatTheme {
       theme: instance.isDark ? LMChatThemeData.light() : LMChatThemeData.dark(),
       isDark: !instance.isDark,
     );
+    themeNotifier.value = instance;
   }
 }
 

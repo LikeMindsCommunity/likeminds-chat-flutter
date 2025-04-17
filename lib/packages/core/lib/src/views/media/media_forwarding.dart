@@ -82,7 +82,7 @@ class _LMChatMediaForwardingScreenState
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return _screenBuilder.scaffold(
             onPopInvoked: (p0) {

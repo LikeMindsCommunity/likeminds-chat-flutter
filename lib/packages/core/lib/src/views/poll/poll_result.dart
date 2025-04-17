@@ -88,7 +88,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return _screenBuilder.scaffold(
               backgroundColor: theme.container,
