@@ -518,12 +518,20 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
                 final checkLink = extractLinkAndEmailFromString(link ?? '');
                 if (checkLink is UrlElement) {
                   if (Uri.parse(checkLink.url).isAbsolute) {
+                    if (widget.onUrlTap != null) {
+                      widget.onUrlTap?.call(checkLink.url);
+                      return;
+                    }
                     launchUrl(
                       Uri.parse(checkLink.url),
                       mode: LaunchMode.externalApplication,
                     );
                   }
                 } else if (checkLink is EmailElement) {
+                  if (widget.onUrlTap != null) {
+                    widget.onUrlTap?.call(checkLink.emailAddress);
+                    return;
+                  }
                   launchUrl(
                     Uri.parse('mailto:${checkLink.emailAddress}'),
                     mode: LaunchMode.externalApplication,
