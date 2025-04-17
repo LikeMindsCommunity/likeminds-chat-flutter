@@ -34,7 +34,7 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   Widget build(BuildContext context) {
     ScreenSize.init(context);
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return DefaultTabController(
             length: 2,
@@ -68,6 +68,14 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       ),
       leading: const SizedBox.shrink(),
       trailing: [
+        // toggle button for theme switch
+        Switch(
+          value: LMChatTheme.theme.isDark,
+          onChanged: (value) {
+            LMChatTheme.setTheme(
+                value ? LMChatThemeData.dark() : LMChatThemeData.light());
+          },
+        ),
         const SizedBox(width: 8),
         LMChatProfilePicture(
           fallbackText: user.name,
