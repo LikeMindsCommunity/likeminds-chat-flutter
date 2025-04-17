@@ -117,7 +117,6 @@ class LMChatConversationBloc
       (event) {
         if (event.snapshot.value != null && currentChatroomId != null) {
           final response = event.snapshot.value as Map;
-          print("Response: lol $response");
           final conversationId = int.tryParse(response["answer_id"]);
 
           if (lastConversationId != null &&
