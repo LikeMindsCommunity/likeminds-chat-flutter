@@ -602,6 +602,9 @@ class LMChatTextFieldStyle {
   /// margin for the text field
   final EdgeInsets? margin;
 
+  final int? maxLines;
+  final int? minLines;
+
   const LMChatTextFieldStyle({
     this.inputDecoration,
     this.textStyle,
@@ -619,6 +622,8 @@ class LMChatTextFieldStyle {
     this.showLoadingIndicator,
     this.debounceDuration,
     this.margin,
+    this.maxLines,
+    this.minLines,
   });
 
   /// Creates a copy of the text field style with optional modifications
@@ -637,6 +642,8 @@ class LMChatTextFieldStyle {
     LMChatTextStyle? suggestionItemTextStyle,
     LMChatProfilePictureStyle? suggestionItemAvatarStyle,
     EdgeInsets? margin,
+    int? maxLines,
+    int? minLines,
   }) {
     return LMChatTextFieldStyle(
       inputDecoration: inputDecoration ?? this.inputDecoration,
@@ -660,6 +667,8 @@ class LMChatTextFieldStyle {
           suggestionItemAvatarStyle ?? this.suggestionItemAvatarStyle,
       debounceDuration: debounceDuration ?? this.debounceDuration,
       margin: margin ?? this.margin,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
     );
   }
 
