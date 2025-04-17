@@ -1127,50 +1127,54 @@ class _LMChatOptionTileState extends State<LMChatOptionTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      child: TextField(
-        controller: _controller,
-        onChanged: widget.onChanged,
-        style: TextStyle(
-          color: theme.onContainer,
-        ),
-        decoration: widget.optionStyle?.inputDecoration ??
-            InputDecoration(
-              fillColor: LMChatTheme.isThemeDark
-                  ? theme.backgroundColor
-                  : theme.textFieldStyle.inputDecoration?.fillColor,
-              filled: true,
-              hintText: 'Option ${widget.index + 1}',
-              hintStyle: TextStyle(
-                color: theme.inActiveColor,
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifierBloc,
+        builder: (context, _, child) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            child: TextField(
+              controller: _controller,
+              onChanged: widget.onChanged,
+              style: TextStyle(
+                color: theme.onContainer,
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              suffixIconColor: theme.inActiveColor,
-              suffixIcon: widget.isRemovable
-                  ? IconButton(
-                      isSelected: true,
-                      icon: const Icon(Icons.close),
-                      onPressed: widget.onDelete,
-                    )
-                  : null,
+              decoration: widget.optionStyle?.inputDecoration ??
+                  InputDecoration(
+                    fillColor: LMChatTheme.isThemeDark
+                        ? theme.backgroundColor
+                        : theme.textFieldStyle.inputDecoration?.fillColor,
+                    filled: true,
+                    hintText: 'Option ${widget.index + 1}',
+                    hintStyle: TextStyle(
+                      color: theme.inActiveColor,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    suffixIconColor: theme.inActiveColor,
+                    suffixIcon: widget.isRemovable
+                        ? IconButton(
+                            isSelected: true,
+                            icon: const Icon(Icons.close),
+                            onPressed: widget.onDelete,
+                          )
+                        : null,
+                  ),
             ),
-      ),
-    );
+          );
+        });
   }
 }

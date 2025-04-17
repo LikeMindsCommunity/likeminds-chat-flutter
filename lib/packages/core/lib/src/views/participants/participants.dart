@@ -70,42 +70,47 @@ class _LMChatroomParticipantsPageState
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      backgroundColor: LMChatTheme.instance.themeData.scaffold,
-      appBar: _screenBuilder.appBarBuilder(
-        context,
-        _searchController,
-        _onSearchTap,
-        _defAppBar(),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child:
-                  BlocConsumer<LMChatParticipantsBloc, LMChatParticipantsState>(
-                bloc: participantsBloc,
-                listener: _updatePaginationState,
-                buildWhen: (previous, current) {
-                  if (current is LMChatParticipantsPaginationLoadingState) {
-                    return false;
-                  }
-                  return true;
-                },
-                builder: (context, state) {
-                  if (state is LMChatParticipantsLoadingState) {
-                    return LMChatLoader(
-                      style: LMChatTheme.theme.loaderStyle,
-                    );
-                  }
-                  return _buildParticipantsList();
-                },
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifierBloc,
+        builder: (context, _, child) {
+          return _screenBuilder.scaffold(
+            backgroundColor: LMChatTheme.instance.themeData.scaffold,
+            appBar: _screenBuilder.appBarBuilder(
+              context,
+              _searchController,
+              _onSearchTap,
+              _defAppBar(),
+            ),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: BlocConsumer<LMChatParticipantsBloc,
+                        LMChatParticipantsState>(
+                      bloc: participantsBloc,
+                      listener: _updatePaginationState,
+                      buildWhen: (previous, current) {
+                        if (current
+                            is LMChatParticipantsPaginationLoadingState) {
+                          return false;
+                        }
+                        return true;
+                      },
+                      builder: (context, state) {
+                        if (state is LMChatParticipantsLoadingState) {
+                          return LMChatLoader(
+                            style: LMChatTheme.theme.loaderStyle,
+                          );
+                        }
+                        return _buildParticipantsList();
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   LMChatAppBar _defAppBar() {

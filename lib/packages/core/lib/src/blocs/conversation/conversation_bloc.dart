@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -45,6 +46,10 @@ class LMChatConversationBloc
   /// chatroom is currently selected.
   static int? currentChatroomId;
 
+  /// Subscription to the real-time database changes.
+  /// Needs to be cancelled when the BLoC is closed.
+  StreamSubscription? _realtimeSubscription;
+
   /// The reply conversation if user taps on reply and is not present in the current list
   static LMChatConversationViewData? replyConversation;
 
@@ -76,8 +81,10 @@ class LMChatConversationBloc
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     currentChatroomId = null;
+    await _realtimeSubscription?.cancel();
+    _realtimeSubscription = null;
     LMChatConversationBloc.replyConversation = null;
     return super.close();
   }
@@ -100,14 +107,18 @@ class LMChatConversationBloc
     LMChatInitialiseConversationsEvent event,
     Emitter<LMChatConversationState> emit,
   ) async {
+    await _realtimeSubscription?.cancel(); // Cancel previous subscription
+    _realtimeSubscription = null; // Clear reference
+
     currentChatroomId = event.chatroomId;
     lastConversationId = event.conversationId;
 
-    realTime.onChildChanged.listen(
+    _realtimeSubscription = realTime.onChildChanged.listen(
       (event) {
         if (event.snapshot.value != null && currentChatroomId != null) {
           final response = event.snapshot.value as Map;
           final conversationId = int.tryParse(response["answer_id"]);
+
           if (lastConversationId != null &&
               conversationId != lastConversationId &&
               conversationId != null) {

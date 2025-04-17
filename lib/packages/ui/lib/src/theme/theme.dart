@@ -20,9 +20,15 @@ class LMChatTheme {
   /// Gets the text theme
   static TextTheme get text => instance.textTheme;
 
+  // late ValueNotifier<LMChatTheme> themeNotifier;
+
+  static ValueNotifier<LMChatTheme> themeNotifierBloc =
+      ValueNotifier<LMChatTheme>(instance);
+
   /// Sets the theme data
   static void setTheme(LMChatThemeData theme) {
     final instance = LMChatTheme.instance;
+
     instance.initialise(
       theme: theme,
       isDark: theme.isDark,
@@ -58,6 +64,8 @@ class LMChatTheme {
     themeData = theme ??
         (this.isDark ? LMChatThemeData.dark() : LMChatThemeData.light());
     this.textTheme = textTheme ?? ThemeData.light().textTheme;
+
+    themeNotifierBloc.value = this;
   }
 
   /// Static helper to check if current theme is dark

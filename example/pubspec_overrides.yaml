@@ -6,6 +6,6 @@ dependency_overrides:
   likeminds_chat_flutter_ui:
     path: ../lib/packages/ui
   likeminds_chat_fl:
-    path: ../../LikeMinds-Flutter-GroupChat-SDK/
+    path: ../../LikeMinds-Flutter-GroupChat-SDK
   extended_text_field: ^16.0.0
   js: ^0.7.1

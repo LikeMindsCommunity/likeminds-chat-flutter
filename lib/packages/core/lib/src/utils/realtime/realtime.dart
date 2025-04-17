@@ -20,9 +20,13 @@ class LMChatRealtime {
     debugPrint("Database is ${database.toString()}");
   }
 
-  set chatroomId(int chatroomId) {
+  set chatroomId(int? chatroomId) {
     debugPrint("Chatroom ID set to $chatroomId");
     _chatroomId = chatroomId;
+  }
+
+  int? get chatroomId {
+    return _chatroomId;
   }
 
   DatabaseReference homeFeed() {
