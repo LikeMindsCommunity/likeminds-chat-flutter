@@ -307,8 +307,8 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           const TextStyle(fontSize: 14),
       textCapitalization: TextCapitalization.sentences,
       focusNode: _focusNode,
-      minLines: 1,
-      maxLines: 200,
+      minLines: effectiveStyle.minLines ?? 1,
+      maxLines: effectiveStyle.maxLines ?? 200,
       scrollPadding: const EdgeInsets.all(2),
       enabled: widget.decoration?.enabled ?? true,
       decoration: effectiveStyle.inputDecoration ??

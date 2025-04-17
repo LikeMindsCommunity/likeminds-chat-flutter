@@ -73,7 +73,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return _screenBuilder.scaffold(
             backgroundColor: theme.container,

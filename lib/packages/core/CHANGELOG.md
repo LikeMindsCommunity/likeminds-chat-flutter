@@ -76,3 +76,8 @@
 
 - Fixed attachment menubar hanging issue
 - Fixed link preview bug
+
+## 0.16.0
+
+- Added search in a chatrrom
+- Added theme notifier

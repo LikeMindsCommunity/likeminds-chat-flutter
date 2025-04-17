@@ -1128,7 +1128,7 @@ class _LMChatOptionTileState extends State<LMChatOptionTile> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),

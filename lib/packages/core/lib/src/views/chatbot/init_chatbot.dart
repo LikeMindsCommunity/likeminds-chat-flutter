@@ -141,7 +141,7 @@ class _LMChatAIBotInitiationScreenState
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return Scaffold(
             backgroundColor: LMChatTheme.theme.container,

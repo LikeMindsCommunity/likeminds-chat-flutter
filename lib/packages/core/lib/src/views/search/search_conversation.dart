@@ -37,6 +37,7 @@ class _LMChatSearchConversationScreenState
   final TextEditingController _searchController = TextEditingController();
   final LMSearchBuilderDelegate _screenBuilder =
       LMChatCore.config.searchConversationConfig.builder;
+  final ValueNotifier<bool> _isInitialState = ValueNotifier(true);
 
   @override
   void initState() {
@@ -66,6 +67,7 @@ class _LMChatSearchConversationScreenState
     _pagingController.dispose();
     _debounce?.cancel();
     _focusNode.dispose();
+    _isInitialState.dispose();
     super.dispose();
   }
 
@@ -77,6 +79,7 @@ class _LMChatSearchConversationScreenState
     _pagingController.nextPageKey = 1; // Reset to the first page
 
     // Add this line to trigger the initial state
+    _isInitialState.value = true;
     _searchConversationBloc.add(
       LMChatGetSearchConversationEvent(
         chatroomId: widget.chatRoomId,
@@ -92,7 +95,7 @@ class _LMChatSearchConversationScreenState
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return _screenBuilder.scaffold(
             appBar:
@@ -256,7 +259,14 @@ class _LMChatSearchConversationScreenState
         _defaultTextField(),
       ),
       trailing: [
-        _screenBuilder.clearSearchButton(context, _defaultClearSearchButton()),
+        ValueListenableBuilder(
+            valueListenable: _isInitialState,
+            builder: (context, _, __) {
+              return !_isInitialState.value
+                  ? _screenBuilder.clearSearchButton(
+                      context, _defaultClearSearchButton())
+                  : const SizedBox.shrink();
+            }),
       ],
       style:
           LMChatAppBarStyle.basic(Colors.white), // Customize the AppBar style
@@ -290,7 +300,11 @@ class _LMChatSearchConversationScreenState
   LMChatTextField _defaultTextField() {
     return LMChatTextField(
       controller: _searchController,
-      chatroomId: 1,
+      chatroomId: widget.chatRoomId,
+      textFieldStyle: const LMChatTextFieldStyle(
+        maxLines: 1,
+      ),
+      enabled: false,
       onTagSelected: (p0) {},
       isDown: false,
       focusNode: _focusNode,
@@ -344,10 +358,13 @@ class _LMChatSearchConversationScreenState
           _clearSearch();
           return;
         }
-
+        if (value.trim().isEmpty && _isInitialState.value == false) {
+          _isInitialState.value = true;
+        }
         searchTerm = value;
         _pagingController.nextPageKey = 2;
         _pagingController.itemList = <LMChatConversationViewData>[];
+        _isInitialState.value = false;
         _searchConversationBloc.add(
           LMChatGetSearchConversationEvent(
             chatroomId: widget.chatRoomId,
@@ -411,7 +428,12 @@ class _LMChatSearchConversationScreenState
         physics: const ClampingScrollPhysics(),
         builderDelegate: PagedChildBuilderDelegate<LMChatConversationViewData>(
           itemBuilder: (context, item, index) {
-            List<String> matches = _findFirstMatch(searchTerm, item.answer);
+            final String answer = LMChatTaggingHelper.convertRouteToTag(
+                  item.answer,
+                  withTilde: false,
+                ) ??
+                "";
+            List<String> matches = _findFirstMatch(searchTerm, answer);
             return _screenBuilder.conversationTile(
                 context, _defConversationTile(item, matches));
           },

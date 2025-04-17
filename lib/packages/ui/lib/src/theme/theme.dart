@@ -22,7 +22,7 @@ class LMChatTheme {
 
   // late ValueNotifier<LMChatTheme> themeNotifier;
 
-  static ValueNotifier<LMChatTheme> themeNotifierBloc =
+  static ValueNotifier<LMChatTheme> themeNotifier =
       ValueNotifier<LMChatTheme>(instance);
 
   /// Sets the theme data
@@ -33,6 +33,7 @@ class LMChatTheme {
       theme: theme,
       isDark: theme.isDark,
     );
+    themeNotifier.value = instance;
   }
 
   /// Sets the theme data
@@ -64,8 +65,6 @@ class LMChatTheme {
     themeData = theme ??
         (this.isDark ? LMChatThemeData.dark() : LMChatThemeData.light());
     this.textTheme = textTheme ?? ThemeData.light().textTheme;
-
-    themeNotifierBloc.value = this;
   }
 
   /// Static helper to check if current theme is dark
@@ -78,6 +77,7 @@ class LMChatTheme {
       theme: instance.isDark ? LMChatThemeData.light() : LMChatThemeData.dark(),
       isDark: !instance.isDark,
     );
+    themeNotifier.value = instance;
   }
 }
 
@@ -602,6 +602,9 @@ class LMChatTextFieldStyle {
   /// margin for the text field
   final EdgeInsets? margin;
 
+  final int? maxLines;
+  final int? minLines;
+
   const LMChatTextFieldStyle({
     this.inputDecoration,
     this.textStyle,
@@ -619,6 +622,8 @@ class LMChatTextFieldStyle {
     this.showLoadingIndicator,
     this.debounceDuration,
     this.margin,
+    this.maxLines,
+    this.minLines,
   });
 
   /// Creates a copy of the text field style with optional modifications
@@ -637,6 +642,8 @@ class LMChatTextFieldStyle {
     LMChatTextStyle? suggestionItemTextStyle,
     LMChatProfilePictureStyle? suggestionItemAvatarStyle,
     EdgeInsets? margin,
+    int? maxLines,
+    int? minLines,
   }) {
     return LMChatTextFieldStyle(
       inputDecoration: inputDecoration ?? this.inputDecoration,
@@ -660,6 +667,8 @@ class LMChatTextFieldStyle {
           suggestionItemAvatarStyle ?? this.suggestionItemAvatarStyle,
       debounceDuration: debounceDuration ?? this.debounceDuration,
       margin: margin ?? this.margin,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
     );
   }
 

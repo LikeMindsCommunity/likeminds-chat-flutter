@@ -155,7 +155,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifierBloc,
+        valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, child) {
           return _screenBuilder.scaffold(
             resizeToAvoidBottomInset: true,
