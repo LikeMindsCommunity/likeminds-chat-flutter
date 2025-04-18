@@ -9,6 +9,7 @@ extension MediaConvertor on LMChatAttachmentViewData {
       mediaType: mapStringToMediaType(type!),
       mediaUrl: url ?? fileUrl,
       mediaFile: attachmentFile,
+      mediaBytes: attachmentBytes,
       thumbnailUrl: thumbnailUrl,
       thumbnailFile: thumbnailFile,
       meta: meta,
@@ -26,6 +27,7 @@ extension ViewDataConvertor on LMChatMediaModel {
     final LMChatAttachmentViewDataBuilder attachmentBuilder =
         LMChatAttachmentViewDataBuilder()
           ..attachmentFile(mediaFile)
+          ..attachmentBytes(mediaBytes)
           ..fileUrl(mediaUrl)
           ..height(height)
           ..width(width)

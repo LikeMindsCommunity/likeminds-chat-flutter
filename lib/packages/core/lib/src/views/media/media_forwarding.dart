@@ -521,7 +521,8 @@ class _LMChatMediaForwardingScreenState
 
   LMChatImage _defImage() {
     return LMChatImage(
-      imageFile: mediaList[currPosition].mediaFile!,
+      imageBytes: mediaList[currPosition].mediaBytes,
+      imageFile: mediaList[currPosition].mediaFile,
       style: const LMChatImageStyle(
         boxFit: BoxFit.cover,
       ),

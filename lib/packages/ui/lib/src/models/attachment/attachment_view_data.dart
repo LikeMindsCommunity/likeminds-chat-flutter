@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 /// `LMChatAttachmentViewData` is a model class that holds the data for the attachment view.
 class LMChatAttachmentViewData {
@@ -8,6 +9,7 @@ class LMChatAttachmentViewData {
   final String? fileUrl;
   final String? url;
   final File? attachmentFile;
+  final Uint8List? attachmentBytes;
   final dynamic height;
   final int? id;
   final int? index;
@@ -28,6 +30,7 @@ class LMChatAttachmentViewData {
     required this.fileUrl,
     required this.url,
     required this.attachmentFile,
+    this.attachmentBytes,
     required this.height,
     required this.id,
     required this.index,
@@ -51,6 +54,7 @@ class LMChatAttachmentViewData {
     String? fileUrl,
     String? url,
     File? attachmentFile,
+    Uint8List? attachmentBytes,
     dynamic height,
     int? id,
     int? index,
@@ -69,6 +73,7 @@ class LMChatAttachmentViewData {
       createdAt: createdAt ?? this.createdAt,
       dimensions: dimensions ?? this.dimensions,
       fileUrl: fileUrl ?? this.fileUrl,
+      attachmentBytes: attachmentBytes ?? this.attachmentBytes,
       url: url ?? this.url,
       attachmentFile: attachmentFile ?? this.attachmentFile,
       height: height ?? this.height,
@@ -95,6 +100,7 @@ class LMChatAttachmentViewDataBuilder {
   String? _fileUrl;
   String? _url;
   File? _attachmentFile;
+  Uint8List? _attachmentBytes;
   dynamic _height;
   int? _id;
   int? _index;
@@ -130,6 +136,10 @@ class LMChatAttachmentViewDataBuilder {
 
   void attachmentFile(File? attachmentFile) {
     _attachmentFile = attachmentFile;
+  }
+
+  void attachmentBytes(Uint8List? attachmentBytes) {
+    _attachmentBytes = attachmentBytes;
   }
 
   void height(dynamic height) {
@@ -189,6 +199,7 @@ class LMChatAttachmentViewDataBuilder {
       fileUrl: _fileUrl,
       url: _url,
       attachmentFile: _attachmentFile,
+      attachmentBytes: _attachmentBytes,
       height: _height,
       id: _id,
       index: _index,

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
@@ -175,8 +176,16 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
               builder: (context, _, __) {
                 return Padding(
                   padding: EdgeInsets.only(
-                    bottom: Platform.isIOS ? 64.0 : 96.0,
-                    right: Platform.isIOS ? 2 : 4,
+                    bottom: kIsWeb
+                        ? 64.0
+                        : Platform.isIOS
+                            ? 64.0
+                            : 96.0,
+                    right: kIsWeb
+                        ? 2.0
+                        : Platform.isIOS
+                            ? 2
+                            : 4,
                   ),
                   child: showScrollButton
                       ? _screenBuilder

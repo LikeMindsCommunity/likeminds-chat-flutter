@@ -68,14 +68,6 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
       ),
       leading: const SizedBox.shrink(),
       trailing: [
-        // toggle button for theme switch
-        Switch(
-          value: LMChatTheme.theme.isDark,
-          onChanged: (value) {
-            LMChatTheme.setTheme(
-                value ? LMChatThemeData.dark() : LMChatThemeData.light());
-          },
-        ),
         const SizedBox(width: 8),
         LMChatProfilePicture(
           fallbackText: user.name,

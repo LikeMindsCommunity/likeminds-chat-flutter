@@ -10,6 +10,7 @@ extension AttachmentViewDataConvertor on Attachment {
         LMChatAttachmentViewDataBuilder()
           ..answerId(answerId)
           ..attachmentFile(attachmentFile)
+          ..attachmentBytes(attachmentBytes)
           ..createdAt(createdAt)
           ..dimensions(dimensions)
           ..fileUrl(fileUrl)
@@ -44,6 +45,7 @@ extension AttachmentConvertor on LMChatAttachmentViewData {
       type: type,
       answerId: answerId,
       attachmentFile: attachmentFile,
+      attachmentBytes: attachmentBytes,
       dimensions: dimensions,
       height: height,
       width: width,
@@ -67,6 +69,7 @@ extension MediaConvertor on LMChatAttachmentViewData {
       mediaType: mapStringToMediaType(type!),
       mediaUrl: url ?? fileUrl,
       mediaFile: attachmentFile,
+      mediaBytes: attachmentBytes,
       thumbnailUrl: thumbnailUrl,
       thumbnailFile: thumbnailFile,
       meta: meta,
@@ -84,6 +87,7 @@ extension ViewDataConvertor on LMChatMediaModel {
     final LMChatAttachmentViewDataBuilder attachmentBuilder =
         LMChatAttachmentViewDataBuilder()
           ..attachmentFile(mediaFile)
+          ..attachmentBytes(mediaBytes)
           ..fileUrl(mediaUrl)
           ..height(height)
           ..width(width)

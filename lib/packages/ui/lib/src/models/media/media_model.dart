@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
@@ -44,6 +45,9 @@ class LMChatMediaModel {
   /// The media file associated with the chat
   File? mediaFile;
 
+  /// The bytes of the media file associated with the chat
+  Uint8List? mediaBytes;
+
   /// The type of media (e.g., image, video)
   LMChatMediaType mediaType;
 
@@ -83,6 +87,7 @@ class LMChatMediaModel {
   ///{@macro lm_chat_media_model}
   LMChatMediaModel({
     this.mediaFile,
+    this.mediaBytes,
     required this.mediaType,
     this.mediaUrl,
     this.height,
@@ -101,6 +106,7 @@ class LMChatMediaModel {
   /// If the new values are not provided, the old values are used.
   LMChatMediaModel copyWith({
     File? mediaFile,
+    Uint8List? mediaBytes,
     LMChatMediaType? mediaType,
     String? mediaUrl,
     int? width,
@@ -116,6 +122,7 @@ class LMChatMediaModel {
   }) {
     return LMChatMediaModel(
       mediaFile: mediaFile ?? this.mediaFile,
+      mediaBytes: mediaBytes ?? this.mediaBytes,
       mediaType: mediaType ?? this.mediaType,
       mediaUrl: mediaUrl ?? this.mediaUrl,
       width: width ?? this.width,

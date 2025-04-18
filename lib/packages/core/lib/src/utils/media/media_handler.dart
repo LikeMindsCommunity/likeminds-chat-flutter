@@ -255,6 +255,14 @@ class LMChatMediaHandler {
             );
           }
           attachedMedia.add(
+            kIsWeb?
+                LMChatMediaModel(
+                  mediaType: LMChatMediaType.image,
+                  mediaBytes: file.bytes,
+                  meta: {
+                    'file_name': file.name,
+                  },
+                ):
             LMChatMediaModel(
               mediaType: LMChatMediaType.image,
               mediaFile: File(file.path!),

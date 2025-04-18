@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/media/error.dart';
@@ -511,6 +512,16 @@ Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
     ),
     child: Stack(
       children: [
+        kIsWeb
+            ? Image.memory(
+                mediaFile.attachmentBytes!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const LMChatMediaErrorWidget(),
+                height: height,
+                width: width,
+              )
+            : const SizedBox(),
         Image.file(
           mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
               ? mediaFile.attachmentFile!
@@ -932,35 +943,34 @@ Widget getImageFileMessage(
 /// Returns the local file path where the file was saved
 Future<String> downloadFile({String? fileUrl, LMChatMediaModel? media}) async {
   try {
-    // Use either direct URL or get URL from media model
     final String url = fileUrl ?? media?.mediaUrl ?? '';
     if (url.isEmpty) {
       throw Exception('No URL provided for download');
     }
 
-    // Get file name from URL
-    final String fileName = path.basename(url);
+    if (kIsWeb) {
+      // For web, we return the URL directly since we can't save files locally
+      return url;
+    } else {
+      // Existing native platform implementation
+      final String fileName = path.basename(url);
+      final Directory tempDir = await getTemporaryDirectory();
+      final String localPath = path.join(tempDir.path, fileName);
 
-    // Get temporary directory for storing downloaded files
-    final Directory tempDir = await getTemporaryDirectory();
-    final String localPath = path.join(tempDir.path, fileName);
+      if (await File(localPath).exists()) {
+        return localPath;
+      }
 
-    // Check if file already exists locally
-    if (await File(localPath).exists()) {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        throw Exception('Failed to download file: ${response.statusCode}');
+      }
+
+      final File file = File(localPath);
+      await file.writeAsBytes(response.bodyBytes);
+
       return localPath;
     }
-
-    // Download file
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode != 200) {
-      throw Exception('Failed to download file: ${response.statusCode}');
-    }
-
-    // Save file locally
-    final File file = File(localPath);
-    await file.writeAsBytes(response.bodyBytes);
-
-    return localPath;
   } catch (e) {
     throw Exception('Error downloading file: $e');
   }

@@ -64,6 +64,19 @@ postMultimediaConversationEventHandler(
             url = response.data;
             media.mediaUrl = url;
           }
+        }
+        if (media.mediaBytes != null) {
+          final response = await LMChatMediaService.uploadFile(
+            media.mediaBytes!,
+            user.sdkClientInfo?.uuid ?? user.userUniqueId!,
+            fileName: media.meta!['file_name'],
+            chatroomId: event.postConversationRequest.chatroomId,
+          );
+
+          if (response.success) {
+            url = response.data;
+            media.mediaUrl = url;
+          }
         } else {
           url = media.mediaUrl;
         }
