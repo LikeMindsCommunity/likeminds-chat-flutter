@@ -111,6 +111,9 @@ class _LMImageState extends State<LMChatImage> {
   /// Determines which type of image to build based on the provided source
   /// Returns the appropriate image widget for URL, File, or Asset images
   Widget _buildImageWidget() {
+    if (widget.imageBytes != null) {
+      return _buildBytesImage();
+    }
     if (widget.imageUrl != null) {
       return _buildNetworkImage();
     }
@@ -119,9 +122,6 @@ class _LMImageState extends State<LMChatImage> {
     }
     if (widget.imageAssetPath != null) {
       return _buildAssetImage();
-    }
-    if (widget.imageBytes != null) {
-      return _buildBytesImage();
     }
     return const SizedBox();
   }

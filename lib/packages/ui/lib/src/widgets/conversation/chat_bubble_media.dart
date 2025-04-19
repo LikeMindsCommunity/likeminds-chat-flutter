@@ -146,7 +146,8 @@ class LMChatBubbleMedia extends StatelessWidget {
   }
 
   Widget _defaultMediaWidget(BuildContext context) {
-    if (attachments.first.attachmentFile != null) {
+    if (attachments.first.attachmentFile != null ||
+        attachments.first.attachmentBytes != null) {
       return getImageFileMessage(context, attachments, imageBuilder);
     }
     return getImageMessage(context, attachments, imageBuilder);

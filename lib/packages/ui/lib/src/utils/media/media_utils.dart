@@ -500,7 +500,7 @@ Widget getChatBubbleImage(
 
 Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
     {double? width, double? height}) {
-  if (mediaFile.attachmentFile == null && mediaFile.thumbnailFile == null) {
+  if (mediaFile.attachmentFile == null && mediaFile.thumbnailFile == null && mediaFile.attachmentBytes == null) {
     return const LMChatMediaErrorWidget();
   }
   return Container(
@@ -521,17 +521,16 @@ Widget getFileImageTile(LMChatAttachmentViewData mediaFile,
                 height: height,
                 width: width,
               )
-            : const SizedBox(),
-        Image.file(
-          mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
-              ? mediaFile.attachmentFile!
-              : mediaFile.thumbnailFile!,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              const LMChatMediaErrorWidget(),
-          height: height,
-          width: width,
-        ),
+            : Image.file(
+                mapStringToMediaType(mediaFile.type!) == LMChatMediaType.image
+                    ? mediaFile.attachmentFile!
+                    : mediaFile.thumbnailFile!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const LMChatMediaErrorWidget(),
+                height: height,
+                width: width,
+              ),
         mapStringToMediaType(mediaFile.type!) == LMChatMediaType.video &&
                 mediaFile.thumbnailFile != null
             ? Center(
