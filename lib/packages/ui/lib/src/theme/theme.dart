@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
@@ -947,11 +948,14 @@ class ScreenSize {
   static late double safeBlockVertical;
 
   /// Initializes the screen size based on the provided context
-  static init(BuildContext context) {
+  static init(
+    BuildContext context, {
+      double? setWidth,
+    }) {
     final mediaQuery = MediaQuery.of(context);
     pixelRatio = mediaQuery.devicePixelRatio;
     textScale = mediaQuery.textScaler;
-    width = mediaQuery.size.width;
+    width = setWidth?? mediaQuery.size.width;
     height = mediaQuery.size.height;
     blockSizeHorizontal = width / 100;
     blockSizeVertical = height / 100;

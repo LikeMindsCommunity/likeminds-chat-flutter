@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/search_conversation/search_conversation_bloc.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 
 class LMChatSearchConversationScreen extends StatefulWidget {
   static const routeName = '/searchConversation';
@@ -38,6 +37,7 @@ class _LMChatSearchConversationScreenState
   final LMSearchBuilderDelegate _screenBuilder =
       LMChatCore.config.searchConversationConfig.builder;
   final ValueNotifier<bool> _isInitialState = ValueNotifier(true);
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   void initState() {
@@ -94,44 +94,51 @@ class _LMChatSearchConversationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifier,
-        builder: (context, _, child) {
-          return _screenBuilder.scaffold(
-            appBar:
-                _screenBuilder.appBarBuilder(context, _defaultAppBar(context)),
-            body: SafeArea(
-                child: Column(
-              children: [
-                Expanded(
-                  child: BlocConsumer<LMChatSearchConversationBloc,
-                      LMChatSearchConversationState>(
-                    bloc: _searchConversationBloc,
-                    listener: _updatePaginationState,
-                    buildWhen: (previous, current) {
-                      if (current
-                          is LMChatSearchConversationPaginationLoadingState) {
-                        return false;
-                      }
-                      return true;
-                    },
-                    builder: (context, state) {
-                      if (state is LMChatSearchConversationLoadingState) {
-                        return LMChatLoader(
-                          style: LMChatTheme.theme.loaderStyle,
-                        );
-                      } else if (state is LMChatSearchConversationInitial) {
-                        return _screenBuilder.emptyTextIndicatorBuilder();
-                      }
-
-                      return _buildSearchResultsList();
-                    },
-                  ),
-                ),
-              ],
-            )),
-          );
-        });
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                appBar:
+                    _screenBuilder.appBarBuilder(context, _defaultAppBar(context)),
+                body: SafeArea(
+                    child: Column(
+                  children: [
+                    Expanded(
+                      child: BlocConsumer<LMChatSearchConversationBloc,
+                          LMChatSearchConversationState>(
+                        bloc: _searchConversationBloc,
+                        listener: _updatePaginationState,
+                        buildWhen: (previous, current) {
+                          if (current
+                              is LMChatSearchConversationPaginationLoadingState) {
+                            return false;
+                          }
+                          return true;
+                        },
+                        builder: (context, state) {
+                          if (state is LMChatSearchConversationLoadingState) {
+                            return LMChatLoader(
+                              style: LMChatTheme.theme.loaderStyle,
+                            );
+                          } else if (state is LMChatSearchConversationInitial) {
+                            return _screenBuilder.emptyTextIndicatorBuilder();
+                          }
+        
+                          return _buildSearchResultsList();
+                        },
+                      ),
+                    ),
+                  ],
+                )),
+              );
+            }),
+      ),
+    );
   }
 
   LMChatTile _defConversationTile(

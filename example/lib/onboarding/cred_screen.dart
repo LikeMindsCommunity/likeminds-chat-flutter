@@ -82,177 +82,184 @@ class _CredScreenState extends State<CredScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: backgroundColor,
-        elevation: 0,
-        centerTitle: false,
-        title: Text(
-          "LMChat Flutter Showcase",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 600,
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              children: [
-                Icon(
-                  isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                  color: textColor,
-                ),
-                const SizedBox(width: 8),
-                Switch(
-                  value: isDarkMode,
-                  onChanged: (value) {
-                    setState(() {
-                      isDarkMode = value;
-                    });
-                    LMChatTheme.setTheme(
-                      isDarkMode
-                          ? LMChatThemeData.dark()
-                          : LMChatThemeData.light(),
-                    );
-                  },
-                  activeColor: Colors.grey[800],
-                  activeTrackColor: Colors.grey[600],
-                ),
-              ],
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          backgroundColor: backgroundColor,
+          appBar: AppBar(
+            backgroundColor: backgroundColor,
+            elevation: 0,
+            centerTitle: false,
+            title: Text(
+              "LMChat Flutter Showcase",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 48),
-              Text(
-                "Enter your credentials",
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 16,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                      color: textColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Switch(
+                      value: isDarkMode,
+                      onChanged: (value) {
+                        setState(() {
+                          isDarkMode = value;
+                        });
+                        LMChatTheme.setTheme(
+                          isDarkMode
+                              ? LMChatThemeData.dark()
+                              : LMChatThemeData.light(),
+                        );
+                      },
+                      activeColor: Colors.grey[800],
+                      activeTrackColor: Colors.grey[600],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 18),
-              TextField(
-                cursorColor: textColor,
-                controller: _apiKeyController,
-                style: TextStyle(color: textColor),
-                decoration: InputDecoration(
-                  fillColor: textColor,
-                  focusColor: textColor,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: textFieldBorderColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: textFieldBorderColor),
-                  ),
-                  labelText: 'API Key',
-                  labelStyle: TextStyle(
-                    color: textColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                cursorColor: textColor,
-                style: TextStyle(color: textColor),
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  fillColor: textColor,
-                  focusColor: textColor,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: textFieldBorderColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: textFieldBorderColor),
-                  ),
-                  labelText: 'Username',
-                  labelStyle: TextStyle(
-                    color: textColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                cursorColor: textColor,
-                controller: _userIdController,
-                style: TextStyle(color: textColor),
-                decoration: InputDecoration(
-                  fillColor: textColor,
-                  focusColor: textColor,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: textFieldBorderColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: textFieldBorderColor),
-                  ),
-                  labelText: 'User ID',
-                  labelStyle: TextStyle(
-                    color: textColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 48),
-              Text(
-                "If no credentials are provided, the app will run with the default credentials.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 72),
-              ElevatedButton(
-                style: buttonStyle,
-                onPressed: _onSubmit,
-                child: Text(
-                  "Submit",
-                  style: buttonTextStyle,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: buttonStyle,
-                onPressed: () async {
-                  await LMChatLocalPreference.instance.clearLocalData();
-                  _clearTextFieldData();
-                  setState(() {});
-                },
-                child: Text(
-                  "Clear Data",
-                  style: buttonTextStyle,
-                ),
-              ),
-              const SizedBox(height: 18),
-              LMChatAIButton(
-                style: LMChatAIButtonStyle.basic().copyWith(
-                  backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                  textColor: isDarkMode ? Colors.white : backgroundColor,
-                  borderRadius: 12,
-                ),
-                props: LMChatAIButtonProps(
-                  uuid: _userIdController.text,
-                  userName: _usernameController.text,
-                  apiKey: _apiKeyController.text,
-                ),
-              ),
-              const SizedBox(height: 80),
             ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 48),
+                  Text(
+                    "Enter your credentials",
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  TextField(
+                    cursorColor: textColor,
+                    controller: _apiKeyController,
+                    style: TextStyle(color: textColor),
+                    decoration: InputDecoration(
+                      fillColor: textColor,
+                      focusColor: textColor,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: textFieldBorderColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: textFieldBorderColor),
+                      ),
+                      labelText: 'API Key',
+                      labelStyle: TextStyle(
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    cursorColor: textColor,
+                    style: TextStyle(color: textColor),
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      fillColor: textColor,
+                      focusColor: textColor,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: textFieldBorderColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: textFieldBorderColor),
+                      ),
+                      labelText: 'Username',
+                      labelStyle: TextStyle(
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    cursorColor: textColor,
+                    controller: _userIdController,
+                    style: TextStyle(color: textColor),
+                    decoration: InputDecoration(
+                      fillColor: textColor,
+                      focusColor: textColor,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: textFieldBorderColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: textFieldBorderColor),
+                      ),
+                      labelText: 'User ID',
+                      labelStyle: TextStyle(
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  Text(
+                    "If no credentials are provided, the app will run with the default credentials.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 72),
+                  ElevatedButton(
+                    style: buttonStyle,
+                    onPressed: _onSubmit,
+                    child: Text(
+                      "Submit",
+                      style: buttonTextStyle,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: buttonStyle,
+                    onPressed: () async {
+                      await LMChatLocalPreference.instance.clearLocalData();
+                      _clearTextFieldData();
+                      setState(() {});
+                    },
+                    child: Text(
+                      "Clear Data",
+                      style: buttonTextStyle,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  LMChatAIButton(
+                    style: LMChatAIButtonStyle.basic().copyWith(
+                      backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                      textColor: isDarkMode ? Colors.white : backgroundColor,
+                      borderRadius: 12,
+                    ),
+                    props: LMChatAIButtonProps(
+                      uuid: _userIdController.text,
+                      userName: _usernameController.text,
+                      apiKey: _apiKeyController.text,
+                    ),
+                  ),
+                  const SizedBox(height: 80),
+                ],
+              ),
+            ),
           ),
         ),
       ),

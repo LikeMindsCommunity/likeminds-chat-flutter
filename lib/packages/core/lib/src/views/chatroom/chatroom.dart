@@ -76,6 +76,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   final CustomPopupMenuController _menuController = CustomPopupMenuController();
   final MemberStateResponse? getMemberState =
       LMChatLocalPreference.instance.getMemberRights();
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   bool isAnyMessageSelected() {
     return _selectedIds.isNotEmpty;
@@ -129,7 +130,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
-    ScreenSize.init(context);
+     ScreenSize.init(context, setWidth: _webConfiguration.maxWidth);
     super.didChangeDependencies();
   }
 
@@ -155,187 +156,194 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifier,
-        builder: (context, _, child) {
-          return _screenBuilder.scaffold(
-            resizeToAvoidBottomInset: true,
-            onPopInvoked: (p) {
-              _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
-                chatroomId: chatroom.id,
-              ));
-              if (LMChatCoreAudioHandler.instance.player.isPlaying ||
-                  LMChatCoreAudioHandler.instance.recorder.isRecording) {
-                LMChatCoreAudioHandler.instance.stopAudio();
-                LMChatCoreAudioHandler.instance.stopRecording();
-              }
-            },
-            backgroundColor: LMChatTheme.theme.backgroundColor,
-            floatingActionButton: ValueListenableBuilder(
-              valueListenable: rebuildFloatingButton,
-              builder: (context, _, __) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: kIsWeb
-                        ? 64.0
-                        : Platform.isIOS
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                resizeToAvoidBottomInset: true,
+                onPopInvoked: (p) {
+                  _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
+                    chatroomId: chatroom.id,
+                  ));
+                  if (LMChatCoreAudioHandler.instance.player.isPlaying ||
+                      LMChatCoreAudioHandler.instance.recorder.isRecording) {
+                    LMChatCoreAudioHandler.instance.stopAudio();
+                    LMChatCoreAudioHandler.instance.stopRecording();
+                  }
+                },
+                backgroundColor: LMChatTheme.theme.backgroundColor,
+                floatingActionButton: ValueListenableBuilder(
+                  valueListenable: rebuildFloatingButton,
+                  builder: (context, _, __) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: kIsWeb
                             ? 64.0
-                            : 96.0,
-                    right: kIsWeb
-                        ? 2.0
-                        : Platform.isIOS
-                            ? 2
-                            : 4,
-                  ),
-                  child: showScrollButton
-                      ? _screenBuilder
-                          .floatingActionButton(_defaultScrollButton())
-                      : null,
-                );
-              },
-            ),
-            body: SafeArea(
-              bottom: false,
-              child: BlocConsumer<LMChatroomBloc, LMChatroomState>(
-                bloc: _chatroomBloc,
-                listener: (context, state) {
-                  if (state is LMChatroomLoadedState) {
-                    chatroom = state.chatroom;
-                    lastConversationId = state.lastConversationId;
-                    _conversationBloc.add(LMChatInitialiseConversationsEvent(
-                      chatroomId: chatroom.id,
-                      conversationId: lastConversationId,
-                    ));
-                    _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
-                      chatroomId: chatroom.id,
-                    ));
-                    LMChatAnalyticsBloc.instance.add(
-                      const LMChatFireAnalyticsEvent(
-                        eventName: LMChatAnalyticsKeys.syncComplete,
-                        eventProperties: {'sync_complete': true},
+                            : Platform.isIOS
+                                ? 64.0
+                                : 96.0,
+                        right: kIsWeb
+                            ? 2.0
+                            : Platform.isIOS
+                                ? 2
+                                : 4,
                       ),
+                      child: showScrollButton
+                          ? _screenBuilder
+                              .floatingActionButton(_defaultScrollButton())
+                          : null,
                     );
-                    LMChatAnalyticsBloc.instance.add(
-                      LMChatFireAnalyticsEvent(
-                        eventName: LMChatAnalyticsKeys.chatroomOpened,
-                        eventProperties: {
-                          'chatroom_id': chatroom.id,
-                          'community_id': chatroom.communityId,
-                          'chatroom_type': chatroom.type,
-                          'source': 'home_feed',
-                        },
-                      ),
-                    );
-                    updateChatBotChatroom();
-                  }
-                },
-                builder: (chatroomContext, chatroomState) {
-                  if (chatroomState is LMChatroomLoadedState) {
-                    chatroom = chatroomState.chatroom;
-                    actions = chatroomState.actions;
-                    return Column(
-                      children: [
-                        BlocListener<LMChatConversationActionBloc,
-                            LMChatConversationActionState>(
-                          bloc: _convActionBloc,
-                          listener: (context, state) {
-                            if (state is LMChatRefreshBarState) {
-                              chatroom = state.chatroom.toChatRoom();
-                            }
-                          },
-                          child: _screenBuilder.appBarBuilder.call(
-                            context,
-                            chatroom.toChatRoomViewData(),
-                            _defaultAppBar(
-                              chatroom,
-                              chatroomState.participantCount,
-                            ),
-                            chatroomState.participantCount,
+                  },
+                ),
+                body: SafeArea(
+                  bottom: false,
+                  child: BlocConsumer<LMChatroomBloc, LMChatroomState>(
+                    bloc: _chatroomBloc,
+                    listener: (context, state) {
+                      if (state is LMChatroomLoadedState) {
+                        chatroom = state.chatroom;
+                        lastConversationId = state.lastConversationId;
+                        _conversationBloc.add(LMChatInitialiseConversationsEvent(
+                          chatroomId: chatroom.id,
+                          conversationId: lastConversationId,
+                        ));
+                        _chatroomActionBloc.add(LMChatMarkReadChatroomEvent(
+                          chatroomId: chatroom.id,
+                        ));
+                        LMChatAnalyticsBloc.instance.add(
+                          const LMChatFireAnalyticsEvent(
+                            eventName: LMChatAnalyticsKeys.syncComplete,
+                            eventProperties: {'sync_complete': true},
                           ),
-                        ),
-                        Expanded(
-                          child: Listener(
-                            behavior: HitTestBehavior.opaque,
-                            onPointerDown: (_) {
-                              if (FocusScope.of(context).hasFocus) {
-                                FocusScope.of(context).unfocus();
-                              }
+                        );
+                        LMChatAnalyticsBloc.instance.add(
+                          LMChatFireAnalyticsEvent(
+                            eventName: LMChatAnalyticsKeys.chatroomOpened,
+                            eventProperties: {
+                              'chatroom_id': chatroom.id,
+                              'community_id': chatroom.communityId,
+                              'chatroom_type': chatroom.type,
+                              'source': 'home_feed',
                             },
-                            child: ValueListenableBuilder(
-                              valueListenable: rebuildConversationList,
-                              builder: (context, value, child) {
-                                return _chatroomList();
-                              },
-                            ),
                           ),
-                        ),
-                        BlocBuilder(
-                            bloc: _chatroomActionBloc,
-                            builder: (context, state) {
-                              if (state is LMChatShowEmojiKeyboardState) {
-                                return SafeArea(
-                                  child: LMChatReactionKeyboard(
-                                    onEmojiSelected: (reaction) {
-                                      LMChatAnalyticsBloc.instance.add(
-                                        LMChatFireAnalyticsEvent(
-                                          eventName:
-                                              LMChatAnalyticsKeys.reactionAdded,
-                                          eventProperties: {
-                                            'reaction': reaction,
-                                            'from': 'keyboard',
-                                            'message_id': state.conversationId,
-                                            'chatroom_id': chatroom.id,
-                                          },
-                                        ),
-                                      );
-                                      _convActionBloc.add(
-                                        LMChatPutReaction(
-                                          conversationId: state.conversationId,
-                                          reaction: reaction,
-                                        ),
-                                      );
-                                      _chatroomActionBloc.add(
-                                        LMChatHideEmojiKeyboardEvent(),
-                                      );
-                                    },
-                                  ),
-                                );
-                              }
-                              return _screenBuilder.chatBarBuilder(
+                        );
+                        updateChatBotChatroom();
+                      }
+                    },
+                    builder: (chatroomContext, chatroomState) {
+                      if (chatroomState is LMChatroomLoadedState) {
+                        chatroom = chatroomState.chatroom;
+                        actions = chatroomState.actions;
+                        return Column(
+                          children: [
+                            BlocListener<LMChatConversationActionBloc,
+                                LMChatConversationActionState>(
+                              bloc: _convActionBloc,
+                              listener: (context, state) {
+                                if (state is LMChatRefreshBarState) {
+                                  chatroom = state.chatroom.toChatRoom();
+                                }
+                              },
+                              child: _screenBuilder.appBarBuilder.call(
                                 context,
-                                LMChatroomBar(
-                                  chatroom: chatroom.toChatRoomViewData(),
-                                  scrollToBottom: _scrollToBottom,
-                                  enableTagging: chatroom.type != 10,
+                                chatroom.toChatRoomViewData(),
+                                _defaultAppBar(
+                                  chatroom,
+                                  chatroomState.participantCount,
                                 ),
-                              );
-                            }),
-                        if (isOtherUserAIChatbot(chatroom.toChatRoomViewData()))
-                          LMChatText(
-                            "AI may make mistakes",
-                            style: LMChatTextStyle(
-                              padding: const EdgeInsets.only(
-                                bottom: 10,
-                                top: 6,
-                              ),
-                              textStyle: TextStyle(
-                                color: LMChatTheme.theme.onContainer
-                                    .withOpacity(0.6),
+                                chatroomState.participantCount,
                               ),
                             ),
-                          )
-                      ],
-                    );
-                  }
-                  return _screenBuilder.loadingPageWidgetBuilder(
-                    context,
-                    const LMChatSkeletonChatPage(),
-                  );
-                },
-              ),
-            ),
-          );
-        });
+                            Expanded(
+                              child: Listener(
+                                behavior: HitTestBehavior.opaque,
+                                onPointerDown: (_) {
+                                  if (FocusScope.of(context).hasFocus) {
+                                    FocusScope.of(context).unfocus();
+                                  }
+                                },
+                                child: ValueListenableBuilder(
+                                  valueListenable: rebuildConversationList,
+                                  builder: (context, value, child) {
+                                    return _chatroomList();
+                                  },
+                                ),
+                              ),
+                            ),
+                            BlocBuilder(
+                                bloc: _chatroomActionBloc,
+                                builder: (context, state) {
+                                  if (state is LMChatShowEmojiKeyboardState) {
+                                    return SafeArea(
+                                      child: LMChatReactionKeyboard(
+                                        onEmojiSelected: (reaction) {
+                                          LMChatAnalyticsBloc.instance.add(
+                                            LMChatFireAnalyticsEvent(
+                                              eventName:
+                                                  LMChatAnalyticsKeys.reactionAdded,
+                                              eventProperties: {
+                                                'reaction': reaction,
+                                                'from': 'keyboard',
+                                                'message_id': state.conversationId,
+                                                'chatroom_id': chatroom.id,
+                                              },
+                                            ),
+                                          );
+                                          _convActionBloc.add(
+                                            LMChatPutReaction(
+                                              conversationId: state.conversationId,
+                                              reaction: reaction,
+                                            ),
+                                          );
+                                          _chatroomActionBloc.add(
+                                            LMChatHideEmojiKeyboardEvent(),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }
+                                  return _screenBuilder.chatBarBuilder(
+                                    context,
+                                    LMChatroomBar(
+                                      chatroom: chatroom.toChatRoomViewData(),
+                                      scrollToBottom: _scrollToBottom,
+                                      enableTagging: chatroom.type != 10,
+                                    ),
+                                  );
+                                }),
+                            if (isOtherUserAIChatbot(chatroom.toChatRoomViewData()))
+                              LMChatText(
+                                "AI may make mistakes",
+                                style: LMChatTextStyle(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 10,
+                                    top: 6,
+                                  ),
+                                  textStyle: TextStyle(
+                                    color: LMChatTheme.theme.onContainer
+                                        .withOpacity(0.6),
+                                  ),
+                                ),
+                              )
+                          ],
+                        );
+                      }
+                      return _screenBuilder.loadingPageWidgetBuilder(
+                        context,
+                        const LMChatSkeletonChatPage(),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }),
+      ),
+    );
   }
 
   Widget _chatroomList() {
