@@ -20,6 +20,7 @@ class LMChatAttachmentViewData {
   final String? name;
   final String? thumbnailUrl;
   final File? thumbnailFile;
+  final Uint8List? thumbnailBytes;
   final String? type;
   final dynamic width;
 
@@ -41,6 +42,7 @@ class LMChatAttachmentViewData {
     required this.name,
     required this.thumbnailUrl,
     required this.thumbnailFile,
+    this.thumbnailBytes,
     required this.type,
     required this.width,
   });
@@ -65,6 +67,7 @@ class LMChatAttachmentViewData {
     String? name,
     String? thumbnailUrl,
     File? thumbnailFile,
+    Uint8List? thumbnailBytes,
     String? type,
     dynamic width,
   }) {
@@ -86,6 +89,7 @@ class LMChatAttachmentViewData {
       name: name ?? this.name,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       thumbnailFile: thumbnailFile ?? this.thumbnailFile,
+      thumbnailBytes: thumbnailBytes ?? this.thumbnailBytes,
       type: type ?? this.type,
       width: width ?? this.width,
     );
@@ -111,6 +115,7 @@ class LMChatAttachmentViewDataBuilder {
   String? _name;
   String? _thumbnailUrl;
   File? _thumbnailFile;
+  Uint8List? _thumbnailBytes;
   String? _type;
   dynamic _width;
 
@@ -182,6 +187,10 @@ class LMChatAttachmentViewDataBuilder {
     _thumbnailFile = thumbnailFile;
   }
 
+  void thumbnailBytes(Uint8List? thumbnailBytes) {
+    _thumbnailBytes = thumbnailBytes;
+  }
+
   void type(String? type) {
     _type = type;
   }
@@ -210,6 +219,7 @@ class LMChatAttachmentViewDataBuilder {
       name: _name,
       thumbnailUrl: _thumbnailUrl,
       thumbnailFile: _thumbnailFile,
+      thumbnailBytes: _thumbnailBytes,
       type: _type,
       width: _width,
     );

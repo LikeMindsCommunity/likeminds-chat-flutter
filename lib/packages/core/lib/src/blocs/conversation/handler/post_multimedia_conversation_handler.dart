@@ -10,7 +10,11 @@ postMultimediaConversationEventHandler(
     // Generate thumbnails for videos before creating temporary conversation
     for (LMChatMediaModel media in mediaList) {
       if (media.mediaType == LMChatMediaType.video) {
-        media.thumbnailFile ??= await getVideoThumbnail(media);
+        if (kIsWeb) {
+          media.thumbnailBytes ??= await getVideoThumbnailBytes(media);
+        } else {
+          media.thumbnailFile ??= await getVideoThumbnail(media);
+        }
       }
     }
 
@@ -85,9 +89,11 @@ postMultimediaConversationEventHandler(
         String? thumbnailUrl;
         if (media.mediaType == LMChatMediaType.video) {
           final response = await LMChatMediaService.uploadFile(
-            media.thumbnailFile!.readAsBytesSync(),
+            media.thumbnailBytes ?? media.thumbnailFile!.readAsBytesSync(),
             user.userUniqueId!,
-            fileName: media.thumbnailFile!.path.split('/').last,
+            fileName: media.thumbnailBytes != null
+                ? "thumbnail"
+                : media.thumbnailFile!.path.split('/').last,
             chatroomId: event.postConversationRequest.chatroomId,
           );
 
@@ -162,10 +168,12 @@ postMultimediaConversationEventHandler(
         temporaryId,
       ));
     }
-  } catch (e) {
+  } catch (e, stackTrace) {
     _callAnalyticEvent(event);
+    debugPrint("Error: $e");
+    debugPrint("Stack Trace: $stackTrace");
     emit(LMChatConversationErrorState(
-      "An error occurred",
+      e.toString() ,
       event.postConversationRequest.temporaryId,
     ));
   }

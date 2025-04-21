@@ -66,6 +66,9 @@ class LMChatMediaModel {
   /// The thumbnail file associated with the media
   File? thumbnailFile;
 
+  /// The bytes of the thumbnail image
+  Uint8List? thumbnailBytes;
+
   /// The number of pages (for documents)
   int? pageCount;
 
@@ -94,6 +97,7 @@ class LMChatMediaModel {
     this.pageCount,
     this.size,
     this.thumbnailFile,
+    this.thumbnailBytes,
     this.thumbnailUrl,
     this.width,
     this.duration,
@@ -113,6 +117,7 @@ class LMChatMediaModel {
     int? height,
     String? thumbnailUrl,
     File? thumbnailFile,
+    Uint8List? thumbnailBytes,
     int? pageCount,
     int? size,
     double? duration,
@@ -129,6 +134,7 @@ class LMChatMediaModel {
       height: height ?? this.height,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       thumbnailFile: thumbnailFile ?? this.thumbnailFile,
+      thumbnailBytes: thumbnailBytes ?? this.thumbnailBytes,
       pageCount: pageCount ?? this.pageCount,
       size: size ?? this.size,
       duration: duration ?? this.duration,

@@ -119,7 +119,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
       );
     } else {
       return await _player!.open(
-        await Media.memory(widget.media.mediaFile!.readAsBytesSync()),
+        await Media.memory(widget.media.mediaBytes!),
         play: true,
       );
     }

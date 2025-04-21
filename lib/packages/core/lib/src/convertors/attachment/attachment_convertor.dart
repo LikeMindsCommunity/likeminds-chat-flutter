@@ -24,6 +24,7 @@ extension AttachmentViewDataConvertor on Attachment {
           ..meta(meta)
           ..name(name)
           ..thumbnailFile(thumbnailFile)
+          ..thumbnailBytes(thumbnailBytes)
           ..thumbnailUrl(thumbnailUrl)
           ..type(type)
           ..url(url);
@@ -54,6 +55,7 @@ extension AttachmentConvertor on LMChatAttachmentViewData {
       meta: meta,
       name: name,
       thumbnailFile: thumbnailFile,
+      thumbnailBytes: thumbnailBytes,
       thumbnailUrl: thumbnailUrl,
       url: url,
     );
@@ -72,6 +74,7 @@ extension MediaConvertor on LMChatAttachmentViewData {
       mediaBytes: attachmentBytes,
       thumbnailUrl: thumbnailUrl,
       thumbnailFile: thumbnailFile,
+      thumbnailBytes: thumbnailBytes,
       meta: meta,
       height: height,
       width: width,
@@ -93,6 +96,7 @@ extension ViewDataConvertor on LMChatMediaModel {
           ..width(width)
           ..meta(meta)
           ..thumbnailFile(thumbnailFile)
+          ..thumbnailBytes(thumbnailBytes)
           ..thumbnailUrl(thumbnailUrl)
           ..type(mapMediaTypeToString(mediaType))
           ..url(mediaUrl);
