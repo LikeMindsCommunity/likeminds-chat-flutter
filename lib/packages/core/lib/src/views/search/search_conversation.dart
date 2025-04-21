@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/search_conversation/search_conversation_bloc.dart';
-import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 
 class LMChatSearchConversationScreen extends StatefulWidget {
   static const routeName = '/searchConversation';
@@ -38,6 +37,7 @@ class _LMChatSearchConversationScreenState
   final LMSearchBuilderDelegate _screenBuilder =
       LMChatCore.config.searchConversationConfig.builder;
   final ValueNotifier<bool> _isInitialState = ValueNotifier(true);
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   void initState() {
@@ -94,44 +94,52 @@ class _LMChatSearchConversationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifier,
-        builder: (context, _, child) {
-          return _screenBuilder.scaffold(
-            appBar:
-                _screenBuilder.appBarBuilder(context, _defaultAppBar(context)),
-            body: SafeArea(
-                child: Column(
-              children: [
-                Expanded(
-                  child: BlocConsumer<LMChatSearchConversationBloc,
-                      LMChatSearchConversationState>(
-                    bloc: _searchConversationBloc,
-                    listener: _updatePaginationState,
-                    buildWhen: (previous, current) {
-                      if (current
-                          is LMChatSearchConversationPaginationLoadingState) {
-                        return false;
-                      }
-                      return true;
-                    },
-                    builder: (context, state) {
-                      if (state is LMChatSearchConversationLoadingState) {
-                        return LMChatLoader(
-                          style: LMChatTheme.theme.loaderStyle,
-                        );
-                      } else if (state is LMChatSearchConversationInitial) {
-                        return _screenBuilder.emptyTextIndicatorBuilder();
-                      }
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                backgroundColor: LMChatTheme.theme.scaffold,
+                appBar: _screenBuilder.appBarBuilder(
+                    context, _defaultAppBar(context)),
+                body: SafeArea(
+                    child: Column(
+                  children: [
+                    Expanded(
+                      child: BlocConsumer<LMChatSearchConversationBloc,
+                          LMChatSearchConversationState>(
+                        bloc: _searchConversationBloc,
+                        listener: _updatePaginationState,
+                        buildWhen: (previous, current) {
+                          if (current
+                              is LMChatSearchConversationPaginationLoadingState) {
+                            return false;
+                          }
+                          return true;
+                        },
+                        builder: (context, state) {
+                          if (state is LMChatSearchConversationLoadingState) {
+                            return LMChatLoader(
+                              style: LMChatTheme.theme.loaderStyle,
+                            );
+                          } else if (state is LMChatSearchConversationInitial) {
+                            return _screenBuilder.emptyTextIndicatorBuilder();
+                          }
 
-                      return _buildSearchResultsList();
-                    },
-                  ),
-                ),
-              ],
-            )),
-          );
-        });
+                          return _buildSearchResultsList();
+                        },
+                      ),
+                    ),
+                  ],
+                )),
+              );
+            }),
+      ),
+    );
   }
 
   LMChatTile _defConversationTile(
@@ -257,6 +265,7 @@ class _LMChatSearchConversationScreenState
       title: _screenBuilder.searchField(
         context,
         _defaultTextField(),
+        _searchController,
       ),
       trailing: [
         ValueListenableBuilder(
@@ -268,8 +277,8 @@ class _LMChatSearchConversationScreenState
                   : const SizedBox.shrink();
             }),
       ],
-      style:
-          LMChatAppBarStyle.basic(Colors.white), // Customize the AppBar style
+      style: LMChatAppBarStyle.basic(
+          LMChatTheme.theme.container), // Customize the AppBar style
     );
   }
 
@@ -301,8 +310,13 @@ class _LMChatSearchConversationScreenState
     return LMChatTextField(
       controller: _searchController,
       chatroomId: widget.chatRoomId,
-      textFieldStyle: const LMChatTextFieldStyle(
+      textFieldStyle: LMChatTextFieldStyle(
         maxLines: 1,
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: LMChatTheme.theme.onContainer,
+        ),
       ),
       enabled: false,
       onTagSelected: (p0) {},
@@ -435,7 +449,7 @@ class _LMChatSearchConversationScreenState
                 "";
             List<String> matches = _findFirstMatch(searchTerm, answer);
             return _screenBuilder.conversationTile(
-                context, _defConversationTile(item, matches));
+                context, _defConversationTile(item, matches), item);
           },
           firstPageErrorIndicatorBuilder:
               _screenBuilder.firstPageErrorIndicatorBuilder,
