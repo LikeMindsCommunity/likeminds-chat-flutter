@@ -137,11 +137,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void dispose() {
-    LMChatRealtime.instance.chatroomId = null;
-    _chatroomBloc.close();
-    _convActionBloc.close();
-    _conversationBloc.close();
-    _chatroomActionBloc.close();
     scrollController.removeListener(
         _showScrollToBottomButton); // Good practice to remove listeners
     scrollController.dispose(); // Dispose controllers owned by this state
