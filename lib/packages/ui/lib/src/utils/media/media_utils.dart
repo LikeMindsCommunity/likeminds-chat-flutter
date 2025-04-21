@@ -6,8 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
-import 'package:likeminds_chat_flutter_ui/src/utils/media/video_thumbnail.dart'
-    as vt;
+import 'package:likeminds_chat_flutter_ui/src/utils/media/video_thumbnail.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/media/error.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:http/http.dart' as http;
@@ -401,7 +400,8 @@ Future<File?> getVideoThumbnail(LMChatMediaModel media) async {
 }
 
 Future<Uint8List?> getVideoThumbnailBytes(LMChatMediaModel media) async {
-  final thumbnailBytes = await vt.generateThumbnailFromBytes(media.mediaBytes!);
+  final thumbnailBytes = await VideoThumbnailGenerator.instance
+      .generateThumbnailFromBytes(media.mediaBytes!);
   media.thumbnailBytes = thumbnailBytes;
   return thumbnailBytes;
 }
