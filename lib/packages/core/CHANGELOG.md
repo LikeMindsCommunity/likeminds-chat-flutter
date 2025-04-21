@@ -81,3 +81,7 @@
 
 - Added search in a chatrrom
 - Added theme notifier
+
+## 0.17.0
+
+- Added support for flutter web
