@@ -94,6 +94,7 @@ class LMSearchBuilderDelegate {
   Widget searchField(
     BuildContext context,
     LMChatTextField textField,
+    TextEditingController controller,
   ) {
     return textField;
   }
@@ -110,6 +111,7 @@ class LMSearchBuilderDelegate {
   Widget conversationTile(
     BuildContext context,
     LMChatTile conversationTile,
+    LMChatConversationViewData conversation,
   ) {
     return conversationTile;
   }

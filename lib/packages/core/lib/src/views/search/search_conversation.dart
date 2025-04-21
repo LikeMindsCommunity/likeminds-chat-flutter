@@ -264,6 +264,7 @@ class _LMChatSearchConversationScreenState
       title: _screenBuilder.searchField(
         context,
         _defaultTextField(),
+        _searchController,
       ),
       trailing: [
         ValueListenableBuilder(
@@ -442,7 +443,7 @@ class _LMChatSearchConversationScreenState
                 "";
             List<String> matches = _findFirstMatch(searchTerm, answer);
             return _screenBuilder.conversationTile(
-                context, _defConversationTile(item, matches));
+                context, _defConversationTile(item, matches), item);
           },
           firstPageErrorIndicatorBuilder:
               _screenBuilder.firstPageErrorIndicatorBuilder,
