@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/member_rights/member_rights.dart';

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/utils/utils.dart';
@@ -44,6 +45,9 @@ class LMChatMediaModel {
   /// The media file associated with the chat
   File? mediaFile;
 
+  /// The bytes of the media file associated with the chat
+  Uint8List? mediaBytes;
+
   /// The type of media (e.g., image, video)
   LMChatMediaType mediaType;
 
@@ -61,6 +65,9 @@ class LMChatMediaModel {
 
   /// The thumbnail file associated with the media
   File? thumbnailFile;
+
+  /// The bytes of the thumbnail image
+  Uint8List? thumbnailBytes;
 
   /// The number of pages (for documents)
   int? pageCount;
@@ -83,12 +90,14 @@ class LMChatMediaModel {
   ///{@macro lm_chat_media_model}
   LMChatMediaModel({
     this.mediaFile,
+    this.mediaBytes,
     required this.mediaType,
     this.mediaUrl,
     this.height,
     this.pageCount,
     this.size,
     this.thumbnailFile,
+    this.thumbnailBytes,
     this.thumbnailUrl,
     this.width,
     this.duration,
@@ -101,12 +110,14 @@ class LMChatMediaModel {
   /// If the new values are not provided, the old values are used.
   LMChatMediaModel copyWith({
     File? mediaFile,
+    Uint8List? mediaBytes,
     LMChatMediaType? mediaType,
     String? mediaUrl,
     int? width,
     int? height,
     String? thumbnailUrl,
     File? thumbnailFile,
+    Uint8List? thumbnailBytes,
     int? pageCount,
     int? size,
     double? duration,
@@ -116,12 +127,14 @@ class LMChatMediaModel {
   }) {
     return LMChatMediaModel(
       mediaFile: mediaFile ?? this.mediaFile,
+      mediaBytes: mediaBytes ?? this.mediaBytes,
       mediaType: mediaType ?? this.mediaType,
       mediaUrl: mediaUrl ?? this.mediaUrl,
       width: width ?? this.width,
       height: height ?? this.height,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       thumbnailFile: thumbnailFile ?? this.thumbnailFile,
+      thumbnailBytes: thumbnailBytes ?? this.thumbnailBytes,
       pageCount: pageCount ?? this.pageCount,
       size: size ?? this.size,
       duration: duration ?? this.duration,

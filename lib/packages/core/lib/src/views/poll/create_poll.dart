@@ -88,6 +88,7 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
       widget.pollQuestionStyle ?? _screenStyle.pollQuestionStyle;
   late LMChatTextFieldStyle? optionStyle =
       widget.optionStyle ?? _screenStyle.optionStyle;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   Future<DateTime?> showDateTimePicker({
     required BuildContext context,
@@ -265,40 +266,52 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      backgroundColor: theme.container,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context),
-          _isValidatedController, validatePoll, onPollSubmit),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _screenBuilder.userTileBuilder(
-              context,
-              _defUserTile(),
-            ),
-            _screenBuilder.pollQuestionContainerBuilder(
-              context,
-              _questionController,
-              _defPollQuestionContainer(),
-            ),
-            const SizedBox(height: 16),
-            _screenBuilder.pollOptionsListBuilder(
-              context,
-              _defPollOptionList(),
-            ),
-            const SizedBox(height: 16),
-            // Advanced settings
-            // if community configuration allow_override is true show advanced settings
-            // else, check if community configuration no_poll_expiry is false show expiry time
-            // else hide expiry time, it will be set to infinite automatically
-            communityConfigurations?.value?['allow_override']
-                ? _screenBuilder.advancedOptionBuilder(
-                    context, _defAdvancedOptions(context))
-                : communityConfigurations?.value?['no_poll_expiry'] == false
-                    ? _defExpiryTime(context)
-                    : const SizedBox(),
-          ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
         ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                backgroundColor: theme.container,
+                appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context),
+                    _isValidatedController, validatePoll, onPollSubmit),
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _screenBuilder.userTileBuilder(
+                        context,
+                        _defUserTile(),
+                      ),
+                      _screenBuilder.pollQuestionContainerBuilder(
+                        context,
+                        _questionController,
+                        _defPollQuestionContainer(),
+                      ),
+                      const SizedBox(height: 16),
+                      _screenBuilder.pollOptionsListBuilder(
+                        context,
+                        _defPollOptionList(),
+                      ),
+                      const SizedBox(height: 16),
+                      // Advanced settings
+                      // if community configuration allow_override is true show advanced settings
+                      // else, check if community configuration no_poll_expiry is false show expiry time
+                      // else hide expiry time, it will be set to infinite automatically
+                      communityConfigurations?.value?['allow_override']
+                          ? _screenBuilder.advancedOptionBuilder(
+                              context, _defAdvancedOptions(context))
+                          : communityConfigurations?.value?['no_poll_expiry'] ==
+                                  false
+                              ? _defExpiryTime(context)
+                              : const SizedBox(),
+                    ],
+                  ),
+                ),
+              );
+            }),
       ),
     );
   }

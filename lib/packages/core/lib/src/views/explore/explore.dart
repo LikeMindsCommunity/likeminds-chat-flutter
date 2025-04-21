@@ -42,6 +42,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   PagingController<int, ChatRoom> exploreFeedPagingController =
       PagingController<int, ChatRoom>(firstPageKey: 1);
   final _screenBuilder = LMChatCore.config.exploreConfig.builder;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   int pinnedChatroomCount = 0;
   int _page = 1;
@@ -90,19 +91,26 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: LMChatTheme.themeNotifier,
-        builder: (context, _, child) {
-          return _screenBuilder.scaffold(
-            backgroundColor: LMChatTheme.theme.scaffold,
-            appBar:
-                _screenBuilder.appBarBuilder(context, _defaultExploreAppBar()),
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 2.w),
-              child: _defaultExploreBody(),
-            ),
-          );
-        });
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                backgroundColor: LMChatTheme.theme.scaffold,
+                appBar:
+                    _screenBuilder.appBarBuilder(context, _defaultExploreAppBar()),
+                body: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 2.w),
+                  child: _defaultExploreBody(),
+                ),
+              );
+            }),
+      ),
+    );
   }
 
   Column _defaultExploreBody() {
@@ -152,7 +160,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   LMChatAppBar _defaultExploreAppBar() {
     return LMChatAppBar(
       style: LMChatTheme.theme.appBarStyle.copyWith(
-        height: 72,
+        height: 76,
         gap: 4.w,
         padding: EdgeInsets.all(4.w),
       ),

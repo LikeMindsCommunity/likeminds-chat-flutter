@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_sample/app.dart';
@@ -63,7 +64,9 @@ Future<void> _handleNotification(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setupNotifications();
+  if (!kIsWeb) {
+    await setupNotifications();
+  }
   await LMChatCore.instance.initialize(
     excludedConversationStates: [
       ConversationState.memberJoinedOpenChatroom,

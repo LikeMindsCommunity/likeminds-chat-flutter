@@ -10,6 +10,7 @@ extension AttachmentViewDataConvertor on Attachment {
         LMChatAttachmentViewDataBuilder()
           ..answerId(answerId)
           ..attachmentFile(attachmentFile)
+          ..attachmentBytes(attachmentBytes)
           ..createdAt(createdAt)
           ..dimensions(dimensions)
           ..fileUrl(fileUrl)
@@ -23,6 +24,7 @@ extension AttachmentViewDataConvertor on Attachment {
           ..meta(meta)
           ..name(name)
           ..thumbnailFile(thumbnailFile)
+          ..thumbnailBytes(thumbnailBytes)
           ..thumbnailUrl(thumbnailUrl)
           ..type(type)
           ..url(url);
@@ -44,6 +46,7 @@ extension AttachmentConvertor on LMChatAttachmentViewData {
       type: type,
       answerId: answerId,
       attachmentFile: attachmentFile,
+      attachmentBytes: attachmentBytes,
       dimensions: dimensions,
       height: height,
       width: width,
@@ -52,6 +55,7 @@ extension AttachmentConvertor on LMChatAttachmentViewData {
       meta: meta,
       name: name,
       thumbnailFile: thumbnailFile,
+      thumbnailBytes: thumbnailBytes,
       thumbnailUrl: thumbnailUrl,
       url: url,
     );
@@ -67,8 +71,10 @@ extension MediaConvertor on LMChatAttachmentViewData {
       mediaType: mapStringToMediaType(type!),
       mediaUrl: url ?? fileUrl,
       mediaFile: attachmentFile,
+      mediaBytes: attachmentBytes,
       thumbnailUrl: thumbnailUrl,
       thumbnailFile: thumbnailFile,
+      thumbnailBytes: thumbnailBytes,
       meta: meta,
       height: height,
       width: width,
@@ -84,11 +90,13 @@ extension ViewDataConvertor on LMChatMediaModel {
     final LMChatAttachmentViewDataBuilder attachmentBuilder =
         LMChatAttachmentViewDataBuilder()
           ..attachmentFile(mediaFile)
+          ..attachmentBytes(mediaBytes)
           ..fileUrl(mediaUrl)
           ..height(height)
           ..width(width)
           ..meta(meta)
           ..thumbnailFile(thumbnailFile)
+          ..thumbnailBytes(thumbnailBytes)
           ..thumbnailUrl(thumbnailUrl)
           ..type(mapMediaTypeToString(mediaType))
           ..url(mediaUrl);
