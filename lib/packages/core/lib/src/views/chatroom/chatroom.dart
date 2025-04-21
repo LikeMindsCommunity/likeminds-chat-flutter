@@ -130,7 +130,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _chatroomActionBloc = LMChatroomActionBloc.instance;
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
-     ScreenSize.init(context, setWidth: _webConfiguration.maxWidth);
+    ScreenSize.init(context,
+        setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
     super.didChangeDependencies();
   }
 
@@ -208,7 +209,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                       if (state is LMChatroomLoadedState) {
                         chatroom = state.chatroom;
                         lastConversationId = state.lastConversationId;
-                        _conversationBloc.add(LMChatInitialiseConversationsEvent(
+                        _conversationBloc
+                            .add(LMChatInitialiseConversationsEvent(
                           chatroomId: chatroom.id,
                           conversationId: lastConversationId,
                         ));
@@ -284,19 +286,21 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                         onEmojiSelected: (reaction) {
                                           LMChatAnalyticsBloc.instance.add(
                                             LMChatFireAnalyticsEvent(
-                                              eventName:
-                                                  LMChatAnalyticsKeys.reactionAdded,
+                                              eventName: LMChatAnalyticsKeys
+                                                  .reactionAdded,
                                               eventProperties: {
                                                 'reaction': reaction,
                                                 'from': 'keyboard',
-                                                'message_id': state.conversationId,
+                                                'message_id':
+                                                    state.conversationId,
                                                 'chatroom_id': chatroom.id,
                                               },
                                             ),
                                           );
                                           _convActionBloc.add(
                                             LMChatPutReaction(
-                                              conversationId: state.conversationId,
+                                              conversationId:
+                                                  state.conversationId,
                                               reaction: reaction,
                                             ),
                                           );
@@ -316,7 +320,8 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                                     ),
                                   );
                                 }),
-                            if (isOtherUserAIChatbot(chatroom.toChatRoomViewData()))
+                            if (isOtherUserAIChatbot(
+                                chatroom.toChatRoomViewData()))
                               LMChatText(
                                 "AI may make mistakes",
                                 style: LMChatTextStyle(

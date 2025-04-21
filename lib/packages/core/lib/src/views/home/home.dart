@@ -34,7 +34,8 @@ class _LMChatHomeScreenState extends State<LMChatHomeScreen> {
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
-    ScreenSize.init(context, setWidth: _webConfiguration.maxWidth);
+    ScreenSize.init(context,
+        setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
   }
 
   @override

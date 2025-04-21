@@ -950,12 +950,12 @@ class ScreenSize {
   /// Initializes the screen size based on the provided context
   static init(
     BuildContext context, {
-      double? setWidth,
-    }) {
+    double? setWidth,
+  }) {
     final mediaQuery = MediaQuery.of(context);
     pixelRatio = mediaQuery.devicePixelRatio;
     textScale = mediaQuery.textScaler;
-    width = setWidth?? mediaQuery.size.width;
+    width = setWidth ?? mediaQuery.size.width;
     height = mediaQuery.size.height;
     blockSizeHorizontal = width / 100;
     blockSizeVertical = height / 100;
