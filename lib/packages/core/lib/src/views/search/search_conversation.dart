@@ -103,8 +103,9 @@ class _LMChatSearchConversationScreenState
             valueListenable: LMChatTheme.themeNotifier,
             builder: (context, _, child) {
               return _screenBuilder.scaffold(
-                appBar:
-                    _screenBuilder.appBarBuilder(context, _defaultAppBar(context)),
+                backgroundColor: LMChatTheme.theme.scaffold,
+                appBar: _screenBuilder.appBarBuilder(
+                    context, _defaultAppBar(context)),
                 body: SafeArea(
                     child: Column(
                   children: [
@@ -128,7 +129,7 @@ class _LMChatSearchConversationScreenState
                           } else if (state is LMChatSearchConversationInitial) {
                             return _screenBuilder.emptyTextIndicatorBuilder();
                           }
-        
+
                           return _buildSearchResultsList();
                         },
                       ),
@@ -276,8 +277,8 @@ class _LMChatSearchConversationScreenState
                   : const SizedBox.shrink();
             }),
       ],
-      style:
-          LMChatAppBarStyle.basic(Colors.white), // Customize the AppBar style
+      style: LMChatAppBarStyle.basic(
+          LMChatTheme.theme.container), // Customize the AppBar style
     );
   }
 
@@ -309,8 +310,13 @@ class _LMChatSearchConversationScreenState
     return LMChatTextField(
       controller: _searchController,
       chatroomId: widget.chatRoomId,
-      textFieldStyle: const LMChatTextFieldStyle(
+      textFieldStyle: LMChatTextFieldStyle(
         maxLines: 1,
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: LMChatTheme.theme.onContainer,
+        ),
       ),
       enabled: false,
       onTagSelected: (p0) {},
