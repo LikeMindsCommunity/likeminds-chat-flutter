@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'video_thumbnail_instance.dart'
-    if (dart.library.js) 'video_thumbnail_web_instance.dart';
+    if (dart.library.js) 'video_thumbnail_web.dart';
 
 /// Abstract class for generating video thumbnails
 abstract class VideoThumbnailGenerator {

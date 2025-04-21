@@ -9,9 +9,6 @@ import 'video_thumbnail.dart';
 class VideoThumbnailGeneratorWeb implements VideoThumbnailGenerator {
   @override
   Future<Uint8List> generateThumbnailFromBytes(Uint8List videoBytes, {double timeSeconds = 1.0}) async {
-    if (identical(0, 0.0)) {
-      throw UnsupportedError('Web implementation not available on this platform');
-    }
     
     // Web-specific implementation
     final blob = html.Blob([videoBytes], 'video/mp4');
