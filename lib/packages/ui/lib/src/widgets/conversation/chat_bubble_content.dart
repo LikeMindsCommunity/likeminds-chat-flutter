@@ -9,11 +9,14 @@ class LMChatBubbleContent extends StatelessWidget {
     required this.conversation,
     required this.onTagTap,
     this.style,
+    this.textBuilder,
   });
 
   final LMChatConversationViewData conversation;
   final Function(String tag) onTagTap;
   final LMChatBubbleContentStyle? style;
+  final Widget Function(BuildContext context, LMChatExpandableText text)?
+      textBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -23,29 +26,33 @@ class LMChatBubbleContent extends StatelessWidget {
     return Padding(
       padding: inStyle.padding ?? EdgeInsets.zero,
       child: conversation.answer.isNotEmpty
-          ? LMChatExpandableText(
-              conversation.answer,
-              expandText: "see more",
-              enableSelection: inStyle.enableSelection ?? false,
-              animation: inStyle.animation ?? true,
-              maxLines: inStyle.visibleLines ?? 6,
-              mentionStyle: inStyle.tagStyle,
-              linkStyle: inStyle.linkStyle ??
-                  TextStyle(
-                    color: LMChatTheme.theme.linkColor,
-                    fontSize: 14,
-                  ),
-              textAlign: TextAlign.left,
-              style: inStyle.textStyle ??
-                  TextStyle(
-                    fontSize: 14,
-                    color: LMChatTheme.theme.onContainer,
-                    fontWeight: FontWeight.w400,
-                  ),
-              linkEllipsis: true,
-              onTagTap: onTagTap,
-            )
+          ? textBuilder?.call(context, _defText(inStyle)) ?? _defText(inStyle)
           : const SizedBox(),
+    );
+  }
+
+  LMChatExpandableText _defText(LMChatBubbleContentStyle inStyle) {
+    return LMChatExpandableText(
+      conversation.answer,
+      expandText: "see more",
+      enableSelection: inStyle.enableSelection ?? false,
+      animation: inStyle.animation ?? true,
+      maxLines: inStyle.visibleLines ?? 6,
+      mentionStyle: inStyle.tagStyle,
+      linkStyle: inStyle.linkStyle ??
+          TextStyle(
+            color: LMChatTheme.theme.linkColor,
+            fontSize: 14,
+          ),
+      textAlign: TextAlign.left,
+      style: inStyle.textStyle ??
+          TextStyle(
+            fontSize: 14,
+            color: LMChatTheme.theme.onContainer,
+            fontWeight: FontWeight.w400,
+          ),
+      linkEllipsis: true,
+      onTagTap: onTagTap,
     );
   }
 
@@ -53,11 +60,14 @@ class LMChatBubbleContent extends StatelessWidget {
     LMChatConversationViewData? conversation,
     Function(String tag)? onTagTap,
     LMChatBubbleContentStyle? style,
+    Widget Function(BuildContext context, LMChatExpandableText text)?
+        textBuilder,
   }) {
     return LMChatBubbleContent(
       conversation: conversation ?? this.conversation,
       onTagTap: onTagTap ?? this.onTagTap,
       style: style ?? this.style,
+      textBuilder: textBuilder ?? this.textBuilder,
     );
   }
 }

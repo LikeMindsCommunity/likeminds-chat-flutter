@@ -55,6 +55,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   final LMChatReportBuilderDelegate _screenBuilder =
       LMChatCore.config.reportConfig.builder;
   final LMChatModerationBloc _moderationBloc = LMChatModerationBloc();
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   void initState() {
@@ -72,50 +73,62 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    return _screenBuilder.scaffold(
-      backgroundColor: theme.container,
-      source: _widgetSource,
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context)),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    widget.reportContentBuilder
-                            ?.call(context, _defReportContentWidget()) ??
-                        _defReportContentWidget(),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    _defChipListBuilder(),
-                    if (_selectedReportTag?.name.toLowerCase() == 'others' ||
-                        _selectedReportTag?.name.toLowerCase() == 'other')
-                      _screenBuilder.otherReasonTextFieldBuilder(
-                        context,
-                        _reportReasonController,
-                        _defOtherReasonTextField(),
-                      )
-                  ],
-                ),
-              ),
-            ),
-            _screenBuilder.submitButtonBuilder(
-              context,
-              widget.entityId,
-              _selectedReportTag?.id,
-              _reportReasonController.text.trim(),
-              _defSubmitButton(context),
-            ),
-          ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
         ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                backgroundColor: theme.container,
+                source: _widgetSource,
+                appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context)),
+                body: SafeArea(
+                  top: false,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              widget.reportContentBuilder
+                                      ?.call(context, _defReportContentWidget()) ??
+                                  _defReportContentWidget(),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              _defChipListBuilder(),
+                              if (_selectedReportTag?.name.toLowerCase() ==
+                                      'others' ||
+                                  _selectedReportTag?.name.toLowerCase() == 'other')
+                                _screenBuilder.otherReasonTextFieldBuilder(
+                                  context,
+                                  _reportReasonController,
+                                  _defOtherReasonTextField(),
+                                )
+                            ],
+                          ),
+                        ),
+                      ),
+                      _screenBuilder.submitButtonBuilder(
+                        context,
+                        widget.entityId,
+                        _selectedReportTag?.id,
+                        _reportReasonController.text.trim(),
+                        _defSubmitButton(context),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
       ),
     );
   }

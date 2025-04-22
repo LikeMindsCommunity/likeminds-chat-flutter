@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
@@ -16,13 +19,16 @@ class LMCommunityHybridChatScreen extends StatefulWidget {
   });
 
   @override
-  State<LMCommunityHybridChatScreen> createState() => _LMCommunityHybridChatScreenState();
+  State<LMCommunityHybridChatScreen> createState() =>
+      _LMCommunityHybridChatScreenState();
 }
 
-class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScreen> {
+class _LMCommunityHybridChatScreenState
+    extends State<LMCommunityHybridChatScreen> {
   final LMChatUserViewData user =
       LMChatLocalPreference.instance.getUser().toUserViewData();
   final _screenBuilder = LMChatCore.config.communityHybridChatConfig.builder;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   void didUpdateWidget(covariant LMCommunityHybridChatScreen oldWidget) {
@@ -30,27 +36,48 @@ class _LMCommunityHybridChatScreenState extends State<LMCommunityHybridChatScree
   }
 
   @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    ScreenSize.init(context,
+        setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    ScreenSize.init(context);
-    return DefaultTabController(
-      length: 2,
-      child: Builder(builder: (context) {
-        return _screenBuilder.scaffold(
-          backgroundColor: LMChatTheme.theme.backgroundColor,
-          appBar: _screenBuilder.appBarBuilder(
-            context,
-            user,
-            DefaultTabController.of(context),
-            _defAppBar(context),
-          ),
-          body: const TabBarView(
-            children: [
-              LMCommunityChatScreen(),
-              LMNetworkingChatScreen(),
-            ],
-          ),
-        );
-      }),
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+          maxHeight: MediaQuery.of(context).size.height,
+        ),
+        child: ValueListenableBuilder(
+          valueListenable: LMChatTheme.themeNotifier,
+          builder: (context, _, child) {
+            return DefaultTabController(
+              length: 2,
+              child: Builder(builder: (context) {
+                return _screenBuilder.scaffold(
+                  backgroundColor: LMChatTheme.theme.backgroundColor,
+                  appBar: _screenBuilder.appBarBuilder(
+                    context,
+                    user,
+                    DefaultTabController.of(context),
+                    _defAppBar(context),
+                  ),
+                  body: const TabBarView(
+                    children: [
+                      // home feed -> community
+                      // dm feed -> networking
+                      LMCommunityChatScreen(),
+                      LMNetworkingChatScreen(),
+                    ],
+                  ),
+                );
+              }),
+            );
+          },
+        ),
+      ),
     );
   }
 

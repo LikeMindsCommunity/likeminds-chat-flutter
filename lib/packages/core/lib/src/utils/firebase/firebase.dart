@@ -12,6 +12,15 @@ initFirebase() async {
       name: 'likeminds_chat',
       options: !isDebug
           ?
+          kIsWeb?
+          //Prod Firebase options
+          FirebaseOptions(
+            apiKey: FbCredsProd.fbApiKey,
+            appId: FbCredsProd.fbAppIdAN,
+            messagingSenderId: FbCredsProd.fbMessagingSenderId,
+            projectId: FbCredsProd.fbProjectId,
+            databaseURL: FbCredsProd.fbDatabaseUrl,
+          ):
           //Prod Firebase options
           Platform.isIOS
               ? FirebaseOptions(
@@ -29,7 +38,18 @@ initFirebase() async {
                   databaseURL: FbCredsProd.fbDatabaseUrl,
                 )
           //Beta Firebase options
-          : Platform.isIOS
+          :
+          kIsWeb?
+          //Beta Firebase options
+          FirebaseOptions(
+            apiKey: FbCredsDev.fbApiKey,
+            appId: FbCredsDev.fbAppIdAN,
+            messagingSenderId: FbCredsDev.fbMessagingSenderId,
+            projectId: FbCredsDev.fbProjectId,
+            databaseURL: FbCredsDev.fbDatabaseUrl,
+          ):
+          //Beta Firebase options
+           Platform.isIOS
               ? FirebaseOptions(
                   apiKey: FbCredsDev.fbApiKey,
                   appId: FbCredsDev.fbAppIdIOS,

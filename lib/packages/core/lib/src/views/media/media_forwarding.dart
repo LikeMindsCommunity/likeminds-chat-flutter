@@ -60,6 +60,7 @@ class _LMChatMediaForwardingScreenState
 
   List<LMChatTagViewData> tags = [];
   final _themeData = LMChatTheme.theme;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   void initState() {
@@ -81,38 +82,49 @@ class _LMChatMediaForwardingScreenState
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      onPopInvoked: (p0) {
-        LMChatMediaHandler.instance.clearPickedMedia();
-      },
-      systemUiOverlay: SystemUiOverlayStyle.light,
-      backgroundColor: LMChatTheme.isThemeDark
-          ? LMChatTheme.theme.container
-          : LMChatTheme.theme.onContainer,
-      appBar: _screenBuilder.appBarBuilder(
-        context,
-        _defAppBar(),
-        LMChatMediaHandler.instance.pickedMedia.length,
-        currPosition,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: rebuildCurr,
-              builder: (context, _, __) {
-                return _buildMediaPreview();
-              },
-            ),
-          ),
-          _screenBuilder.chatroomBottomBarContainer(
-            context,
-            _defChatBar(),
-            _defSendButton(context),
-            _defInnerTextField(context),
-            _defAttachmentButton(),
-          ),
-        ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                onPopInvoked: (p0) {
+                  LMChatMediaHandler.instance.clearPickedMedia();
+                },
+                systemUiOverlay: SystemUiOverlayStyle.light,
+                backgroundColor: LMChatTheme.isThemeDark
+                    ? LMChatTheme.theme.container
+                    : LMChatTheme.theme.onContainer,
+                appBar: _screenBuilder.appBarBuilder(
+                  context,
+                  _defAppBar(),
+                  LMChatMediaHandler.instance.pickedMedia.length,
+                  currPosition,
+                ),
+                body: Column(
+                  children: [
+                    Expanded(
+                      child: ValueListenableBuilder(
+                        valueListenable: rebuildCurr,
+                        builder: (context, _, __) {
+                          return _buildMediaPreview();
+                        },
+                      ),
+                    ),
+                    _screenBuilder.chatroomBottomBarContainer(
+                      context,
+                      _defChatBar(),
+                      _defSendButton(context),
+                      _defInnerTextField(context),
+                      _defAttachmentButton(),
+                    ),
+                  ],
+                ),
+              );
+            }),
       ),
     );
   }
@@ -517,7 +529,8 @@ class _LMChatMediaForwardingScreenState
 
   LMChatImage _defImage() {
     return LMChatImage(
-      imageFile: mediaList[currPosition].mediaFile!,
+      imageBytes: mediaList[currPosition].mediaBytes,
+      imageFile: mediaList[currPosition].mediaFile,
       style: const LMChatImageStyle(
         boxFit: BoxFit.cover,
       ),
@@ -526,7 +539,8 @@ class _LMChatMediaForwardingScreenState
 
   LMChatImage _defImageThumbnail(int index) {
     return LMChatImage(
-      imageFile: mediaList[index].mediaFile!,
+      imageFile: mediaList[index].mediaFile,
+      imageBytes: mediaList[index].mediaBytes,
       style: const LMChatImageStyle(
         boxFit: BoxFit.cover,
       ),
