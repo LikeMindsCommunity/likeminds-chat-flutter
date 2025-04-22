@@ -47,6 +47,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   late PageController _pagingController;
   final LMChatPollResultBuilderDelegate _screenBuilder =
       LMChatCore.config.pollConfig.pollResultBuilder;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   initState() {
@@ -87,31 +88,42 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return _screenBuilder.scaffold(
-        backgroundColor: theme.container,
-        appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
-        body: Column(
-          children: [
-            _screenBuilder.tabBarBuilder(
-              context,
-              _defTabBar(width),
-            ),
-            Expanded(
-              child: SafeArea(
-                child: PageView.builder(
-                  onPageChanged: (index) {
-                    _tabController.animateTo(index);
-                  },
-                  controller: _pagingController,
-                  itemCount: widget.pollOptions.length,
-                  itemBuilder: (context, index) {
-                    return _defListView(widget.pollOptions[index]);
-                  },
-                ),
-              ),
-            )
-          ],
-        ));
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                  backgroundColor: theme.container,
+                  appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+                  body: Column(
+                    children: [
+                      _screenBuilder.tabBarBuilder(
+                        context,
+                        _defTabBar(width),
+                      ),
+                      Expanded(
+                        child: SafeArea(
+                          child: PageView.builder(
+                            onPageChanged: (index) {
+                              _tabController.animateTo(index);
+                            },
+                            controller: _pagingController,
+                            itemCount: widget.pollOptions.length,
+                            itemBuilder: (context, index) {
+                              return _defListView(widget.pollOptions[index]);
+                            },
+                          ),
+                        ),
+                      )
+                    ],
+                  ));
+            }),
+      ),
+    );
   }
 
   TabBar _defTabBar(double width) {
@@ -250,7 +262,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         children: [
           const LMChatIcon(
             type: LMChatIconType.svg,
-            assetPath: emptyPollResult,
+            assetPath: emptyResultIcon,
             style: LMChatIconStyle(
               size: 40,
               margin: EdgeInsets.only(bottom: 16),

@@ -37,6 +37,7 @@ class _LMChatroomParticipantsPageState
   final int _pageSize = 10;
   final LMChatParticipantBuilderDelegate _screenBuilder =
       LMChatCore.config.participantConfig.builder;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
 
   @override
   void initState() {
@@ -70,40 +71,52 @@ class _LMChatroomParticipantsPageState
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      backgroundColor: LMChatTheme.instance.themeData.scaffold,
-      appBar: _screenBuilder.appBarBuilder(
-        context,
-        _searchController,
-        _onSearchTap,
-        _defAppBar(),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child:
-                  BlocConsumer<LMChatParticipantsBloc, LMChatParticipantsState>(
-                bloc: participantsBloc,
-                listener: _updatePaginationState,
-                buildWhen: (previous, current) {
-                  if (current is LMChatParticipantsPaginationLoadingState) {
-                    return false;
-                  }
-                  return true;
-                },
-                builder: (context, state) {
-                  if (state is LMChatParticipantsLoadingState) {
-                    return LMChatLoader(
-                      style: LMChatTheme.theme.loaderStyle,
-                    );
-                  }
-                  return _buildParticipantsList();
-                },
-              ),
-            ),
-          ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
         ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                backgroundColor: LMChatTheme.instance.themeData.scaffold,
+                appBar: _screenBuilder.appBarBuilder(
+                  context,
+                  _searchController,
+                  _onSearchTap,
+                  _defAppBar(),
+                ),
+                body: SafeArea(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: BlocConsumer<LMChatParticipantsBloc,
+                            LMChatParticipantsState>(
+                          bloc: participantsBloc,
+                          listener: _updatePaginationState,
+                          buildWhen: (previous, current) {
+                            if (current
+                                is LMChatParticipantsPaginationLoadingState) {
+                              return false;
+                            }
+                            return true;
+                          },
+                          builder: (context, state) {
+                            if (state is LMChatParticipantsLoadingState) {
+                              return LMChatLoader(
+                                style: LMChatTheme.theme.loaderStyle,
+                              );
+                            }
+                            return _buildParticipantsList();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
       ),
     );
   }

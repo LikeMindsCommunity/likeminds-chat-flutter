@@ -72,41 +72,52 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      onPopInvoked: (p0) {
-        LMChatMediaHandler.instance.clearPickedMedia();
-      },
-      systemUiOverlay: SystemUiOverlayStyle.light,
-      backgroundColor: LMChatTheme.isThemeDark
-          ? LMChatTheme.theme.container
-          : LMChatTheme.theme.onContainer,
-      appBar: _screenBuilder.appBarBuilder(
-        context,
-        _defAppBar(),
-        LMChatMediaHandler.instance.pickedMedia.length,
-        _currentPosition.value,
-      ),
-      body: ValueListenableBuilder(
-        valueListenable: _currentPosition,
-        builder: (context, _, __) {
-          return getMediaPreview();
-        },
-      ),
-      bottomNavigationBar: widget.showPreview
-          ? ValueListenableBuilder(
-              valueListenable: _currentPosition,
-              builder: (context, _, __) {
-                return (mediaList.isNotEmpty)
-                    ? _screenBuilder.mediaPreviewBuilder(
-                        context,
-                        LMChatMediaHandler.instance.pickedMedia.copy(),
-                        _currentPosition.value,
-                        _defPreviewBar(),
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: LMChatCore.config.webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return _screenBuilder.scaffold(
+                onPopInvoked: (p0) {
+                  LMChatMediaHandler.instance.clearPickedMedia();
+                },
+                systemUiOverlay: SystemUiOverlayStyle.light,
+                backgroundColor: LMChatTheme.isThemeDark
+                    ? LMChatTheme.theme.container
+                    : LMChatTheme.theme.onContainer,
+                appBar: _screenBuilder.appBarBuilder(
+                  context,
+                  _defAppBar(),
+                  LMChatMediaHandler.instance.pickedMedia.length,
+                  _currentPosition.value,
+                ),
+                body: ValueListenableBuilder(
+                  valueListenable: _currentPosition,
+                  builder: (context, _, __) {
+                    return getMediaPreview();
+                  },
+                ),
+                bottomNavigationBar: widget.showPreview
+                    ? ValueListenableBuilder(
+                        valueListenable: _currentPosition,
+                        builder: (context, _, __) {
+                          return (mediaList.isNotEmpty)
+                              ? _screenBuilder.mediaPreviewBuilder(
+                                  context,
+                                  LMChatMediaHandler.instance.pickedMedia.copy(),
+                                  _currentPosition.value,
+                                  _defPreviewBar(),
+                                )
+                              : const SizedBox.shrink();
+                        },
                       )
-                    : const SizedBox.shrink();
-              },
-            )
-          : null,
+                    : null,
+              );
+            }),
+      ),
     );
   }
 

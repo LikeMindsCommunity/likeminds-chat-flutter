@@ -162,7 +162,7 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
     _loadInitialData();
     widget.paginationController.isFirstPageLoadedController.stream
         .listen((event) {
-      if (event) {
+      if (event && mounted) {
         setState(() {
           _isLoadingFirstPage = false;
         });
@@ -268,6 +268,8 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final items = widget.paginationController.itemList;
+
     if (_isLoadingFirstPage) {
       return widget.firstPageProgressIndicatorBuilder?.call(context) ??
           const Center(child: CircularProgressIndicator());
@@ -277,7 +279,6 @@ class _LMDualSidePagedListState<T> extends State<LMDualSidePagedList<T>> {
       return widget.firstPageErrorIndicatorBuilder?.call(context) ??
           const Center(child: Text("An error occurred"));
     }
-    final items = widget.paginationController.itemList;
 
     if (items.isEmpty) {
       return widget.noItemsFoundIndicatorBuilder?.call(context) ??

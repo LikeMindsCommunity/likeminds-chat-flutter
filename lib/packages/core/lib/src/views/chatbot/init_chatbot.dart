@@ -28,6 +28,8 @@ class _LMChatAIBotInitiationScreenState
     extends State<LMChatAIBotInitiationScreen> with TickerProviderStateMixin {
   final LMChatClient _chatClient = LMChatCore.client;
   late AnimationController _animationController;
+  final LMChatWebConfiguration _webConfiguration =
+      LMChatCore.config.webConfiguration;
 
   @override
   void initState() {
@@ -140,29 +142,40 @@ class _LMChatAIBotInitiationScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: LMChatTheme.theme.container,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Lottie.network(
-                widget.animationToShow ?? aiChatbotLoadingAnimation,
-              ),
-            ),
-            widget.previewText?.call(
-                  context,
-                  const LMChatText(
-                    "Setting up AI Chatbot...",
-                  ),
-                ) ??
-                const LMChatText(
-                  "Setting up AI Chatbot...",
-                ),
-            const SizedBox(height: 28),
-          ],
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
         ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, child) {
+              return Scaffold(
+                backgroundColor: LMChatTheme.theme.container,
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Lottie.network(
+                          widget.animationToShow ?? aiChatbotLoadingAnimation,
+                        ),
+                      ),
+                      widget.previewText?.call(
+                            context,
+                            const LMChatText(
+                              "Setting up AI Chatbot...",
+                            ),
+                          ) ??
+                          const LMChatText(
+                            "Setting up AI Chatbot...",
+                          ),
+                      const SizedBox(height: 28),
+                    ],
+                  ),
+                ),
+              );
+            }),
       ),
     );
   }

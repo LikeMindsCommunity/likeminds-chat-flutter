@@ -76,6 +76,11 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
   }
 
   @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
     feedBloc.close();
     homeFeedPagingController.dispose();
@@ -85,86 +90,88 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            _screenBuilder.exploreTileBuilder(
-              context,
-              _defaultExploreTile(),
-            ),
-            Expanded(
-              child: BlocListener<LMChatHomeFeedBloc, LMChatHomeFeedState>(
-                bloc: feedBloc,
-                listener: (_, state) {
-                  _updatePagingControllers(state);
-                },
-                child: ValueListenableBuilder(
-                    valueListenable: rebuildFeedList,
-                    builder: (context, _, __) {
-                      return PagedListView<int, LMChatRoomViewData>(
-                        pagingController: homeFeedPagingController,
-                        padding: _style.padding ??
-                            const EdgeInsets.symmetric(
-                              horizontal: 8,
-                            ),
-                        physics: const ClampingScrollPhysics(),
-                        builderDelegate:
-                            PagedChildBuilderDelegate<LMChatRoomViewData>(
-                          firstPageErrorIndicatorBuilder: (context) =>
-                              _screenBuilder
-                                  .firstPageErrorIndicatorBuilder(
-                            context,
-                            _defaultErrorView(),
-                          ),
-                          newPageErrorIndicatorBuilder: (context) =>
-                              _screenBuilder
-                                  .newPageErrorIndicatorBuilder(
-                            context,
-                            _defaultErrorView(),
-                          ),
-                          firstPageProgressIndicatorBuilder: (context) =>
-                              _screenBuilder
-                                  .firstPageProgressIndicatorBuilder(
-                            context,
-                            const LMChatSkeletonChatroomList(),
-                          ),
-                          newPageProgressIndicatorBuilder: (context) =>
-                              _screenBuilder
-                                  .newPageProgressIndicatorBuilder(
-                            context,
-                            const LMChatLoader(),
-                          ),
-                          noItemsFoundIndicatorBuilder: (context) =>
-                              _screenBuilder
-                                  .noItemsFoundIndicatorBuilder(
-                            context,
-                            _defaultEmptyView(),
-                          ),
-                          noMoreItemsIndicatorBuilder: (context) =>
-                              _screenBuilder
-                                  .noMoreItemsIndicatorBuilder(
-                            context,
-                            const SizedBox(),
-                          ),
-                          itemBuilder: (context, item, index) {
-                            return _screenBuilder.chatroomTileBuilder(
-                              context,
-                              item,
-                              _defaultHomeChatRoomTile(item),
+    return ValueListenableBuilder(
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, value, __) {
+          return Scaffold(
+            backgroundColor: LMChatTheme.theme.scaffold,
+            body: SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  _screenBuilder.exploreTileBuilder(
+                    context,
+                    _defaultExploreTile(),
+                  ),
+                  Expanded(
+                    child:
+                        BlocListener<LMChatHomeFeedBloc, LMChatHomeFeedState>(
+                      bloc: feedBloc,
+                      listener: (_, state) {
+                        _updatePagingControllers(state);
+                      },
+                      child: ValueListenableBuilder(
+                          valueListenable: rebuildFeedList,
+                          builder: (context, _, __) {
+                            return PagedListView<int, LMChatRoomViewData>(
+                              pagingController: homeFeedPagingController,
+                              padding: _style.padding ??
+                                  const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                              physics: const ClampingScrollPhysics(),
+                              builderDelegate:
+                                  PagedChildBuilderDelegate<LMChatRoomViewData>(
+                                firstPageErrorIndicatorBuilder: (context) =>
+                                    _screenBuilder
+                                        .firstPageErrorIndicatorBuilder(
+                                  context,
+                                  _defaultErrorView(),
+                                ),
+                                newPageErrorIndicatorBuilder: (context) =>
+                                    _screenBuilder.newPageErrorIndicatorBuilder(
+                                  context,
+                                  _defaultErrorView(),
+                                ),
+                                firstPageProgressIndicatorBuilder: (context) =>
+                                    _screenBuilder
+                                        .firstPageProgressIndicatorBuilder(
+                                  context,
+                                  const LMChatSkeletonChatroomList(),
+                                ),
+                                newPageProgressIndicatorBuilder: (context) =>
+                                    _screenBuilder
+                                        .newPageProgressIndicatorBuilder(
+                                  context,
+                                  const LMChatLoader(),
+                                ),
+                                noItemsFoundIndicatorBuilder: (context) =>
+                                    _screenBuilder.noItemsFoundIndicatorBuilder(
+                                  context,
+                                  _defaultEmptyView(),
+                                ),
+                                noMoreItemsIndicatorBuilder: (context) =>
+                                    _screenBuilder.noMoreItemsIndicatorBuilder(
+                                  context,
+                                  const SizedBox(),
+                                ),
+                                itemBuilder: (context, item, index) {
+                                  return _screenBuilder.chatroomTileBuilder(
+                                    context,
+                                    item,
+                                    _defaultHomeChatRoomTile(item),
+                                  );
+                                },
+                              ),
                             );
-                          },
-                        ),
-                      );
-                    }),
+                          }),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 
   LMChatTile _defaultExploreTile() {

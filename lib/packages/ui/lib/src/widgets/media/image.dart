@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -25,17 +26,24 @@ class LMChatImage extends StatefulWidget {
     super.key,
     this.imageUrl,
     this.imageFile,
+    this.imageBytes,
     this.imageAssetPath,
     this.onError,
     this.style,
     this.onTap,
-  }) : assert(imageUrl != null || imageFile != null || imageAssetPath != null);
+  }) : assert(imageUrl != null ||
+            imageFile != null ||
+            imageAssetPath != null ||
+            imageBytes != null);
 
   /// The URL of the image (image from network)
   final String? imageUrl;
 
   /// The file of the image (image from file)
   final File? imageFile;
+
+  /// The Uni8List of the image (image from bytes)
+  final Uint8List? imageBytes;
 
   /// The path of the image (image from asset)
   final String? imageAssetPath;
@@ -57,6 +65,7 @@ class LMChatImage extends StatefulWidget {
   LMChatImage copyWith({
     String? imageUrl,
     File? imageFile,
+    Uint8List? imageBytes,
     String? imageAssetPath,
     LMChatImageStyle? style,
     LMChatErrorHandler? onError,
@@ -65,6 +74,7 @@ class LMChatImage extends StatefulWidget {
     return LMChatImage(
       imageUrl: imageUrl ?? this.imageUrl,
       imageFile: imageFile ?? this.imageFile,
+      imageBytes: imageBytes ?? this.imageBytes,
       imageAssetPath: imageAssetPath ?? this.imageAssetPath,
       style: style ?? this.style,
       onError: onError ?? this.onError,
@@ -101,6 +111,9 @@ class _LMImageState extends State<LMChatImage> {
   /// Determines which type of image to build based on the provided source
   /// Returns the appropriate image widget for URL, File, or Asset images
   Widget _buildImageWidget() {
+    if (widget.imageBytes != null) {
+      return _buildBytesImage();
+    }
     if (widget.imageUrl != null) {
       return _buildNetworkImage();
     }
@@ -260,6 +273,25 @@ class _LMImageState extends State<LMChatImage> {
             imageHeight: snapshot.data!.height.toDouble(),
           );
         },
+      ),
+    );
+  }
+
+  /// Builds a widget for displaying images from bytes
+  /// Returns a Container with the bytes image
+  Widget _buildBytesImage() {
+    return Container(
+      padding: style?.padding,
+      margin: style?.margin,
+      decoration: BoxDecoration(
+        borderRadius: style!.borderRadius ?? BorderRadius.zero,
+        color: style?.backgroundColor,
+      ),
+      child: _buildPhotoView(
+        context: context,
+        imageProvider: MemoryImage(widget.imageBytes!),
+        imageWidth: 100.w,
+        imageHeight: 80.h,
       ),
     );
   }

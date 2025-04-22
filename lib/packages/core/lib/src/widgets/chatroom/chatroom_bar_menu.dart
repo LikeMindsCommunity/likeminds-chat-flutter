@@ -48,6 +48,9 @@ class LMAttachmentMenu extends StatelessWidget {
     final int rows = (itemCount / columns).ceil();
 
     return Container(
+      constraints: BoxConstraints(
+        maxWidth: LMChatCore.config.webConfiguration.maxWidth,
+      ),
       margin: const EdgeInsets.only(bottom: 8),
       child: ClipRRect(
         borderRadius: style.borderRadius,

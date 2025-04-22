@@ -77,3 +77,12 @@
 
 - Fixed attachment menubar hanging issue
 - Fixed link preview bug
+
+## 0.16.0
+
+- Added search in a chatrrom
+- Added theme notifier
+
+## 0.17.0
+
+- Added support for flutter web
