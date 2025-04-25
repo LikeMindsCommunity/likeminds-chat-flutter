@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/media/audio_handler.dart';
+import 'package:likeminds_chat_flutter_core/src/widgets/chatroom/chatroom_approve_reject_view.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
@@ -161,7 +163,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Add near the top of _LMChatroomBarState class
   late final FlutterSoundPlayer _localPlayer;
   bool _isLocalPlayerInitialized = false;
-  LMChatroomRequestState? _chatroomState;
+  final ValueNotifier<LMChatroomRequestState?> _chatroomState =
+      ValueNotifier<LMChatroomRequestState?>(null);
+  bool _requestPermissionToDm = false;
 
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
@@ -325,15 +329,23 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (chatroom?.type != 10) {
       return;
     }
+    print(
+        " lol req-> ${chatroom?.chatRequestedBy?.sdkClientInfo?.uuid} ${chatroom?.member!.id.toString()}  ${chatroom?.id} , ${chatroom?.lastConversation?.memberId.toString()}  uuurr -> ${currentUser.sdkClientInfo?.user}");
 
     // Check DM status
-    final checkDMStatusRequest =
-        (CheckDMStatusRequestBuilder()..reqFrom("chatroom")).build();
+    final checkDMStatusRequest = (CheckDMStatusRequestBuilder()
+          ..reqFrom("dm_feed_v2")
+          ..uuid(chatroom?.chatroomWithUser?.sdkClientInfo?.uuid ?? ""))
+        .build();
     final checkDMStatusResponse =
         await LMChatCore.client.checkDMStatus(checkDMStatusRequest);
-
+    if (!checkDMStatusResponse.success) {
+      throw Exception(
+          "Error checking DM status: ${checkDMStatusResponse.errorMessage}");
+    }
     if (checkDMStatusResponse.data?.showDm == false) {
       // TODO: Show disabled message in input box and disable it
+      _chatroomState.value = LMChatroomRequestState.disabled;
       _focusNode.unfocus();
       return;
     }
@@ -343,14 +355,31 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
     if (chatroom?.chatRequestState == null) {
       if (isDMWithRequestEnabled) {
-        _chatroomState = LMChatroomRequestState.notInitiated;
+        /*
+
+        */
+        _chatroomState.value = LMChatroomRequestState.notInitiated;
+        _requestPermissionToDm = true;
+      } else {
+        _chatroomState.value = LMChatroomRequestState.notInitiated;
+        _requestPermissionToDm = false;
       }
+    } else if (chatroom?.chatRequestState == 0) {
+      _chatroomState.value = LMChatroomRequestState.initiated;
+    } else if (chatroom?.chatRequestState == 1) {
+      _chatroomState.value = LMChatroomRequestState.accepted;
+    } else if (chatroom?.chatRequestState == 2) {
+      _chatroomState.value = LMChatroomRequestState.rejected;
     } else {
-      _chatroomState =
+      _chatroomState.value =
           LMChatroomRequestState.fromValue(chatroom?.chatRequestState ?? 0);
       debugPrint('chatroomState: $_chatroomState');
     }
-    setState(() {});
+
+    print(
+        'chatroomState: ${_chatroomState.value}  ${chatroom?.chatRequestState}');
+    //! hardcode:
+    // _chatroomState = LMChatroomRequestState.initiated;
   }
 
   @override
@@ -389,13 +418,15 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _getWidgetBasedOnState(LMChatroomRequestState? state) {
-    if (state == null) {
+    //  return _defTextFieldContainer();
+    if (state == null || state == LMChatroomRequestState.accepted) {
       return const SizedBox();
     }
+
     // if state is not initiated return a text widget
     if (state == LMChatroomRequestState.notInitiated) {
       return LMChatText(
-        "Send a DM request to ${chatroom?.member?.name} by sending your 1st message",
+        "Send a DM request to ${chatroom?.chatroomWithUser?.name} by sending your 1st message",
         style: LMChatTextStyle(
           padding: const EdgeInsets.symmetric(
             horizontal: 8,
@@ -408,26 +439,136 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ),
       );
     }
+
     // if state is initiated & current user != chatRequestedBy
     // show approve/reject buttons
+
     return Container(
-        width: 100.w,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
-        decoration: BoxDecoration(
-          color: _themeData.container,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Center(
-          child: LMChatText(
-            _containerText(state),
-            style: LMChatTextStyle(
-                textStyle: TextStyle(
-              fontSize: 14,
-              color: _themeData.secondaryColor,
-            )),
+        // width: 100.w,
+        // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        // padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
+        // decoration: BoxDecoration(
+        //   color: _themeData.container,
+        //   borderRadius: BorderRadius.circular(24),
+        // ),
+        child: Column(
+      children: [
+        if (state == LMChatroomRequestState.initiated &&
+            chatroom?.chatRequestedBy?.sdkClientInfo?.uuid != null &&
+            chatroom?.chatRequestedBy?.sdkClientInfo?.uuid !=
+                currentUser.sdkClientInfo?.uuid)
+          LMChatApproveRejectView(
+            onApproveButtonClicked: () {
+              showDMDialog(
+                context,
+                type: DMDialogType.approve,
+                onPrimary: () async {
+                  Navigator.pop(context);
+
+                  final response = await LMChatCore.client.sendDMRequest(
+                    (SendDMRequestBuilder()
+                          ..chatroomId(chatroom!.id)
+                          ..chatRequestState(1)
+                          ..text(""))
+                        .build(),
+                  );
+                  if (response.success) {
+                    print("everything good");
+                  } else {
+                    throw Exception(
+                        "Error approving request: ${response.errorMessage}");
+                  }
+                  _chatroomState.value = LMChatroomRequestState.accepted;
+                  print("Primary button clicked");
+                },
+                onSecondary: () {
+                  Navigator.pop(context);
+                  print("seco button clicked");
+                },
+              );
+            },
+            onRejectButtonClicked: () {
+              // Handle reject action
+              showDMDialog(
+                context,
+                type: DMDialogType.reject,
+                onPrimary: () async {
+                  Navigator.pop(context);
+
+                  final response = await LMChatCore.client.sendDMRequest(
+                    (SendDMRequestBuilder()
+                          ..chatroomId(chatroom!.id)
+                          ..chatRequestState(2))
+                        .build(),
+                  );
+                  if (response.success) {
+                    print("everything good");
+                  } else {
+                    throw Exception(
+                        "Error rejecting request: ${response.errorMessage}");
+                  }
+                  _chatroomState.value = LMChatroomRequestState.rejected;
+                },
+                onSecondary: () {
+                  Navigator.pop(context);
+                },
+                onTertiary: () async {
+                  Navigator.pop(context);
+
+                  final response = await LMChatCore.client.sendDMRequest(
+                    (SendDMRequestBuilder()
+                          ..chatroomId(chatroom!.id)
+                          ..chatRequestState(2)
+                          ..text(""))
+                        .build(),
+                  );
+                  if (response.success) {
+                    print("everything good");
+                  } else {
+                    throw Exception(
+                        "Error rejecting request: ${response.errorMessage}");
+                  }
+                  _chatroomState.value = LMChatroomRequestState.rejected;
+
+                  // push to LMChatReportScreen
+                  context.push(
+                    LMChatReportScreen(
+                      //! todo: fetech member id
+                      entityId: chatroom?.chatroomWithUser?.id.toString() ?? "",
+                      entityCreatorId:
+                          currentUser.sdkClientInfo?.user.toString() ?? "",
+                      entityType: 1,
+                    ),
+                  );
+                },
+
+                // push to LMChatReportScreen
+              );
+              print("Reject button clicked");
+            },
           ),
-        ));
+        Container(
+          width: 100.w,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
+          decoration: BoxDecoration(
+            color: _themeData.container,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Center(
+            child: LMChatText(
+              _containerText(state),
+              style: LMChatTextStyle(
+                  padding: const EdgeInsets.only(top: 8),
+                  textStyle: TextStyle(
+                    fontSize: 14,
+                    color: _themeData.secondaryColor,
+                  )),
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 
   String _containerText(LMChatroomRequestState state) {
@@ -435,8 +576,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       case LMChatroomRequestState.notInitiated:
         return 'Send a message to start a chat';
       case LMChatroomRequestState.initiated:
-        if (currentUser.sdkClientInfo?.uuid ==
-            chatroom!.chatRequestedBy?.sdkClientInfo?.uuid) {
+        if (chatroom!.chatRequestedBy?.sdkClientInfo?.uuid == null ||
+            currentUser.sdkClientInfo?.uuid ==
+                chatroom!.chatRequestedBy?.sdkClientInfo?.uuid) {
           return "DM request pending. Messaging would be enabled once your request is approved.";
         } else {
           return "Approve or reject connection request";
@@ -444,12 +586,15 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       case LMChatroomRequestState.accepted:
         return 'Chat request accepted';
       case LMChatroomRequestState.rejected:
-        return 'Chat request rejected';
+        return 'Chat request rejected'; //! Todo change this
+      case LMChatroomRequestState.disabled:
+        return 'Direct messaging among members has been disabled by the community manager';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('chatroomState: $_chatroomState');
     return Stack(
       children: [
         BlocConsumer<LMChatConversationActionBloc,
@@ -457,26 +602,30 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           bloc: chatActionBloc,
           listener: _blocListener,
           builder: (context, state) {
-            return Column(
-              children: [
-                if (chatroom?.type == 10)
-                  _getWidgetBasedOnState(_chatroomState),
-                if ((chatroom?.type == 10 &&
-                        (_chatroomState ==
-                                LMChatroomRequestState.notInitiated ||
-                            _chatroomState ==
-                                LMChatroomRequestState.accepted)) ||
-                    chatroom?.type != 10)
-                  _screenBuilder.chatroomBottomBarContainer(
-                    context,
-                    _defTextFieldContainer(),
-                    _defSendButton(context),
-                    _defVoiceOverlayLayout(context),
-                    _defInnerTextField(context),
-                    _defAttachmentButton(),
-                  ),
-              ],
-            );
+            return ValueListenableBuilder(
+                valueListenable: _chatroomState,
+                builder: (context, _, __) {
+                  return Column(
+                    children: [
+                      if (chatroom?.type == 10)
+                        _getWidgetBasedOnState(_chatroomState.value),
+                      if ((chatroom?.type == 10 &&
+                              (_chatroomState.value ==
+                                      LMChatroomRequestState.notInitiated ||
+                                  _chatroomState.value ==
+                                      LMChatroomRequestState.accepted)) ||
+                          chatroom?.type != 10)
+                        _screenBuilder.chatroomBottomBarContainer(
+                          context,
+                          _defTextFieldContainer(),
+                          _defSendButton(context),
+                          _defVoiceOverlayLayout(context),
+                          _defInnerTextField(context),
+                          _defAttachmentButton(),
+                        ),
+                    ],
+                  );
+                });
           },
         ),
       ],
@@ -1595,6 +1744,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       _focusNode.requestFocus();
     } else if (state is LMChatRefreshBarState) {
       chatroom = state.chatroom;
+      print(" chatroom request state: ${state.chatroom.chatRequestState}");
+      _initiateDMChatroomFlow();
     } else if (state is LMChatLinkAttachedState) {
       // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
       if (_isSentBeforeLinkFetched) {
@@ -1625,6 +1776,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Handler functions of the LMChatroomBar
   void _onSend() async {
     final message = _textEditingController.text.trim();
+    if (message.isEmpty &&
+        !_isReviewingRecording.value &&
+        !_isRecordingLocked.value) {
+      toast("Text can't be empty");
+      return;
+    }
 
     // Check for DM request state and character limit
     if (_isDMRequestState() && message.length > 300) {
@@ -1634,30 +1791,31 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
     // If in DM request state, show confirmation dialog if private member
     if (_isDMRequestState()) {
-      if (chatroom?.isPrivateMember == true) {
+      if (chatroom?.isPrivateMember == true && _requestPermissionToDm) {
+        //! TODO: Add config>???
+
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Send DM Request"),
-            content: const Text("Are you sure you want to send a DM request?"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel"),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  await _sendDMRequest(message);
-                },
-                child: const Text("Confirm"),
-              ),
-            ],
-          ),
+          builder: (context) => _defRequestDialog(context, "", "", message),
+        );
+        showDMDialog(
+          context,
+          type: DMDialogType.send,
+          onPrimary: () async {
+            Navigator.pop(context);
+            _sendDMRequest(message);
+            _chatroomState.value = LMChatroomRequestState.initiated;
+            print("Primary button clicked");
+          },
+          onSecondary: () {
+            Navigator.pop(context);
+            print("seco button clicked");
+          },
         );
       } else {
         await _sendDMRequest(message);
       }
+      _resetMessageInput();
       return;
     }
 
@@ -1691,13 +1849,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       }
     }
 
-    if (message.isEmpty &&
-        !_isReviewingRecording.value &&
-        !_isRecordingLocked.value) {
-      toast("Text can't be empty");
-      return;
-    }
-
     _isSentBeforeLinkFetched = true;
     tags = LMChatTaggingHelper.matchTags(message, tags);
     result = LMChatTaggingHelper.encodeString(message, tags).trim();
@@ -1716,7 +1867,206 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     _resetMessageInput();
   }
 
+  Future<void> showDMDialog(
+    BuildContext context, {
+    required DMDialogType type,
+    required VoidCallback onPrimary, // CONFIRM / ACCEPT / REJECT
+    VoidCallback? onSecondary, // CANCEL
+    VoidCallback? onTertiary, // REPORT AND REJECT (only for reject)
+  }) {
+    // map titles and bodies
+    final _titles = {
+      DMDialogType.send: 'Send DM request?',
+      DMDialogType.approve: 'Approve DM request?',
+      DMDialogType.reject: 'Reject DM request?',
+    };
+    final _bodies = {
+      DMDialogType.send:
+          'A direct messaging request would be sent to this member. You would be able to send further messages only once your request is approved.',
+      DMDialogType.approve:
+          'Member will be able to send you messages and get notified of the same.',
+      DMDialogType.reject:
+          'Member would be blocked from sending you further messages. The sender will not be notified of this.',
+    };
+
+    // build the list of buttons
+    List<Widget> actions = [];
+
+    switch (type) {
+      case DMDialogType.send:
+        actions = [
+          LMChatText(
+            "CANCEL",
+            onTap: onSecondary ?? () => Navigator.pop(context),
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.inActiveColor,
+              ),
+            ),
+          ),
+          LMChatText(
+            "CONFIRM",
+            onTap: onPrimary,
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.primaryColor,
+              ),
+            ),
+          ),
+        ];
+        break;
+
+      case DMDialogType.approve:
+        actions = [
+          LMChatText(
+            "CANCEL",
+            onTap: onSecondary ?? () => Navigator.pop(context),
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.inActiveColor,
+              ),
+            ),
+          ),
+          LMChatText(
+            "ACCEPT",
+            onTap: onPrimary,
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.primaryColor,
+              ),
+            ),
+          ),
+        ];
+        break;
+
+      case DMDialogType.reject:
+        actions = [
+          LMChatText(
+            "REJECT",
+            onTap: onPrimary,
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.primaryColor,
+              ),
+            ),
+          ),
+          LMChatText(
+            "CANCEL",
+            onTap: onSecondary ?? () => Navigator.pop(context),
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.primaryColor,
+              ),
+            ),
+          ),
+          LMChatText(
+            "REPORT AND REJECT",
+            onTap: onTertiary ?? onPrimary,
+            style: LMChatTextStyle(
+              padding: const EdgeInsets.all(10),
+              textStyle: TextStyle(
+                color: _themeData.primaryColor,
+              ),
+            ),
+          ),
+          // REJECT
+        ];
+        break;
+    }
+
+    return showDialog(
+      context: context,
+      builder: (_) => LMChatDialog(
+        title: LMChatText(
+          _titles[type]!,
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              color: _themeData.onContainer,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        style: LMChatDialogStyle(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+
+          // actionsAlignment: MainAxisAlignment.end,
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 8),
+          backgroundColor: _themeData.container,
+        ),
+        content: LMChatText(
+          _bodies[type]!,
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              color: _themeData.onContainer,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        actions: actions,
+      ),
+    );
+  }
+
+  LMChatDialog _defRequestDialog(
+      BuildContext context, String title, String content, String message) {
+    return LMChatDialog(
+      title: LMChatText(
+        "Send DM request?",
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            color: _themeData.onContainer,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      style: LMChatDialogStyle(
+        actionsAlignment: MainAxisAlignment.end,
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 8),
+        backgroundColor: _themeData.container,
+      ),
+      content: const Text(
+          "A direct messaging request would be sent to this member. You would be able to send further messages only once your request is approved."),
+      actions: [
+        LMChatText(
+          "CANCEL",
+          onTap: () => Navigator.pop(context),
+          style: LMChatTextStyle(
+            padding: const EdgeInsets.all(10),
+            textStyle: TextStyle(
+              color: _themeData.inActiveColor,
+            ),
+          ),
+        ),
+        LMChatText(
+          "CONFIRM",
+          onTap: () async {
+            Navigator.pop(context);
+            await _sendDMRequest(message);
+          },
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              color: _themeData.primaryColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _sendDMRequest(String message) async {
+    //Manually adding it to the conversation list
+
     final response = await LMChatCore.client.sendDMRequest(
       (SendDMRequestBuilder()
             ..chatroomId(chatroom!.id)
@@ -1727,8 +2077,30 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
     if (response.success == true) {
       // Fetch latest conversations
+      _chatroomState.value = LMChatroomRequestState.initiated;
       await LMChatCore.client.getConversation(
         (GetConversationRequestBuilder()..chatroomId(chatroom!.id)).build(),
+      );
+      final DateTime dateTime = DateTime.now();
+      final tempId = "-${dateTime.millisecondsSinceEpoch.toString()}";
+      LMChatConversationViewDataBuilder conversationViewDataBuilder =
+          LMChatConversationViewDataBuilder()
+            ..answer(message)
+            ..chatroomId(widget.chatroom.id)
+            ..createdAt("") //! fix this
+            ..memberId(currentUser.id)
+            ..header("")
+            ..date(DateFormat('dd MMM yyyy').format(dateTime))
+            ..attachmentsUploaded(false)
+            ..hasFiles(false)
+            ..member(currentUser)
+            ..temporaryId(tempId)
+            ..createdEpoch(dateTime.millisecondsSinceEpoch)
+            ..id(1);
+      LMChatConversationViewData conversationViewData =
+          conversationViewDataBuilder.build();
+      conversationBloc.add(
+        LMChatLocalConversationEvent(conversation: conversationViewData),
       );
     }
   }
@@ -1890,7 +2262,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   bool _isDMRequestState() {
-    return chatroom!.chatRequestState == null && getIsDMWithRequestEnabled();
+    print("Chatroom type: ${chatroom?.type}");
+    print("Chatroom request state: ${chatroom?.chatRequestState}");
+    print("Chatroom state: $_chatroomState");
+    print("Chatroom is private member: ${chatroom?.isPrivateMember}");
+    return chatroom!.type == 10 &&
+        _chatroomState.value == LMChatroomRequestState.notInitiated;
   }
 
   void _setupEditText() {
@@ -2174,10 +2551,13 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 }
 
+enum DMDialogType { send, approve, reject }
+
 enum LMChatroomRequestState {
   initiated(0),
-  accepted(1),
-  rejected(2),
+  accepted(19),
+  rejected(20),
+  disabled(1),
   notInitiated(3);
 
   final int value;
@@ -2189,8 +2569,12 @@ enum LMChatroomRequestState {
       case 0:
         return LMChatroomRequestState.initiated;
       case 1:
+        return LMChatroomRequestState.disabled;
+      case 3:
+        return LMChatroomRequestState.notInitiated;
+      case 19:
         return LMChatroomRequestState.accepted;
-      case 2:
+      case 20:
         return LMChatroomRequestState.rejected;
       default:
         return LMChatroomRequestState.initiated;

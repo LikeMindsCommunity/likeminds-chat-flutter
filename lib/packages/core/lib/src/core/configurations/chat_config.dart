@@ -38,6 +38,7 @@ class LMChatConfig {
   final LMCommunityChatConfig communityChatConfig;
   final LMNetworkingChatConfig networkingChatConfig;
   final LMCommunityHybridChatConfig communityHybridChatConfig;
+  final LMChatMemberListConfig memberListConfig;
 
   /// {@macro lm_chat_participant_config}
   final LMChatParticipantConfig participantConfig;
@@ -73,6 +74,7 @@ class LMChatConfig {
     this.communityChatConfig = const LMCommunityChatConfig(),
     this.networkingChatConfig = const LMNetworkingChatConfig(),
     this.communityHybridChatConfig = const LMCommunityHybridChatConfig(),
+    this.memberListConfig = const LMChatMemberListConfig(),
     this.participantConfig = const LMChatParticipantConfig(),
     this.reportConfig = const LMChatReportConfig(),
     this.mediaForwardingConfig = const LMChatMediaForwardingConfig(),

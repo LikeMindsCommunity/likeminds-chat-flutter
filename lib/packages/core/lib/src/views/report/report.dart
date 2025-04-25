@@ -84,7 +84,8 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
               return _screenBuilder.scaffold(
                 backgroundColor: theme.container,
                 source: _widgetSource,
-                appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context)),
+                appBar:
+                    _screenBuilder.appBarBuilder(context, _defAppBar(context)),
                 body: SafeArea(
                   top: false,
                   child: Column(
@@ -98,8 +99,8 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
                               const SizedBox(
                                 height: 20,
                               ),
-                              widget.reportContentBuilder
-                                      ?.call(context, _defReportContentWidget()) ??
+                              widget.reportContentBuilder?.call(
+                                      context, _defReportContentWidget()) ??
                                   _defReportContentWidget(),
                               const SizedBox(
                                 height: 24,
@@ -107,7 +108,8 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
                               _defChipListBuilder(),
                               if (_selectedReportTag?.name.toLowerCase() ==
                                       'others' ||
-                                  _selectedReportTag?.name.toLowerCase() == 'other')
+                                  _selectedReportTag?.name.toLowerCase() ==
+                                      'other')
                                 _screenBuilder.otherReasonTextFieldBuilder(
                                   context,
                                   _reportReasonController,
@@ -403,8 +405,9 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   LMReportContentWidget _defReportContentWidget() {
     return LMReportContentWidget(
       title: 'Please specify the problem to continue',
-      description:
-          'You would be able to report this message after selecting a problem.',
+      description: widget.entityType != null && widget.entityType != 1
+          ? 'You would be able to report this message after selecting a problem.'
+          : 'You would be able to report this member after selecting a problem.',
       style: LMReportContentWidgetStyle(
         titleStyle: LMChatTextStyle(
           textStyle: TextStyle(

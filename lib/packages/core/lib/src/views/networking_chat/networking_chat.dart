@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_flutter_core/src/views/member_list/member_list.dart';
 import 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/builder.dart';
 
 /// {@template lm_chat_dm_feed_list}
@@ -103,6 +104,8 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
     super.dispose();
   }
 
+  //TODO: CUSTOMIZTION TO FAB
+//Todo: chatroom action button ka ui
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -379,16 +382,31 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
       },
       style: LMChatButtonStyle(
         backgroundColor: LMChatTheme.theme.backgroundColor,
-        height: 48,
-        width: 48,
-        borderRadius: 12,
+        width: 50.w,
+        height: 10.h,
+        borderRadius: 40,
       ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.message,
-        style: LMChatIconStyle(
-          color: LMChatTheme.theme.primaryColor,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LMChatIcon(
+            type: LMChatIconType.svg,
+            assetPath: kNetworkingChatIcon,
+            style: LMChatIconStyle(
+              color: LMChatTheme.theme.primaryColor,
+              size: 35,
+            ),
+          ),
+          const SizedBox(width: 8),
+          LMChatText('NEW MESSAGE',
+              style: LMChatTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
+        ],
       ),
     );
   }
