@@ -1,13 +1,30 @@
 part of 'chat_bubble.dart';
 
+// This file is part of the 'chat_bubble.dart' file.
+// It defines the `LMChatStateBubble` widget and its associated style class `LMChatStateBubbleStyle`.
 class LMChatStateBubble extends StatelessWidget {
+  /// The message to be displayed in the bubble.
   final String message;
+
+  /// this is for clickable text
+  final String? clickableText;
+
+  /// The function to be called when the clickable text is clicked.
+  final VoidCallback? onClickableTextClicked;
+
+  /// The style of the bubble.
   final LMChatStateBubbleStyle? style;
 
+  /// The constructor for the [LMChatStateBubble] widget.
+  /// It takes a [message], an optional [clickableText], an optional
+  /// [onClickableTextClicked] function, and an optional [style].
+  /// The [message] is required and cannot be null.
   const LMChatStateBubble({
     super.key,
     this.style,
     required this.message,
+    this.clickableText,
+    this.onClickableTextClicked,
   });
 
   /// CopyWith function to get a new object of [LMChatStateBubble]
@@ -47,17 +64,37 @@ class LMChatStateBubble extends StatelessWidget {
                     border: inStyle.border,
                   ),
               alignment: inStyle.alignment ?? Alignment.center,
-              child: LMChatText(
-                message,
-                style: inStyle.messageStyle ??
-                    LMChatTextStyle(
-                      textAlign: TextAlign.center,
-                      textStyle: TextStyle(
-                        fontSize: 12,
-                        color: LMChatTheme.theme.onContainer,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+              child: Wrap(
+                children: [
+                  LMChatText(
+                    message,
+                    style: inStyle.messageStyle ??
+                        LMChatTextStyle(
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            fontSize: 12,
+                            color: LMChatTheme.theme.onContainer,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                  ),
+                  clickableText != null
+                      ? LMChatText(
+                          clickableText!,
+                          onTap: onClickableTextClicked,
+                          style: inStyle.messageStyle ??
+                              LMChatTextStyle(
+                                padding: const EdgeInsets.only(left: 4),
+                                textAlign: TextAlign.center,
+                                textStyle: TextStyle(
+                                  fontSize: 12,
+                                  color: LMChatTheme.theme.onContainer,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                        )
+                      : const SizedBox.shrink(),
+                ],
               ),
             ),
           )

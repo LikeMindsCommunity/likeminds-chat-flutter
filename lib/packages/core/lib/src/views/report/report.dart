@@ -308,7 +308,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
         borderRadius: 50,
       ),
       text: LMChatText(
-        'Report',
+        'Report ${widget.entityType != null && widget.entityType != 1 ? '' : 'member'}',
         style: LMChatTextStyle(
           textStyle: TextStyle(
               color: theme.container,
@@ -386,7 +386,7 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
         )
       ],
       title: LMChatText(
-        'Report',
+        'Report ${widget.entityType != null && widget.entityType != 1 ? '' : 'Abuse'}',
         style: LMChatTextStyle(
           textStyle: TextStyle(
             fontSize: 20,
@@ -405,9 +405,8 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
   LMReportContentWidget _defReportContentWidget() {
     return LMReportContentWidget(
       title: 'Please specify the problem to continue',
-      description: widget.entityType != null && widget.entityType != 1
-          ? 'You would be able to report this message after selecting a problem.'
-          : 'You would be able to report this member after selecting a problem.',
+      description:
+          'You would be able to report this ${widget.entityType != null && widget.entityType != 1 ? 'message' : 'member'} after selecting a problem.',
       style: LMReportContentWidgetStyle(
         titleStyle: LMChatTextStyle(
           textStyle: TextStyle(

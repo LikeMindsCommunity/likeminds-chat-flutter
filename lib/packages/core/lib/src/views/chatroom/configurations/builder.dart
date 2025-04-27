@@ -339,4 +339,36 @@ class LMChatroomBuilderDelegate {
       LMChatRoomViewData chatroomData, LMChatButton searchButton) {
     return searchButton;
   }
+
+  /// Displays a dialog for handling Direct Messaging (DM) requests with customizable actions.
+  ///
+  /// This function shows a dialog based on the provided [DMDialogType] and allows the user
+  /// to perform actions such as confirming, canceling, or rejecting the DM request. The dialog
+  /// includes a title, a body, and a set of action buttons.
+  ///
+  /// The dialog supports the following types:
+  /// - [DMDialogType.send]: Prompts the user to confirm sending a DM request.
+  /// - [DMDialogType.approve]: Prompts the user to approve a DM request.
+  /// - [DMDialogType.reject]: Prompts the user to reject a DM request, with an optional
+  ///   "Report and Reject" action.
+  ///
+  /// Parameters:
+  /// - [context]: The [BuildContext] in which the dialog is displayed.
+  /// - [type]: The type of the dialog, represented by [DMDialogType].
+  /// - [onPrimary]: A required callback for the primary action button (e.g., Confirm, Accept, Reject).
+  /// - [onSecondary]: An optional callback for the secondary action button (e.g., Cancel).
+  /// - [onTertiary]: An optional callback for the tertiary action button (e.g., Report and Reject).
+  ///
+  /// The dialog's title and body are dynamically determined based on the [type].
+
+  Widget dmApproveRejectDialogBuilder(
+    BuildContext context, {
+    required DMDialogType type,
+    required VoidCallback onPrimary, // CONFIRM / ACCEPT / REJECT
+    required VoidCallback onSecondary, // CANCEL
+    VoidCallback? onTertiary, // REPORT AND REJECT (only for reject)
+    required LMChatDialog approveRejectDialog,
+  }) {
+    return approveRejectDialog;
+  }
 }

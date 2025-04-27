@@ -45,8 +45,6 @@ class LMChatroomMenu extends StatefulWidget {
 class _ChatroomMenuState extends State<LMChatroomMenu> {
   late List<ChatroomAction> chatroomActions;
 
-  ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
-
   final LMChatHomeFeedBloc homeBloc = LMChatHomeFeedBloc.instance;
   final LMChatConversationBloc conversationBloc =
       LMChatConversationBloc.instance;
@@ -234,7 +232,6 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
         return element;
       }).toList();
-      rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       widget.controller!.hideMenu();
       homeBloc.add(LMChatRefreshHomeFeedEvent());
     } else {
@@ -391,8 +388,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               "CANCEL",
               style: LMChatTextStyle(
                 textStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w500,
+                  color: LMChatTheme.theme.inActiveColor,
                 ),
               ),
               onTap: () {
@@ -405,7 +402,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
             child: LMChatText("CONFIRM",
                 style: LMChatTextStyle(
                   textStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     color: LMChatTheme.theme.primaryColor,
                   ),
                 ), onTap: () {
@@ -450,7 +447,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
         return element;
       }).toList();
-      rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
+
       widget.controller!.hideMenu();
       // Navigator.pop(context);
     } else {

@@ -381,20 +381,20 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
         );
       },
       style: LMChatButtonStyle(
-        backgroundColor: LMChatTheme.theme.backgroundColor,
+        backgroundColor: LMChatTheme.theme.primaryColor,
         width: 50.w,
-        height: 10.h,
+        height: 8.h,
         borderRadius: 40,
       ),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           LMChatIcon(
             type: LMChatIconType.svg,
             assetPath: kNetworkingChatIcon,
             style: LMChatIconStyle(
-              color: LMChatTheme.theme.primaryColor,
-              size: 35,
+              color: Colors.white,
+              size: 32,
             ),
           ),
           const SizedBox(width: 8),
@@ -402,7 +402,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
               style: LMChatTextStyle(
                 textStyle: TextStyle(
                   fontSize: 14,
-                  color: LMChatTheme.theme.onContainer,
+                  color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
               )),

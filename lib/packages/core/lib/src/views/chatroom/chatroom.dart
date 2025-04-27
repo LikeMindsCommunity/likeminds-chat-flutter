@@ -82,7 +82,6 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     return _selectedIds.isNotEmpty;
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -374,6 +373,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       ),
       conversationHelper: _conversationActionHelper,
       paginatedListController: pagedListController,
+      chatroom: chatroom.toChatRoomViewData(),
     );
   }
 
