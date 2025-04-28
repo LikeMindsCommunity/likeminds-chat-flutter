@@ -342,7 +342,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           "Error checking DM status: ${checkDMStatusResponse.errorMessage}");
     }
     if (checkDMStatusResponse.data?.showDm == false) {
-      // TODO: Show disabled message in input box and disable it
       _chatroomState.value = LMChatroomRequestState.disabled;
       _focusNode.unfocus();
       return;
@@ -373,11 +372,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           LMChatroomRequestState.fromValue(chatroom?.chatRequestState ?? 0);
       debugPrint('chatroomState: $_chatroomState');
     }
-
-    print(
-        'chatroomState: ${_chatroomState.value}  ${chatroom?.chatRequestState}');
-    //! hardcode:
-    //   _chatroomState.value = LMChatroomRequestState.initiated;
   }
 
   @override
@@ -584,13 +578,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           .build(),
     );
     if (response.success) {
-      print("everything good");
-    } else {
-      throw Exception("Error rejecting request: ${response.errorMessage}");
+      _chatroomState.value = LMChatroomRequestState.rejected;
+      LMChatroomBloc.instance
+          .add(LMChatFetchChatroomEvent(chatroomId: widget.chatroom.id));
     }
-    _chatroomState.value = LMChatroomRequestState.rejected;
-    LMChatroomBloc.instance
-        .add(LMChatFetchChatroomEvent(chatroomId: widget.chatroom.id));
   }
 
   String _containerText(LMChatroomRequestState state) {
@@ -606,7 +597,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       case LMChatroomRequestState.accepted:
         return 'Chat request accepted';
       case LMChatroomRequestState.rejected:
-        return 'Messaging would be enabled once your request is approved.';
+        if (checkDMreqByCurrentUser()) {
+          return "DM request pending. Messaging would be enabled once your request is approved.";
+        } else {
+          return "Connection request rejected";
+        }
       case LMChatroomRequestState.disabled:
         return 'Direct messaging among members has been disabled by the community manager';
     }
@@ -620,7 +615,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   @override
   Widget build(BuildContext context) {
-    print('chatroomState: $_chatroomState');
     return Stack(
       children: [
         BlocConsumer<LMChatConversationActionBloc,
@@ -1770,7 +1764,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       _focusNode.requestFocus();
     } else if (state is LMChatRefreshBarState) {
       chatroom = state.chatroom;
-      print(" chatroom request state: ${state.chatroom.chatRequestState}");
+
       _initiateDMChatroomFlow();
     } else if (state is LMChatLinkAttachedState) {
       // to prevent the link preview from being displayed if the message is sent before the link preview is fetched
@@ -1818,18 +1812,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     // If in DM request state, show confirmation dialog if private member
     if (_isDMRequestState()) {
       if (chatroom?.isPrivateMember == true && _requestPermissionToDm) {
-        //! TODO: Add config>???
-
         // Define callbacks
         final VoidCallback onPrimarySend = () async {
           Navigator.pop(context);
           _sendDMRequest(message);
           _chatroomState.value = LMChatroomRequestState.initiated;
-          print("Primary button clicked");
         };
         final VoidCallback onSecondarySend = () {
           Navigator.pop(context);
-          print("seco button clicked");
         };
 
         // Show the dialog
@@ -2249,10 +2239,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   bool _isDMRequestState() {
-    print("Chatroom type: ${chatroom?.type}");
-    print("Chatroom request state: ${chatroom?.chatRequestState}");
-    print("Chatroom state: $_chatroomState");
-    print("Chatroom is private member: ${chatroom?.isPrivateMember}");
     return chatroom!.type == 10 &&
         _chatroomState.value == LMChatroomRequestState.notInitiated;
   }
