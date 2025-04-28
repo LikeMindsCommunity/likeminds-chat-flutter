@@ -371,4 +371,62 @@ class LMChatroomBuilderDelegate {
   }) {
     return approveRejectDialog;
   }
+
+  /// Builds the approve button for DM chatroom
+  Widget dmApproveButton(
+    BuildContext context,
+    LMChatButton approveButton,
+  ) {
+    return approveButton;
+  }
+
+  /// Builds the reject button for DM chatroom
+  Widget dmRejectButton(
+    BuildContext context,
+    LMChatButton rejectButton,
+  ) {
+    return rejectButton;
+  }
+
+  /// Builds the approve/reject text for DM chatroom
+  Widget dmApproveRejectText(
+      BuildContext context, LMChatText approveRejectText) {
+    return approveRejectText;
+  }
+
+  /// Builds the text shown when a DM request needs to be initiated.
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [chatroom]: The current chatroom data.
+  /// - [defaultDmRequestText]: The default LMChatText widget.
+  ///
+  /// Returns a widget to display the initiation prompt.
+  Widget dmRequestInitiationTextBuilder(
+    BuildContext context,
+    LMChatRoomViewData chatroom,
+    LMChatText defaultDmRequestText,
+  ) {
+    // Default implementation returns the original widget
+    return defaultDmRequestText;
+  }
+
+  /// Builds the text shown inside the container for different DM states (initiated, rejected, disabled).
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [state]: The current LMChatroomRequestState.
+  /// - [text]: The text content determined by the state.
+  /// - [defaultDmStateText]: The default LMChatText widget.
+  ///
+  /// Returns a widget to display the state information text.
+  Widget dmStateContainerTextBuilder(
+    BuildContext context,
+    LMChatroomRequestState state,
+    String text,
+    LMChatText defaultDmStateText,
+  ) {
+    // Default implementation returns the original widget
+    return defaultDmStateText;
+  }
 }

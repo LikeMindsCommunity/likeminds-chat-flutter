@@ -7,14 +7,10 @@ class LMChatApproveRejectView extends StatefulWidget {
     super.key,
     required this.onApproveButtonClicked,
     required this.onRejectButtonClicked,
-    this.approveButtonBuilder,
-    this.rejectButtonBuilder,
   });
 
   final VoidCallback onApproveButtonClicked;
   final VoidCallback onRejectButtonClicked;
-  final LMChatButtonBuilder? approveButtonBuilder;
-  final LMChatButtonBuilder? rejectButtonBuilder;
 
   @override
   State<LMChatApproveRejectView> createState() =>
@@ -23,6 +19,7 @@ class LMChatApproveRejectView extends StatefulWidget {
 
 class _LMChatApproveRejectViewState extends State<LMChatApproveRejectView> {
   @override
+  final _screenBuilder = LMChatCore.config.chatRoomConfig.builder;
   final LMChatThemeData _themeData = LMChatTheme.instance.themeData;
   Widget build(BuildContext context) {
     return Container(
@@ -35,38 +32,23 @@ class _LMChatApproveRejectViewState extends State<LMChatApproveRejectView> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LMChatText(
-            'The sender has sent you a direct messaging request. Approve or respond with a message to get connected. Rejecting this request will not notify the sender.',
-            style: LMChatTextStyle(
-              // padding: const EdgeInsets.all(10),
-              textStyle: TextStyle(color: _themeData.inActiveColor),
-            ),
-          ),
-
-          widget.approveButtonBuilder?.call(
-                _defaultApproveButton(context),
-              ) ??
-              _defaultApproveButton(context),
-
-          widget.rejectButtonBuilder?.call(
-                _defaultRejectButton(context),
-              ) ??
-              _defaultRejectButton(context),
-
-          // LMChatDialog(
-          //   title: const Text('Approve or Reject'),
-          //   actions: [
-          //     widget.approveButtonBuilder
-          //             ?.call(_defaultApproveButton(context)) ??
-          //         _defaultApproveButton(context),
-          //     widget.rejectButtonBuilder?.call(_defaultRejectButton(context)) ??
-          //         _defaultRejectButton(context),
-          //   ],
-          // ),
+          _screenBuilder.dmApproveRejectText(
+              context, _defApproveRejectText(context)),
+          _screenBuilder.dmApproveButton(
+              context, _defaultApproveButton(context)),
+          _screenBuilder.dmRejectButton(context, _defaultRejectButton(context)),
         ],
       ),
     );
   }
+
+  LMChatText _defApproveRejectText(BuildContext context) => LMChatText(
+        'The sender has sent you a direct messaging request. Approve or respond with a message to get connected. Rejecting this request will not notify the sender.',
+        style: LMChatTextStyle(
+          // padding: const EdgeInsets.all(10),
+          textStyle: TextStyle(color: _themeData.inActiveColor),
+        ),
+      );
 
   LMChatButton _defaultApproveButton(BuildContext context) {
     return LMChatButton(

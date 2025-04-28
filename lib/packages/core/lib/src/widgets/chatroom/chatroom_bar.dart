@@ -337,10 +337,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         .build();
     final checkDMStatusResponse =
         await LMChatCore.client.checkDMStatus(checkDMStatusRequest);
-    if (!checkDMStatusResponse.success) {
-      throw Exception(
-          "Error checking DM status: ${checkDMStatusResponse.errorMessage}");
-    }
+
     if (checkDMStatusResponse.data?.showDm == false) {
       _chatroomState.value = LMChatroomRequestState.disabled;
       _focusNode.unfocus();
@@ -370,7 +367,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     } else {
       _chatroomState.value =
           LMChatroomRequestState.fromValue(chatroom?.chatRequestState ?? 0);
-      debugPrint('chatroomState: $_chatroomState');
     }
   }
 
@@ -410,14 +406,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _getWidgetBasedOnState(LMChatroomRequestState? state) {
-    //  return _defTextFieldContainer();
     if (state == null || state == LMChatroomRequestState.accepted) {
       return const SizedBox();
     }
 
     // if state is not initiated return a text widget
     if (state == LMChatroomRequestState.notInitiated) {
-      return LMChatText(
+      // Create the default widget first
+      final defaultDmRequestText = LMChatText(
         "Send a DM request to ${chatroom?.chatroomWithUser?.name} by sending your 1st message",
         style: LMChatTextStyle(
           padding: const EdgeInsets.symmetric(
@@ -430,19 +426,20 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           ),
         ),
       );
+      // Call the builder method from the delegate
+      // Ensure chatroom is not null here, potentially add a check or assertion
+      // Since this state implies a DM chatroom, chatroom should exist.
+      return _screenBuilder.dmRequestInitiationTextBuilder(
+        context,
+        chatroom!, // Added assertion assuming chatroom is non-null in this state
+        defaultDmRequestText,
+      );
     }
 
     // if state is initiated & current user != chatRequestedBy
     // show approve/reject buttons
 
     return Container(
-        // width: 100.w,
-        // margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        // padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
-        // decoration: BoxDecoration(
-        //   color: _themeData.container,
-        //   borderRadius: BorderRadius.circular(24),
-        // ),
         child: Column(
       children: [
         if (state == LMChatroomRequestState.initiated &&
@@ -450,7 +447,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           LMChatApproveRejectView(
             onApproveButtonClicked: () {
               // Define callbacks
-
               // Show the dialog
               showDialog(
                   context: context,
@@ -470,8 +466,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                   });
             },
             onRejectButtonClicked: () {
-              // Define callbacks
-
               // Show the dialog
               showDialog(
                   context: context,
@@ -481,6 +475,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                       type: DMDialogType.reject,
                       onPrimary: onPrimaryReject,
                       onSecondary: onSecondaryReject,
+                      onTertiary: onTertiaryReject, // Pass tertiary here
                       approveRejectDialog: _defDmApproveRejectDialog(
                         context,
                         type: DMDialogType.reject,
@@ -493,7 +488,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             },
           ),
         Container(
-          width: 100.w,
+          width: 100.w, // Assuming ScreenUtil is used for .w
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
           decoration: BoxDecoration(
@@ -501,15 +496,29 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             borderRadius: BorderRadius.circular(24),
           ),
           child: Center(
-            child: LMChatText(
-              _containerText(state),
-              style: LMChatTextStyle(
-                  padding: const EdgeInsets.only(top: 8),
-                  textStyle: TextStyle(
-                    fontSize: 14,
-                    color: _themeData.secondaryColor,
-                  )),
-            ),
+            child: Builder(
+                // Use Builder to get context if needed within builder call
+                builder: (context) {
+              // Get the text content
+              final String containerText = _containerText(state);
+              // Create the default widget
+              final defaultDmStateText = LMChatText(
+                containerText,
+                style: LMChatTextStyle(
+                    padding: const EdgeInsets.only(top: 8),
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      color: _themeData.secondaryColor,
+                    )),
+              );
+              // Call the builder method from the delegate
+              return _screenBuilder.dmStateContainerTextBuilder(
+                context,
+                state,
+                containerText,
+                defaultDmStateText,
+              );
+            }),
           ),
         ),
       ],
@@ -597,7 +606,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       case LMChatroomRequestState.accepted:
         return 'Chat request accepted';
       case LMChatroomRequestState.rejected:
-        if (checkDMreqByCurrentUser()) {
+        if (!checkDMreqByCurrentUser()) {
           return "DM request pending. Messaging would be enabled once your request is approved.";
         } else {
           return "Connection request rejected";
