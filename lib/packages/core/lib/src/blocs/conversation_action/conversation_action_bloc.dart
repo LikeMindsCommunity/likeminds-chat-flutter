@@ -55,4 +55,9 @@ class LMChatConversationActionBloc
     on<LMChatSearchConversationInChatroomEvent>(
         _searchConversationInChatroomEventHandler);
   }
+  @override
+  Future<void> close() {
+    _instance = null;
+    return super.close();
+  }
 }

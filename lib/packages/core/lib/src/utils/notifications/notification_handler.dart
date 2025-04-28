@@ -1,5 +1,8 @@
+import 'dart:convert'; // Import for jsonEncode/Decode
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
 
@@ -31,6 +34,7 @@ class LMChatNotificationHandler {
     this.deviceId = deviceId;
     this.fcmToken = fcmToken;
     this._rootNavigatorKey = rootNavigatorKey; // Store the key
+    await initializeNotifications();
   }
 
   /// Register the device for notifications
@@ -60,12 +64,168 @@ class LMChatNotificationHandler {
     }
   }
 
-  // Placeholder for background message handling (e.g., using Firebase background handler)
+  /// Placeholder for background message handling (e.g., using Firebase background handler)
   Future<void> handleBackgroundNotification(RemoteMessage message) {
     debugPrint("--- Handling background notification (placeholder) ---");
     // You might want to increment a badge count or store data,
     // but navigation typically happens when the app is opened from terminated/background state.
     return Future.value();
+  }
+
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  Future<void> initializeNotifications() async {
+    // Initialize Android settings
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings(
+            '@mipmap/ic_launcher'); // Use your app icon
+
+    // Initialize iOS settings
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      // onDidReceiveLocalNotification: onDidReceiveLocalNotification, // Older callback if needed
+    );
+
+    // Combine initialization settings
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+
+    // Initialize the plugin and set up the tap handler
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: onNotificationTap, // <= Handle taps
+      // onDidReceiveBackgroundNotificationResponse: onNotificationTap, // Optional: Handle taps from background state if needed
+    );
+
+    // Create notification channel for Android
+    if (Platform.isAndroid) {
+      await createNotificationChannel();
+    }
+    debugPrint("Local notifications initialized.");
+  }
+
+  /// Callback for when a local notification displayed by the plugin is tapped
+  void onNotificationTap(NotificationResponse notificationResponse) {
+    debugPrint('--- Foreground Notification Tapped ---');
+    final String? payload = notificationResponse.payload;
+    if (payload != null && payload.isNotEmpty) {
+      try {
+        debugPrint('Payload: $payload');
+        final Map<String, dynamic> data = jsonDecode(payload);
+
+        // Reconstruct a RemoteMessage or adapt handleNotification
+        // Here, we create a basic RemoteMessage with the necessary data
+        final RemoteMessage message = RemoteMessage(data: data);
+
+        // Check if navigator key is available before attempting navigation
+        if (_rootNavigatorKey?.currentState != null) {
+          debugPrint("Navigator key found, routing notification.");
+          // Call handleNotification, show = false because we are reacting to a tap, not showing a new one
+          handleNotification(message, _rootNavigatorKey!);
+        } else {
+          debugPrint(
+              "Root navigator key is null or has no state. Cannot navigate from notification tap.");
+          // Handle this case - maybe store the route info and navigate when the key becomes available?
+        }
+      } catch (e) {
+        debugPrint('Error parsing notification payload or routing: $e');
+      }
+    } else {
+      debugPrint('Notification tapped, but no payload found.');
+    }
+  }
+
+  /// Create a notification channel for Android
+  Future<void> createNotificationChannel() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'likeminds_chat_channel', // ID - Make it specific
+      'LikeMinds Chat Notifications', // Name
+      description:
+          'Channel for LikeMinds chat messages and related notifications.', // Description
+      importance: Importance.max, // Use max importance for chat messages
+      playSound: false,
+    );
+
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+    debugPrint("Android Notification Channel Created.");
+  }
+
+  /// Handle foreground notifications - Display them using local notifications
+  Future<void> handleForegroundNotifications(RemoteMessage message) async {
+    // Basic check for chat category
+    if (!(message.data.containsKey('category') &&
+        message.data["category"].toString().toLowerCase().contains("chat"))) {
+      return;
+    }
+
+    // --- Check if the user is already in the specific chatroom ---
+    int? targetChatroomId = _getChatroomIdFromRoute(message.data['route']);
+    int? currentChatroomId = LMChatRealtime.instance.chatroomId;
+
+    if (targetChatroomId != null && currentChatroomId == targetChatroomId) {
+      return; // Don't show the notification
+    }
+    // --- End Check ---
+
+    // Extract notification details for display
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android; // Can be null
+
+    // Ensure we have content to display
+    final String title = notification?.title ??
+        message.data['title'] ??
+        'New Message'; // Fallback title
+    final String body =
+        notification?.body ?? message.data['body'] ?? ''; // Fallback body
+
+    if (body.isEmpty) {
+      return; // Avoid showing notifications with no body
+    }
+
+    // Use platform check for clarity, although android check isn't strictly needed if iOS details are present
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Display the notification using flutter_local_notifications
+      await _flutterLocalNotificationsPlugin.show(
+        notification?.hashCode ??
+            DateTime.now()
+                .millisecondsSinceEpoch
+                .remainder(100000), // Unique ID for the notification
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'likeminds_chat_channel', // Use the channel ID created earlier
+            'LikeMinds Chat Notifications', // Channel Name
+            channelDescription: 'Channel for LikeMinds chat messages',
+            importance: Importance.max, // Match channel importance
+            priority: Priority.high,
+            playSound: false,
+
+            showWhen: true,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true, // Show alert banner
+            presentBadge:
+                true, // Update app badge count (ensure backend sends badge count if needed)
+            presentSound: false, // Play sound
+          ),
+        ),
+        // Pass the necessary data for routing when the notification is tapped
+        payload: jsonEncode(message.data),
+      );
+    } else {
+      debugPrint("Platform not supported for local notification display.");
+    }
   }
 
   /// Extracts chatroom ID from the route string.
@@ -83,8 +243,6 @@ class LMChatNotificationHandler {
           queryParams.containsKey("chatroom_id")) {
         return int.tryParse(queryParams["chatroom_id"]!);
       }
-      debugPrint(
-          "Route host '$host' not recognized for chatroom ID extraction.");
       return null; // Not a recognized chat route
     } catch (e) {
       debugPrint("Error parsing route URI '$route': $e");
@@ -98,22 +256,21 @@ class LMChatNotificationHandler {
   Future<void> handleNotification(
       RemoteMessage message, GlobalKey<NavigatorState> navigatorKey) async {
     debugPrint("--- handleNotification called ---");
-    //  debugPrint("Message Data: ${message.data}");
-    // 'show' parameter might be less relevant now, as displaying foreground
     // notifications is handled in `handleForegroundNotifications`.
     // This function now primarily focuses on ROUTING based on data.
 
     if (message.data.containsKey('category') &&
         message.data["category"].toString().toLowerCase().contains("chat")) {
       if (message.data.isNotEmpty && message.data.containsKey('route')) {
-        debugPrint("Routing notification based on data payload.");
         // Extract the notification data and route to the appropriate screen
         routeNotification(message.data, navigatorKey); // Pass data map directly
       } else {
-        debugPrint("Chat notification received, but data or route is missing.");
+        throw Exception(
+            "Chat notification received, but data or route is missing.");
       }
     } else {
-      debugPrint("Notification category is not chat or category key missing.");
+      throw Exception(
+          "Notification category is not chat or category key missing.");
     }
   }
 
@@ -124,8 +281,7 @@ class LMChatNotificationHandler {
   ) async {
     final String? route = notificationData["route"];
     if (route == null) {
-      debugPrint("Route is null in notification data. Cannot navigate.");
-      return;
+      throw Exception("Route is null in notification data. Cannot navigate.");
     }
 
     debugPrint("Attempting to route for: $route");
@@ -133,20 +289,13 @@ class LMChatNotificationHandler {
     int? targetChatroomId = _getChatroomIdFromRoute(route);
 
     if (targetChatroomId == null) {
-      debugPrint("Could not extract valid chatroom ID from route: $route");
-      return;
+      throw Exception("Could not extract valid chatroom ID from route: $route");
     }
 
-    int? currentChatroomId = LMChatConversationBloc
-        .currentChatroomId; //does not give correct id after pushing
-    // int? currentChatroomId = LMChatConversationBloc.currentChatroomId;
-    debugPrint(
-        "Routing: Target Chatroom ID: $targetChatroomId, Current Open Chatroom ID: $currentChatroomId");
+    int? currentChatroomId = LMChatRealtime.instance.chatroomId;
 
     if (navigatorKey.currentState == null) {
-      debugPrint("Navigator state is null. Cannot perform navigation.");
-      // Handle this scenario - maybe queue the navigation?
-      return;
+      throw Exception("Navigator state is null. Cannot perform navigation.");
     }
 
     // Logic:
@@ -157,6 +306,7 @@ class LMChatNotificationHandler {
     //    - Push the new chatroom screen onto the stack.
 
     final chatroomPageRoute = MaterialPageRoute(
+      maintainState: false,
       builder: (context) => LMChatroomScreen(
         chatroomId: targetChatroomId,
       ),
@@ -164,24 +314,16 @@ class LMChatNotificationHandler {
 
     if (currentChatroomId != null) {
       if (currentChatroomId != targetChatroomId) {
-        LMChatConversationBloc.currentChatroomId = targetChatroomId;
         LMChatRealtime.instance.chatroomId = targetChatroomId;
-        debugPrint(
-            "Different chatroom open. Replacing screen with chatroom $targetChatroomId");
-        // LMChatRealtime.instance.chatroomId = targetChatroomId;
-        // navigatorKey.currentState?.pop();
-        // TODO : implement a pop and push replacement
         navigatorKey.currentState?.pop();
-        //  navigatorKey.currentState?.pushReplacement(chatroomPageRoute);
-      } else {
-        debugPrint(
-            "Target chatroom $targetChatroomId is already open. Doing nothing.");
-        // Optional: Maybe refresh the current chatroom?
-        // LMChatRealtime.instance.notifyChatroomRefreshed(targetChatroomId);
-      }
+        LMChatroomBloc.instance.close();
+        LMChatroomActionBloc.instance.close();
+        LMChatConversationBloc.instance.close();
+        LMChatConversationActionBloc.instance.close();
+
+        navigatorKey.currentState?.push(chatroomPageRoute);
+      } else {}
     } else {
-      debugPrint(
-          "No chatroom open. Pushing screen for chatroom $targetChatroomId");
       navigatorKey.currentState?.push(chatroomPageRoute);
     }
   }
