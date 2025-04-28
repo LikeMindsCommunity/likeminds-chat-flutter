@@ -211,7 +211,6 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
                           stateMessage,
                           "Tap to undo.",
                           onClickableTextClicked: () {
-                            print("unodoooo");
                             unBlockDM();
                           },
                         )
