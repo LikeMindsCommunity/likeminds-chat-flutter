@@ -28,4 +28,10 @@ class LMChatroomBloc extends Bloc<LMChatroomEvent, LMChatroomState> {
     // Event handler for fetching chatroom
     on<LMChatFetchChatroomEvent>(fetchChatroomEventHandler);
   }
+
+  @override
+  Future<void> close() {
+    _instance = null;
+    return super.close();
+  }
 }

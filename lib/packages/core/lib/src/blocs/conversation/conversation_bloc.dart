@@ -87,6 +87,7 @@ class LMChatConversationBloc
     await _realtimeSubscription?.cancel();
     _realtimeSubscription = null;
     LMChatConversationBloc.replyConversation = null;
+    _instance = null;
     return super.close();
   }
 
