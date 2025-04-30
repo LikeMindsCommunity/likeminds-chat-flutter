@@ -5,6 +5,8 @@ export 'chatroom/chatroom_bar_header.dart';
 export 'chatroom/chatroom_bar.dart';
 export 'chatroom/chatroom_bar_menu.dart';
 export 'chatroom/chatroom_menu.dart';
+export 'chatroom/chatroom_approve_reject_view.dart';
+export 'chatroom/chatroom_approve_reject_style.dart';
 
 export 'lists/conversation/conversation_list.dart';
 export 'lists/conversation/dm_conversation_list.dart';

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -27,6 +28,8 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
 
   late final PagingController<int, LMChatUserViewData> _pagingController;
   bool _isProcessingTap = false;
+  final _webConfiguration = LMChatCore.config.webConfiguration;
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +78,12 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
     });
   }
 
+  void didudUpdateWidget(LMChatMemberList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    ScreenSize.init(context,
+        setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
+  }
+
   @override
   void dispose() {
     _pagingController.dispose();
@@ -85,16 +94,28 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
 
   @override
   Widget build(BuildContext context) {
-    return _screenBuilder.scaffold(
-      appBar: _screenBuilder.appBarBuilder(
-        context,
-        _defaultAppBar(),
-        _isSearching,
-        _searchController,
-        _onSearchChanged,
-        _onClear,
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _webConfiguration.maxWidth,
+        ),
+        child: ValueListenableBuilder(
+            valueListenable: LMChatTheme.themeNotifier,
+            builder: (context, _, __) {
+              return _screenBuilder.scaffold(
+                backgroundColor: LMChatTheme.theme.scaffold,
+                appBar: _screenBuilder.appBarBuilder(
+                  context,
+                  _defaultAppBar(),
+                  _isSearching,
+                  _searchController,
+                  _onSearchChanged,
+                  _onClear,
+                ),
+                body: _buildMemberList(),
+              );
+            }),
       ),
-      body: _buildMemberList(),
     );
   }
 
@@ -104,8 +125,16 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
           ? TextField(
               controller: _searchController,
               autofocus: true,
-              decoration: const InputDecoration(
+              style: TextStyle(
+                color: LMChatTheme.theme.onContainer,
+              ),
+              decoration: InputDecoration(
                 hintText: 'Search members',
+                hintStyle: TextStyle(
+                  fontSize: 16,
+                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w400,
+                ),
                 border: InputBorder.none,
               ),
               onChanged: _onSearchChanged,
@@ -115,12 +144,19 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
                 });
               },
             )
-          : const LMChatText('Members'),
+          : Text('Members',
+              style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 20,
+                  color: LMChatTheme.theme.onContainer)),
       trailing: [
         LMChatButton(
           onTap: _onClear,
           style: LMChatButtonStyle.basic().copyWith(
             icon: LMChatIcon(
+              style: LMChatIconStyle.basic().copyWith(
+                color: LMChatTheme.theme.onContainer,
+              ),
               type: LMChatIconType.icon,
               icon: _isSearching ? Icons.close : Icons.search,
             ),

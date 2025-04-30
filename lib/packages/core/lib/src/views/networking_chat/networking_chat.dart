@@ -110,7 +110,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
     return ValueListenableBuilder(
         valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, __) {
-          return Scaffold(
+          return _screenBuilder.scaffold(
             floatingActionButton: ValueListenableBuilder(
               valueListenable: _showDMFab,
               builder: (context, value, child) {
@@ -381,33 +381,28 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
           ),
         );
       },
-      style: LMChatButtonStyle(
-        backgroundColor: LMChatTheme.theme.primaryColor,
-        width: 50.w,
-        height: 8.h,
-        borderRadius: 40,
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LMChatIcon(
-            type: LMChatIconType.svg,
-            assetPath: kNetworkingChatIcon,
-            style: LMChatIconStyle(
+      text: const LMChatText('NEW MESSAGE',
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 13,
               color: Colors.white,
-              size: 32,
+              fontWeight: FontWeight.w500,
             ),
+          )),
+      style: LMChatButtonStyle(
+        spacing: 8,
+        icon: const LMChatIcon(
+          type: LMChatIconType.svg,
+          assetPath: kNetworkingChatIcon,
+          style: LMChatIconStyle(
+            color: Colors.white,
+            size: 30,
           ),
-          const SizedBox(width: 8),
-          LMChatText('NEW MESSAGE',
-              style: LMChatTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              )),
-        ],
+        ),
+        backgroundColor: LMChatTheme.theme.primaryColor,
+        width: 173,
+        height: 48,
+        borderRadius: 40,
       ),
     );
   }

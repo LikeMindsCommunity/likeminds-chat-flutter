@@ -441,100 +441,119 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             children: [
               if (state == LMChatroomRequestState.initiated &&
                   !checkDMreqByCurrentUser())
-                LMChatApproveRejectView(
-                  onApproveButtonClicked: () {
-                    // Define callbacks
-                    // Show the dialog
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return _screenBuilder.dmApproveRejectDialogBuilder(
-                            context,
-                            type: DMDialogType.approve,
-                            onPrimary: onPrimaryApprove,
-                            onSecondary: onSecondaryApprove,
-                            approveRejectDialog: _defDmApproveRejectDialog(
-                              context,
-                              type: DMDialogType.approve,
-                              onPrimary: onPrimaryApprove,
-                              onSecondary: onSecondaryApprove,
-                            ),
-                          );
-                        });
-                  },
-                  onRejectButtonClicked: () {
-                    // Show the dialog
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return _screenBuilder.dmApproveRejectDialogBuilder(
-                            context,
-                            type: DMDialogType.reject,
-                            onPrimary: onPrimaryReject,
-                            onSecondary: onSecondaryReject,
-                            onTertiary: onTertiaryReject, // Pass tertiary here
-                            approveRejectDialog: _defDmApproveRejectDialog(
-                              context,
-                              type: DMDialogType.reject,
-                              onPrimary: onPrimaryReject,
-                              onSecondary: onSecondaryReject,
-                              onTertiary:
-                                  onTertiaryReject, // Pass tertiary here
-                            ),
-                          );
-                        });
-                  },
-                ),
-              Container(
-                width: 90.w,
-                constraints: BoxConstraints(
-                  minHeight: 4.h,
-                ),
-                decoration: BoxDecoration(
-                  color: _themeData.container,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                margin: const EdgeInsets.only(
-                  top: 8,
-                  bottom: 8,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: kPaddingXLarge,
-                    vertical: kPaddingMedium,
-                  ),
-                  child: Center(
-                    child: Builder(
-                        // Use Builder to get context if needed within builder call
-                        builder: (context) {
-                      // Get the text content
-                      final String containerText = _containerText(state);
-                      // Create the default widget
-                      final defaultDmStateText = LMChatText(
-                        containerText,
-                        style: LMChatTextStyle(
-                            textStyle: TextStyle(
-                          fontSize: 14,
-                          color: _themeData.secondaryColor,
-                        )),
-                      );
-                      // Call the builder method from the delegate
-                      return _screenBuilder.dmStateContainerTextBuilder(
-                        context,
-                        state,
-                        containerText,
-                        defaultDmStateText,
-                      );
-                    }),
-                  ),
-                ),
-              ),
+                _screenBuilder.dmApproveRejectViewBuilder(
+                    context,
+                    _defApproveRejectView(),
+                    _onApproveButtonClicked,
+                    _defOnRejectButtonClicked),
+              _screenBuilder.dmStateContainerBuilder(
+                  context, state, _defDisabledTextContainer(state)),
             ],
           )
         : SizedBox.shrink();
   }
 
-  void onPrimaryApprove() async {
+  Container _defDisabledTextContainer(LMChatroomRequestState state) {
+    return Container(
+      width: 90.w,
+      constraints: BoxConstraints(
+        minHeight: 4.h,
+      ),
+      decoration: BoxDecoration(
+        color: _themeData.container,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      margin: const EdgeInsets.only(
+        top: 8,
+        bottom: 8,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kPaddingXLarge,
+          vertical: kPaddingMedium,
+        ),
+        child: Center(
+          child: Builder(
+              // Use Builder to get context if needed within builder call
+              builder: (context) {
+            // Get the text content
+            final String containerText = _containerText(state);
+            // Create the default widget
+            final defaultDmStateText = LMChatText(
+              containerText,
+              style: LMChatTextStyle(
+                  textStyle: TextStyle(
+                fontSize: 14,
+                color: _themeData.secondaryColor,
+              )),
+            );
+            // Call the builder method from the delegate
+            return _screenBuilder.dmStateContainerTextBuilder(
+              context,
+              state,
+              containerText,
+              defaultDmStateText,
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  LMChatApproveRejectView _defApproveRejectView() {
+    return LMChatApproveRejectView(
+      onApproveButtonClicked: _onApproveButtonClicked,
+      onRejectButtonClicked: _defOnRejectButtonClicked,
+      style: LMChatApproveRejectStyle.basic(
+        containerColor: _themeData.container,
+      ),
+    );
+  }
+
+  void _defOnRejectButtonClicked() {
+    // Show the dialog
+    showDialog(
+        context: context,
+        builder: (context) {
+          return _screenBuilder.dmApproveRejectDialogBuilder(
+            context,
+            type: LMDMDialogType.reject,
+            onPrimary: onDialogRejectButtonTap, // reject
+            onSecondary: onDialogCancelButtonTap, // cancel
+            onTertiary: onDialogReportRejectButtonTap, // reprot and reject
+            approveRejectDialog: _defDmApproveRejectDialog(
+              context,
+              type: LMDMDialogType.reject,
+              onPrimary: onDialogRejectButtonTap,
+              onSecondary: onDialogCancelButtonTap,
+              onTertiary: onDialogReportRejectButtonTap, // Pass tertiary here
+            ),
+          );
+        });
+  }
+
+  void _onApproveButtonClicked() {
+    // Define callbacks
+    // Show the dialog
+    showDialog(
+        context: context,
+        builder: (context) {
+          return _screenBuilder.dmApproveRejectDialogBuilder(
+            context,
+            type: LMDMDialogType.approve,
+            onPrimary: onDialogApproveButtonTap,
+            onSecondary: onDialogCancelButtonTap,
+            approveRejectDialog: _defDmApproveRejectDialog(
+              context,
+              type: LMDMDialogType.approve,
+              onPrimary: onDialogApproveButtonTap,
+              onSecondary: onDialogCancelButtonTap,
+            ),
+          );
+        });
+  }
+
+  void onDialogApproveButtonTap() async {
     Navigator.pop(context);
 
     final response = await LMChatCore.client.sendDMRequest(
@@ -565,15 +584,11 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     }
   }
 
-  void onSecondaryApprove() {
+  void onDialogCancelButtonTap() {
     Navigator.pop(context);
   }
 
-  void onSecondaryReject() {
-    Navigator.pop(context);
-  }
-
-  void onTertiaryReject() async {
+  void onDialogReportRejectButtonTap() async {
     // reject and report button clicked
     Navigator.pop(context);
 
@@ -610,7 +625,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     );
   }
 
-  void onPrimaryReject() async {
+  void onDialogRejectButtonTap() async {
     Navigator.pop(context);
 
     final response = await LMChatCore.client.sendDMRequest(
@@ -647,7 +662,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         if (checkDMreqByCurrentUser()) {
           return "DM request pending. Messaging would be enabled once your request is approved.";
         } else {
-          return "Approve or reject connection request";
+          return "DM request pending. Messaging would be enabled once you approve or reject connection request";
         }
       case LMChatroomRequestState.accepted:
         return 'Chat request accepted';
@@ -1866,13 +1881,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (_isDMRequestState()) {
       if (chatroom?.isPrivateMember == true && _isDMRequestNeedApproval) {
         // Define callbacks
-        final VoidCallback onPrimarySend = () async {
+        final VoidCallback onDialogSendButtonClicked = () async {
           Navigator.pop(context);
           _sendDMRequest(message);
           _chatroomState.value = LMChatroomRequestState.initiated;
-        };
-        final VoidCallback onSecondarySend = () {
-          Navigator.pop(context);
         };
 
         // Show the dialog
@@ -1881,14 +1893,14 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             builder: (context) {
               return _screenBuilder.dmApproveRejectDialogBuilder(
                 context,
-                type: DMDialogType.send,
-                onPrimary: onPrimarySend,
-                onSecondary: onSecondarySend,
+                type: LMDMDialogType.send,
+                onPrimary: onDialogSendButtonClicked,
+                onSecondary: onDialogCancelButtonTap,
                 approveRejectDialog: _defDmApproveRejectDialog(
                   context,
-                  type: DMDialogType.send,
-                  onPrimary: onPrimarySend,
-                  onSecondary: onSecondarySend,
+                  type: LMDMDialogType.send,
+                  onPrimary: onDialogSendButtonClicked,
+                  onSecondary: onDialogCancelButtonTap,
                 ),
               );
             });
@@ -1950,23 +1962,23 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   LMChatDialog _defDmApproveRejectDialog(
     BuildContext context, {
-    required DMDialogType type,
+    required LMDMDialogType type,
     required VoidCallback onPrimary, // CONFIRM / ACCEPT / REJECT
     VoidCallback? onSecondary, // CANCEL
     VoidCallback? onTertiary, // REPORT AND REJECT (only for reject)
   }) {
     // map titles and bodies
     final _titles = {
-      DMDialogType.send: 'Send DM request?',
-      DMDialogType.approve: 'Approve DM request?',
-      DMDialogType.reject: 'Reject DM request?',
+      LMDMDialogType.send: 'Send DM request?',
+      LMDMDialogType.approve: 'Approve DM request?',
+      LMDMDialogType.reject: 'Reject DM request?',
     };
     final _bodies = {
-      DMDialogType.send:
+      LMDMDialogType.send:
           'A direct messaging request would be sent to this member. You would be able to send further messages only once your request is approved.',
-      DMDialogType.approve:
+      LMDMDialogType.approve:
           'Member will be able to send you messages and get notified of the same.',
-      DMDialogType.reject:
+      LMDMDialogType.reject:
           'Member would be blocked from sending you further messages. The sender will not be notified of this.',
     };
 
@@ -1974,7 +1986,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     List<Widget> actions = [];
 
     switch (type) {
-      case DMDialogType.send:
+      case LMDMDialogType.send:
         actions = [
           LMChatText(
             "CANCEL",
@@ -1999,7 +2011,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ];
         break;
 
-      case DMDialogType.approve:
+      case LMDMDialogType.approve:
         actions = [
           LMChatText(
             "CANCEL",
@@ -2024,7 +2036,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         ];
         break;
 
-      case DMDialogType.reject:
+      case LMDMDialogType.reject:
         actions = [
           LMChatText(
             "REJECT",
@@ -2109,7 +2121,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       _chatroomState.value = LMChatroomRequestState.initiated;
 
       //if (_isOwnerOrCM) {
-      if (chatroom != null && !chatroom!.isPrivateMember!) {
+      if (!(chatroom?.isPrivateMember ?? true)) {
         conversationBloc.add(LMChatFetchConversationsEvent(
           chatroomId: chatroom!.id,
           page: 1,
@@ -2578,15 +2590,43 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 }
 
-enum DMDialogType { send, approve, reject }
+/// This function shows a dialog based on the provided [LMDMDialogType] and allows the user
+/// to perform actions such as confirming, canceling, or rejecting the DM request. The dialog
+/// includes a title, a body, and a set of action buttons.
+///
+/// The dialog supports the following types:
+/// - [LMDMDialogType.send]: Prompts the user to confirm sending a DM request.
+/// - [LMDMDialogType.approve]: Prompts the user to approve a DM request.
+/// - [LMDMDialogType.reject]: Prompts the user to reject a DM request, with an optional
+///   "Report and Reject" action.
+///
+enum LMDMDialogType { send, approve, reject }
 
+/// Represents the various states of a chatroom request in the application.
+///
+/// This enum is used to track the lifecycle of a chatroom request between two users.
+/// For example, `user1` sends a chatroom request to `user2`, and the state of the request
+/// transitions based on the actions taken by either user or the admin.
+///
+/// - `initiated`: The chatroom request has been sent by `user1` to `user2` but has not yet
+///   been accepted or rejected. For example, `user1` sends a request to start a chatroom
+///   with `user2`, and it is awaiting a response.
+/// - `accepted`: The chatroom request has been accepted by `user2`. For example, `user2`
+///   agrees to the chatroom request sent by `user1`, and the chatroom is now active.
+/// - `rejected`: The chatroom request has been rejected by `user2`. For example, `user2`
+///   declines the chatroom request sent by `user1`.
+/// - `disabled`: The chatroom has been disabled by an admin. For example, an admin disables
+///   the chatroom due to policy violations or other reasons.
+/// - `notInitiated`: No chatroom request has been initiated between `user1` and `user2`.
+///   For example, neither `user1` nor `user2` has sent a chatroom request.
 enum LMChatroomRequestState {
   /// chatroom request is initiated but not yet accepted
   /// or rejected
   initiated(0),
-  accepted(1),
 
   /// chatroom request is accepted
+  accepted(1),
+
   /// chatroom request is rejected
   rejected(2),
 

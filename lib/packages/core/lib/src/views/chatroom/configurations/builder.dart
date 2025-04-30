@@ -342,19 +342,19 @@ class LMChatroomBuilderDelegate {
 
   /// Displays a dialog for handling Direct Messaging (DM) requests with customizable actions.
   ///
-  /// This function shows a dialog based on the provided [DMDialogType] and allows the user
+  /// This function shows a dialog based on the provided [LMDMDialogType] and allows the user
   /// to perform actions such as confirming, canceling, or rejecting the DM request. The dialog
   /// includes a title, a body, and a set of action buttons.
   ///
   /// The dialog supports the following types:
-  /// - [DMDialogType.send]: Prompts the user to confirm sending a DM request.
-  /// - [DMDialogType.approve]: Prompts the user to approve a DM request.
-  /// - [DMDialogType.reject]: Prompts the user to reject a DM request, with an optional
+  /// - [LMDMDialogType.send]: Prompts the user to confirm sending a DM request.
+  /// - [LMDMDialogType.approve]: Prompts the user to approve a DM request.
+  /// - [LMDMDialogType.reject]: Prompts the user to reject a DM request, with an optional
   ///   "Report and Reject" action.
   ///
   /// Parameters:
   /// - [context]: The [BuildContext] in which the dialog is displayed.
-  /// - [type]: The type of the dialog, represented by [DMDialogType].
+  /// - [type]: The type of the dialog, represented by [LMDMDialogType].
   /// - [onPrimary]: A required callback for the primary action button (e.g., Confirm, Accept, Reject).
   /// - [onSecondary]: An optional callback for the secondary action button (e.g., Cancel).
   /// - [onTertiary]: An optional callback for the tertiary action button (e.g., Report and Reject).
@@ -363,7 +363,7 @@ class LMChatroomBuilderDelegate {
 
   Widget dmApproveRejectDialogBuilder(
     BuildContext context, {
-    required DMDialogType type,
+    required LMDMDialogType type,
     required VoidCallback onPrimary, // CONFIRM / ACCEPT / REJECT
     required VoidCallback onSecondary, // CANCEL
     VoidCallback? onTertiary, // REPORT AND REJECT (only for reject)
@@ -372,26 +372,13 @@ class LMChatroomBuilderDelegate {
     return approveRejectDialog;
   }
 
-  /// Builds the approve button for DM chatroom
-  Widget dmApproveButton(
+  Widget dmApproveRejectViewBuilder(
     BuildContext context,
-    LMChatButton approveButton,
+    LMChatApproveRejectView approveRejectView,
+    VoidCallback onApprove,
+    VoidCallback onReject,
   ) {
-    return approveButton;
-  }
-
-  /// Builds the reject button for DM chatroom
-  Widget dmRejectButton(
-    BuildContext context,
-    LMChatButton rejectButton,
-  ) {
-    return rejectButton;
-  }
-
-  /// Builds the approve/reject text for DM chatroom
-  Widget dmApproveRejectText(
-      BuildContext context, LMChatText approveRejectText) {
-    return approveRejectText;
+    return approveRejectView;
   }
 
   /// Builds the text shown when a DM request needs to be initiated.
@@ -411,7 +398,8 @@ class LMChatroomBuilderDelegate {
     return defaultDmRequestText;
   }
 
-  /// Builds the text shown inside the container for different DM states (initiated, rejected, disabled).
+  /// Builds the text shown inside the container for different DM states (initiated, rejected, disabled),
+  ///  read more about state in [LMChatroomRequestState] definiation .
   ///
   /// Parameters:
   /// - [context]: The build context.
@@ -428,5 +416,17 @@ class LMChatroomBuilderDelegate {
   ) {
     // Default implementation returns the original widget
     return defaultDmStateText;
+  }
+
+  /// Builds the text shown inside the container for different DM states (initiated, rejected, disabled),
+  /// read more about state in [LMChatroomRequestState] definiation .
+
+  Container dmStateContainerBuilder(
+    BuildContext context,
+    LMChatroomRequestState state,
+    Container defaultDmStateContainer,
+  ) {
+    // Default implementation returns the original widget
+    return defaultDmStateContainer;
   }
 }

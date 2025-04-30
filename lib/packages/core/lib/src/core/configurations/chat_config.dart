@@ -25,6 +25,9 @@ export 'package:likeminds_chat_flutter_core/src/views/poll/configurations/config
 export 'package:likeminds_chat_flutter_core/src/views/search/configuration/config.dart';
 export 'package:likeminds_chat_flutter_core/src/utils/web/web_configurations.dart';
 export 'package:likeminds_chat_flutter_core/src/views/member_list/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/community_chat/configurations/config.dart';
+export 'package:likeminds_chat_flutter_core/src/views/community_hybrid_chat/configurations/config.dart';
 
 /// {@template lm_chat_config}
 /// Configuration class for the Likeminds Chat SDK.
