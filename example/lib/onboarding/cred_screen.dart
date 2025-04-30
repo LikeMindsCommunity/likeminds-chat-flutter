@@ -292,7 +292,7 @@ class _CredScreenState extends State<CredScreen> {
       );
       if (response.success) {
         MaterialPageRoute route = MaterialPageRoute(
-          builder: (context) => const LMChatHomeScreen(
+          builder: (context) => const LMCommunityHybridChatScreen(
               // chatroomType: LMChatroomType.dm,
               ),
         );

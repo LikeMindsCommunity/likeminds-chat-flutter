@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
-/// {@template lm_chat_home_builder_delegate}
-/// [LMChatHomeBuilderDelegate] is a class which is used to build the home
+/// {@template lm_community_hybrid_chat_builder_delegate}
+/// [LMCommunityHybridChatBuilderDelegate] is a class which is used to build the home
 /// screen. It is used to customize the home screen.
 /// To customize the home screen, create a class that extends
-/// [LMChatHomeBuilderDelegate] and override the methods.
+/// [LMCommunityHybridChatBuilderDelegate] and override the methods.
 /// Then pass the instance of this class to the [LMChatHomeConfig] class.
 /// which is used to configure the home screen.
 ///
@@ -44,9 +44,9 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 /// );
 /// ```
 /// {@endtemplate}
-class LMChatHomeBuilderDelegate {
-  /// {@macro lm_chat_home_builder_delegate}
-  const LMChatHomeBuilderDelegate();
+class LMCommunityHybridChatBuilderDelegate {
+  /// {@macro lm_community_hybrid_chat_builder_delegate}
+  const LMCommunityHybridChatBuilderDelegate();
 
   /// chatWidgetBuilder
   static final LMChatWidgetBuilderDelegate _chatWidgetBuilderDelegate =
@@ -130,155 +130,5 @@ class LMChatHomeBuilderDelegate {
     TabBar tabBar,
   ) {
     return tabBar;
-  }
-
-  // Builders for home feed list
-
-  /// Builds a home feed chatroom tile
-  Widget homeFeedTileBuilder(
-    BuildContext context,
-    LMChatRoomViewData chatroom,
-    LMChatTile tile,
-  ) {
-    return tile;
-  }
-
-  /// Builds a home feed explore tile
-  Widget homeFeedExploreTileBuilder(
-    BuildContext context,
-    LMChatTile tile,
-  ) {
-    return tile;
-  }
-
-  /// Builds the explore chip
-  Widget homeFeedExploreChipBuilder(
-    BuildContext context,
-    LMChatChip chip,
-  ) {
-    return chip;
-  }
-
-  /// Builds mute icon in home feed
-  Widget homeFeedMuteIconBuilder(LMChatIcon icon) {
-    return icon;
-  }
-
-  /// Builds search icon in home feed
-  Widget homeFeedSecretChatroomIconBuilder(LMChatIcon icon) {
-    return icon;
-  }
-
-  /// Builds the first page error indicator.
-  Widget homeFeedFirstPageErrorIndicatorBuilder(
-    BuildContext context,
-    Widget errorWidget,
-  ) {
-    return errorWidget;
-  }
-
-  /// Builds the new page error indicator.
-  Widget homeFeedNewPageErrorIndicatorBuilder(
-    BuildContext context,
-    Widget errorWidget,
-  ) {
-    return errorWidget;
-  }
-
-  /// Builds the first page progress indicator.
-  Widget homeFeedFirstPageProgressIndicatorBuilder(
-    BuildContext context,
-    Widget loaderWidget,
-  ) {
-    return loaderWidget;
-  }
-
-  /// Builds the new page progress indicator.
-  Widget homeFeedNewPageProgressIndicatorBuilder(
-    BuildContext context,
-    Widget loaderWidget,
-  ) {
-    return loaderWidget;
-  }
-
-  /// Builds the no items found indicator.
-  Widget homeFeedNoItemsFoundIndicatorBuilder(
-    BuildContext context,
-    Widget noItemsFoundWidget,
-  ) {
-    return noItemsFoundWidget;
-  }
-
-  /// Builds the no more items indicator.
-  Widget homeFeedNoMoreItemsIndicatorBuilder(
-    BuildContext context,
-    Widget noMoreItemsWidget,
-  ) {
-    return noMoreItemsWidget;
-  }
-
-  // Builders for dm feed list
-
-  /// Builds a dm feed chatroom tile
-  Widget dmFeedTileBuilder(
-    BuildContext context,
-    LMChatRoomViewData chatroom,
-    LMChatTile tile,
-  ) {
-    return tile;
-  }
-
-  /// Builds mute icon in dm feed
-  Widget dmFeedMuteIconBuilder(LMChatIcon icon) {
-    return icon;
-  }
-
-  /// Builds the first page error indicator.
-  Widget dmFeedFirstPageErrorIndicatorBuilder(
-    BuildContext context,
-    Widget errorWidget,
-  ) {
-    return errorWidget;
-  }
-
-  /// Builds the new page error indicator.
-  Widget dmFeedNewPageErrorIndicatorBuilder(
-    BuildContext context,
-    Widget errorWidget,
-  ) {
-    return errorWidget;
-  }
-
-  /// Builds the first page progress indicator.
-  Widget dmFeedFirstPageProgressIndicatorBuilder(
-    BuildContext context,
-    Widget loaderWidget,
-  ) {
-    return loaderWidget;
-  }
-
-  /// Builds the new page progress indicator.
-  Widget dmFeedNewPageProgressIndicatorBuilder(
-    BuildContext context,
-    Widget loaderWidget,
-  ) {
-    return loaderWidget;
-  }
-
-  /// Builds the no items found indicator.
-
-  Widget dmFeedNoItemsFoundIndicatorBuilder(
-    BuildContext context,
-    Widget noItemsFoundWidget,
-  ) {
-    return noItemsFoundWidget;
-  }
-
-  /// Builds the no more items indicator.
-  Widget dmFeedNoMoreItemsIndicatorBuilder(
-    BuildContext context,
-    Widget noMoreItemsWidget,
-  ) {
-    return noMoreItemsWidget;
   }
 }

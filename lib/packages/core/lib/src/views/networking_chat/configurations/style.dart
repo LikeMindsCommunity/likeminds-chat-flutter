@@ -1,17 +1,17 @@
 import 'package:likeminds_chat_flutter_core/src/widgets/widgets.dart';
 
 /// {@template lm_chat_home_style}
-/// [LMChatHomeStyle] is a class which is used to style the home
+/// [LMNetworkingChatStyle] is a class which is used to style the home
 /// screen. It is used to customize the home screen.
 /// {@endtemplate}
-class LMChatHomeStyle {
+class LMNetworkingChatStyle {
   /// {@macro lm_chat_home_style}
-  const LMChatHomeStyle({
+  const LMNetworkingChatStyle({
     this.homeFeedListStyle,
     this.dmFeedListStyle,
   });
 
-  final LMChatHomeFeedListStyle Function(LMChatHomeFeedListStyle)?
+  final LMCommunityChatListStyle Function(LMCommunityChatListStyle)?
       homeFeedListStyle;
   final LMChatDMFeedListStyle Function(LMChatDMFeedListStyle)? dmFeedListStyle;
 }
