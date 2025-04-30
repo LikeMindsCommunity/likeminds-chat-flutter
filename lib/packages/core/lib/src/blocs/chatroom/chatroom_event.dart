@@ -5,12 +5,15 @@ abstract class LMChatroomEvent extends Equatable {}
 
 class LMChatFetchChatroomEvent extends LMChatroomEvent {
   final int chatroomId;
+  final bool? reInitializeConversationList;
 
-  LMChatFetchChatroomEvent({required this.chatroomId});
+  LMChatFetchChatroomEvent(
+      {required this.chatroomId, this.reInitializeConversationList});
 
   @override
   List<Object> get props => [
         chatroomId,
+        reInitializeConversationList ?? false,
       ];
 }
 

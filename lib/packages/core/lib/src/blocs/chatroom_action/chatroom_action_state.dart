@@ -42,3 +42,17 @@ class LMChatHideEmojiKeyboardState extends LMChatroomActionState {
   @override
   List<Object?> get props => [];
 }
+
+// chatroom action update state
+class LMChatroomActionUpdateState extends LMChatroomActionState {
+  final ChatRoom chatroom;
+  final List<ChatroomAction> actions;
+
+  LMChatroomActionUpdateState({
+    required this.chatroom,
+    required this.actions,
+  });
+
+  @override
+  List<Object> get props => [chatroom, actions];
+}

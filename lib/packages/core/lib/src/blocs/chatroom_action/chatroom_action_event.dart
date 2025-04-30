@@ -90,3 +90,14 @@ class LMChatHideEmojiKeyboardEvent extends LMChatroomActionEvent {
   @override
   List<Object?> get props => [];
 }
+
+class LMChatroomActionUpdateEvent extends LMChatroomActionEvent {
+  final int chatroomId;
+
+  LMChatroomActionUpdateEvent({
+    required this.chatroomId,
+  });
+
+  @override
+  List<Object> get props => [chatroomId];
+}
