@@ -315,13 +315,13 @@ class LMChatNotificationHandler {
     if (currentChatroomId != null) {
       if (currentChatroomId != targetChatroomId) {
         LMChatRealtime.instance.chatroomId = targetChatroomId;
-        navigatorKey.currentState?.pop();
+
         LMChatroomBloc.instance.close();
         LMChatroomActionBloc.instance.close();
         LMChatConversationBloc.instance.close();
         LMChatConversationActionBloc.instance.close();
 
-        navigatorKey.currentState?.push(chatroomPageRoute);
+        navigatorKey.currentState?.pushReplacement(chatroomPageRoute);
       } else {}
     } else {
       navigatorKey.currentState?.push(chatroomPageRoute);

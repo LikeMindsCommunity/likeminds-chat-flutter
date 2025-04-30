@@ -778,7 +778,7 @@ class LMChatDefaultTheme {
   static const Color primaryColor = Color.fromARGB(255, 50, 105, 200);
 
   /// Default secondary color
-  static const Color secondaryColor = Color.fromARGB(255, 223, 103, 34);
+  static const Color secondaryColor = Color.fromRGBO(74, 74, 74, 1);
 
   /// Default shadow color
   static const Color shadowColor = Color.fromRGBO(0, 0, 0, 0.239);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/src/models/models.dart';
 import 'package:likeminds_chat_flutter_ui/src/theme/theme.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
@@ -9,6 +10,20 @@ class LMChatUserTile extends LMChatTile {
   final LMChatUserViewData userViewData;
 
   final LMChatThemeData _chatTheme = LMChatTheme.theme;
+
+  /// A builder function to customize the appearance of the profile picture
+  /// in the user tile widget.
+  ///
+  /// If provided, this function will be used to build the profile picture
+  /// instead of the default implementation.
+  final LMChatProfilePictureBuilder? profilePictureBuilder;
+
+  /// A builder function to customize the appearance of the title
+  /// in the user tile widget.
+  ///
+  /// If provided, this function will be used to build the title
+  /// instead of the default implementation.
+  final LMChatTextBuilder? titleBuilder;
 
   /// [LMChatUserTile] constructor to create an instance of [LMChatUserTile].
   LMChatUserTile({
@@ -21,13 +36,15 @@ class LMChatUserTile extends LMChatTile {
     super.subtitle,
     super.trailing,
     super.absorbTouch,
+    this.profilePictureBuilder,
+    this.titleBuilder,
   });
 
   @override
   Widget build(BuildContext context) {
     return userViewData.isDeleted == true
         ? _defDeletedUserTile()
-        : _defUserTile();
+        : _defUserTile(context);
   }
 
   Widget _defDeletedUserTile() {
@@ -54,7 +71,7 @@ class LMChatUserTile extends LMChatTile {
     );
   }
 
-  LMChatTile _defUserTile() {
+  LMChatTile _defUserTile(BuildContext context) {
     return LMChatTile(
       onTap: onTap,
       style: style ??
@@ -64,27 +81,37 @@ class LMChatUserTile extends LMChatTile {
             margin: const EdgeInsets.only(bottom: 2),
           ),
       leading: leading ??
-          LMChatProfilePicture(
-            style: LMChatProfilePictureStyle.basic().copyWith(
-              size: 48,
-            ),
-            fallbackText: userViewData.name,
-            imageUrl: userViewData.imageUrl,
-            onTap: onTap,
-          ),
+          profilePictureBuilder?.call(context, _defProfilePicture()) ??
+          _defProfilePicture(),
       trailing: trailing,
       title: title ??
-          LMChatText(
-            userViewData.name,
-            style: LMChatTextStyle(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: _chatTheme.onContainer,
-              ),
-            ),
-          ),
+          titleBuilder?.call(context, _defTitleText()) ??
+          _defTitleText(),
       subtitle: subtitle,
+    );
+  }
+
+  LMChatText _defTitleText() {
+    return LMChatText(
+      userViewData.name,
+      style: LMChatTextStyle(
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: _chatTheme.onContainer,
+        ),
+      ),
+    );
+  }
+
+  LMChatProfilePicture _defProfilePicture() {
+    return LMChatProfilePicture(
+      style: LMChatProfilePictureStyle.basic().copyWith(
+        size: 48,
+      ),
+      fallbackText: userViewData.name,
+      imageUrl: userViewData.imageUrl,
+      onTap: onTap,
     );
   }
 
@@ -98,6 +125,8 @@ class LMChatUserTile extends LMChatTile {
     Widget? title,
     Widget? subtitle,
     Widget? trailing,
+    LMChatProfilePictureBuilder? profilePictureBuilder,
+    LMChatTextBuilder? titleBuilder,
   }) {
     return LMChatUserTile(
       userViewData: userViewData ?? this.userViewData,
@@ -107,6 +136,9 @@ class LMChatUserTile extends LMChatTile {
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
       trailing: trailing ?? this.trailing,
+      profilePictureBuilder:
+          profilePictureBuilder ?? this.profilePictureBuilder,
+      titleBuilder: titleBuilder ?? this.titleBuilder,
     );
   }
 }

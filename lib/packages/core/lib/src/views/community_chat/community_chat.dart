@@ -82,7 +82,6 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
 
   @override
   void dispose() {
-    feedBloc.close();
     homeFeedPagingController.dispose();
     super.dispose();
   }

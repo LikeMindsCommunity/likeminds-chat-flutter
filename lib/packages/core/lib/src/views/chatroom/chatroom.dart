@@ -137,6 +137,12 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
 
   @override
   void dispose() {
+    LMChatRealtime.instance.chatroomId = null;
+    _chatroomBloc.close();
+    _chatroomActionBloc.close();
+    _conversationBloc.close();
+    _convActionBloc.close();
+
     scrollController.removeListener(
         _showScrollToBottomButton); // Good practice to remove listeners
     scrollController.dispose(); // Dispose controllers owned by this state
@@ -368,6 +374,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
       ),
       conversationHelper: _conversationActionHelper,
       paginatedListController: pagedListController,
+      chatroom: chatroom.toChatRoomViewData(),
     );
   }
 
@@ -548,16 +555,39 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     );
   }
 
+  (bool haveDeletePermission, bool haveEditPermission)
+      _checkDeleteEditPermissions() {
+    final List<LMChatConversationViewData> selectedConversations =
+        pagedListController.itemList
+            .where((c) => _selectedIds.contains(c.id))
+            .toList();
+    bool haveDeletePermission = true;
+    bool haveEditPermission = true;
+    for (final conversationViewData in selectedConversations) {
+      if (haveDeletePermission) {
+        haveDeletePermission = LMChatMemberRightUtil.checkDeletePermissions(
+                conversationViewData) &&
+            chatroom.chatRequestState != 2;
+      }
+
+      if (haveEditPermission) {
+        haveEditPermission =
+            LMChatMemberRightUtil.checkEditPermissions(conversationViewData) &&
+                chatroom.chatRequestState != 2;
+      }
+      if (!haveDeletePermission && !haveEditPermission) {
+        break;
+      }
+    }
+    return (haveDeletePermission, haveEditPermission);
+  }
+
   List<Widget> _defaultSelectedChatroomMenu() {
     final LMChatConversationViewData conversationViewData = pagedListController
         .itemList
         .firstWhere((element) => element.id == _selectedIds.first);
-    final bool haveDeletePermission =
-        LMChatMemberRightUtil.checkDeletePermissions(conversationViewData) &&
-            chatroom.chatRequestState != 2;
-    final bool haveEditPermission =
-        LMChatMemberRightUtil.checkEditPermissions(conversationViewData) &&
-            chatroom.chatRequestState != 2;
+    final (bool haveDeletePermission, bool haveEditPermission) =
+        _checkDeleteEditPermissions();
     final bool isVoiceNote = conversationViewData.attachments
             ?.any((attachment) => attachment.type == 'voice_note') ??
         false;

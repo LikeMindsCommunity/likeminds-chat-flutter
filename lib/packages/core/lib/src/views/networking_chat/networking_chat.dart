@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_flutter_core/src/views/member_list/member_list.dart';
 import 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/builder.dart';
 
 /// {@template lm_chat_dm_feed_list}
@@ -50,10 +51,29 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
           ) ??
           LMChatDMFeedListStyle.basic();
 
+  final ValueNotifier<bool> _showDMFab = ValueNotifier(false);
+  int? _showList;
+
+  void _checkDMStatus() async {
+    final checkDMStatusRequest =
+        (CheckDMStatusRequestBuilder()..reqFrom("dm_feed_v2")).build();
+    final checkDMStatusResponse = await LMChatCore.client.checkDMStatus(
+      checkDMStatusRequest,
+    );
+    _showDMFab.value = checkDMStatusResponse.data?.showDm ?? false;
+    final cta = checkDMStatusResponse.data?.cta;
+    if (cta != null) {
+      Uri uri = Uri.parse(cta);
+      Map<String, String> queryParams = uri.queryParameters;
+      _showList = int.tryParse(queryParams['show_list'] ?? '');
+    }
+  }
+
   @override
   void initState() {
     feedBloc = LMChatDMFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
+    _checkDMStatus();
     _addPaginationListener();
     LMChatAnalyticsBloc.instance.add(
       const LMChatFireAnalyticsEvent(
@@ -90,7 +110,16 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
     return ValueListenableBuilder(
         valueListenable: LMChatTheme.themeNotifier,
         builder: (context, _, __) {
-          return Scaffold(
+          return _screenBuilder.scaffold(
+            floatingActionButton: ValueListenableBuilder(
+              valueListenable: _showDMFab,
+              builder: (context, value, child) {
+                return value
+                    ? _screenBuilder.floatingActionNewMessageButton(
+                        context, _floatingActionButton())
+                    : const SizedBox();
+              },
+            ),
             backgroundColor:
                 _style.backgroundColor ?? LMChatTheme.theme.scaffold,
             body: SafeArea(
@@ -346,22 +375,34 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LMChatExplorePage(),
+            builder: (context) => LMChatMemberList(
+              showList: _showList,
+            ),
           ),
         );
       },
+      text: const LMChatText('NEW MESSAGE',
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 13,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          )),
       style: LMChatButtonStyle(
-        backgroundColor: LMChatTheme.theme.backgroundColor,
-        height: 48,
-        width: 48,
-        borderRadius: 12,
-      ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.message,
-        style: LMChatIconStyle(
-          color: LMChatTheme.theme.primaryColor,
+        spacing: 8,
+        icon: const LMChatIcon(
+          type: LMChatIconType.svg,
+          assetPath: kNetworkingChatIcon,
+          style: LMChatIconStyle(
+            color: Colors.white,
+            size: 30,
+          ),
         ),
+        backgroundColor: LMChatTheme.theme.primaryColor,
+        width: 173,
+        height: 48,
+        borderRadius: 40,
       ),
     );
   }

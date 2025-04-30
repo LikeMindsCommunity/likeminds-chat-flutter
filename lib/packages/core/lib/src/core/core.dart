@@ -169,6 +169,16 @@ class LMChatCore {
               errorMessage: communityConfigurations.errorMessage);
         }
       }
+      // set the isDMWithRequestEnabled flag in local preference
+      final communitySettings =
+          initiateUserResponse.data?.community?.communitySettings;
+      for (final CommunitySettings communitySetting
+          in communitySettings ?? []) {
+        if (communitySetting.settingType ==
+            'enable_dm_without_connection_request') {
+          await storeIsDMWithRequestEnabled(communitySetting.enabled);
+        }
+      }
       return initiateUserResponse;
     } else {
       return await showChatWithoutApiKey(
@@ -240,6 +250,15 @@ class LMChatCore {
         success: false,
         errorMessage: communityConfigurations.errorMessage,
       );
+    }
+
+    // set the isDMWithRequestEnabled flag in local preference
+    final communitySettings = validateUserResponse.community?.communitySettings;
+    for (final CommunitySettings communitySetting in communitySettings ?? []) {
+      if (communitySetting.settingType ==
+          'enable_dm_without_connection_request') {
+        await storeIsDMWithRequestEnabled(communitySetting.enabled);
+      }
     }
 
     return LMResponse(success: true, data: validateUserResponse);

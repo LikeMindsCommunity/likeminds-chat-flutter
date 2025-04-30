@@ -2,54 +2,19 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
-/// {@template lm_networking_chat_builder_delegate}
-/// [LMNetworkingChatBuilderDelegate] is a class which is used to build the home
-/// screen. It is used to customize the home screen.
-/// To customize the home screen, create a class that extends
-/// [LMNetworkingChatBuilderDelegate] and override the methods.
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
-/// which is used to configure the home screen.
-///
-/// example:
-/// ```dart
-/// class ExampleHomeBuilder extends LMNetworkingChatBuilderDelegate {
-///  @override
-///  appBarBuilder(BuildContext context, LMChatAppBar appBar) {
-///   return appBar.copyWith(
-///    style: LMChatAppBarStyle.basic().copyWith(
-///     backgroundColor: Colors.green,
-///       ),
-///     );
-///   }
-/// }
-/// ```
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
-/// ```dart
-/// LMChatHomeConfig(
-///  builder: ExampleHomeBuilder(),
-///   );
-/// ```
-/// Use This [LMChatHomeConfig] instance to configure the home screen
-/// by passing it to the [LMChatCore] class. in initialize method.
-/// ```dart
-/// LMChatCore.instance.initialize(
-///   config: LMChatConfig(
-///     config: LMChatConfig(
-///      homeConfig: LMChatHomeConfig(
-///        builder: ExampleHomeBuilder(),
-///      ),
-///    ),
-/// );
-/// ```
+/// {@template lm_member_list_builder}
+/// [LMChatMemberListBuilderDelegate] is a class which is used to build the member list
+/// screen. It is used to customize the member list screen.
 /// {@endtemplate}
-class LMNetworkingChatBuilderDelegate {
-  /// {@macro lm_chat_home_builder_delegate}
-  const LMNetworkingChatBuilderDelegate();
+class LMChatMemberListBuilderDelegate {
+  /// {@macro lm_member_list_builder}
+  const LMChatMemberListBuilderDelegate();
 
   /// chatWidgetBuilder
   static final LMChatWidgetBuilderDelegate _chatWidgetBuilderDelegate =
       LMChatCore.config.widgetBuilderDelegate;
 
+  /// Builds the scaffold for the screen
   /// Builds a [Scaffold] widget with the given parameters.
   Widget scaffold({
     Key? key,
@@ -78,7 +43,7 @@ class LMNetworkingChatBuilderDelegate {
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true,
     String? restorationId,
-    LMChatWidgetSource source = LMChatWidgetSource.home,
+    LMChatWidgetSource source = LMChatWidgetSource.participants,
     bool canPop = true,
     Function(bool)? onPopInvoked,
   }) {
@@ -111,84 +76,54 @@ class LMNetworkingChatBuilderDelegate {
     );
   }
 
-  /// Builds [AppBar] widget for home screen
+  /// Builds the app bar.
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
-    LMChatUserViewData userViewData,
     LMChatAppBar appBar,
+    bool isSearching,
+    TextEditingController searchController,
+    Function(String text) onSearch,
+    VoidCallback onClear,
   ) {
     return appBar;
   }
 
-  /// Builds a dm feed chatroom tile
+  /// user tile builder
   Widget userTileBuilder(
     BuildContext context,
-    LMChatRoomViewData chatroom,
-    LMChatTile tile,
+    LMChatUserViewData user,
+    LMChatUserTile userTile,
+    Function(int? chatroomId) navigateToChatroom,
   ) {
-    return tile;
+    return userTile;
   }
 
-  /// Builds mute icon in dm feed
-  Widget muteIconBuilder(LMChatIcon icon) {
-    return icon;
-  }
-
-  /// Builds the first page error indicator.
-  Widget firstPageErrorIndicatorBuilder(
-    BuildContext context,
-    Widget errorWidget,
-  ) {
-    return errorWidget;
-  }
-
-  /// Builds the new page error indicator.
-  Widget newPageErrorIndicatorBuilder(
-    BuildContext context,
-    Widget errorWidget,
-  ) {
-    return errorWidget;
-  }
-
-  /// Builds the first page progress indicator.
-  Widget firstPageProgressIndicatorBuilder(
-    BuildContext context,
-    Widget loaderWidget,
-  ) {
-    return loaderWidget;
-  }
-
-  /// Builds the new page progress indicator.
-  Widget newPageProgressIndicatorBuilder(
-    BuildContext context,
-    Widget loaderWidget,
-  ) {
-    return loaderWidget;
-  }
-
-  /// Builds the no items found indicator.
-
+  /// no item builder
   Widget noItemsFoundIndicatorBuilder(
     BuildContext context,
-    Widget noItemsFoundWidget,
+    Widget noItemIndicator,
   ) {
-    return noItemsFoundWidget;
+    return noItemIndicator;
   }
 
-  /// Builds the no more items indicator.
-  Widget noMoreItemsIndicatorBuilder(
+  /// first page progress indicator builder
+  Widget firstPageProgressIndicatorBuilder(
     BuildContext context,
-    Widget noMoreItemsWidget,
+    Widget firstPageProgressIndicator,
   ) {
-    return noMoreItemsWidget;
+    return firstPageProgressIndicator;
   }
 
-// builds the floating action button
-  /// for new message
-  Widget floatingActionNewMessageButton(
+  /// Error indicator builder
+  Widget firstPageErrorIndicatorBuilder(
     BuildContext context,
-    LMChatButton floatingActionNewMessageButton,
+    Widget firstPageErrorIndicator,
   ) {
-    return floatingActionNewMessageButton;
+    return firstPageErrorIndicator;
+  }
+
+  Widget rateLimitDialog(
+      BuildContext context, int? newTime, LMChatDialog defRateLimitDialog) {
+    return defRateLimitDialog;
   }
 }

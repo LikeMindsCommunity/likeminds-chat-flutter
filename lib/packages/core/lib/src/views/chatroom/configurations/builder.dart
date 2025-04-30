@@ -339,4 +339,94 @@ class LMChatroomBuilderDelegate {
       LMChatRoomViewData chatroomData, LMChatButton searchButton) {
     return searchButton;
   }
+
+  /// Displays a dialog for handling Direct Messaging (DM) requests with customizable actions.
+  ///
+  /// This function shows a dialog based on the provided [LMDMDialogType] and allows the user
+  /// to perform actions such as confirming, canceling, or rejecting the DM request. The dialog
+  /// includes a title, a body, and a set of action buttons.
+  ///
+  /// The dialog supports the following types:
+  /// - [LMDMDialogType.send]: Prompts the user to confirm sending a DM request.
+  /// - [LMDMDialogType.approve]: Prompts the user to approve a DM request.
+  /// - [LMDMDialogType.reject]: Prompts the user to reject a DM request, with an optional
+  ///   "Report and Reject" action.
+  ///
+  /// Parameters:
+  /// - [context]: The [BuildContext] in which the dialog is displayed.
+  /// - [type]: The type of the dialog, represented by [LMDMDialogType].
+  /// - [onPrimary]: A required callback for the primary action button (e.g., Confirm, Accept, Reject).
+  /// - [onSecondary]: An optional callback for the secondary action button (e.g., Cancel).
+  /// - [onTertiary]: An optional callback for the tertiary action button (e.g., Report and Reject).
+  ///
+  /// The dialog's title and body are dynamically determined based on the [type].
+
+  Widget dmApproveRejectDialogBuilder(
+    BuildContext context, {
+    required LMDMDialogType type,
+    required VoidCallback onPrimary, // CONFIRM / ACCEPT / REJECT
+    required VoidCallback onSecondary, // CANCEL
+    VoidCallback? onTertiary, // REPORT AND REJECT (only for reject)
+    required LMChatDialog approveRejectDialog,
+  }) {
+    return approveRejectDialog;
+  }
+
+  Widget dmApproveRejectViewBuilder(
+    BuildContext context,
+    LMChatApproveRejectView approveRejectView,
+    VoidCallback onApprove,
+    VoidCallback onReject,
+  ) {
+    return approveRejectView;
+  }
+
+  /// Builds the text shown when a DM request needs to be initiated.
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [chatroom]: The current chatroom data.
+  /// - [defaultDmRequestText]: The default LMChatText widget.
+  ///
+  /// Returns a widget to display the initiation prompt.
+  Widget dmRequestInitiationTextBuilder(
+    BuildContext context,
+    LMChatRoomViewData chatroom,
+    LMChatText defaultDmRequestText,
+  ) {
+    // Default implementation returns the original widget
+    return defaultDmRequestText;
+  }
+
+  /// Builds the text shown inside the container for different DM states (initiated, rejected, disabled),
+  ///  read more about state in [LMChatroomRequestState] definiation .
+  ///
+  /// Parameters:
+  /// - [context]: The build context.
+  /// - [state]: The current LMChatroomRequestState.
+  /// - [text]: The text content determined by the state.
+  /// - [defaultDmStateText]: The default LMChatText widget.
+  ///
+  /// Returns a widget to display the state information text.
+  Widget dmStateContainerTextBuilder(
+    BuildContext context,
+    LMChatroomRequestState state,
+    String text,
+    LMChatText defaultDmStateText,
+  ) {
+    // Default implementation returns the original widget
+    return defaultDmStateText;
+  }
+
+  /// Builds the text shown inside the container for different DM states (initiated, rejected, disabled),
+  /// read more about state in [LMChatroomRequestState] definiation .
+
+  Container dmStateContainerBuilder(
+    BuildContext context,
+    LMChatroomRequestState state,
+    Container defaultDmStateContainer,
+  ) {
+    // Default implementation returns the original widget
+    return defaultDmStateContainer;
+  }
 }

@@ -7,10 +7,11 @@ localConversationEventHandler(
 ) async {
   int? lastConversationId = LMChatConversationBloc.instance.lastConversationId;
   if (lastConversationId != null &&
-      event.conversation.id != lastConversationId) {
-    emit(LMChatLocalConversationState(event.conversation));
-    lastConversationId = event.conversation.id;
+      event.conversation.id == lastConversationId) {
+    return;
   }
+  emit(LMChatLocalConversationState(event.conversation));
+  lastConversationId = event.conversation.id;
 
   LMChatConversationBloc.instance.lastConversationId = lastConversationId;
 }
