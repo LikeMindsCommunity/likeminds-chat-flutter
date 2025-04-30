@@ -182,4 +182,13 @@ class LMNetworkingChatBuilderDelegate {
   ) {
     return noMoreItemsWidget;
   }
+
+// builds the floating action button
+  /// for new message
+  Widget floatingActionNewMessageButton(
+    BuildContext context,
+    LMChatButton floatingActionNewMessageButton,
+  ) {
+    return floatingActionNewMessageButton;
+  }
 }

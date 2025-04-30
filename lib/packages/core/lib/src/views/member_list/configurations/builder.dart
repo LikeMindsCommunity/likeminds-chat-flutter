@@ -80,6 +80,10 @@ class LMChatMemberListBuilderDelegate {
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
     LMChatAppBar appBar,
+    bool isSearching,
+    TextEditingController searchController,
+    Function(String text) onSearch,
+    VoidCallback onClear,
   ) {
     return appBar;
   }
@@ -89,6 +93,7 @@ class LMChatMemberListBuilderDelegate {
     BuildContext context,
     LMChatUserViewData user,
     LMChatUserTile userTile,
+    Function(int? chatroomId) navigateToChatroom,
   ) {
     return userTile;
   }
@@ -117,4 +122,8 @@ class LMChatMemberListBuilderDelegate {
     return firstPageErrorIndicator;
   }
 
-} 
+  Widget rateLimitDialog(
+      BuildContext context, int? newTime, LMChatDialog defRateLimitDialog) {
+    return defRateLimitDialog;
+  }
+}

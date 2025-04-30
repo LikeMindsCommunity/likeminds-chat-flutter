@@ -104,8 +104,6 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
     super.dispose();
   }
 
-  //TODO: CUSTOMIZTION TO FAB
-//Todo: chatroom action button ka ui
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -116,7 +114,10 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
             floatingActionButton: ValueListenableBuilder(
               valueListenable: _showDMFab,
               builder: (context, value, child) {
-                return value ? _floatingActionButton() : const SizedBox();
+                return value
+                    ? _screenBuilder.floatingActionNewMessageButton(
+                        context, _floatingActionButton())
+                    : const SizedBox();
               },
             ),
             backgroundColor:

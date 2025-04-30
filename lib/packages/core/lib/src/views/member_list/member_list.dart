@@ -4,6 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/member_list/member_list_bloc.dart';
 import 'dart:async';
+import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 
 class LMChatMemberList extends StatefulWidget {
   const LMChatMemberList({super.key, this.showList});
@@ -21,9 +22,11 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
   bool _isSearching = false;
   Timer? _debounceTimer;
   final TextEditingController _searchController = TextEditingController();
+  final LMChatUserViewData currentUser =
+      LMChatLocalPreference.instance.getUser().toUserViewData();
 
   late final PagingController<int, LMChatUserViewData> _pagingController;
-
+  bool _isProcessingTap = false;
   @override
   void initState() {
     super.initState();
@@ -83,7 +86,14 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
   @override
   Widget build(BuildContext context) {
     return _screenBuilder.scaffold(
-      appBar: _defaultAppBar(),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _defaultAppBar(),
+        _isSearching,
+        _searchController,
+        _onSearchChanged,
+        _onClear,
+      ),
       body: _buildMemberList(),
     );
   }
@@ -105,19 +115,10 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
                 });
               },
             )
-          : const Text('Members'),
+          : const LMChatText('Members'),
       trailing: [
         LMChatButton(
-          onTap: () {
-            setState(() {
-              _isSearching = !_isSearching;
-              if (!_isSearching) {
-                _searchController.clear();
-                searchTerm = null;
-                _pagingController.refresh();
-              }
-            });
-          },
+          onTap: _onClear,
           style: LMChatButtonStyle.basic().copyWith(
             icon: LMChatIcon(
               type: LMChatIconType.icon,
@@ -129,6 +130,17 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
     );
   }
 
+  void _onClear() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        searchTerm = null;
+        _pagingController.refresh();
+      }
+    });
+  }
+
   Widget _buildMemberList() {
     return BlocConsumer<LMChatMemberListBloc, LMChatMemberListState>(
       bloc: _memberListBloc,
@@ -136,10 +148,13 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
         if (state is LMChatMemberListError) {
           _pagingController.error = state.message;
         } else if (state is LMChatMemberListLoaded) {
-          if (state.members.length < _pageSize) {
-            _pagingController.appendLastPage(state.members);
+          final filteredMembers = state.members
+              .where((member) => member.id != currentUser.id)
+              .toList();
+          if (filteredMembers.length < _pageSize) {
+            _pagingController.appendLastPage(filteredMembers);
           } else {
-            _pagingController.appendPage(state.members, state.page + 1);
+            _pagingController.appendPage(filteredMembers, state.page + 1);
           }
         }
       },
@@ -156,16 +171,18 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
                     context,
                     member,
                     _defaultMemberTile(member),
+                    _navigateToChatroom,
                   );
                 },
-                firstPageProgressIndicatorBuilder: (context) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                noItemsFoundIndicatorBuilder: (context) => const Center(
-                  child: Text(
-                    'No members found',
-                  ),
-                ),
+                firstPageErrorIndicatorBuilder: (context) =>
+                    _screenBuilder.firstPageErrorIndicatorBuilder(
+                        context, _defFirstPageErrorIndicatorBuilder),
+                firstPageProgressIndicatorBuilder: (context) =>
+                    _screenBuilder.firstPageProgressIndicatorBuilder(
+                        context, _defFirstPageProgressIndicatorBuilder),
+                noItemsFoundIndicatorBuilder: (context) =>
+                    _screenBuilder.noItemsFoundIndicatorBuilder(
+                        context, _defNoItemsFoundIndicatorBuilder),
               ),
             ),
           ),
@@ -173,6 +190,22 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
       },
     );
   }
+
+  final Widget _defNoItemsFoundIndicatorBuilder = const Center(
+    child: Text(
+      'No members found',
+    ),
+  );
+
+  final Widget _defFirstPageProgressIndicatorBuilder = const Center(
+    child: CircularProgressIndicator(),
+  );
+
+  final Widget _defFirstPageErrorIndicatorBuilder = const Center(
+    child: Text(
+      'Failed to load members. Please try again.',
+    ),
+  );
 
   LMChatUserTile _defaultMemberTile(LMChatUserViewData member) {
     return LMChatUserTile(
@@ -183,6 +216,13 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
   }
 
   void _handleUserTileTap(LMChatUserViewData member) async {
+    // Prevent multiple taps while processing
+    if (_isProcessingTap) return;
+
+    // Set flag to true
+
+    _isProcessingTap = true;
+
     // Get isDMWithRequestEnabled setting from local preferences
     final bool isDMWithRequestEnabled = getIsDMWithRequestEnabled();
 
@@ -202,13 +242,7 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
     // check if the user already have a chatroom with the member
     if (response.data?.chatroomId != null) {
       // navigate to the chatroom
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              LMChatroomScreen(chatroomId: response.data!.chatroomId!),
-        ),
-      );
+      _navigateToChatroom(response.data?.chatroomId);
     } else {
       if (isDMWithRequestEnabled) {
         // check if limit is not exceeded
@@ -225,12 +259,7 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
 
           if (response.success) {
             // navigate to the chatroom
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LMChatroomScreen(
-                      chatroomId: response.data!.chatRoom!.id)),
-            );
+            _navigateToChatroom(response.data?.chatRoom?.id);
           } else {
             // show error
             ScaffoldMessenger.of(context).showSnackBar(
@@ -242,19 +271,11 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
         } else {
           // show error
           // Show dialog with DM limit exceeded message
+          int? newTime = response.data!.newRequestDmTimestamp;
           showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('DM Request Limit Exceeded'),
-              content: Text(
-                  'You have exceeded your DM request limit. You can send your next DM request after ${response.data?.newRequestDmTimestamp != null ? DateTime.fromMillisecondsSinceEpoch(response.data!.newRequestDmTimestamp! * 1000).toString() : 'some time'}.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
+            builder: (context) => _screenBuilder.rateLimitDialog(
+                context, newTime, _defRateLimitDialog(newTime, context)),
           );
         }
       } else {
@@ -270,12 +291,8 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
 
         if (response.success) {
           // navigate to the chatroom
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LMChatroomScreen(chatroomId: response.data!.chatRoom!.id)),
-          );
+
+          _navigateToChatroom(response.data?.chatRoom?.id);
         } else {
           // show error
           ScaffoldMessenger.of(context).showSnackBar(
@@ -285,6 +302,60 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
           );
         }
       }
+    }
+    _isProcessingTap = false;
+  }
+
+  void _navigateToChatroom(int? chatroomId) {
+    if (chatroomId == null) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LMChatroomScreen(chatroomId: chatroomId),
+      ),
+    );
+  }
+
+  LMChatDialog _defRateLimitDialog(int? newTime, BuildContext context) {
+    return LMChatDialog(
+      title: const LMChatText('DM Request Limit Exceeded'),
+      content: LMChatText(
+          'You have exceeded your DM request limit. You can send your next DM request after ${getTimeLeftToSendReq(newTime)}.'),
+      actions: [
+        LMChatText(
+          'OK',
+          onTap: () => Navigator.pop(context),
+        ),
+      ],
+    );
+  }
+
+  /// Returns the time left to send req.
+  static String getTimeLeftToSendReq(int? expiryTime) {
+    if (expiryTime == null) {
+      return "";
+    }
+    DateTime expiryTimeInDateTime =
+        DateTime.fromMillisecondsSinceEpoch(expiryTime);
+    DateTime now = DateTime.now();
+    Duration difference = expiryTimeInDateTime.difference(now);
+
+    if (difference.isNegative) {
+      return "some time.";
+    }
+
+    int days = difference.inDays;
+    int hours = difference.inHours % 24;
+    int minutes = difference.inMinutes % 60;
+
+    if (days > 0) {
+      return "$days day${days > 1 ? 's' : ''}";
+    } else if (hours > 0) {
+      return "$hours hour${hours > 1 ? 's' : ''} $minutes minute${minutes > 1 ? 's' : ''}";
+    } else if (minutes > 0) {
+      return "$minutes minute${minutes > 1 ? 's' : ''}";
+    } else {
+      return "some time.";
     }
   }
 }
