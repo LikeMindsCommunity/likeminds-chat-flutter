@@ -450,7 +450,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                   context, state, _defDisabledTextContainer(state)),
             ],
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 
   Container _defDisabledTextContainer(LMChatroomRequestState state) {

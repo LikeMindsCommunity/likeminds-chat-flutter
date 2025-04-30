@@ -7,41 +7,35 @@ void _getAllMembersEventHandler(
   LMChatGetAllMemberEvent event,
   Emitter<LMChatMemberListState> emit,
 ) async {
-  try {
-    emit(LMChatMemberListLoading());
+  emit(LMChatMemberListLoading());
 
-    final filterMemberRoles = event.showList == 1
-        ? [UserRole.member, UserRole.admin]
-        : [UserRole.admin];
+  final filterMemberRoles = event.showList == 1
+      ? [UserRole.member, UserRole.admin]
+      : [UserRole.admin];
 
-    final request = (GetAllMembersRequestBuilder()
-          ..page(event.page)
-          ..filterMemberRoles(filterMemberRoles)
-          ..excludeSelfUser(true))
-        .build();
-    debugPrint('GetAllMembersRequest: $request');
-    final response = await LMChatCore.client.getAllMembers(request);
+  final request = (GetAllMembersRequestBuilder()
+        ..page(event.page)
+        ..filterMemberRoles(filterMemberRoles)
+        ..excludeSelfUser(true))
+      .build();
+  debugPrint('GetAllMembersRequest: $request');
+  final response = await LMChatCore.client.getAllMembers(request);
 
-    if (!response.success) {
-      emit(LMChatMemberListError(
-        message: response.errorMessage ?? 'Failed to fetch members',
-      ));
-      return;
-    }
-
-    final members = response.data?.members
-            ?.map((member) => member.toUserViewData())
-            .toList() ??
-        [];
-
-    emit(LMChatMemberListLoaded(
-      members: members,
-      totalMembers: response.data?.totalMembers ?? 0,
-      page: event.page,
-    ));
-  } catch (e) {
+  if (!response.success) {
     emit(LMChatMemberListError(
-      message: e.toString(),
+      message: response.errorMessage ?? 'Failed to fetch members',
     ));
+    return;
   }
+
+  final members = response.data?.members
+          ?.map((member) => member.toUserViewData())
+          .toList() ??
+      [];
+
+  emit(LMChatMemberListLoaded(
+    members: members,
+    totalMembers: response.data?.totalMembers ?? 0,
+    page: event.page,
+  ));
 }

@@ -13,14 +13,19 @@ Future<void> _updateChatroomActionHandler(
     (GetChatroomRequestBuilder()..chatroomId(event.chatroomId)).build(),
   );
 
-  //Success, now continue with parsing the response
-  final ChatRoom chatroom = response.data!.chatroom!;
+  if (response.success) {
+    //Success, now continue with parsing the response
+    final ChatRoom chatroom = response.data!.chatroom!;
 
-  //Finally, emit the loaded success state with the chatroom response
-  emit(
-    LMChatroomActionUpdateState(
-      chatroom: chatroom,
-      actions: response.data!.chatroomActions!,
-    ),
-  );
+    //Finally, emit the loaded success state with the chatroom response
+    emit(
+      LMChatroomActionUpdateState(
+        chatroom: chatroom,
+        actions: response.data!.chatroomActions!,
+      ),
+    );
+  } else {
+    emit(
+        LMChatroomActionUpdateErrorState(errorMessage: response.errorMessage!));
+  }
 }
