@@ -22,10 +22,13 @@ class LMChatConversationLoadedState extends LMChatConversationState {
   final bool reInitialize;
 
   /// Creates and returns a new instance of [LMChatConversationLoadedState]
-  LMChatConversationLoadedState(this.getConversationResponse, this.direction, this.page, {this.reInitialize = false});
+  LMChatConversationLoadedState(
+      this.getConversationResponse, this.direction, this.page,
+      {this.reInitialize = false});
 
   @override
-  List<Object> get props => [getConversationResponse, direction, page, reInitialize];
+  List<Object> get props =>
+      [getConversationResponse, direction, page, reInitialize];
 }
 
 /// Represents an error state in the conversation.

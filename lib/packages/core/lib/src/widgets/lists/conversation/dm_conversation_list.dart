@@ -256,16 +256,20 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
       toast("Member unblocked");
 
       final conversation = response.data!.conversation!;
-
       _conversationBloc.add(LMChatLocalConversationEvent(
         conversation: conversation.toConversationViewData(),
       ));
-      // refresh the chatroom
 
-      LMChatroomBloc.instance
-          .add(LMChatFetchChatroomEvent(chatroomId: widget.chatroomId));
-    } else {
-      toast(response.errorMessage!);
+      _convActionBloc.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom!.copyWith(
+          chatRequestState: 1,
+        ),
+      ));
+      LMChatroomActionBloc.instance.add(
+        LMChatroomActionUpdateEvent(
+          chatroomId: widget.chatroomId,
+        ),
+      );
     }
   }
 
@@ -666,7 +670,6 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
   void updatePagingControllers(LMChatConversationState state) {
     if (state is LMChatConversationLoadedState) {
-      pagedListController.clear();
       if (state.getConversationResponse.conversationMeta != null &&
           state.getConversationResponse.conversationMeta!.isNotEmpty) {
         conversationMeta

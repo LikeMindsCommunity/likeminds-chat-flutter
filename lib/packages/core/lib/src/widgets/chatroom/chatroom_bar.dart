@@ -165,8 +165,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   bool _isLocalPlayerInitialized = false;
   final ValueNotifier<LMChatroomRequestState?> _chatroomState =
       ValueNotifier<LMChatroomRequestState?>(null);
-  bool _requestPermissionToDm = false;
-
+  bool _isDMRequestNeedApproval = false;
   String getText() {
     if (_textEditingController.text.isNotEmpty) {
       return _textEditingController.text;
@@ -204,6 +203,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     _textEditingController.addListener(() {
       _onTextChanged(_textEditingController.text); // Notify on text change
     });
+    final bool isDMWithRequestEnabled = getIsDMWithRequestEnabled();
+
+    _isDMRequestNeedApproval = isDMWithRequestEnabled;
 
     _initiateDMChatroomFlow();
 
@@ -337,27 +339,20 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         .build();
     final checkDMStatusResponse =
         await LMChatCore.client.checkDMStatus(checkDMStatusRequest);
-
     if (checkDMStatusResponse.data?.showDm == false) {
       _chatroomState.value = LMChatroomRequestState.disabled;
       _focusNode.unfocus();
       return;
     }
 
-    // Get isDMWithRequestEnabled from local prefs
-    final bool isDMWithRequestEnabled = getIsDMWithRequestEnabled();
+    final MemberStateResponse? memberRight =
+        LMChatLocalPreference.instance.getMemberRights();
 
+    if (memberRight != null && memberRight.member?.state == 1) {
+      _isDMRequestNeedApproval = false;
+    }
     if (chatroom?.chatRequestState == null) {
-      if (isDMWithRequestEnabled) {
-        /*
-
-        */
-        _chatroomState.value = LMChatroomRequestState.notInitiated;
-        _requestPermissionToDm = true;
-      } else {
-        _chatroomState.value = LMChatroomRequestState.notInitiated;
-        _requestPermissionToDm = false;
-      }
+      _chatroomState.value = LMChatroomRequestState.notInitiated;
     } else if (chatroom?.chatRequestState == 0) {
       _chatroomState.value = LMChatroomRequestState.initiated;
     } else if (chatroom?.chatRequestState == 1) {
@@ -406,7 +401,9 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Widget _getWidgetBasedOnState(LMChatroomRequestState? state) {
-    if (state == null || state == LMChatroomRequestState.accepted) {
+    if (state == null ||
+        state == LMChatroomRequestState.accepted ||
+        !_isDMRequestNeedApproval) {
       return const SizedBox();
     }
 
@@ -439,90 +436,102 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     // if state is initiated & current user != chatRequestedBy
     // show approve/reject buttons
 
-    return Container(
-        child: Column(
-      children: [
-        if (state == LMChatroomRequestState.initiated &&
-            !checkDMreqByCurrentUser())
-          LMChatApproveRejectView(
-            onApproveButtonClicked: () {
-              // Define callbacks
-              // Show the dialog
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return _screenBuilder.dmApproveRejectDialogBuilder(
-                      context,
-                      type: DMDialogType.approve,
-                      onPrimary: onPrimaryApprove,
-                      onSecondary: onSecondaryApprove,
-                      approveRejectDialog: _defDmApproveRejectDialog(
+    return _isDMRequestNeedApproval
+        ? Column(
+            children: [
+              if (state == LMChatroomRequestState.initiated &&
+                  !checkDMreqByCurrentUser())
+                LMChatApproveRejectView(
+                  onApproveButtonClicked: () {
+                    // Define callbacks
+                    // Show the dialog
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return _screenBuilder.dmApproveRejectDialogBuilder(
+                            context,
+                            type: DMDialogType.approve,
+                            onPrimary: onPrimaryApprove,
+                            onSecondary: onSecondaryApprove,
+                            approveRejectDialog: _defDmApproveRejectDialog(
+                              context,
+                              type: DMDialogType.approve,
+                              onPrimary: onPrimaryApprove,
+                              onSecondary: onSecondaryApprove,
+                            ),
+                          );
+                        });
+                  },
+                  onRejectButtonClicked: () {
+                    // Show the dialog
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return _screenBuilder.dmApproveRejectDialogBuilder(
+                            context,
+                            type: DMDialogType.reject,
+                            onPrimary: onPrimaryReject,
+                            onSecondary: onSecondaryReject,
+                            onTertiary: onTertiaryReject, // Pass tertiary here
+                            approveRejectDialog: _defDmApproveRejectDialog(
+                              context,
+                              type: DMDialogType.reject,
+                              onPrimary: onPrimaryReject,
+                              onSecondary: onSecondaryReject,
+                              onTertiary:
+                                  onTertiaryReject, // Pass tertiary here
+                            ),
+                          );
+                        });
+                  },
+                ),
+              Container(
+                width: 90.w,
+                constraints: BoxConstraints(
+                  minHeight: 4.h,
+                ),
+                decoration: BoxDecoration(
+                  color: _themeData.container,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                margin: const EdgeInsets.only(
+                  top: 8,
+                  bottom: 8,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: kPaddingXLarge,
+                    vertical: kPaddingMedium,
+                  ),
+                  child: Center(
+                    child: Builder(
+                        // Use Builder to get context if needed within builder call
+                        builder: (context) {
+                      // Get the text content
+                      final String containerText = _containerText(state);
+                      // Create the default widget
+                      final defaultDmStateText = LMChatText(
+                        containerText,
+                        style: LMChatTextStyle(
+                            textStyle: TextStyle(
+                          fontSize: 14,
+                          color: _themeData.secondaryColor,
+                        )),
+                      );
+                      // Call the builder method from the delegate
+                      return _screenBuilder.dmStateContainerTextBuilder(
                         context,
-                        type: DMDialogType.approve,
-                        onPrimary: onPrimaryApprove,
-                        onSecondary: onSecondaryApprove,
-                      ),
-                    );
-                  });
-            },
-            onRejectButtonClicked: () {
-              // Show the dialog
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return _screenBuilder.dmApproveRejectDialogBuilder(
-                      context,
-                      type: DMDialogType.reject,
-                      onPrimary: onPrimaryReject,
-                      onSecondary: onSecondaryReject,
-                      onTertiary: onTertiaryReject, // Pass tertiary here
-                      approveRejectDialog: _defDmApproveRejectDialog(
-                        context,
-                        type: DMDialogType.reject,
-                        onPrimary: onPrimaryReject,
-                        onSecondary: onSecondaryReject,
-                        onTertiary: onTertiaryReject, // Pass tertiary here
-                      ),
-                    );
-                  });
-            },
-          ),
-        Container(
-          width: 100.w, // Assuming ScreenUtil is used for .w
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
-          decoration: BoxDecoration(
-            color: _themeData.container,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Center(
-            child: Builder(
-                // Use Builder to get context if needed within builder call
-                builder: (context) {
-              // Get the text content
-              final String containerText = _containerText(state);
-              // Create the default widget
-              final defaultDmStateText = LMChatText(
-                containerText,
-                style: LMChatTextStyle(
-                    padding: const EdgeInsets.only(top: 8),
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      color: _themeData.secondaryColor,
-                    )),
-              );
-              // Call the builder method from the delegate
-              return _screenBuilder.dmStateContainerTextBuilder(
-                context,
-                state,
-                containerText,
-                defaultDmStateText,
-              );
-            }),
-          ),
-        ),
-      ],
-    ));
+                        state,
+                        containerText,
+                        defaultDmStateText,
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ],
+          )
+        : SizedBox.shrink();
   }
 
   void onPrimaryApprove() async {
@@ -538,10 +547,22 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
     if (response.success) {
       _chatroomState.value = LMChatroomRequestState.accepted;
-    }
+      final conversation = response.data!.conversation!;
+      conversationBloc.add(LMChatLocalConversationEvent(
+        conversation: conversation.toConversationViewData(),
+      ));
 
-    LMChatroomBloc.instance
-        .add(LMChatFetchChatroomEvent(chatroomId: widget.chatroom.id));
+      LMChatConversationActionBloc.instance.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom!.copyWith(
+          chatRequestState: 1,
+        ),
+      ));
+      LMChatroomActionBloc.instance.add(
+        LMChatroomActionUpdateEvent(
+          chatroomId: chatroom!.id,
+        ),
+      );
+    }
   }
 
   void onSecondaryApprove() {
@@ -572,8 +593,21 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         entityType: 1,
       ),
     );
-    LMChatroomBloc.instance
-        .add(LMChatFetchChatroomEvent(chatroomId: widget.chatroom.id));
+    final conversation = response.data!.conversation!;
+    conversationBloc.add(LMChatLocalConversationEvent(
+      conversation: conversation.toConversationViewData(),
+    ));
+
+    LMChatConversationActionBloc.instance.add(LMChatRefreshBarEvent(
+      chatroom: widget.chatroom!.copyWith(
+        chatRequestState: 2,
+      ),
+    ));
+    LMChatroomActionBloc.instance.add(
+      LMChatroomActionUpdateEvent(
+        chatroomId: chatroom!.id,
+      ),
+    );
   }
 
   void onPrimaryReject() async {
@@ -587,9 +621,21 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           .build(),
     );
     if (response.success) {
-      _chatroomState.value = LMChatroomRequestState.rejected;
-      LMChatroomBloc.instance
-          .add(LMChatFetchChatroomEvent(chatroomId: widget.chatroom.id));
+      final conversation = response.data!.conversation!;
+      conversationBloc.add(LMChatLocalConversationEvent(
+        conversation: conversation.toConversationViewData(),
+      ));
+
+      LMChatConversationActionBloc.instance.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom!.copyWith(
+          chatRequestState: 2,
+        ),
+      ));
+      LMChatroomActionBloc.instance.add(
+        LMChatroomActionUpdateEvent(
+          chatroomId: chatroom!.id,
+        ),
+      );
     }
   }
 
@@ -606,11 +652,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       case LMChatroomRequestState.accepted:
         return 'Chat request accepted';
       case LMChatroomRequestState.rejected:
-        if (!checkDMreqByCurrentUser()) {
-          return "DM request pending. Messaging would be enabled once your request is approved.";
-        } else {
-          return "Connection request rejected";
-        }
+        return "Connection request rejected";
+
       case LMChatroomRequestState.disabled:
         return 'Direct messaging among members has been disabled by the community manager';
     }
@@ -643,7 +686,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                                       LMChatroomRequestState.notInitiated ||
                                   _chatroomState.value ==
                                       LMChatroomRequestState.accepted)) ||
-                          chatroom?.type != 10)
+                          chatroom?.type != 10 ||
+                          !_isDMRequestNeedApproval)
                         _screenBuilder.chatroomBottomBarContainer(
                           context,
                           _defTextFieldContainer(),
@@ -712,7 +756,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
                                   ),
                                 );
                               },
-                              child: shouldShowSendButton
+                              child: shouldShowSendButton || _isDMRequestState()
                                   ? _screenBuilder.sendButton(
                                       context,
                                       _textEditingController,
@@ -1820,7 +1864,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
     // If in DM request state, show confirmation dialog if private member
     if (_isDMRequestState()) {
-      if (chatroom?.isPrivateMember == true && _requestPermissionToDm) {
+      if (chatroom?.isPrivateMember == true && _isDMRequestNeedApproval) {
         // Define callbacks
         final VoidCallback onPrimarySend = () async {
           Navigator.pop(context);
@@ -1851,6 +1895,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       } else {
         await _sendDMRequest(message);
       }
+
       _resetMessageInput();
       return;
     }
@@ -2051,8 +2096,6 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   Future<void> _sendDMRequest(String message) async {
-    //Manually adding it to the conversation list
-
     final response = await LMChatCore.client.sendDMRequest(
       (SendDMRequestBuilder()
             ..chatroomId(chatroom!.id)
@@ -2064,30 +2107,32 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     if (response.success == true) {
       // Fetch latest conversations
       _chatroomState.value = LMChatroomRequestState.initiated;
-      await LMChatCore.client.getConversation(
-        (GetConversationRequestBuilder()..chatroomId(chatroom!.id)).build(),
+
+      //if (_isOwnerOrCM) {
+      if (chatroom != null && !chatroom!.isPrivateMember!) {
+        conversationBloc.add(LMChatFetchConversationsEvent(
+          chatroomId: chatroom!.id,
+          page: 1,
+          pageSize: 200,
+          direction: LMPaginationDirection.top,
+          lastConversationId: response.data!.conversation!.id,
+          reInitialize: true,
+        ));
+      }
+      conversationBloc.add(LMChatLocalConversationEvent(
+          conversation: response.data!.conversation!.toConversationViewData()));
+      LMChatConversationActionBloc.instance.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom!.copyWith(
+          chatRequestState: chatroom?.isPrivateMember == true ? 0 : 1,
+        ),
+      ));
+      LMChatroomActionBloc.instance.add(
+        LMChatroomActionUpdateEvent(
+          chatroomId: chatroom!.id,
+        ),
       );
-      final DateTime dateTime = DateTime.now();
-      final tempId = "-${dateTime.millisecondsSinceEpoch.toString()}";
-      LMChatConversationViewDataBuilder conversationViewDataBuilder =
-          LMChatConversationViewDataBuilder()
-            ..answer(message)
-            ..chatroomId(widget.chatroom.id)
-            ..createdAt(DateFormat('HH:mm').format(DateTime.now()))
-            ..memberId(currentUser.id)
-            ..header("")
-            ..date(DateFormat('dd MMM yyyy').format(dateTime))
-            ..attachmentsUploaded(false)
-            ..hasFiles(false)
-            ..member(currentUser)
-            ..temporaryId(tempId)
-            ..createdEpoch(dateTime.millisecondsSinceEpoch)
-            ..id(1);
-      LMChatConversationViewData conversationViewData =
-          conversationViewDataBuilder.build();
-      conversationBloc.add(
-        LMChatLocalConversationEvent(conversation: conversationViewData),
-      );
+
+      //  }
     }
   }
 

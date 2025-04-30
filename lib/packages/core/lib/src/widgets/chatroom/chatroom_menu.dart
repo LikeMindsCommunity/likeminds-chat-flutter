@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
@@ -50,6 +51,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
       LMChatConversationBloc.instance;
   final LMChatConversationActionBloc conversationActionBloc =
       LMChatConversationActionBloc.instance;
+  final LMChatroomActionBloc chatroomActionBloc = LMChatroomActionBloc.instance;
   @override
   void initState() {
     super.initState();
@@ -82,12 +84,20 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               BoxDecoration(
                 color: LMChatTheme.theme.container,
               ),
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            itemCount: chatroomActions.length,
-            itemBuilder: (BuildContext context, int index) {
-              return getListTile(chatroomActions[index]);
+          child: BlocBuilder(
+            bloc: chatroomActionBloc,
+            builder: (context, state) {
+              if (state is LMChatroomActionUpdateState) {
+                chatroomActions = state.actions;
+              }
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: chatroomActions.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return getListTile(chatroomActions[index]);
+                },
+              );
             },
           ),
         ),
