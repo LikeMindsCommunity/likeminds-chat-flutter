@@ -40,4 +40,10 @@ class LMChatroomActionBloc
       await _handleSetChatroomTopic(event, emit);
     }
   }
+
+  @override
+  Future<void> close() {
+    _instance = null;
+    return super.close();
+  }
 }
