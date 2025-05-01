@@ -119,4 +119,12 @@ class LMChatReportBuilderDelegate {
   ) {
     return submitButton;
   }
+
+  /// Build MemberReported Dialog
+  Widget memberReportedDialogBuilder(
+    BuildContext context,
+    LMChatDialog defMemberReportedDialog,
+  ) {
+    return defMemberReportedDialog;
+  }
 }

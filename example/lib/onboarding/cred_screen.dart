@@ -234,7 +234,12 @@ class _CredScreenState extends State<CredScreen> {
                   ElevatedButton(
                     style: buttonStyle,
                     onPressed: () async {
-                      await LMChatLocalPreference.instance.clearLocalData();
+                      final response = await LMChatCore.instance.logout();
+                      if (!response.success) {
+                        await LMChatLocalPreference.instance.clearLocalData();
+                      } else {
+                        toast("Logged out successfully");
+                      }
                       _clearTextFieldData();
                       setState(() {});
                     },
