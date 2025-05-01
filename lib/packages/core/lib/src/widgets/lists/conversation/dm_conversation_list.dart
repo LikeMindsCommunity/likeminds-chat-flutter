@@ -205,8 +205,8 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
                   context,
                   stateMessage,
                   item.state == 19 &&
-                          user.id != item.memberId &&
-                          chatroom?.chatRequestState == 2
+                          chatroom?.chatRequestState == 2 &&
+                          user.id == chatroom?.chatRequestedBy?.id
                       ? _defaultStateBubble(
                           stateMessage,
                           "Tap to undo.",

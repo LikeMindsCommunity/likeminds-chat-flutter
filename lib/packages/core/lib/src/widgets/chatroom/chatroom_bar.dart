@@ -667,7 +667,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       case LMChatroomRequestState.accepted:
         return 'Chat request accepted';
       case LMChatroomRequestState.rejected:
-        return "Connection request rejected";
+        return "You can not respond to a rejected connection. Approve to send a message.";
 
       case LMChatroomRequestState.disabled:
         return 'Direct messaging among members has been disabled by the community manager';
