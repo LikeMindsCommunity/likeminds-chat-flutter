@@ -85,3 +85,8 @@
 ## 0.17.0
 
 - Added support for flutter web
+
+## 1.0.0
+- Changed different screens for DM,Commnity, hybrid
+- Added DM Flow
+- Added notification fix
