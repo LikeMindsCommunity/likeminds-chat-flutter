@@ -42,3 +42,32 @@ class LMChatHideEmojiKeyboardState extends LMChatroomActionState {
   @override
   List<Object?> get props => [];
 }
+
+// chatroom action update state
+class LMChatroomActionUpdateState extends LMChatroomActionState {
+  final ChatRoom chatroom;
+  final List<ChatroomAction> actions;
+
+  LMChatroomActionUpdateState({
+    required this.chatroom,
+    required this.actions,
+  });
+
+  @override
+  List<Object> get props => [chatroom, actions];
+}
+
+/// State to represent an error during chatroom action updates
+class LMChatroomActionUpdateErrorState extends LMChatroomActionState {
+  /// Error message describing the issue
+  final String errorMessage;
+
+  /// Constructor to initialize the error message
+  LMChatroomActionUpdateErrorState({
+    required this.errorMessage,
+  });
+
+  // Equatable props to compare instances
+  @override
+  List<Object?> get props => [errorMessage];
+}

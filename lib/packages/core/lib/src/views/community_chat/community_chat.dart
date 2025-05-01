@@ -4,15 +4,16 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_flutter_core/src/views/community_chat/configurations/builder.dart';
 
-/// {@template lm_chat_home_feed_list}
+/// {@template lm_community_chat_screen}
 /// A widget that represents a List of Group Chatrooms on home
 /// Talks to an instance of LMChatHomeFeedBloc, and updates accordingly
 /// Allows for customizations to change the look and feel.
 /// {@endtemplate}
-class LMChatHomeFeedList extends StatefulWidget {
-  /// {@macro lm_chat_home_feed_list}
-  const LMChatHomeFeedList({
+class LMCommunityChatScreen extends StatefulWidget {
+  /// {@macro lm_community_chat_screen}
+  const LMCommunityChatScreen({
     super.key,
     this.chatroomTag,
   });
@@ -20,21 +21,21 @@ class LMChatHomeFeedList extends StatefulWidget {
   /// Tag to filter chatrooms, takes priority over the tag from config
   final String? chatroomTag;
 
-  /// Creates a copy of this [LMChatHomeFeedList] but with the given fields replaced with the new values.
-  LMChatHomeFeedList copyWith({
+  /// Creates a copy of this [LMCommunityChatScreen] but with the given fields replaced with the new values.
+  LMCommunityChatScreen copyWith({
     String? chatroomTag,
   }) {
-    return LMChatHomeFeedList(
+    return LMCommunityChatScreen(
       chatroomTag: chatroomTag ?? this.chatroomTag,
     );
   }
 
   @override
-  State<LMChatHomeFeedList> createState() => _LMChatHomeFeedListState();
+  State<LMCommunityChatScreen> createState() => _LMCommunityChatScreenState();
 }
 
-class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
-    with AutomaticKeepAliveClientMixin<LMChatHomeFeedList> {
+class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
+    with AutomaticKeepAliveClientMixin<LMCommunityChatScreen> {
   // Widget level track of page key for pagination
   int _page = 1;
 
@@ -47,14 +48,14 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   // Paging controller to handle pagination, and list updation
   late PagingController<int, LMChatRoomViewData> homeFeedPagingController;
 
-  final LMChatHomeBuilderDelegate _screenBuilder =
-      LMChatCore.config.homeConfig.builder;
-  final _homeScreenSettings = LMChatCore.config.homeConfig.setting;
-  final LMChatHomeFeedListStyle _style =
-      LMChatCore.config.homeConfig.style.homeFeedListStyle?.call(
-            LMChatHomeFeedListStyle.basic(LMChatTheme.theme.scaffold),
+  final LMCommunityChatBuilderDelegate _screenBuilder =
+      LMChatCore.config.communityChatConfig.builder;
+  final _homeScreenSettings = LMChatCore.config.communityChatConfig.setting;
+  final LMCommunityChatListStyle _style =
+      LMChatCore.config.communityChatConfig.style.homeFeedListStyle?.call(
+            LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold),
           ) ??
-          LMChatHomeFeedListStyle.basic(LMChatTheme.theme.scaffold);
+          LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold);
 
   String get _tag => widget.chatroomTag ?? _homeScreenSettings.tag ?? '';
 
@@ -67,12 +68,13 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   }
 
   @override
-  void didUpdateWidget(covariant LMChatHomeFeedList oldWidget) {
+  void didUpdateWidget(covariant LMCommunityChatScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     feedBloc = LMChatHomeFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
     _addPaginationListener();
   }
+
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
@@ -80,7 +82,6 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
 
   @override
   void dispose() {
-    feedBloc.close();
     homeFeedPagingController.dispose();
     super.dispose();
   }
@@ -89,90 +90,87 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
   Widget build(BuildContext context) {
     super.build(context);
     return ValueListenableBuilder(
-      valueListenable: LMChatTheme.themeNotifier,
-      builder: (context,value,__) {
-        return Scaffold(
-          backgroundColor: LMChatTheme.theme.scaffold,
-          body: SafeArea(
-            top: false,
-            child: Column(
-              children: [
-                _screenBuilder.homeFeedExploreTileBuilder(
-                  context,
-                  _defaultExploreTile(),
-                ),
-                Expanded(
-                  child: BlocListener<LMChatHomeFeedBloc, LMChatHomeFeedState>(
-                    bloc: feedBloc,
-                    listener: (_, state) {
-                      _updatePagingControllers(state);
-                    },
-                    child: ValueListenableBuilder(
-                        valueListenable: rebuildFeedList,
-                        builder: (context, _, __) {
-                          return PagedListView<int, LMChatRoomViewData>(
-                            pagingController: homeFeedPagingController,
-                            padding: _style.padding ??
-                                const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                            physics: const ClampingScrollPhysics(),
-                            builderDelegate:
-                                PagedChildBuilderDelegate<LMChatRoomViewData>(
-                              firstPageErrorIndicatorBuilder: (context) =>
-                                  _screenBuilder
-                                      .homeFeedFirstPageErrorIndicatorBuilder(
-                                context,
-                                _defaultErrorView(),
-                              ),
-                              newPageErrorIndicatorBuilder: (context) =>
-                                  _screenBuilder
-                                      .homeFeedNewPageErrorIndicatorBuilder(
-                                context,
-                                _defaultErrorView(),
-                              ),
-                              firstPageProgressIndicatorBuilder: (context) =>
-                                  _screenBuilder
-                                      .homeFeedFirstPageProgressIndicatorBuilder(
-                                context,
-                                const LMChatSkeletonChatroomList(),
-                              ),
-                              newPageProgressIndicatorBuilder: (context) =>
-                                  _screenBuilder
-                                      .homeFeedNewPageProgressIndicatorBuilder(
-                                context,
-                                const LMChatLoader(),
-                              ),
-                              noItemsFoundIndicatorBuilder: (context) =>
-                                  _screenBuilder
-                                      .homeFeedNoItemsFoundIndicatorBuilder(
-                                context,
-                                _defaultEmptyView(),
-                              ),
-                              noMoreItemsIndicatorBuilder: (context) =>
-                                  _screenBuilder
-                                      .homeFeedNoMoreItemsIndicatorBuilder(
-                                context,
-                                const SizedBox(),
-                              ),
-                              itemBuilder: (context, item, index) {
-                                return _screenBuilder.homeFeedTileBuilder(
-                                  context,
-                                  item,
-                                  _defaultHomeChatRoomTile(item),
-                                );
-                              },
-                            ),
-                          );
-                        }),
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, value, __) {
+          return Scaffold(
+            backgroundColor: LMChatTheme.theme.scaffold,
+            body: SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  _screenBuilder.exploreTileBuilder(
+                    context,
+                    _defaultExploreTile(),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child:
+                        BlocListener<LMChatHomeFeedBloc, LMChatHomeFeedState>(
+                      bloc: feedBloc,
+                      listener: (_, state) {
+                        _updatePagingControllers(state);
+                      },
+                      child: ValueListenableBuilder(
+                          valueListenable: rebuildFeedList,
+                          builder: (context, _, __) {
+                            return PagedListView<int, LMChatRoomViewData>(
+                              pagingController: homeFeedPagingController,
+                              padding: _style.padding ??
+                                  const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                              physics: const ClampingScrollPhysics(),
+                              builderDelegate:
+                                  PagedChildBuilderDelegate<LMChatRoomViewData>(
+                                firstPageErrorIndicatorBuilder: (context) =>
+                                    _screenBuilder
+                                        .firstPageErrorIndicatorBuilder(
+                                  context,
+                                  _defaultErrorView(),
+                                ),
+                                newPageErrorIndicatorBuilder: (context) =>
+                                    _screenBuilder.newPageErrorIndicatorBuilder(
+                                  context,
+                                  _defaultErrorView(),
+                                ),
+                                firstPageProgressIndicatorBuilder: (context) =>
+                                    _screenBuilder
+                                        .firstPageProgressIndicatorBuilder(
+                                  context,
+                                  const LMChatSkeletonChatroomList(),
+                                ),
+                                newPageProgressIndicatorBuilder: (context) =>
+                                    _screenBuilder
+                                        .newPageProgressIndicatorBuilder(
+                                  context,
+                                  const LMChatLoader(),
+                                ),
+                                noItemsFoundIndicatorBuilder: (context) =>
+                                    _screenBuilder.noItemsFoundIndicatorBuilder(
+                                  context,
+                                  _defaultEmptyView(),
+                                ),
+                                noMoreItemsIndicatorBuilder: (context) =>
+                                    _screenBuilder.noMoreItemsIndicatorBuilder(
+                                  context,
+                                  const SizedBox(),
+                                ),
+                                itemBuilder: (context, item, index) {
+                                  return _screenBuilder.chatroomTileBuilder(
+                                    context,
+                                    item,
+                                    _defaultHomeChatRoomTile(item),
+                                  );
+                                },
+                              ),
+                            );
+                          }),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 
   LMChatTile _defaultExploreTile() {
@@ -232,7 +230,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
               snapshot.hasData) {
             if (snapshot.data!.success) {
               GetExploreTabCountResponse response = snapshot.data!.data!;
-              return _screenBuilder.homeFeedExploreChipBuilder(
+              return _screenBuilder.exploreChipBuilder(
                 context,
                 _defExploreChip(response),
               );
@@ -383,7 +381,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
           ),
           const SizedBox(width: 2),
           if (chatroom.isSecret == true)
-            _screenBuilder.homeFeedSecretChatroomIconBuilder(
+            _screenBuilder.secretChatroomIconBuilder(
               _defSecretChatroomIcon(),
             ),
         ],
@@ -417,7 +415,7 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
-              ? _screenBuilder.homeFeedMuteIconBuilder(
+              ? _screenBuilder.muteIconBuilder(
                   _defMuteIcon(),
                 )
               : const SizedBox.shrink(),
@@ -486,8 +484,8 @@ class _LMChatHomeFeedListState extends State<LMChatHomeFeedList>
 /// {@template lm_chat_home_feed_list_style}
 /// A style object to customize the look and feel of the home feed list
 /// {@endtemplate}
-class LMChatHomeFeedListStyle {
-  /// [backgroundColor] is the background color of the list
+class LMCommunityChatListStyle {
+  /// LMChatHomeFeedListStyle[backgroundColor] is the background color of the list
   final Color? backgroundColor;
 
   /// [padding] is the padding of the list
@@ -502,7 +500,7 @@ class LMChatHomeFeedListStyle {
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_home_feed_list_style}
-  const LMChatHomeFeedListStyle({
+  const LMCommunityChatListStyle({
     this.backgroundColor,
     this.padding,
     this.profilePictureStyle,
@@ -510,8 +508,8 @@ class LMChatHomeFeedListStyle {
   });
 
   /// Default style for the home feed list
-  factory LMChatHomeFeedListStyle.basic(Color? scaffold) {
-    return LMChatHomeFeedListStyle(
+  factory LMCommunityChatListStyle.basic(Color? scaffold) {
+    return LMCommunityChatListStyle(
         backgroundColor: scaffold,
         padding: const EdgeInsets.only(
           right: 8,
@@ -537,15 +535,15 @@ class LMChatHomeFeedListStyle {
         ));
   }
 
-  /// Creates a copy of this [LMChatHomeFeedListStyle] but with the given fields replaced with the new values.
+  /// Creates a copy of this [LMCommunityChatListStyle] but with the given fields replaced with the new values.
   /// If the fields are null, the original values are retained.
-  LMChatHomeFeedListStyle copyWith({
+  LMCommunityChatListStyle copyWith({
     Color? backgroundColor,
     EdgeInsets? padding,
     LMChatProfilePictureStyle? profilePictureStyle,
     LMChatTextStyle? unReadCountTextStyle,
   }) {
-    return LMChatHomeFeedListStyle(
+    return LMCommunityChatListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
       profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,

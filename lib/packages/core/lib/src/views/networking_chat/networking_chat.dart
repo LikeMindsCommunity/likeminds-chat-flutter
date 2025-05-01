@@ -4,30 +4,31 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/assets.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/realtime/realtime.dart';
-import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
+import 'package:likeminds_chat_flutter_core/src/views/member_list/member_list.dart';
+import 'package:likeminds_chat_flutter_core/src/views/networking_chat/configurations/builder.dart';
 
 /// {@template lm_chat_dm_feed_list}
 /// A widget that represents a List of DM Chatrooms
 /// Talks to an instance of LMChatDMFeedBloc, and updates accordingly
 /// Allows for customizations to change the look and feel.
 /// {@endtemplate}
-class LMChatDMFeedList extends StatefulWidget {
+class LMNetworkingChatScreen extends StatefulWidget {
   /// {@macro lm_chat_dm_feed_list}
-  const LMChatDMFeedList({
+  const LMNetworkingChatScreen({
     super.key,
   });
 
-  /// Creates a copy of this [LMChatDMFeedList] but with the given fields replaced with the new values.
-  LMChatDMFeedList copyWith() {
-    return const LMChatDMFeedList();
+  /// Creates a copy of this [LMNetworkingChatScreen] but with the given fields replaced with the new values.
+  LMNetworkingChatScreen copyWith() {
+    return const LMNetworkingChatScreen();
   }
 
   @override
-  State<LMChatDMFeedList> createState() => _LMChatDMFeedListState();
+  State<LMNetworkingChatScreen> createState() => _LMNetworkingChatScreenState();
 }
 
-class _LMChatDMFeedListState extends State<LMChatDMFeedList>
-    with AutomaticKeepAliveClientMixin<LMChatDMFeedList> {
+class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
+    with AutomaticKeepAliveClientMixin<LMNetworkingChatScreen> {
   // Widget level track of page key for pagination
   int _page = 1;
 
@@ -40,20 +41,39 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   // Paging controller to handle pagination, and list updation
   late PagingController<int, LMChatRoomViewData> homeFeedPagingController;
 
-  final LMChatHomeBuilderDelegate _screenBuilder =
-      LMChatCore.config.homeConfig.builder;
+  final LMNetworkingChatBuilderDelegate _screenBuilder =
+      LMChatCore.config.networkingChatConfig.builder;
 
   /// [_style] is a style object to customize the look and feel of the list
   final LMChatDMFeedListStyle _style =
-      LMChatCore.config.homeConfig.style.dmFeedListStyle?.call(
+      LMChatCore.config.networkingChatConfig.style.dmFeedListStyle?.call(
             LMChatDMFeedListStyle.basic(),
           ) ??
           LMChatDMFeedListStyle.basic();
+
+  final ValueNotifier<bool> _showDMFab = ValueNotifier(false);
+  int? _showList;
+
+  void _checkDMStatus() async {
+    final checkDMStatusRequest =
+        (CheckDMStatusRequestBuilder()..reqFrom("dm_feed_v2")).build();
+    final checkDMStatusResponse = await LMChatCore.client.checkDMStatus(
+      checkDMStatusRequest,
+    );
+    _showDMFab.value = checkDMStatusResponse.data?.showDm ?? false;
+    final cta = checkDMStatusResponse.data?.cta;
+    if (cta != null) {
+      Uri uri = Uri.parse(cta);
+      Map<String, String> queryParams = uri.queryParameters;
+      _showList = int.tryParse(queryParams['show_list'] ?? '');
+    }
+  }
 
   @override
   void initState() {
     feedBloc = LMChatDMFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
+    _checkDMStatus();
     _addPaginationListener();
     LMChatAnalyticsBloc.instance.add(
       const LMChatFireAnalyticsEvent(
@@ -70,7 +90,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   }
 
   @override
-  void didUpdateWidget(covariant LMChatDMFeedList oldWidget) {
+  void didUpdateWidget(covariant LMNetworkingChatScreen oldWidget) {
     feedBloc = LMChatDMFeedBloc.instance;
     homeFeedPagingController = PagingController(firstPageKey: 1);
     _addPaginationListener();
@@ -88,75 +108,84 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
   Widget build(BuildContext context) {
     super.build(context);
     return ValueListenableBuilder(
-      valueListenable: LMChatTheme.themeNotifier,
-      builder: (context, _, __) {
-        return Scaffold(
-          backgroundColor: _style.backgroundColor ?? LMChatTheme.theme.scaffold,
-          body: SafeArea(
-            top: false,
-            child: BlocListener<LMChatDMFeedBloc, LMChatDMFeedState>(
-              bloc: feedBloc,
-              listener: (_, state) {
-                _updatePagingControllers(state);
+        valueListenable: LMChatTheme.themeNotifier,
+        builder: (context, _, __) {
+          return _screenBuilder.scaffold(
+            floatingActionButton: ValueListenableBuilder(
+              valueListenable: _showDMFab,
+              builder: (context, value, child) {
+                return value
+                    ? _screenBuilder.floatingActionNewMessageButton(
+                        context, _floatingActionButton())
+                    : const SizedBox();
               },
-              child: ValueListenableBuilder(
-                  valueListenable: rebuildFeedList,
-                  builder: (context, _, __) {
-                    return PagedListView<int, LMChatRoomViewData>(
-                      pagingController: homeFeedPagingController,
-                      padding: _style.padding ??
-                          const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 4,
-                          ),
-                      physics: const ClampingScrollPhysics(),
-                      builderDelegate:
-                          PagedChildBuilderDelegate<LMChatRoomViewData>(
-                        itemBuilder: (context, chatroom, index) {
-                          return _screenBuilder.dmFeedTileBuilder(
-                            context,
-                            chatroom,
-                            _defaultDMChatRoomTile(chatroom),
-                          );
-                        },
-                        firstPageErrorIndicatorBuilder: (context) =>
-                            _screenBuilder.dmFeedFirstPageErrorIndicatorBuilder(
-                          context,
-                          _defaultErrorView(),
-                        ),
-                        newPageErrorIndicatorBuilder: (context) =>
-                            _screenBuilder.dmFeedNewPageErrorIndicatorBuilder(
-                          context,
-                          _defaultErrorView(),
-                        ),
-                        firstPageProgressIndicatorBuilder: (context) =>
-                            _screenBuilder.dmFeedFirstPageProgressIndicatorBuilder(
-                          context,
-                          const LMChatSkeletonChatroomList(),
-                        ),
-                        newPageProgressIndicatorBuilder: (context) =>
-                            _screenBuilder.dmFeedNewPageProgressIndicatorBuilder(
-                          context,
-                          const LMChatLoader(),
-                        ),
-                        noItemsFoundIndicatorBuilder: (context) =>
-                            _screenBuilder.dmFeedNoItemsFoundIndicatorBuilder(
-                          context,
-                          _defaultEmptyView(),
-                        ),
-                        noMoreItemsIndicatorBuilder: (context) =>
-                            _screenBuilder.dmFeedNoMoreItemsIndicatorBuilder(
-                          context,
-                          const SizedBox(),
-                        ),
-                      ),
-                    );
-                  }),
             ),
-          ),
-        );
-      }
-    );
+            backgroundColor:
+                _style.backgroundColor ?? LMChatTheme.theme.scaffold,
+            body: SafeArea(
+              top: false,
+              child: BlocListener<LMChatDMFeedBloc, LMChatDMFeedState>(
+                bloc: feedBloc,
+                listener: (_, state) {
+                  _updatePagingControllers(state);
+                },
+                child: ValueListenableBuilder(
+                    valueListenable: rebuildFeedList,
+                    builder: (context, _, __) {
+                      return PagedListView<int, LMChatRoomViewData>(
+                        pagingController: homeFeedPagingController,
+                        padding: _style.padding ??
+                            const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 4,
+                            ),
+                        physics: const ClampingScrollPhysics(),
+                        builderDelegate:
+                            PagedChildBuilderDelegate<LMChatRoomViewData>(
+                          itemBuilder: (context, chatroom, index) {
+                            return _screenBuilder.userTileBuilder(
+                              context,
+                              chatroom,
+                              _defaultDMChatRoomTile(chatroom),
+                            );
+                          },
+                          firstPageErrorIndicatorBuilder: (context) =>
+                              _screenBuilder.firstPageErrorIndicatorBuilder(
+                            context,
+                            _defaultErrorView(),
+                          ),
+                          newPageErrorIndicatorBuilder: (context) =>
+                              _screenBuilder.newPageErrorIndicatorBuilder(
+                            context,
+                            _defaultErrorView(),
+                          ),
+                          firstPageProgressIndicatorBuilder: (context) =>
+                              _screenBuilder.firstPageProgressIndicatorBuilder(
+                            context,
+                            const LMChatSkeletonChatroomList(),
+                          ),
+                          newPageProgressIndicatorBuilder: (context) =>
+                              _screenBuilder.newPageProgressIndicatorBuilder(
+                            context,
+                            const LMChatLoader(),
+                          ),
+                          noItemsFoundIndicatorBuilder: (context) =>
+                              _screenBuilder.noItemsFoundIndicatorBuilder(
+                            context,
+                            _defaultEmptyView(),
+                          ),
+                          noMoreItemsIndicatorBuilder: (context) =>
+                              _screenBuilder.noMoreItemsIndicatorBuilder(
+                            context,
+                            const SizedBox(),
+                          ),
+                        ),
+                      );
+                    }),
+              ),
+            ),
+          );
+        });
   }
 
   _addPaginationListener() {
@@ -291,7 +320,7 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           chatroom.muteStatus != null && chatroom.muteStatus!
-              ? _screenBuilder.dmFeedMuteIconBuilder(
+              ? _screenBuilder.muteIconBuilder(
                   _defMuteButton(),
                 )
               : const SizedBox.shrink(),
@@ -346,22 +375,34 @@ class _LMChatDMFeedListState extends State<LMChatDMFeedList>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LMChatExplorePage(),
+            builder: (context) => LMChatMemberList(
+              showList: _showList,
+            ),
           ),
         );
       },
+      text: const LMChatText('NEW MESSAGE',
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 13,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          )),
       style: LMChatButtonStyle(
-        backgroundColor: LMChatTheme.theme.backgroundColor,
-        height: 48,
-        width: 48,
-        borderRadius: 12,
-      ),
-      icon: LMChatIcon(
-        type: LMChatIconType.icon,
-        icon: Icons.message,
-        style: LMChatIconStyle(
-          color: LMChatTheme.theme.primaryColor,
+        spacing: 8,
+        icon: const LMChatIcon(
+          type: LMChatIconType.svg,
+          assetPath: kNetworkingChatIcon,
+          style: LMChatIconStyle(
+            color: Colors.white,
+            size: 30,
+          ),
         ),
+        backgroundColor: LMChatTheme.theme.primaryColor,
+        width: 173,
+        height: 48,
+        borderRadius: 40,
       ),
     );
   }

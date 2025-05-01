@@ -59,7 +59,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 Future<void> _handleNotification(RemoteMessage message) async {
   debugPrint("--- Notification received in LEVEL 1 ---");
   await LMChatNotificationHandler.instance
-      .handleBackgroundNotification(message);
+      .handleNotification(message, rootNavigatorKey);
 }
 
 void main() async {
@@ -102,9 +102,16 @@ Future<void> setupNotifications() async {
   FirebaseMessaging.onBackgroundMessage(_handleNotification);
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    debugPrint("---The app is opened from a notification---");
+    debugPrint("---The app is opened from a notifiPcation---");
     await LMChatNotificationHandler.instance
         .handleNotification(message, rootNavigatorKey);
+  });
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    debugPrint("---Foreground notification received---");
+
+    await LMChatNotificationHandler.instance
+        .handleForegroundNotifications(message);
   });
 
   FirebaseMessaging.instance.getInitialMessage().then(

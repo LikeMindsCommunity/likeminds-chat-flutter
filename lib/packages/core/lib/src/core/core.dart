@@ -169,6 +169,16 @@ class LMChatCore {
               errorMessage: communityConfigurations.errorMessage);
         }
       }
+      // set the isDMWithRequestEnabled flag in local preference
+      final communitySettings =
+          initiateUserResponse.data?.community?.communitySettings;
+      for (final CommunitySettings communitySetting
+          in communitySettings ?? []) {
+        if (communitySetting.settingType ==
+            'enable_dm_without_connection_request') {
+          await storeIsDMWithRequestEnabled(communitySetting.enabled);
+        }
+      }
       return initiateUserResponse;
     } else {
       return await showChatWithoutApiKey(
@@ -242,11 +252,29 @@ class LMChatCore {
       );
     }
 
+    // set the isDMWithRequestEnabled flag in local preference
+    final communitySettings = validateUserResponse.community?.communitySettings;
+    for (final CommunitySettings communitySetting in communitySettings ?? []) {
+      if (communitySetting.settingType ==
+          'enable_dm_without_connection_request') {
+        await storeIsDMWithRequestEnabled(communitySetting.enabled);
+      }
+    }
+
     return LMResponse(success: true, data: validateUserResponse);
   }
 
   /// This function is used to logout the user session.
-  Future<LMResponse<void>> logout(LogoutRequest? request) async {
+  Future<LMResponse<void>> logout({LogoutRequest? request}) async {
+    // if `request` is null
+    // get device id from `LMChatNotificationHandler` instance
+    // and create a `LogoutRequest` instance with the device id
+    // this will ensure that if we already have device id registered
+    // we will use the same device id to logout the user
+    final deviceId = LMChatNotificationHandler.instance.deviceId;
+    if (deviceId != null) {
+      request ??= (LogoutRequestBuilder()..deviceId(deviceId)).build();
+    }
     LMResponse<void> response = await lmChatClient.logout(
       request ?? LogoutRequestBuilder().build(),
     );

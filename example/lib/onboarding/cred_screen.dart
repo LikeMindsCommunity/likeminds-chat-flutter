@@ -234,7 +234,12 @@ class _CredScreenState extends State<CredScreen> {
                   ElevatedButton(
                     style: buttonStyle,
                     onPressed: () async {
-                      await LMChatLocalPreference.instance.clearLocalData();
+                      final response = await LMChatCore.instance.logout();
+                      if (!response.success) {
+                        await LMChatLocalPreference.instance.clearLocalData();
+                      } else {
+                        toast("Logged out successfully");
+                      }
                       _clearTextFieldData();
                       setState(() {});
                     },
@@ -246,7 +251,8 @@ class _CredScreenState extends State<CredScreen> {
                   const SizedBox(height: 18),
                   LMChatAIButton(
                     style: LMChatAIButtonStyle.basic().copyWith(
-                      backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                      backgroundColor:
+                          isDarkMode ? Colors.grey[800] : Colors.white,
                       textColor: isDarkMode ? Colors.white : backgroundColor,
                       borderRadius: 12,
                     ),
@@ -267,22 +273,20 @@ class _CredScreenState extends State<CredScreen> {
   }
 
   Future<void> _onSubmit() async {
+    await LMChatLocalPreference.instance.clearLocalData();
     String apiKey = _apiKeyController.text;
     String username = _usernameController.text;
     String userId = _userIdController.text;
+    // Ensure all data is fetched correctly
     if (apiKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter the API Key"),
-        ),
+        const SnackBar(content: Text("Please enter the API Key")),
       );
       return;
     }
     if (userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter the User ID"),
-        ),
+        const SnackBar(content: Text("Please enter the User ID")),
       );
     } else {
       final response = await LMChatCore.instance.showChatWithApiKey(
@@ -291,12 +295,11 @@ class _CredScreenState extends State<CredScreen> {
         userName: username,
       );
       if (response.success) {
-        MaterialPageRoute route = MaterialPageRoute(
-          builder: (context) => const LMChatHomeScreen(
-              // chatroomType: LMChatroomType.dm,
-              ),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const LMCommunityHybridChatScreen()),
         );
-        Navigator.push(context, route);
       } else {
         toast(response.errorMessage ?? "An error occurred");
       }

@@ -32,6 +32,7 @@ void fetchChatroomEventHandler(
       actions: response.data!.chatroomActions!,
       participantCount: response.data!.participantCount ?? 0,
       lastConversationId: response.data!.lastConversationId ?? 0,
+      reInitializeConversationList: event.reInitializeConversationList ?? false,
     ),
   );
 }

@@ -13,12 +13,14 @@ class LMChatroomLoadedState extends LMChatroomState {
   final List<ChatroomAction> actions;
   final int lastConversationId;
   final int participantCount;
+  final bool? reInitializeConversationList;
 
   LMChatroomLoadedState({
     required this.chatroom,
     required this.actions,
     required this.lastConversationId,
     required this.participantCount,
+    this.reInitializeConversationList,
   });
 
   @override
@@ -27,6 +29,7 @@ class LMChatroomLoadedState extends LMChatroomState {
         actions,
         lastConversationId,
         participantCount,
+        reInitializeConversationList ?? false,
       ];
 }
 

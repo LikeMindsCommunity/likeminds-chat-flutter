@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/constants/enums.dart';
+import 'package:likeminds_chat_flutter_core/src/utils/constants/strings.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/conversation/conversation_utils.dart';
 import 'package:likeminds_chat_flutter_core/src/utils/preferences/preferences.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -136,4 +138,22 @@ bool isOtherUserAIChatbot(LMChatRoomViewData chatroom) {
 
   // Check if the other member has the chatbot role
   return otherMember?.roles?.contains(LMChatUserRole.chatbot) ?? false;
+}
+
+/// Store the isDMWithRequestEnabled flag in local preference
+Future<void> storeIsDMWithRequestEnabled(bool isDMWithRequestEnabled) async {
+  await LMChatLocalPreference.instance.storeCache(
+    (LMChatCacheBuilder()
+          ..key(LMChatStringConstants.isDMWithRequestEnabled)
+          ..value(isDMWithRequestEnabled))
+        .build(),
+  );
+}
+
+/// Get the isDMWithRequestEnabled flag from local preference
+bool getIsDMWithRequestEnabled() {
+  final isDMWithRequestEnabled = LMChatLocalPreference.instance.fetchCache(
+    LMChatStringConstants.isDMWithRequestEnabled,
+  );
+  return isDMWithRequestEnabled?.value ?? false;
 }

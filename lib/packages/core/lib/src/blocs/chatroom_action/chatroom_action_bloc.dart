@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:meta/meta.dart';
 
 part 'chatroom_action_event.dart';
@@ -11,6 +10,7 @@ part 'handler/show_emoji_keyboard_handler.dart';
 part 'handler/hide_emoji_keyboard_handler.dart';
 part 'handler/mark_read_chatroom_handler.dart';
 part 'handler/set_chatroom_topic_handler.dart';
+part 'handler/update_chatroom_action_handler.dart';
 
 class LMChatroomActionBloc
     extends Bloc<LMChatroomActionEvent, LMChatroomActionState> {
@@ -38,6 +38,14 @@ class LMChatroomActionBloc
       await _handleMarkReadChatroom(event);
     } else if (event is LMChatSetChatroomTopicEvent) {
       await _handleSetChatroomTopic(event, emit);
+    } else if (event is LMChatroomActionUpdateEvent) {
+      await _updateChatroomActionHandler(event, emit);
     }
+  }
+
+  @override
+  Future<void> close() {
+    _instance = null;
+    return super.close();
   }
 }

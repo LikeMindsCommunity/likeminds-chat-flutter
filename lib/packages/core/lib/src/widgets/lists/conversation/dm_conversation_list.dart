@@ -31,6 +31,8 @@ class LMChatDMConversationList extends StatefulWidget {
 
   /// The conversation helper.
   final LMChatConversationActionInterface? conversationHelper;
+  //chatrrom data
+  final LMChatRoomViewData? chatroom;
 
   /// Creates a new instance of LMChatDMConversationList
   const LMChatDMConversationList({
@@ -41,6 +43,7 @@ class LMChatDMConversationList extends StatefulWidget {
     this.paginatedListController,
     this.isOtherUserAIChatbot,
     this.conversationHelper,
+    this.chatroom,
   });
 
   @override
@@ -87,9 +90,11 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
           );
   LMChatConversationViewData? localConversation;
 
+  LMChatRoomViewData? chatroom;
   @override
   void initState() {
     super.initState();
+    chatroom = widget.chatroom;
     user = LMChatLocalPreference.instance.getUser();
     _conversationBloc = LMChatConversationBloc.instance;
     _convActionBloc = LMChatConversationActionBloc.instance;
@@ -113,8 +118,6 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
 
   @override
   void dispose() {
-    _convActionBloc.close();
-    _conversationBloc.close();
     super.dispose();
   }
 
@@ -131,6 +134,9 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
                   in state.conversations) {
                 _updateDeletedConversation(conversation);
               }
+            }
+            if (state is LMChatRefreshBarState) {
+              chatroom = state.chatroom;
             }
             if (state is LMChatConversationEdited) {
               updateEditedConversation(state.conversationViewData);
@@ -198,9 +204,20 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
                 return _screenBuilder.stateBubbleBuilder(
                   context,
                   stateMessage,
-                  _defaultStateBubble(stateMessage),
+                  item.state == 19 &&
+                          chatroom?.chatRequestState == 2 &&
+                          user.id == chatroom?.chatRequestedBy?.id
+                      ? _defaultStateBubble(
+                          stateMessage,
+                          "Tap to undo.",
+                          onClickableTextClicked: () {
+                            unBlockDM();
+                          },
+                        )
+                      : _defaultStateBubble(stateMessage, null),
                 );
               }
+
               return item.memberId == user.id
                   ? _screenBuilder.sentChatBubbleBuilder(
                       context, item, _defaultSentChatBubble(item))
@@ -224,10 +241,36 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
                 ),
             ],
           );
-          ;
         },
       ),
     );
+  }
+
+  void unBlockDM() async {
+    final request = (BlockMemberRequestBuilder()
+          ..chatroomId(chatroom!.id)
+          ..status(1))
+        .build();
+    final response = await LMChatCore.client.blockMember(request);
+    if (response.success) {
+      toast("Member unblocked");
+
+      final conversation = response.data!.conversation!;
+      _conversationBloc.add(LMChatLocalConversationEvent(
+        conversation: conversation.toConversationViewData(),
+      ));
+
+      _convActionBloc.add(LMChatRefreshBarEvent(
+        chatroom: widget.chatroom!.copyWith(
+          chatRequestState: 1,
+        ),
+      ));
+      LMChatroomActionBloc.instance.add(
+        LMChatroomActionUpdateEvent(
+          chatroomId: widget.chatroomId,
+        ),
+      );
+    }
   }
 
   Future<void> _onPaginationTriggered(pageKey, direction, conversation) async {
@@ -256,9 +299,12 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
     );
   }
 
-  LMChatStateBubble _defaultStateBubble(String message) {
+  LMChatStateBubble _defaultStateBubble(String message, String? clickableText,
+      {Function()? onClickableTextClicked}) {
     return LMChatStateBubble(
       message: message,
+      clickableText: clickableText,
+      onClickableTextClicked: onClickableTextClicked,
       style: LMChatTheme.theme.stateBubbleStyle.copyWith(
         backgroundColor: const Color(0xffacb7c0),
         messageStyle: LMChatTextStyle.basic().copyWith(
@@ -685,7 +731,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         pagedListController.clear();
         _topPage = 1;
         if (localConversation != null) {
-          conversationData?.insert(0, localConversation!);
+          conversationData.insert(0, localConversation!);
           localConversation = null;
         }
       }

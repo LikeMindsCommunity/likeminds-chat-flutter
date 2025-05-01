@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_flutter_core/src/blocs/blocs.dart';
 import 'package:likeminds_chat_flutter_core/src/convertors/convertors.dart';
 import 'package:likeminds_chat_flutter_core/src/core/core.dart';
@@ -45,13 +46,12 @@ class LMChatroomMenu extends StatefulWidget {
 class _ChatroomMenuState extends State<LMChatroomMenu> {
   late List<ChatroomAction> chatroomActions;
 
-  ValueNotifier<bool> rebuildChatroomMenu = ValueNotifier(false);
-
   final LMChatHomeFeedBloc homeBloc = LMChatHomeFeedBloc.instance;
   final LMChatConversationBloc conversationBloc =
       LMChatConversationBloc.instance;
   final LMChatConversationActionBloc conversationActionBloc =
       LMChatConversationActionBloc.instance;
+  final LMChatroomActionBloc chatroomActionBloc = LMChatroomActionBloc.instance;
   @override
   void initState() {
     super.initState();
@@ -84,12 +84,20 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               BoxDecoration(
                 color: LMChatTheme.theme.container,
               ),
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            itemCount: chatroomActions.length,
-            itemBuilder: (BuildContext context, int index) {
-              return getListTile(chatroomActions[index]);
+          child: BlocBuilder(
+            bloc: chatroomActionBloc,
+            builder: (context, state) {
+              if (state is LMChatroomActionUpdateState) {
+                chatroomActions = state.actions;
+              }
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: chatroomActions.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return getListTile(chatroomActions[index]);
+                },
+              );
             },
           ),
         ),
@@ -234,7 +242,6 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
         return element;
       }).toList();
-      rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
       widget.controller!.hideMenu();
       homeBloc.add(LMChatRefreshHomeFeedEvent());
     } else {
@@ -391,8 +398,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
               "CANCEL",
               style: LMChatTextStyle(
                 textStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: LMChatTheme.theme.onContainer,
+                  fontWeight: FontWeight.w500,
+                  color: LMChatTheme.theme.inActiveColor,
                 ),
               ),
               onTap: () {
@@ -405,7 +412,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
             child: LMChatText("CONFIRM",
                 style: LMChatTextStyle(
                   textStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     color: LMChatTheme.theme.primaryColor,
                   ),
                 ), onTap: () {
@@ -450,7 +457,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
         return element;
       }).toList();
-      rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
+
       widget.controller!.hideMenu();
       // Navigator.pop(context);
     } else {
