@@ -265,7 +265,7 @@ class LMChatCore {
   }
 
   /// This function is used to logout the user session.
-  Future<LMResponse<void>> logout(LogoutRequest? request) async {
+  Future<LMResponse<void>> logout({LogoutRequest? request}) async {
     // if `request` is null
     // get device id from `LMChatNotificationHandler` instance
     // and create a `LogoutRequest` instance with the device id

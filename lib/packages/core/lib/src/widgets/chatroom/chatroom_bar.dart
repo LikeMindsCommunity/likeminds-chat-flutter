@@ -1992,7 +1992,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             "CANCEL",
             onTap: onSecondary ?? () => Navigator.pop(context),
             style: LMChatTextStyle(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               textStyle: TextStyle(
                 color: _themeData.inActiveColor,
               ),
@@ -2002,7 +2002,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             "CONFIRM",
             onTap: onPrimary,
             style: LMChatTextStyle(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               textStyle: TextStyle(
                 color: _themeData.primaryColor,
               ),
@@ -2017,7 +2017,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             "CANCEL",
             onTap: onSecondary ?? () => Navigator.pop(context),
             style: LMChatTextStyle(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               textStyle: TextStyle(
                 color: _themeData.inActiveColor,
               ),
@@ -2027,7 +2027,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             "ACCEPT",
             onTap: onPrimary,
             style: LMChatTextStyle(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               textStyle: TextStyle(
                 color: _themeData.primaryColor,
               ),
@@ -2062,7 +2062,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             "REPORT AND REJECT",
             onTap: onTertiary ?? onPrimary, // Use onTertiary if provided
             style: LMChatTextStyle(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
               textStyle: TextStyle(
                 color: _themeData.primaryColor,
               ),

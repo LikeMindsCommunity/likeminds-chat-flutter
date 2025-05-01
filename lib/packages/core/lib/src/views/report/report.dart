@@ -29,7 +29,12 @@ class LMChatReportScreen extends StatefulWidget {
   /// The id of the entity creator
   final String entityCreatorId;
 
-  /// The type of the entity
+  /// The type of the entity being reported.
+  ///
+  /// Possible values:
+  /// - `0`: Chatroom
+  /// - `1`: Member
+  /// - `3`: Conversation, Post, Comment, or Reply
   final int? entityType;
 
   /// {@macro lm_chat_report_screen}
@@ -201,10 +206,18 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
       _defChipListBuilder() {
     return BlocConsumer<LMChatModerationBloc, LMChatModerationState>(
         bloc: _moderationBloc,
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is LMChatModerationReportPostedState) {
-            toast('Reported successfully');
+            // show dialog if the report is for a member
+            // and the entity type is 1
             context.pop();
+            Future.microtask(() async {
+              if (widget.entityType == 1) {
+                await _showMemberReportedDialog(); // show after popping
+              } else {
+                toast('Reported successfully');
+              }
+            });
           }
         },
         buildWhen: (previous, current) {
@@ -247,6 +260,68 @@ class _LMChatReportScreenState extends State<LMChatReportScreen> {
             return const SizedBox();
           }
         });
+  }
+
+  /// Show dialog when the member is reported
+  /// and the entity type is 1
+  Future<void> _showMemberReportedDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) => _screenBuilder.memberReportedDialogBuilder(
+          context, _defMemberReportedDialog(context)),
+    );
+  }
+
+  LMChatDialog _defMemberReportedDialog(BuildContext context) {
+    return LMChatDialog(
+      title: LMChatText(
+        "The member is reported for review",
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            color: LMChatTheme.theme.onContainer,
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      style: LMChatDialogStyle(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        backgroundColor: LMChatTheme.theme.container,
+      ),
+      content: LMChatText(
+        "Our team will look into your feedback and will take appropriate action on this member.",
+        style: LMChatTextStyle(
+          textStyle: TextStyle(
+            color: LMChatTheme.theme.onContainer.withOpacity(0.7),
+            fontSize: 15,
+          ),
+        ),
+      ),
+      actions: [
+        LMChatButton(
+          text: const LMChatText("OK",
+              style: LMChatTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
+          onTap: () {
+            context.pop();
+          },
+          style: LMChatButtonStyle(
+            height: 40,
+            width: 192,
+            backgroundColor: LMChatTheme.theme.primaryColor,
+            borderRadius: 24,
+          ),
+        ),
+      ],
+    );
   }
 
   LMChatChip _defChip(LMChatReportTagViewData tagViewData) {
