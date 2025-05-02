@@ -31,13 +31,13 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 ///  builder: ExampleHomeBuilder(),
 ///   );
 /// ```
-/// Use This [LMCommunityHybridChatScreen] instance to configure the LMCommunityHybridChatScreen
+/// Use This [LMCommunityHybridChatConfig] instance to configure the LMCommunityHybridChatScreen
 /// by passing it to the [LMChatCore] class. in initialize method.
 /// ```dart
 /// LMChatCore.instance.initialize(
 ///   config: LMChatConfig(
 ///     config: LMChatConfig(
-///      homeConfig: LMCommunityHybridChatScreen(
+///      communityHybridChatConfig: LMCommunityHybridChatConfig(
 ///        builder: ExampleHomeBuilder(),
 ///      ),
 ///    ),

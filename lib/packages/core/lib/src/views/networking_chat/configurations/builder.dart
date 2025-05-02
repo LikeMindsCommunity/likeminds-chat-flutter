@@ -35,7 +35,7 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 /// LMChatCore.instance.initialize(
 ///   config: LMChatConfig(
 ///     config: LMChatConfig(
-///      homeConfig: LMNetworkingChatConfig(
+///      networkingChatConfig: LMNetworkingChatConfig(
 ///        builder: ExampleHomeBuilder(),
 ///      ),
 ///    ),
