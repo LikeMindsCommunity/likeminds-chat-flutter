@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
 /// {@template lm_community_chat_builder_delegate}
-/// [LMCommunityChatBuilderDelegate] is a class which is used to build the home
-/// screen. It is used to customize the home screen.
-/// To customize the home screen, create a class that extends
+/// To customize the community chat screen, create a class that extends
 /// [LMCommunityChatBuilderDelegate] and override the methods.
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
-/// which is used to configure the home screen.
+/// Then pass the instance of this class to the [LMCommunityChatConfig] class,
+/// which is used to configure the community chat screen.
 ///
-/// example:
+/// Example:
 /// ```dart
-/// class ExampleHomeBuilder extends LMCommunityChatBuilderDelegate {
+/// class ExampleCommunityChatBuilder extends LMCommunityChatBuilderDelegate {
 ///  @override
 ///  appBarBuilder(BuildContext context, LMChatAppBar appBar) {
 ///   return appBar.copyWith(
@@ -23,22 +21,21 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 ///   }
 /// }
 /// ```
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
+/// Then pass the instance of this class to the [LMCommunityChatConfig] class.
 /// ```dart
-/// LMChatHomeConfig(
-///  builder: ExampleHomeBuilder(),
+/// LMCommunityChatConfig(
+///  builder: ExampleCommunityChatBuilder(),
 ///   );
 /// ```
-/// Use This [LMChatHomeConfig] instance to configure the home screen
-/// by passing it to the [LMChatCore] class. in initialize method.
+/// Use this [LMCommunityChatConfig] instance to configure the community chat
+/// screen by passing it to the [LMChatCore] class in the initialize method.
 /// ```dart
 /// LMChatCore.instance.initialize(
 ///   config: LMChatConfig(
-///     config: LMChatConfig(
-///      homeConfig: LMChatHomeConfig(
-///        builder: ExampleHomeBuilder(),
-///      ),
-///    ),
+///     communityChatConfig: LMCommunityChatConfig(
+///       builder: ExampleCommunityChatBuilder(),
+///     ),
+///   ),
 /// );
 /// ```
 /// {@endtemplate}
@@ -202,4 +199,4 @@ class LMCommunityChatBuilderDelegate {
   ) {
     return noMoreItemsWidget;
   }
- }
+}

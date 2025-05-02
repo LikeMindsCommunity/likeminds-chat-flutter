@@ -8,8 +8,8 @@ export 'style.dart';
 export 'settings.dart';
 
 /// {@template lm_community_hybrid_chat_config}
-/// [LMCommunityHybridChatConfig] is a class which is used to configure the home
-/// screen. It is used to customize the home screen.
+/// [LMCommunityHybridChatConfig] is a class which is used to configure the LMCommunityHybridChatScreen
+/// It is used to customize the LMCommunityHybridChatScreen.
 /// {@endtemplate}
 class LMCommunityHybridChatConfig {
   /// {@macro lm_community_chat_builder_delegate}

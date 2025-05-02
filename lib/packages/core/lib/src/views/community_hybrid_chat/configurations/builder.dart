@@ -5,16 +5,16 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 
 /// {@template lm_community_hybrid_chat_builder_delegate}
-/// [LMCommunityHybridChatBuilderDelegate] is a class which is used to build the home
-/// screen. It is used to customize the home screen.
-/// To customize the home screen, create a class that extends
+/// [LMCommunityHybridChatBuilderDelegate] is a class which is used to build the LMCommunityHybridChatScreen.
+///  It is used to customize the LMCommunityHybridChatScreen.
+/// To customize the LMCommunityHybridChatScreen, create a class that extends
 /// [LMCommunityHybridChatBuilderDelegate] and override the methods.
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
-/// which is used to configure the home screen.
+/// Then pass the instance of this class to the [LMCommunityHybridChatScreen] class.
+/// which is used to configure the LMCommunityHybridChatScreen.
 ///
 /// example:
 /// ```dart
-/// class ExampleHomeBuilder extends LMChatHomeBuilderDelegate {
+/// class ExampleHomeBuilder extends LMCommunityHybridChatBuilderDelegate {
 ///  @override
 ///  appBarBuilder(BuildContext context, LMChatAppBar appBar) {
 ///   return appBar.copyWith(
@@ -25,19 +25,19 @@ import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 ///   }
 /// }
 /// ```
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
+/// Then pass the instance of this class to the [LMCommunityHybridChatScreen] class.
 /// ```dart
-/// LMChatHomeConfig(
+/// LMCommunityHybridChatScreen(
 ///  builder: ExampleHomeBuilder(),
 ///   );
 /// ```
-/// Use This [LMChatHomeConfig] instance to configure the home screen
+/// Use This [LMCommunityHybridChatConfig] instance to configure the LMCommunityHybridChatScreen
 /// by passing it to the [LMChatCore] class. in initialize method.
 /// ```dart
 /// LMChatCore.instance.initialize(
 ///   config: LMChatConfig(
 ///     config: LMChatConfig(
-///      homeConfig: LMChatHomeConfig(
+///      communityHybridChatConfig: LMCommunityHybridChatConfig(
 ///        builder: ExampleHomeBuilder(),
 ///      ),
 ///    ),
@@ -113,7 +113,7 @@ class LMCommunityHybridChatBuilderDelegate {
     );
   }
 
-  /// Builds [AppBar] widget for home screen
+  /// Builds [AppBar] widget for LMCommunityHybridChatScreen
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
     LMChatUserViewData userViewData,
@@ -123,7 +123,7 @@ class LMCommunityHybridChatBuilderDelegate {
     return appBar;
   }
 
-  /// Builds [TabBar] widget for home screen
+  /// Builds [TabBar] widget for LMCommunityHybridChatScreen
   PreferredSizeWidget tabBarBuilder(
     BuildContext context,
     TabController tabController,

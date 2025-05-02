@@ -45,11 +45,12 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
       LMChatCore.config.networkingChatConfig.builder;
 
   /// [_style] is a style object to customize the look and feel of the list
-  final LMChatDMFeedListStyle _style =
-      LMChatCore.config.networkingChatConfig.style.dmFeedListStyle?.call(
-            LMChatDMFeedListStyle.basic(),
-          ) ??
-          LMChatDMFeedListStyle.basic();
+  final LMNetworkingChatListStyle _style = LMChatCore
+          .config.networkingChatConfig.style.netwrokingChatListStyle
+          ?.call(
+        LMNetworkingChatListStyle.basic(),
+      ) ??
+      LMNetworkingChatListStyle.basic();
 
   final ValueNotifier<bool> _showDMFab = ValueNotifier(false);
   int? _showList;
@@ -421,7 +422,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
 /// {@template lm_chat_dm_feed_list_style}
 /// A style object to customize the look and feel of the DM Feed List
 /// {@endtemplate}
-class LMChatDMFeedListStyle {
+class LMNetworkingChatListStyle {
   /// [backgroundColor] is the background color of the list
   final Color? backgroundColor;
 
@@ -437,7 +438,7 @@ class LMChatDMFeedListStyle {
   static final LMChatThemeData _themeData = LMChatTheme.theme;
 
   /// {@macro lm_chat_dm_feed_list_style}
-  const LMChatDMFeedListStyle({
+  const LMNetworkingChatListStyle({
     this.backgroundColor,
     this.padding,
     this.profilePictureStyle,
@@ -445,8 +446,8 @@ class LMChatDMFeedListStyle {
   });
 
   /// {@macro lm_chat_dm_feed_list_style}
-  factory LMChatDMFeedListStyle.basic() {
-    return LMChatDMFeedListStyle(
+  factory LMNetworkingChatListStyle.basic() {
+    return LMNetworkingChatListStyle(
       backgroundColor: _themeData.scaffold,
       padding: const EdgeInsets.only(
         left: 4,
@@ -469,15 +470,15 @@ class LMChatDMFeedListStyle {
     );
   }
 
-  /// Creates a copy of this [LMChatDMFeedListStyle] but with the given fields replaced with the new values.
+  /// Creates a copy of this [LMNetworkingChatListStyle] but with the given fields replaced with the new values.
   /// If the new values are null, the old values are retained.
-  LMChatDMFeedListStyle copyWith({
+  LMNetworkingChatListStyle copyWith({
     Color? backgroundColor,
     EdgeInsets? padding,
     LMChatProfilePictureStyle? profilePictureStyle,
     LMChatTextStyle? unreadCountTextStyle,
   }) {
-    return LMChatDMFeedListStyle(
+    return LMNetworkingChatListStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
       profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,

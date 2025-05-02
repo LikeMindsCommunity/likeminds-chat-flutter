@@ -4,11 +4,11 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 
 /// {@template lm_networking_chat_builder_delegate}
 /// [LMNetworkingChatBuilderDelegate] is a class which is used to build the home
-/// screen. It is used to customize the home screen.
-/// To customize the home screen, create a class that extends
+/// screen. It is used to customize the LMNetworkingChatScreen.
+/// To customize the LMNetworkingChatScreen, create a class that extends
 /// [LMNetworkingChatBuilderDelegate] and override the methods.
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
-/// which is used to configure the home screen.
+/// Then pass the instance of this class to the [LMNetworkingChatConfig] class.
+/// which is used to configure the LMNetworkingChatScreen.
 ///
 /// example:
 /// ```dart
@@ -23,19 +23,19 @@ import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 ///   }
 /// }
 /// ```
-/// Then pass the instance of this class to the [LMChatHomeConfig] class.
+/// Then pass the instance of this class to the [LMNetworkingChatConfig] class.
 /// ```dart
-/// LMChatHomeConfig(
+/// LMNetworkingChatConfig(
 ///  builder: ExampleHomeBuilder(),
 ///   );
 /// ```
-/// Use This [LMChatHomeConfig] instance to configure the home screen
+/// Use This [LMNetworkingChatConfig] instance to configure the LMNetworkingChatScreen
 /// by passing it to the [LMChatCore] class. in initialize method.
 /// ```dart
 /// LMChatCore.instance.initialize(
 ///   config: LMChatConfig(
 ///     config: LMChatConfig(
-///      homeConfig: LMChatHomeConfig(
+///      networkingChatConfig: LMNetworkingChatConfig(
 ///        builder: ExampleHomeBuilder(),
 ///      ),
 ///    ),
@@ -111,7 +111,7 @@ class LMNetworkingChatBuilderDelegate {
     );
   }
 
-  /// Builds [AppBar] widget for home screen
+  /// Builds [AppBar] widget for LMNetworkingChatScreen
   PreferredSizeWidget appBarBuilder(
     BuildContext context,
     LMChatUserViewData userViewData,
