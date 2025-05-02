@@ -8,8 +8,8 @@ export 'style.dart';
 export 'settings.dart';
 
 /// {@template lm_chat_home_config}
-/// [LMNetworkingChatConfig] is a class which is used to configure the home
-/// screen. It is used to customize the home screen.
+/// [LMNetworkingChatConfig] is a class which is used to configure the LMNetworkingChatScreen
+/// It is used to customize the LMNetworkingChatScreen.
 /// {@endtemplate}
 class LMNetworkingChatConfig {
   /// {@macro lm_chat_home_config}

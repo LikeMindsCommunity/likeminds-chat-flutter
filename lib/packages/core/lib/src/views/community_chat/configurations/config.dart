@@ -8,8 +8,8 @@ export 'style.dart';
 export 'settings.dart';
 
 /// {@template lm_community_chat_config}
-/// [LMCommunityChatConfig] is a class which is used to configure the home
-/// screen. It is used to customize the home screen.
+/// [LMCommunityChatConfig] is a class which is used to configure the LMCommunityChatScreen
+///  It is used to customize the LMCommunityChatScreen.
 /// {@endtemplate}
 class LMCommunityChatConfig {
   /// {@macro lm_community_chat_builder_delegate}
