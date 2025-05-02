@@ -91,3 +91,7 @@
 - Changed different screens for DM,Commnity, hybrid
 - Added DM Flow
 - Added notification fix
+
+## 1.0.1
+
+- Renamed style config for for Netwroking & Commnity screen
