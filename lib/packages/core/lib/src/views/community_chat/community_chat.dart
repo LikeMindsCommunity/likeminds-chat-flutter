@@ -52,7 +52,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
       LMChatCore.config.communityChatConfig.builder;
   final _homeScreenSettings = LMChatCore.config.communityChatConfig.setting;
   final LMCommunityChatListStyle _style =
-      LMChatCore.config.communityChatConfig.style.homeFeedListStyle?.call(
+      LMChatCore.config.communityChatConfig.style.communityChatListStyle?.call(
             LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold),
           ) ??
           LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold);
