@@ -63,8 +63,13 @@ class LMChatCore {
   /// The [widgets] parameter is optional and is used to pass the utility widgets of the chat.
   /// The [theme] parameter is optional and is used to pass the theme of the chat.
   /// The [lmChatCallback] parameter is optional and is used to pass the callback functions of the chat.
+  /// [LMInitiateLoggerRequest] is used to initilize logging req, if not initilized by user, a defualt logger will be used
+  /// [LMInitiateLoggerRequest] conatins [coreVersion] An optional string representing the core version of LikeMinds SDK,
+  /// it is auotmatically set while initializing, don't set [coreVersion] unless explicitly needed.
+
   /// The function returns a [LMResponse] object.
   /// If the initialization is successful, the [LMResponse] object give [success] as true and [data] as null.
+
   Future<LMResponse<void>> initialize({
     @Deprecated(
         "Use [LMChatCore.instance.client] to get an instance of [LMChatClient] instead of passing it as a parameter.")
@@ -76,14 +81,33 @@ class LMChatCore {
     List<ConversationState>? excludedConversationStates,
     Function(LMChatAnalyticsEventFired)? analyticsListener,
     Function(LMChatProfileState)? profileListener,
+    LMInitiateLoggerRequest? loggingRequest,
   }) async {
     final lmChatSDKCallback =
         LMChatSDKCallbackImpl(lmChatCallback: lmChatCallback);
-    this.lmChatClient = lmChatClient ??
-        (LMChatClientBuilder()
-              ..sdkCallback(lmChatSDKCallback)
-              ..excludedConversationStates(excludedConversationStates ?? []))
-            .build();
+    final lmChatClientBuilder = (LMChatClientBuilder()
+      ..sdkCallback(lmChatSDKCallback)
+      ..excludedConversationStates(excludedConversationStates ?? []));
+
+    if (loggingRequest != null) {
+      if (loggingRequest.coreVersion == null) {
+        loggingRequest = loggingRequest.copyWith(
+            coreVersion: LMChatStringConstants.coreVersion);
+      }
+      lmChatClientBuilder.initiateLoggerRequest(loggingRequest);
+    } else {
+      LMInitiateLoggerRequestBuilder defaultLoggerRequestBuilder =
+          (LMInitiateLoggerRequestBuilder()
+            ..coreVersion(LMChatStringConstants.coreVersion)
+            ..onErrorHandler((e, _) {})
+            ..logLevel(LMSeverity.ERROR)
+            ..shareLogsWithLM(true));
+      lmChatClientBuilder
+          .initiateLoggerRequest(defaultLoggerRequestBuilder.build());
+    }
+
+    this.lmChatClient = lmChatClient ?? lmChatClientBuilder.build();
+
     if (domain != null) _clientDomain = domain;
     LMChatTheme.instance.initialise(theme: theme);
     _lmChatConfig = config ?? LMChatConfig();
@@ -179,6 +203,9 @@ class LMChatCore {
           await storeIsDMWithRequestEnabled(communitySetting.enabled);
         }
       }
+      //flush all the logs
+      lmChatClient.flushLogs();
+
       return initiateUserResponse;
     } else {
       return await showChatWithoutApiKey(
@@ -260,6 +287,8 @@ class LMChatCore {
         await storeIsDMWithRequestEnabled(communitySetting.enabled);
       }
     }
+    //flush all the logs
+    lmChatClient.flushLogs();
 
     return LMResponse(success: true, data: validateUserResponse);
   }
