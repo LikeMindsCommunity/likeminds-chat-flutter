@@ -43,5 +43,5 @@ class LMChatStringConstants {
   static const String errorFallback = "Something went wrong, please try again!";
 
   /// Core version of the LikeMinds Chat SDK
-  static const String coreVersion = "1.0.1";
+  static const String coreVersion = "1.1.1";
 }
