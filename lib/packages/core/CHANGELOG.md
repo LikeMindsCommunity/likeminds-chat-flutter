@@ -95,3 +95,7 @@
 ## 1.0.1
 
 - Renamed style config for for Netwroking & Commnity screen
+
+## 1.1.0
+
+- Added error logging 

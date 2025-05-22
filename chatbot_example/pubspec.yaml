@@ -1,7 +1,7 @@
 name: likeminds_chatbot_flutter_sample
 description: "A new Flutter project for testing out just the chatbot capabilities of LikeMinds Chat SDK."
 publish_to: "none"
-version: 1.0.1
+version: 1.1.0
 
 environment:
   sdk: ">=3.1.0 <4.0.0"
@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core:
 
-  likeminds_chat_flutter_core: ^1.0.1
+  likeminds_chat_flutter_core: ^1.1.0
   google_fonts: ^6.2.0
   flutter_dotenv: ^5.1.0
   firebase_messaging: ^15.0.3
