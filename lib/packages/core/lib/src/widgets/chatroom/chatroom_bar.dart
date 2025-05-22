@@ -2438,7 +2438,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         chatActionBloc.add(LMChatReplyRemoveEvent());
       }
       widget.scrollToBottom(true);
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       debugPrint('Error sending voice note: $e');
       toast("Error sending voice note");
       _resetRecordingState();
@@ -2524,7 +2525,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       try {
         await _localPlayer.openPlayer();
         _isLocalPlayerInitialized = true;
-      } catch (e) {
+      } on Exception catch (e, stackTrace) {
+        LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
         debugPrint('Error initializing local player: $e');
       }
     }
@@ -2574,7 +2576,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           },
         );
       }
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       debugPrint('Error in local playback: $e');
       _stopLocalPlayback();
     }
