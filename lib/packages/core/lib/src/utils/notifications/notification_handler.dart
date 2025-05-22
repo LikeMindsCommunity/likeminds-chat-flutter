@@ -134,7 +134,8 @@ class LMChatNotificationHandler {
               "Root navigator key is null or has no state. Cannot navigate from notification tap.");
           // Handle this case - maybe store the route info and navigate when the key becomes available?
         }
-      } catch (e) {
+      } on Exception catch (e, stackTrace) {
+        LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
         debugPrint('Error parsing notification payload or routing: $e');
       }
     } else {
@@ -244,7 +245,8 @@ class LMChatNotificationHandler {
         return int.tryParse(queryParams["chatroom_id"]!);
       }
       return null; // Not a recognized chat route
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       debugPrint("Error parsing route URI '$route': $e");
       return null; // Error during parsing
     }

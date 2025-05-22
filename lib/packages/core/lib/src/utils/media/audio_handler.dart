@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
@@ -197,7 +198,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
         }
       }
       return null;
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error stopping recording: $e');
       return null;
     } finally {
@@ -224,7 +226,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
           await recordingFile.delete();
         }
       }
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error canceling recording: $e');
     } finally {
       _currentRecordingPath = null;
@@ -250,7 +253,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       await _player.stopPlayer();
 
       return duration != null && duration.inMilliseconds > 0;
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error validating audio file: $e');
       return false;
     }
@@ -306,7 +310,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
       // Set up progress tracking for this specific path
       _setupProgressTracking(path);
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error playing audio: $e');
       await _onPlaybackError(path);
     }
@@ -339,7 +344,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
         _audioStateController.add(LMChatAudioState.playing);
         _currentlyPlayingController.add(_currentlyPlayingUrl!);
       }
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error resuming audio: $e');
     }
   }
@@ -371,7 +377,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       _currentlyPlayingController.add('');
       await _currentProgressSubscription?.cancel();
       _currentProgressSubscription = null;
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error stopping audio: $e');
     }
   }
@@ -383,7 +390,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
     try {
       await _player.seekToPlayer(position);
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error seeking audio: $e');
     }
   }
@@ -435,7 +443,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
 
       // Add cleanup of audio state controller
       await _audioStateController.close();
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error in dispose: $e');
     }
   }
@@ -540,7 +549,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
           }
         }
       }
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error cleaning up recordings: $e');
     }
   }
@@ -579,7 +589,8 @@ class LMChatCoreAudioHandler implements LMChatAudioHandler {
       }
 
       return duration;
-    } catch (e) {
+    } on Exception catch (e, stackTrace) {
+      LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
       print('Error getting audio duration: $e');
       return null;
     }
