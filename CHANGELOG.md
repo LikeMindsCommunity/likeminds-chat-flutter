@@ -100,3 +100,7 @@
 ## 1.1.0
 
 - Added error logging 
+
+## 1.1.1
+
+- Fixed missing package in data layer
