@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:likeminds_chat_flutter_core/likeminds_chat_flutter_core.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -69,14 +70,19 @@ Future<bool> _handleIOSPermissions(int mediaType) async {
 }
 
 Future<bool> _requestPermission(Permission permission) async {
-  PermissionStatus permissionStatus = await permission.status;
-  if (permissionStatus == PermissionStatus.granted) {
-    return true;
-  } else if (permissionStatus == PermissionStatus.denied) {
-    permissionStatus = await permission.request();
-    return _handlePermissionResponse(permissionStatus);
+  try {
+    PermissionStatus permissionStatus = await permission.status;
+    if (permissionStatus == PermissionStatus.granted) {
+      return true;
+    } else if (permissionStatus == PermissionStatus.denied) {
+      permissionStatus = await permission.request();
+      return _handlePermissionResponse(permissionStatus);
+    }
+    return false;
+  } on Exception catch (e, stackTrace) {
+    LMChatCore.instance.lmChatClient.handleException(e, stackTrace);
+    return false;
   }
-  return false;
 }
 
 bool _handlePermissionResponse(PermissionStatus status) {
