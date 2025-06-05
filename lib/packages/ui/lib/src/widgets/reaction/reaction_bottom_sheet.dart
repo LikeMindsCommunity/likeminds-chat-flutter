@@ -84,12 +84,13 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     initialiseBottomSheetData();
     return Container(
       clipBehavior: Clip.none,
       padding: style.padding ??
           const EdgeInsets.symmetric(horizontal: 18.0), // Use style padding
-      height: style.height ?? 60.h, // Use style height
+      height: style.height ?? height * 0.6, // Use style height
       decoration: BoxDecoration(
         color: style.backgroundColor ??
             LMChatTheme.theme.container, // Use style background color

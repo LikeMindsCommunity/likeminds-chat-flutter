@@ -54,8 +54,8 @@ class LMChatSkeletonAppBar extends StatelessWidget {
           children: [
             LMChatSkeletonAnimation(
               child: Container(
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                   borderRadius: const BorderRadius.all(
@@ -147,8 +147,8 @@ class LMChatSkeletonChatBar extends StatelessWidget {
             LMChatDefaultTheme.kHorizontalPaddingMedium,
             LMChatSkeletonAnimation(
               child: Container(
-                width: 6.h,
-                height: 6.h,
+                width: size.height * 0.06,
+                height: size.height * 0.06,
                 decoration: BoxDecoration(
                   color: LMChatTheme.theme.onContainer.withOpacity(0.5),
                   borderRadius: const BorderRadius.all(
@@ -199,7 +199,7 @@ class LMChatSkeletonChatroomList extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: 1.h,
+        vertical: MediaQuery.sizeOf(context).height * 0.01,
       ),
       child: Column(
         children: list,
@@ -220,7 +220,7 @@ class LMChatSkeletonChatroom extends StatelessWidget {
         padding: EdgeInsets.only(
           left: 18,
           right: 18,
-          bottom: 4.h,
+          bottom: size.height * 0.04,
         ),
         child: Row(
           children: [
@@ -288,9 +288,10 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: 1.h,
+        vertical: size.height * 0.01,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment:
             isSent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
@@ -301,34 +302,36 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
               else
                 LMChatSkeletonAnimation(
                   child: Container(
-                    width: 4.5.h,
-                    height: 4.5.h,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: LMChatTheme.theme.onContainer.withOpacity(0.5),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(3.h),
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(100),
                       ),
                     ),
                   ),
                 ),
               LMChatDefaultTheme.kHorizontalPaddingMedium,
-              Container(
-                decoration: BoxDecoration(
-                  color: LMChatTheme.theme.container.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                constraints: BoxConstraints(
-                  maxWidth: size.width * 0.6,
-                  maxHeight: 4.5.h,
-                  minHeight: 4.5.h,
-                ),
-                alignment: Alignment.center,
-                child: LMChatSkeletonAnimation(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: LMChatTheme.theme.container.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(1.h),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: LMChatTheme.theme.container.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth: size.width * 0.6,
+                    maxHeight: size.height * 0.045,
+                    minHeight: size.height * 0.045,
+                  ),
+                  alignment: Alignment.center,
+                  child: LMChatSkeletonAnimation(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: LMChatTheme.theme.container.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
@@ -337,12 +340,12 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
               if (isSent)
                 LMChatSkeletonAnimation(
                   child: Container(
-                    width: 4.5.h,
-                    height: 4.5.h,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: LMChatTheme.theme.onContainer.withOpacity(0.5),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(3.h),
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(100),
                       ),
                     ),
                   ),

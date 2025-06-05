@@ -150,7 +150,7 @@ class _LMImageState extends State<LMChatImage> {
   }) {
     // Calculate container dimensions
     final containerWidth = style?.width ?? size.width;
-    final containerHeight = style?.height ?? 80.h;
+    final containerHeight = style?.height ?? size.height * 0.8;
 
     // Calculate scale to fit
     final double scaleX = containerWidth / imageWidth;
@@ -298,7 +298,7 @@ class _LMImageState extends State<LMChatImage> {
         context: context,
         imageProvider: MemoryImage(widget.imageBytes!),
         imageWidth: size.width,
-        imageHeight: 80.h,
+        imageHeight: size.height * 0.8,
       ),
     );
   }

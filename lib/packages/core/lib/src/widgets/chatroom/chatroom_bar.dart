@@ -464,7 +464,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     return Container(
       width: size.width * 0.9,
       constraints: BoxConstraints(
-        minHeight: 4.h,
+        minHeight: size.height * 0.04,
       ),
       decoration: BoxDecoration(
         color: _themeData.container,
@@ -739,15 +739,17 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          ValueListenableBuilder<bool>(
-            valueListenable: _isVoiceButtonHeld,
-            builder: (context, isHeld, child) {
-              return isHeld || _isReviewingRecording.value
-                  ? _defRecordingContainer(context)
-                  : _isRespondingAllowed()
-                      ? _defTextField(context)
-                      : _defDisabledTextField(context);
-            },
+          Expanded(
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _isVoiceButtonHeld,
+              builder: (context, isHeld, child) {
+                return isHeld || _isReviewingRecording.value
+                    ? _defRecordingContainer(context)
+                    : _isRespondingAllowed()
+                        ? _defTextField(context)
+                        : _defDisabledTextField(context);
+              },
+            ),
           ),
           _isRespondingAllowed()
               ? ValueListenableBuilder<bool>(
@@ -907,8 +909,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
         Container(
           width: size.width * 0.8,
           constraints: BoxConstraints(
-            minHeight: 5.2.h,
-            maxHeight: 24.h,
+            minHeight: size.height * 0.052,
+            maxHeight: size.height * 0.24,
           ),
           child: _screenBuilder.chatroomTextField(
             context,
@@ -926,8 +928,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     return Container(
       width: size.width * 0.9,
       constraints: BoxConstraints(
-        minHeight: 4.h,
-        maxHeight: 6.h,
+        minHeight: size.height * 0.04,
+        maxHeight: size.height * 0.06,
       ),
       decoration: BoxDecoration(
         color: _themeData.container,
@@ -1061,7 +1063,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           children: [
             Container(
               width: size.width * 0.8,
-              height: 6.2.h,
+              height: size.height * 0.062,
               decoration: BoxDecoration(
                 color: _themeData.container,
                 borderRadius: BorderRadius.circular(24),
@@ -1742,7 +1744,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       userText = 'You';
     }
     return LMChatBarHeader(
-      style: LMChatBarHeaderStyle.basic().copyWith(height: 8.h),
+      style: LMChatBarHeaderStyle.basic().copyWith(height: size.height * 0.08),
       titleText: userText,
       onCanceled: () {
         chatActionBloc.add(LMChatReplyRemoveEvent());

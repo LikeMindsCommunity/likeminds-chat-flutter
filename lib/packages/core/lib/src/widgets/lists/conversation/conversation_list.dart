@@ -15,7 +15,6 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:intl/intl.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
-//TODO: do same change in dm file ( later)
 /// {@template lm_chat_conversation_list}
 /// A widget that displays a list of conversations.
 /// {@endtemplate}
@@ -115,107 +114,115 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<LMChatConversationActionBloc,
-            LMChatConversationActionState>(
-          bloc: _convActionBloc,
-          listener: (context, state) {
-            if (state is LMChatConversationDelete) {
-              for (LMChatConversationViewData conversation
-                  in state.conversations) {
-                _updateDeletedConversation(conversation);
-              }
-            }
-
-            if (state is LMChatConversationEdited) {
-              _updateEditedConversation(state.conversationViewData);
-            }
-            if (state is LMChatPutReactionState ||
-                state is LMChatPutReactionError ||
-                state is LMChatDeleteReactionState ||
-                state is LMChatDeleteReactionError) {
-              _updateReactions(state);
-            }
-            if (state is LMChatSearchConversationInChatroomState) {
-              _searchWithMessageId(
-                  state.conversation, pagedListController, widget.chatroomId);
-            }
-          },
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: LMChatCore.config.webConfiguration.maxWidth,
+          maxHeight: MediaQuery.sizeOf(context).height,
         ),
-        BlocListener<LMChatConversationBloc, LMChatConversationState>(
-          bloc: _conversationBloc,
-          listener: (context, state) {
-            updatePagingControllers(state);
-          },
-        )
-      ],
-      child: ValueListenableBuilder(
-        valueListenable: rebuildConversationList,
-        builder: (context, value, child) {
-          final lmDualSidePagedList =
-              LMDualSidePagedList<LMChatConversationViewData>(
-            paginationType: LMChatConversationBloc.replyConversation == null
-                ? LMPaginationType.top
-                : LMPaginationType.both,
-            initialPage: 1,
-            onPaginationTriggered: _onPaginationTriggered,
-            paginationController: pagedListController,
-            padding: const EdgeInsets.symmetric(
-              vertical: 10,
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<LMChatConversationActionBloc,
+                LMChatConversationActionState>(
+              bloc: _convActionBloc,
+              listener: (context, state) {
+                if (state is LMChatConversationDelete) {
+                  for (LMChatConversationViewData conversation
+                      in state.conversations) {
+                    _updateDeletedConversation(conversation);
+                  }
+                }
+        
+                if (state is LMChatConversationEdited) {
+                  _updateEditedConversation(state.conversationViewData);
+                }
+                if (state is LMChatPutReactionState ||
+                    state is LMChatPutReactionError ||
+                    state is LMChatDeleteReactionState ||
+                    state is LMChatDeleteReactionError) {
+                  _updateReactions(state);
+                }
+                if (state is LMChatSearchConversationInChatroomState) {
+                  _searchWithMessageId(
+                      state.conversation, pagedListController, widget.chatroomId);
+                }
+              },
             ),
-            reverse: true,
-            firstPageProgressIndicatorBuilder: (context) =>
-                _screenBuilder.loadingListWidgetBuilder(
-              context,
-              const LMChatSkeletonChatList(),
-            ),
-            newPageProgressIndicatorBuilder: (context) =>
-                _screenBuilder.paginatedLoadingWidgetBuilder(
-              context,
-              const LMChatLoader(),
-            ),
-            noItemsFoundIndicatorBuilder: (context) {
-              return _defaultEmptyView();
-            },
-            itemBuilder: (context, item, index) {
-              if (item.isTimeStamp != null && item.isTimeStamp! ||
-                  item.state != 0 && item.state != 10 && item.state != null) {
-                final stateMessage =
-                    LMChatTaggingHelper.extractStateMessage(item.answer);
-                return _screenBuilder.stateBubbleBuilder(
-                  context,
-                  stateMessage,
-                  _defaultStateBubble(stateMessage),
-                );
-              }
-              return conversationWithCustomWidget(item)
-                  ? _screenBuilder.customChatBubbleBuilder(
-                      context, item, widget.chatroomId)
-                  : item.memberId == user.id
-                      ? _screenBuilder.sentChatBubbleBuilder(
-                          context, item, _defaultSentChatBubble(item))
-                      : _screenBuilder.receivedChatBubbleBuilder(
-                          context, item, _defaultReceivedChatBubble(item));
-            },
-          );
-          return Stack(
-            children: [
-              // The list is always in the tree
-              lmDualSidePagedList,
-              if (_isPaginatedConversationLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: LMChatTheme.theme.backgroundColor,
-                    child: _screenBuilder.loadingListWidgetBuilder(
-                      context,
-                      const LMChatSkeletonChatList(),
-                    ),
-                  ),
+            BlocListener<LMChatConversationBloc, LMChatConversationState>(
+              bloc: _conversationBloc,
+              listener: (context, state) {
+                updatePagingControllers(state);
+              },
+            )
+          ],
+          child: ValueListenableBuilder(
+            valueListenable: rebuildConversationList,
+            builder: (context, value, child) {
+              final lmDualSidePagedList =
+                  LMDualSidePagedList<LMChatConversationViewData>(
+                paginationType: LMChatConversationBloc.replyConversation == null
+                    ? LMPaginationType.top
+                    : LMPaginationType.both,
+                initialPage: 1,
+                onPaginationTriggered: _onPaginationTriggered,
+                paginationController: pagedListController,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
                 ),
-            ],
-          );
-        },
+                reverse: true,
+                firstPageProgressIndicatorBuilder: (context) =>
+                    _screenBuilder.loadingListWidgetBuilder(
+                  context,
+                  const LMChatSkeletonChatList(),
+                ),
+                newPageProgressIndicatorBuilder: (context) =>
+                    _screenBuilder.paginatedLoadingWidgetBuilder(
+                  context,
+                  const LMChatLoader(),
+                ),
+                noItemsFoundIndicatorBuilder: (context) {
+                  return _defaultEmptyView();
+                },
+                itemBuilder: (context, item, index) {
+                  if (item.isTimeStamp != null && item.isTimeStamp! ||
+                      item.state != 0 && item.state != 10 && item.state != null) {
+                    final stateMessage =
+                        LMChatTaggingHelper.extractStateMessage(item.answer);
+                    return _screenBuilder.stateBubbleBuilder(
+                      context,
+                      stateMessage,
+                      _defaultStateBubble(stateMessage),
+                    );
+                  }
+                  return conversationWithCustomWidget(item)
+                      ? _screenBuilder.customChatBubbleBuilder(
+                          context, item, widget.chatroomId)
+                      : item.memberId == user.id
+                          ? _screenBuilder.sentChatBubbleBuilder(
+                              context, item, _defaultSentChatBubble(item))
+                          : _screenBuilder.receivedChatBubbleBuilder(
+                              context, item, _defaultReceivedChatBubble(item));
+                },
+              );
+              return Stack(
+                children: [
+                  // The list is always in the tree
+                  lmDualSidePagedList,
+                  if (_isPaginatedConversationLoading)
+                    Positioned.fill(
+                      child: Container(
+                        color: LMChatTheme.theme.backgroundColor,
+                        child: _screenBuilder.loadingListWidgetBuilder(
+                          context,
+                          const LMChatSkeletonChatList(),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

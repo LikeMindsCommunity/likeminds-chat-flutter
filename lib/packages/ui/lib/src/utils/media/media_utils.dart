@@ -456,7 +456,7 @@ Widget getChatBubbleImage(
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(height: 2.h),
+                    const SizedBox(height: 8),
                     LMChatIcon(
                       type: LMChatIconType.icon,
                       icon: Icons.play_arrow,

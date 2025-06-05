@@ -38,8 +38,8 @@ class _LMCommunityHybridChatScreenState
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
-    ScreenSize.init(context,
-        setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
+    // ScreenSize.init(context,
+    //     setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
   }
 
   @override
@@ -109,7 +109,7 @@ class _LMCommunityHybridChatScreenState
         LMChatStringConstants.homeFeedTitle,
         style: LMChatTextStyle(
           textStyle: TextStyle(
-            fontSize: 22.0.sp,
+            fontSize: 22,
             fontWeight: FontWeight.w600,
             color: LMChatTheme.theme.onContainer,
           ),

@@ -898,10 +898,10 @@ class LMChatDefaultTheme {
 }
 
 /// Converts a percentage to screen height
-extension ScreenHeight on num {
-  /// Converts a percentage to screen height
-  double get h => (this / 100) * ScreenSize.height;
-}
+// extension ScreenHeight on num {
+//   /// Converts a percentage to screen height
+//   double get h => (this / 100) * ScreenSize.height;
+// }
 
 /// Convert integer or double to screen width percentage (w)
 // extension ScreenWidth on num {
@@ -910,61 +910,61 @@ extension ScreenHeight on num {
 // }
 
 /// Extension to convert double to scaled text size
-extension ScreenPoints on double {
-  /// Converts a value to scaled text size
-  double get sp => ScreenSize.textScale.scale(this);
-}
+// extension ScreenPoints on double {
+//   /// Converts a value to scaled text size
+//   double get sp => ScreenSize.textScale.scale(this);
+// }
 
 /// Class to initialize the screen size
-class ScreenSize {
-  /// Width of the screen
-  static late double width;
+// class ScreenSize {
+//   /// Width of the screen
+//   static late double width;
 
-  /// Height of the screen
-  static late double height;
+//   /// Height of the screen
+//   static late double height;
 
-  /// Pixel ratio of the screen
-  static late double pixelRatio;
+//   /// Pixel ratio of the screen
+//   static late double pixelRatio;
 
-  /// Text scaler for the screen
-  static late TextScaler textScale;
+//   /// Text scaler for the screen
+//   static late TextScaler textScale;
 
-  /// Block size for horizontal layout
-  static late double blockSizeHorizontal;
+//   /// Block size for horizontal layout
+//   static late double blockSizeHorizontal;
 
-  /// Block size for vertical layout
-  static late double blockSizeVertical;
+//   /// Block size for vertical layout
+//   static late double blockSizeVertical;
 
-  /// Safe area horizontal padding
-  static late double _safeAreaHorizontal;
+//   /// Safe area horizontal padding
+//   static late double _safeAreaHorizontal;
 
-  /// Safe area vertical padding
-  static late double _safeAreaVertical;
+//   /// Safe area vertical padding
+//   static late double _safeAreaVertical;
 
-  /// Safe block size for horizontal layout
-  static late double safeBlockHorizontal;
+//   /// Safe block size for horizontal layout
+//   static late double safeBlockHorizontal;
 
-  /// Safe block size for vertical layout
-  static late double safeBlockVertical;
+//   /// Safe block size for vertical layout
+//   static late double safeBlockVertical;
 
-  /// Initializes the screen size based on the provided context
-  static init(
-    BuildContext context, {
-    double? setWidth,
-  }) {
-    final mediaQuery = MediaQuery.of(context);
-    pixelRatio = mediaQuery.devicePixelRatio;
-    textScale = mediaQuery.textScaler;
-    width = setWidth ?? mediaQuery.size.width;
-    height = mediaQuery.size.height;
-    blockSizeHorizontal = width / 100;
-    blockSizeVertical = height / 100;
-    _safeAreaHorizontal = mediaQuery.padding.left + mediaQuery.padding.right;
-    _safeAreaVertical = mediaQuery.padding.top + mediaQuery.padding.bottom;
-    safeBlockHorizontal = (width - _safeAreaHorizontal) / 100;
-    safeBlockVertical = (height - _safeAreaVertical) / 100;
-  }
-}
+//   /// Initializes the screen size based on the provided context
+//   static init(
+//     BuildContext context, {
+//     double? setWidth,
+//   }) {
+//     final mediaQuery = MediaQuery.of(context);
+//     pixelRatio = mediaQuery.devicePixelRatio;
+//     textScale = mediaQuery.textScaler;
+//     width = setWidth ?? mediaQuery.size.width;
+//     height = mediaQuery.size.height;
+//     blockSizeHorizontal = width / 100;
+//     blockSizeVertical = height / 100;
+//     _safeAreaHorizontal = mediaQuery.padding.left + mediaQuery.padding.right;
+//     _safeAreaVertical = mediaQuery.padding.top + mediaQuery.padding.bottom;
+//     safeBlockHorizontal = (width - _safeAreaHorizontal) / 100;
+//     safeBlockVertical = (height - _safeAreaVertical) / 100;
+//   }
+// }
 
 /// Default dark theme colors and values for the LMChat UI
 class LMChatDefaultDarkTheme {

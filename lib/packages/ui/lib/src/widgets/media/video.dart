@@ -128,6 +128,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
     final chatTheme = LMChatTheme.theme;
     style = widget.style ?? chatTheme.videoStyle;
     return Container(
@@ -144,7 +145,7 @@ class _LMChatVideoState extends State<LMChatVideo> {
       child: AspectRatio(
         // aspectRatio:
         aspectRatio: (style?.width ?? widget.media.width?.toDouble() ?? width) /
-            (style?.height ?? widget.media.height?.toDouble() ?? 56.h),
+            (style?.height ?? widget.media.height?.toDouble() ?? height * 0.56),
         child: MaterialVideoControlsTheme(
           fullscreen: const MaterialVideoControlsThemeData(),
           normal: MaterialVideoControlsThemeData(

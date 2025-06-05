@@ -556,7 +556,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       !inStyle.enableClipper ? inStyle.backgroundColor : null,
                 ),
             constraints: BoxConstraints(
-                minHeight: 2.h,
+                minHeight: size.height * 0.02,
                 minWidth: conversation.answer.split('\n').length > 4
                     ? size.width * 0.4
                     : size.width * 0.05,
@@ -608,14 +608,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     return Padding(
       padding: isSent
           ? EdgeInsets.only(
-              top: _isDeleted ? 0.8.h : 1.h,
-              bottom: _isDeleted ? 1.2.h : 1.h,
+              top: _isDeleted ? size.height * 0.008 : size.height * 0.01,
+              bottom: _isDeleted ? size.height * 0.012 : size.height * 0.01,
               left: size.width * 0.03,
               right: size.width * 0.03 + (inStyle.enableClipper ? 10 : 0),
             )
           : EdgeInsets.only(
-              top: _isDeleted ? 0.8.h : 1.h,
-              bottom: _isDeleted ? 1.2.h : 1.h,
+              top: _isDeleted ? size.height * 0.008 : size.height * 0.01,
+              bottom: _isDeleted ? size.height * 0.012 : size.height * 0.01,
               left: size.width * 0.033 + (inStyle.enableClipper ? 10 : 0),
               right: size.width * 0.03,
             ),
@@ -847,7 +847,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   double calculateFinalWidth() {
     // if the conversation is a poll, return the max width
-    if (conversation.state == 10) return double.infinity;
+    if (conversation.state == 10) return size.width;
 
     // Get all lines of text
     final lines =
