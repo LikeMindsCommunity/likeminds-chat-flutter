@@ -66,6 +66,7 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return CustomPopupMenu(
       pressType: PressType.singleClick,
       showArrow: false,
@@ -77,8 +78,8 @@ class _ChatroomMenuState extends State<LMChatroomMenu> {
           width: widget.style?.menuBoxWidth,
           height: widget.style?.menuBoxHeight,
           constraints: BoxConstraints(
-            minWidth: 12.w,
-            maxWidth: 60.w,
+            minWidth: width * 0.12,
+            maxWidth: width * 0.60,
           ),
           decoration: widget.style?.menuBoxDecoration ??
               BoxDecoration(

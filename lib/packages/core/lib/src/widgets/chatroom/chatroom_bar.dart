@@ -156,6 +156,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   late final Animation<double> _binScaleAnimation;
   late final Animation<double> _binFadeAnimation;
   late final Animation<double> _micFadeAnimation;
+  late Size size;
 
   // Add this near other state variables in _LMChatroomBarState
   StreamSubscription<LMChatAudioState>? _audioStateSubscription;
@@ -366,6 +367,12 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
+  }
+
+  @override
   void dispose() {
     // Clean up recording related resources
     _stopRecordingTimer();
@@ -455,7 +462,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   Container _defDisabledTextContainer(LMChatroomRequestState state) {
     return Container(
-      width: 90.w,
+      width: size.width * 0.9,
       constraints: BoxConstraints(
         minHeight: 4.h,
       ),
@@ -724,10 +731,10 @@ class _LMChatroomBarState extends State<LMChatroomBar>
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(
-        left: 2.w,
-        right: 2.w,
-        top: 1.5.h,
-        bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : 1.5.h,
+        left: size.width * 0.02,
+        right: size.width * 0.02,
+        top: size.width * 0.015,
+        bottom: (isOtherUserAIChatbot(chatroom!)) ? 0 : size.width * 0.015,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -898,7 +905,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
             _defLinkPreview(linkModel!.ogTags!),
           ),
         Container(
-          width: 80.w,
+          width: size.width * 0.8,
           constraints: BoxConstraints(
             minHeight: 5.2.h,
             maxHeight: 24.h,
@@ -917,7 +924,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
   // Widget functions for the default widgets of LMChatroomBar
   Widget _defDisabledTextField(BuildContext context) {
     return Container(
-      width: 90.w,
+      width: size.width * 0.9,
       constraints: BoxConstraints(
         minHeight: 4.h,
         maxHeight: 6.h,
@@ -1053,7 +1060,7 @@ class _LMChatroomBarState extends State<LMChatroomBar>
           clipBehavior: Clip.none,
           children: [
             Container(
-              width: 80.w,
+              width: size.width * 0.8,
               height: 6.2.h,
               decoration: BoxDecoration(
                 color: _themeData.container,
@@ -1252,8 +1259,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
 
   Widget _buildReviewContainer(BuildContext context) {
     return Container(
-      width: 80.w,
-      height: 6.2.h,
+      width: size.width * 0.8,
+      height: size.height * 0.062,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: _themeData.container,

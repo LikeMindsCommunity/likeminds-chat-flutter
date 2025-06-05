@@ -62,6 +62,8 @@ class _LMChatMediaForwardingScreenState
   final _themeData = LMChatTheme.theme;
   final _webConfiguration = LMChatCore.config.webConfiguration;
 
+  late Size size;
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +71,12 @@ class _LMChatMediaForwardingScreenState
     textFieldText = widget.textFieldText;
     if (textFieldText != null) _textEditingController.text = textFieldText!;
     mediaList = LMChatMediaHandler.instance.pickedMedia;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
   }
 
   @override
@@ -154,7 +162,7 @@ class _LMChatMediaForwardingScreenState
         child: mediaList[currPosition].mediaType == LMChatMediaType.image
             ? _screenBuilder.image(context, _defImage())
             : Padding(
-                padding: EdgeInsets.symmetric(vertical: 2.h),
+                padding: EdgeInsets.symmetric(vertical: size.height * 0.02),
                 child: _screenBuilder.video(context, _defVideo()),
               ),
       );
@@ -180,11 +188,11 @@ class _LMChatMediaForwardingScreenState
         ),
       ),
       padding: EdgeInsets.symmetric(
-        vertical: 2.h,
-        horizontal: 2.w,
+        vertical: size.height * 0.02,
+        horizontal: size.width * 0.02,
       ),
       child: SizedBox(
-        height: 15.w,
+        height: size.width * 0.15,
         child: _defPreviewList(),
       ),
     );
@@ -195,10 +203,10 @@ class _LMChatMediaForwardingScreenState
       color: _themeData.backgroundColor,
       child: Padding(
         padding: EdgeInsets.only(
-          bottom: 2.h,
-          left: 2.w,
-          right: 2.w,
-          top: 1.5.h,
+          bottom: size.height * 0.02,
+          left: size.width * 0.02,
+          right: size.width * 0.02,
+          top: size.height * 0.015,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,10 +235,10 @@ class _LMChatMediaForwardingScreenState
             _defReplyConversationWidget(),
           ),
         Container(
-          width: 80.w,
+          width: size.width * 0.80,
           constraints: BoxConstraints(
-            minHeight: 5.2.h,
-            maxHeight: 24.h,
+            minHeight: size.height * 0.052,
+            maxHeight: size.height * 0.24,
           ),
           child: _screenBuilder.chatroomTextField(
             context,
@@ -327,9 +335,9 @@ class _LMChatMediaForwardingScreenState
         ),
       ),
       style: LMChatButtonStyle(
-        height: 4.h,
+        height: size.height * 0.04,
         margin: EdgeInsets.symmetric(
-          horizontal: 2.w,
+          horizontal: size.width * 0.02,
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -390,7 +398,7 @@ class _LMChatMediaForwardingScreenState
         backgroundColor: LMChatTheme.isThemeDark
             ? LMChatTheme.theme.container.withOpacity(0.5)
             : LMChatTheme.theme.onContainer.withOpacity(0.5),
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
       ),
       leading: LMChatButton(
         onTap: () {
@@ -449,7 +457,7 @@ class _LMChatMediaForwardingScreenState
         media: mediaList.first,
         autoplay: true,
         style: LMChatGIFStyle(
-          width: 100.w,
+          width: size.width * 1.00,
         ),
       );
 
@@ -479,8 +487,8 @@ class _LMChatMediaForwardingScreenState
                           strokeAlign: BorderSide.strokeAlignOutside,
                         )
                       : null),
-              width: 15.w,
-              height: 15.w,
+              width: size.width * 0.15,
+              height: size.width * 0.15,
               child: mediaList[index].mediaType == LMChatMediaType.image
                   ? _defImageThumbnail(index)
                   : mediaList[index].mediaType == LMChatMediaType.video
@@ -551,7 +559,7 @@ class _LMChatMediaForwardingScreenState
     return LMChatDocumentPreview(
       media: mediaList[currPosition],
       style: LMChatDocumentPreviewStyle(
-        maxHeight: 50.h,
+        maxHeight: size.height * 0.50,
       ),
     );
   }
@@ -560,8 +568,8 @@ class _LMChatMediaForwardingScreenState
     return LMChatDocumentThumbnail(
       media: mediaList[index],
       style: LMChatDocumentThumbnailStyle(
-        height: 15.w,
-        width: 15.w,
+        height: size.width * 0.15,
+        width: size.width * 0.15,
       ),
     );
   }
@@ -580,7 +588,7 @@ class _LMChatMediaForwardingScreenState
               imageFile: mediaList[index].thumbnailFile!,
               style: LMChatImageStyle(
                 boxFit: BoxFit.cover,
-                width: 15.w,
+                width: size.width * 0.15,
               ),
             ),
           )

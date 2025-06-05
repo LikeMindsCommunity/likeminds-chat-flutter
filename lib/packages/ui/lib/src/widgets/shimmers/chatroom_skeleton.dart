@@ -123,26 +123,22 @@ class LMChatSkeletonChatBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
     return Container(
       color: LMChatTheme.theme.backgroundColor,
       child: Padding(
-        padding: EdgeInsets.only(
-          left: 18,
-          right: 18,
-          top: 2.h,
-          bottom: 2.h,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
           children: [
             Expanded(
               child: LMChatSkeletonAnimation(
                 child: Container(
-                  width: 90.w,
-                  height: 6.h,
+                  width: size.width * 0.9,
+                  height: size.height * 0.06,
                   decoration: BoxDecoration(
                     color: LMChatTheme.theme.onContainer.withOpacity(0.5),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(2.5.h),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(12),
                     ),
                   ),
                 ),
@@ -155,8 +151,8 @@ class LMChatSkeletonChatBar extends StatelessWidget {
                 height: 6.h,
                 decoration: BoxDecoration(
                   color: LMChatTheme.theme.onContainer.withOpacity(0.5),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(3.h),
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(12),
                   ),
                 ),
               ),
@@ -181,10 +177,7 @@ class LMChatSkeletonChatList extends StatelessWidget {
     );
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: 1.4.h,
-        horizontal: 2.w,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Column(
         children: list,
       ),
@@ -220,6 +213,7 @@ class LMChatSkeletonChatroom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
     return Container(
       color: LMChatTheme.theme.container,
       child: Padding(
@@ -249,7 +243,7 @@ class LMChatSkeletonChatroom extends StatelessWidget {
                 children: [
                   LMChatSkeletonAnimation(
                     child: Container(
-                      width: 60.w,
+                      width: size.width * 0.6,
                       height: 14,
                       decoration: BoxDecoration(
                         color: LMChatTheme.theme.onContainer.withOpacity(0.5),
@@ -262,7 +256,7 @@ class LMChatSkeletonChatroom extends StatelessWidget {
                   LMChatDefaultTheme.kVerticalPaddingSmall,
                   LMChatSkeletonAnimation(
                     child: Container(
-                      width: 40.w,
+                      width: size.width * 0.4,
                       height: 10,
                       decoration: BoxDecoration(
                         color: LMChatTheme.theme.onContainer.withOpacity(0.5),
@@ -291,6 +285,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: 1.h,
@@ -323,7 +318,7 @@ class LMChatSkeletonChatBubble extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 constraints: BoxConstraints(
-                  maxWidth: 60.w,
+                  maxWidth: size.width * 0.6,
                   maxHeight: 4.5.h,
                   minHeight: 4.5.h,
                 ),

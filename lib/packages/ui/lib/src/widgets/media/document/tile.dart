@@ -94,6 +94,7 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return FutureBuilder(
         future: loadedFile,
         builder: (context, snapshot) {
@@ -111,7 +112,7 @@ class _LMChatDocumentTileState extends State<LMChatDocumentTile> {
                 ),
                 child: Container(
                   height: style.height ?? 60,
-                  width: style.width ?? 55.w,
+                  width: style.width ?? width * 0.55,
                   decoration: BoxDecoration(
                     border: Border.all(color: LMChatDefaultTheme.greyColor),
                     borderRadius: BorderRadius.circular(kBorderRadiusMedium),

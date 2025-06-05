@@ -85,6 +85,7 @@ class LMChatImage extends StatefulWidget {
 
 class _LMImageState extends State<LMChatImage> {
   LMChatImageStyle? style;
+  late Size size;
 
   // Determines if the image is an SVG image based on the file extension of the URL
   bool _isSvgImage() {
@@ -96,6 +97,12 @@ class _LMImageState extends State<LMChatImage> {
   void initState() {
     super.initState();
     style = widget.style ?? LMChatTheme.theme.imageStyle;
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
   }
 
   /// Builds the widget tree for the image widget
@@ -142,7 +149,7 @@ class _LMImageState extends State<LMChatImage> {
     required double imageHeight,
   }) {
     // Calculate container dimensions
-    final containerWidth = style?.width ?? 100.w;
+    final containerWidth = style?.width ?? size.width;
     final containerHeight = style?.height ?? 80.h;
 
     // Calculate scale to fit
@@ -181,7 +188,7 @@ class _LMImageState extends State<LMChatImage> {
                 return style!.loaderWidget ??
                     LMChatMediaShimmerWidget(
                       height: style!.height,
-                      width: style!.width ?? 100.w,
+                      width: style!.width ?? size.width,
                     );
               },
               // errorBuilder: (context, error, stackTrace) {
@@ -242,7 +249,7 @@ class _LMImageState extends State<LMChatImage> {
                   style!.shimmerWidget ??
                   LMChatMediaShimmerWidget(
                     height: style!.height,
-                    width: style!.width ?? 100.w,
+                    width: style!.width ?? size.width,
                   ),
             ),
     );
@@ -290,7 +297,7 @@ class _LMImageState extends State<LMChatImage> {
       child: _buildPhotoView(
         context: context,
         imageProvider: MemoryImage(widget.imageBytes!),
-        imageWidth: 100.w,
+        imageWidth: size.width,
         imageHeight: 80.h,
       ),
     );

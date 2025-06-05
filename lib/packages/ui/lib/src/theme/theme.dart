@@ -904,10 +904,10 @@ extension ScreenHeight on num {
 }
 
 /// Convert integer or double to screen width percentage (w)
-extension ScreenWidth on num {
-  /// Converts a percentage to screen width
-  double get w => (this / 100) * ScreenSize.width;
-}
+// extension ScreenWidth on num {
+//   /// Converts a percentage to screen width
+//   double get w => (this / 100) * ScreenSize.width;
+// }
 
 /// Extension to convert double to scaled text size
 extension ScreenPoints on double {

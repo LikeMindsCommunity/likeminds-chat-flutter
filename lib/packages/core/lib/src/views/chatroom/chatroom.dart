@@ -77,6 +77,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
   final MemberStateResponse? getMemberState =
       LMChatLocalPreference.instance.getMemberRights();
   final _webConfiguration = LMChatCore.config.webConfiguration;
+  late Size size;
 
   bool isAnyMessageSelected() {
     return _selectedIds.isNotEmpty;
@@ -132,6 +133,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     _convActionBloc = LMChatConversationActionBloc.instance;
     ScreenSize.init(context,
         setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
+    size = MediaQuery.sizeOf(context);
     super.didChangeDependencies();
   }
 
@@ -401,7 +403,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
     return LMChatAppBar(
       style: LMChatAppBarStyle(
         height: 72,
-        gap: 2.6.w,
+        gap: size.width * 0.026,
         backgroundColor: LMChatTheme.theme.container,
         padding: const EdgeInsets.symmetric(horizontal: 18),
       ),
@@ -752,7 +754,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
           menuBuilder: () => ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Container(
-              width: 60.w,
+              width: size.width * 0.6,
               color: LMChatTheme.theme.container,
               child: LMChatText(
                 "Report Message",
@@ -763,7 +765,7 @@ class _LMChatroomScreenState extends State<LMChatroomScreen> {
                 style: LMChatTextStyle(
                   maxLines: 1,
                   padding: EdgeInsets.symmetric(
-                    horizontal: 6.w,
+                    horizontal: size.width * 0.06,
                     vertical: 2.h,
                   ),
                   textStyle: TextStyle(

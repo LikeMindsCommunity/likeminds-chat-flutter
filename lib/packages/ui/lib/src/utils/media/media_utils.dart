@@ -573,12 +573,13 @@ Widget getImageMessage(
   if (conversationAttachments == null || conversationAttachments.isEmpty) {
     return const SizedBox();
   }
+  final width = MediaQuery.sizeOf(context).width;
 
   if (conversationAttachments.length == 1) {
     return getChatBubbleImage(
       conversationAttachments.first,
-      height: 55.w,
-      width: 55.w,
+      height: width * 0.55,
+      width: width * 0.55,
     );
   } else if (conversationAttachments.length == 2) {
     return Row(
@@ -586,14 +587,14 @@ Widget getImageMessage(
       children: <Widget>[
         getChatBubbleImage(
           conversationAttachments[0],
-          height: 25.w,
-          width: 25.w,
+          height: width * 0.25,
+          width: width * 0.25,
         ),
         kHorizontalPaddingSmall,
         getChatBubbleImage(
           conversationAttachments[1],
-          height: 25.w,
-          width: 25.w,
+          height: width * 0.25,
+          width: width * 0.25,
         ),
       ],
     );
@@ -603,13 +604,13 @@ Widget getImageMessage(
       children: <Widget>[
         getChatBubbleImage(
           conversationAttachments[0],
-          height: 25.w,
-          width: 25.w,
+          height: width * 0.25,
+          width: width * 0.25,
         ),
         kHorizontalPaddingSmall,
         Container(
-          height: 25.w,
-          width: 25.w,
+          height: width * 0.25,
+          width: width * 0.25,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6.0),
@@ -618,13 +619,13 @@ Widget getImageMessage(
             children: [
               getChatBubbleImage(
                 conversationAttachments[1],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
               Positioned(
                 child: Container(
-                  height: 25.w,
-                  width: 25.w,
+                  height: width * 0.25,
+                  width: width * 0.25,
                   alignment: Alignment.center,
                   color: LMChatTheme.theme.container.withOpacity(0.5),
                   child: LMChatText(
@@ -652,14 +653,14 @@ Widget getImageMessage(
           children: <Widget>[
             getChatBubbleImage(
               conversationAttachments[0],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
             kHorizontalPaddingSmall,
             getChatBubbleImage(
               conversationAttachments[1],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
           ],
         ),
@@ -669,14 +670,14 @@ Widget getImageMessage(
           children: <Widget>[
             getChatBubbleImage(
               conversationAttachments[2],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
             kHorizontalPaddingSmall,
             getChatBubbleImage(
               conversationAttachments[3],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
           ],
         ),
@@ -690,14 +691,14 @@ Widget getImageMessage(
           children: <Widget>[
             getChatBubbleImage(
               conversationAttachments[0],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
             kHorizontalPaddingSmall,
             getChatBubbleImage(
               conversationAttachments[1],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
           ],
         ),
@@ -707,13 +708,13 @@ Widget getImageMessage(
           children: <Widget>[
             getChatBubbleImage(
               conversationAttachments[2],
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
             ),
             kHorizontalPaddingSmall,
             Container(
-              height: 25.w,
-              width: 25.w,
+              height: width * 0.25,
+              width: width * 0.25,
               clipBehavior: Clip.hardEdge,
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(6.0)),
@@ -721,13 +722,13 @@ Widget getImageMessage(
                 children: [
                   getChatBubbleImage(
                     conversationAttachments[3],
-                    height: 25.w,
-                    width: 25.w,
+                    height: width * 0.25,
+                    width: width * 0.25,
                   ),
                   Positioned(
                     child: Container(
-                      height: 25.w,
-                      width: 25.w,
+                      height: width * 0.25,
+                      width: width * 0.25,
                       alignment: Alignment.center,
                       color: LMChatTheme.theme.container.withOpacity(0.5),
                       child: LMChatText(
@@ -757,12 +758,13 @@ Widget getImageFileMessage(
   List<LMChatAttachmentViewData> mediaFiles,
   LMChatImageBuilder? imageBuilder,
 ) {
+  final width = MediaQuery.sizeOf(context).width;
   if (mediaFiles.length == 1) {
     return GestureDetector(
       child: getFileImageTile(
         mediaFiles.first,
-        height: 55.w,
-        width: 55.w,
+        height: width * 0.55,
+        width: width * 0.55,
       ),
     );
   } else if (mediaFiles.length == 2) {
@@ -772,14 +774,14 @@ Widget getImageFileMessage(
         children: <Widget>[
           getFileImageTile(
             mediaFiles[0],
-            height: 25.w,
-            width: 25.w,
+            height: width * 0.25,
+            width: width * 0.25,
           ),
           LMChatDefaultTheme.kHorizontalPaddingSmall,
           getFileImageTile(
             mediaFiles[1],
-            height: 25.w,
-            width: 25.w,
+            height: width * 0.25,
+            width: width * 0.25,
           )
         ],
       ),
@@ -791,13 +793,13 @@ Widget getImageFileMessage(
         children: <Widget>[
           getFileImageTile(
             mediaFiles[0],
-            height: 25.w,
-            width: 25.w,
+            height: width * 0.25,
+            width: width * 0.25,
           ),
           LMChatDefaultTheme.kHorizontalPaddingSmall,
           Container(
-            height: 25.w,
-            width: 25.w,
+            height: width * 0.25,
+            width: width * 0.25,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6.0),
@@ -806,13 +808,13 @@ Widget getImageFileMessage(
               children: [
                 getFileImageTile(
                   mediaFiles[1],
-                  height: 25.w,
-                  width: 25.w,
+                  height: width * 0.25,
+                  width: width * 0.25,
                 ),
                 Positioned(
                   child: Container(
-                    height: 25.w,
-                    width: 25.w,
+                    height: width * 0.25,
+                    width: width * 0.25,
                     alignment: Alignment.center,
                     color: LMChatDefaultTheme.blackColor.withOpacity(0.5),
                     child: const LMChatText(
@@ -842,14 +844,14 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[0],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               getFileImageTile(
                 mediaFiles[1],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
             ],
           ),
@@ -859,14 +861,14 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[2],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               getFileImageTile(
                 mediaFiles[3],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
             ],
           ),
@@ -883,14 +885,14 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[0],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               getFileImageTile(
                 mediaFiles[1],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
             ],
           ),
@@ -900,8 +902,8 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[2],
-                height: 25.w,
-                width: 25.w,
+                height: width * 0.25,
+                width: width * 0.25,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               Container(
@@ -914,13 +916,13 @@ Widget getImageFileMessage(
                   children: [
                     getFileImageTile(
                       mediaFiles[3],
-                      height: 25.w,
-                      width: 25.w,
+                      height: width * 0.25,
+                      width: width * 0.25,
                     ),
                     Positioned(
                       child: Container(
-                        height: 25.w,
-                        width: 25.w,
+                        height: width * 0.25,
+                        width: width * 0.25,
                         alignment: Alignment.center,
                         color: LMChatDefaultTheme.blackColor.withOpacity(0.5),
                         child: LMChatText(

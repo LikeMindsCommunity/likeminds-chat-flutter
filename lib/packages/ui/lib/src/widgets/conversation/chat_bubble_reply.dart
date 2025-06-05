@@ -55,6 +55,7 @@ class LMChatBubbleReply extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = LMChatTheme.theme;
     final inStyle = chatBubbleReplyStyle ?? theme.replyStyle;
+    final width = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.translucent,
@@ -66,8 +67,8 @@ class LMChatBubbleReply extends StatelessWidget {
           borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 8),
         ),
         constraints: BoxConstraints(
-          minWidth: 20.w,
-          maxWidth: 64.w,
+          minWidth: width * 0.2,
+          maxWidth: width * 0.64,
         ),
         margin: inStyle.margin ?? const EdgeInsets.symmetric(vertical: 4),
         padding: inStyle.padding,
@@ -77,7 +78,7 @@ class LMChatBubbleReply extends StatelessWidget {
           children: [
             Container(
               height: 6.h,
-              width: 1.w,
+              width: width * 0.01,
               decoration: BoxDecoration(
                 color: inStyle.highlightColor ?? theme.primaryColor,
               ),

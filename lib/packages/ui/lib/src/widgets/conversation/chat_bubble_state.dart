@@ -42,6 +42,7 @@ class LMChatStateBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inStyle = style ?? LMChatTheme.theme.stateBubbleStyle;
+    final width = MediaQuery.sizeOf(context).width;
     return IntrinsicWidth(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -49,7 +50,7 @@ class LMChatStateBubble extends StatelessWidget {
         children: [
           IntrinsicWidth(
             child: Container(
-              constraints: BoxConstraints(maxWidth: 70.w),
+              constraints: BoxConstraints(maxWidth: width*0.7),
               margin: const EdgeInsets.symmetric(vertical: 5),
               padding: const EdgeInsets.symmetric(
                 horizontal: 8,

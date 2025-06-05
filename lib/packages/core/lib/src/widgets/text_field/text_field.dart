@@ -115,6 +115,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   String _tagValue = "";
   static const int _fixedSize = 50;
   late LMChatTextFieldStyle effectiveStyle;
+  late Size size;
 
   @override
   void initState() {
@@ -244,6 +245,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: effectiveStyle.margin ?? EdgeInsets.zero,
@@ -285,7 +292,7 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
 
   SuggestionsBoxDecoration _buildSuggestionsBoxDecoration() {
     return SuggestionsBoxDecoration(
-      offsetX: -4.w,
+      offsetX: -(size.width * 0.04),
       elevation: effectiveStyle.suggestionsBoxElevation ?? 2,
       color: effectiveStyle.suggestionsBoxColor ?? LMChatTheme.theme.container,
       clipBehavior: Clip.hardEdge,
@@ -293,7 +300,8 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
           const BorderRadius.all(Radius.circular(12.0)),
       hasScrollbar: false,
       constraints: effectiveStyle.suggestionsBoxConstraints ??
-          BoxConstraints(maxHeight: 24.h, minWidth: 80.w),
+          BoxConstraints(
+              maxHeight: size.height * 0.24, minWidth: size.width * 0.8),
     );
   }
 

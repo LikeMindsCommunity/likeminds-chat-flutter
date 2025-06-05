@@ -316,6 +316,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
 
   // Add ValueNotifier for voice note duration
   late final ValueNotifier<Duration> _voiceNoteDurationNotifier;
+  late Size size;
 
   @override
   void initState() {
@@ -372,6 +373,12 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
+  }
+
+  @override
   void dispose() {
     _voiceNoteDurationNotifier.dispose();
     super.dispose();
@@ -395,11 +402,9 @@ class _LMChatBubbleState extends State<LMChatBubble> {
               }
             },
             background: Padding(
-              padding: EdgeInsets.only(
-                left: 2.w,
-                right: 2.w,
-                top: 0.2.h,
-                bottom: 0.2.h,
+              padding: EdgeInsets.symmetric(
+                horizontal: size.width * 0.02,
+                vertical: size.width * 0.002,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -492,13 +497,13 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                   : null,
             ),
             padding: EdgeInsets.only(
-              left: 1.8.w,
-              right: 1.8.w,
+              left: 8,
+              right: 8,
               top: conversation.conversationViewType !=
                       LMChatConversationViewType.bottom
-                  ? 0.8.h
+                  ? 6
                   : 0,
-              bottom: 0.6.h,
+              bottom: 4,
             ),
             child: Row(
               mainAxisAlignment:
@@ -551,15 +556,16 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                       !inStyle.enableClipper ? inStyle.backgroundColor : null,
                 ),
             constraints: BoxConstraints(
-              minHeight: 2.h,
-              minWidth: conversation.answer.split('\n').length > 4 ? 40.w : 5.w,
-              maxWidth:
-                  (widget.attachments != null && widget.attachments!.isNotEmpty)
-                      ? 60.w
-                      : conversation.state == 10
-                          ? 70.w
-                          : 65.w,
-            ),
+                minHeight: 2.h,
+                minWidth: conversation.answer.split('\n').length > 4
+                    ? size.width * 0.4
+                    : size.width * 0.05,
+                maxWidth: (widget.attachments != null &&
+                        widget.attachments!.isNotEmpty)
+                    ? size.width * 0.6
+                    : conversation.state == 10
+                        ? size.width * 0.7
+                        : size.width * 0.65),
             child: inStyle.enableClipper
                 ? PhysicalShape(
                     clipper: inStyle.clipper ??
@@ -604,14 +610,14 @@ class _LMChatBubbleState extends State<LMChatBubble> {
           ? EdgeInsets.only(
               top: _isDeleted ? 0.8.h : 1.h,
               bottom: _isDeleted ? 1.2.h : 1.h,
-              left: 3.w,
-              right: 3.w + (inStyle.enableClipper ? 10 : 0),
+              left: size.width * 0.03,
+              right: size.width * 0.03 + (inStyle.enableClipper ? 10 : 0),
             )
           : EdgeInsets.only(
               top: _isDeleted ? 0.8.h : 1.h,
               bottom: _isDeleted ? 1.2.h : 1.h,
-              left: 3.w + (inStyle.enableClipper ? 10 : 0),
-              right: 3.w,
+              left: size.width * 0.033 + (inStyle.enableClipper ? 10 : 0),
+              right: size.width * 0.03,
             ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -870,7 +876,7 @@ class _LMChatBubbleState extends State<LMChatBubble> {
     if ((widget.attachments != null && widget.attachments!.isNotEmpty) ||
         conversation.replyId != null ||
         conversation.replyConversationObject != null) {
-      return 65.w; // Full width if media or reply is present
+      return size.width * 0.65; // Full width if media or reply is present
     }
 
     if (conversation.ogTags != null) {
