@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:likeminds_chat_flutter_ui/packages/expandable_text/expandable_text.dart';
@@ -267,38 +266,44 @@ class _LMChatPollState extends State<LMChatPoll> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    widget.pollTypeTextBuilder?.call(
-                          context,
+                SizedBox(
+                  width: 450,
+                  child: Row(
+                    children: [
+                      widget.pollTypeTextBuilder?.call(
+                            context,
+                            _defPollTypeText(),
+                          ) ??
                           _defPollTypeText(),
-                        ) ??
-                        _defPollTypeText(),
-                    widget.pollHeaderSeparatorBuilder?.call(context) ??
-                        _defHeaderSeparator(),
-                    widget.votingTypeTextBuilder?.call(
-                          context,
+                      widget.pollHeaderSeparatorBuilder?.call(context) ??
+                          _defHeaderSeparator(),
+                      widget.votingTypeTextBuilder?.call(
+                            context,
+                            _defVotingTypeText(),
+                          ) ??
                           _defVotingTypeText(),
-                        ) ??
-                        _defVotingTypeText(),
-                  ],
+                    ],
+                  ),
                 ),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    widget.pollIconBuilder?.call(
-                          context,
+                SizedBox(
+                  width: 450,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      widget.pollIconBuilder?.call(
+                            context,
+                            _defPollIcon(),
+                          ) ??
                           _defPollIcon(),
-                        ) ??
-                        _defPollIcon(),
-                    widget.timeLeftTextBuilder?.call(
-                          context,
-                          _defTimeLeftText(),
-                        ) ??
-                        _defTimeLeftText() ??
-                        const SizedBox.shrink(),
-                  ],
+                      widget.timeLeftTextBuilder?.call(
+                            context,
+                            _defTimeLeftText(),
+                          ) ??
+                          _defTimeLeftText() ??
+                          const SizedBox.shrink(),
+                    ],
+                  ),
                 ),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
                 widget.pollQuestionBuilder?.call(context, _defPollQuestion()) ??
@@ -310,7 +315,9 @@ class _LMChatPollState extends State<LMChatPoll> {
                     ) ??
                     _defPollSelection(),
                 const SizedBox(height: 8),
-                _defPollOptionList(),
+                SizedBox(
+                  width: 450,
+                  child: _defPollOptionList()),
                 //add and option button
                 if (LMChatPollUtils.showAddOption(widget.pollData))
                   widget.addOptionButtonBuilder?.call(context,

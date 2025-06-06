@@ -89,6 +89,10 @@ class LMChatBubbleFooter extends StatelessWidget {
 
   /// Calculates the width of the footer based on its content.
   double calculateFooterWidth() {
+    // if the conversation is of poll type, return the max width.
+    if (conversation.state == 10) {
+      return 450;
+    }
     double? timestamp, edited, result = 0;
     // Measure the footer text width
     final footerPainter = TextPainter(
