@@ -37,6 +37,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
         highlightColor: style.highlightColor ??
             LMChatTheme.theme.onContainer.withOpacity(0.5),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
