@@ -119,15 +119,18 @@ Widget getChatItemAttachmentTile(
             ),
           ),
         ),
-        LMChatText(
-          answerText,
-          style: LMChatTextStyle(
-            maxLines: 1,
-            textStyle: TextStyle(
-              overflow: TextOverflow.ellipsis,
-              fontSize: 14,
-              fontWeight: FontWeight.normal,
-              color: LMChatTheme.theme.onContainer.withOpacity(0.8),
+        SizedBox(
+          width: width * 0.5,
+          child: LMChatText(
+            answerText,
+            style: LMChatTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+                color: LMChatTheme.theme.onContainer.withOpacity(0.8),
+              ),
             ),
           ),
         ),
