@@ -31,13 +31,17 @@ void postPollConversationHandler(
   final PostPollConversationRequest pollRequest = requestBuilder.build();
 
   final DateTime dateTime = DateTime.now();
+  final String date =
+      DateFormat('dd MMM yyyy').format(dateTime);
   // create local conversation
   LMChatConversationViewData conversationViewData =
       (LMChatConversationViewDataBuilder()
             ..allowAddOption(event.allowAddOption)
             ..answer(event.text)
             ..chatroomId(event.chatroomId)
-            ..createdAt("")
+            ..createdAt(dateTime.millisecondsSinceEpoch.toString())
+            ..createdEpoch(dateTime.millisecondsSinceEpoch)
+            ..date(date)
             ..expiryTime(event.expiryTime)
             ..memberId(user.id)
             ..member(user.toUserViewData())
