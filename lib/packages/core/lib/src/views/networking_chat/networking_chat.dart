@@ -302,7 +302,7 @@ class _LMNetworkingChatScreenState extends State<LMNetworkingChatScreen>
       subtitle: ((chatroom.lastConversation?.attachmentsUploaded ?? false) &&
               chatroom.lastConversation?.deletedByUserId == null)
           ? getChatItemAttachmentTile(
-              message, chatroom.attachments, chatroom.lastConversation!)
+              context, message, chatroom.attachments, chatroom.lastConversation!)
           : LMChatText(
               chatroom.lastConversation!.state != 0
                   ? LMChatTaggingHelper.extractStateMessage(message)

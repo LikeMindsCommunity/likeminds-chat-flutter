@@ -132,7 +132,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                     _updateDeletedConversation(conversation);
                   }
                 }
-        
+
                 if (state is LMChatConversationEdited) {
                   _updateEditedConversation(state.conversationViewData);
                 }
@@ -143,8 +143,8 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                   _updateReactions(state);
                 }
                 if (state is LMChatSearchConversationInChatroomState) {
-                  _searchWithMessageId(
-                      state.conversation, pagedListController, widget.chatroomId);
+                  _searchWithMessageId(state.conversation, pagedListController,
+                      widget.chatroomId);
                 }
               },
             ),
@@ -185,7 +185,9 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
                 },
                 itemBuilder: (context, item, index) {
                   if (item.isTimeStamp != null && item.isTimeStamp! ||
-                      item.state != 0 && item.state != 10 && item.state != null) {
+                      item.state != 0 &&
+                          item.state != 10 &&
+                          item.state != null) {
                     final stateMessage =
                         LMChatTaggingHelper.extractStateMessage(item.answer);
                     return _screenBuilder.stateBubbleBuilder(
@@ -398,7 +400,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         return oldWidget.copyWith(
           subtitle: ((reply.attachmentsUploaded ?? false) &&
                   reply.deletedByUserId == null)
-              ? getChatItemAttachmentTile(message,
+              ? getChatItemAttachmentTile(context, message,
                   conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
               : LMChatText(
                   reply.state != 0
@@ -571,7 +573,7 @@ class _LMChatConversationListState extends State<LMChatConversationList> {
         return oldWidget.copyWith(
           subtitle: ((reply.attachmentsUploaded ?? false) &&
                   reply.deletedByUserId == null)
-              ? getChatItemAttachmentTile(message,
+              ? getChatItemAttachmentTile(context, message,
                   conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
               : LMChatText(
                   reply.state != 0

@@ -56,6 +56,7 @@ class LMChatBubbleReply extends StatelessWidget {
     final theme = LMChatTheme.theme;
     final inStyle = chatBubbleReplyStyle ?? theme.replyStyle;
     final width = MediaQuery.sizeOf(context).width;
+     final relativeWidth = width < 500 ? width * 0.55 : width * 0.35;
     final height = MediaQuery.sizeOf(context).height;
     return GestureDetector(
       onTap: onTap,
@@ -85,7 +86,8 @@ class LMChatBubbleReply extends StatelessWidget {
               ),
             ),
             kHorizontalPaddingMedium,
-            Expanded(
+            SizedBox(
+              width: relativeWidth * 0.82,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,

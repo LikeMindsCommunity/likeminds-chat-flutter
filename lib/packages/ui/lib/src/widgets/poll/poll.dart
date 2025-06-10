@@ -251,6 +251,8 @@ class _LMChatPollState extends State<LMChatPoll> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final relativeWidth = width < 500 ? width * 0.45 : width * 0.27;
     return ValueListenableBuilder(
         valueListenable: _rebuildPollWidget,
         builder: (context, value, __) {
@@ -267,7 +269,7 @@ class _LMChatPollState extends State<LMChatPoll> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: 450,
+                  width: relativeWidth,
                   child: Row(
                     children: [
                       widget.pollTypeTextBuilder?.call(
@@ -287,7 +289,7 @@ class _LMChatPollState extends State<LMChatPoll> {
                 ),
                 LMChatDefaultTheme.kVerticalPaddingMedium,
                 SizedBox(
-                  width: 450,
+                  width: relativeWidth,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -316,7 +318,7 @@ class _LMChatPollState extends State<LMChatPoll> {
                     _defPollSelection(),
                 const SizedBox(height: 8),
                 SizedBox(
-                  width: 450,
+                  width: relativeWidth,
                   child: _defPollOptionList()),
                 //add and option button
                 if (LMChatPollUtils.showAddOption(widget.pollData))

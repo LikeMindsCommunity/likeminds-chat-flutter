@@ -169,7 +169,10 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       style: LMChatTheme.theme.appBarStyle.copyWith(
         height: 76,
         gap: size.width * 0.04,
-        padding: EdgeInsets.all(size.width * 0.04),
+        padding: EdgeInsets.symmetric(
+          horizontal: size.width * 0.04,
+          vertical: size.height * 0.01,
+        ),
       ),
       title: LMChatText(
         'Explore Chatrooms',

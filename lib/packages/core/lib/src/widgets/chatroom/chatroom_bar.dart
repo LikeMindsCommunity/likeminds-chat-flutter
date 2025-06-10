@@ -1751,8 +1751,8 @@ class _LMChatroomBarState extends State<LMChatroomBar>
       },
       subtitle: ((replyToConversation?.attachmentsUploaded ?? false) &&
               replyToConversation?.deletedByUserId == null)
-          ? getChatItemAttachmentTile(
-              message, replyConversationAttachments ?? [], replyToConversation!)
+          ? getChatItemAttachmentTile(context, message,
+              replyConversationAttachments ?? [], replyToConversation!)
           : LMChatText(
               replyToConversation!.state != 0
                   ? LMChatTaggingHelper.extractStateMessage(message)

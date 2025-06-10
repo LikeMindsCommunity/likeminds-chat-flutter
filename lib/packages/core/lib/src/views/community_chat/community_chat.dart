@@ -394,6 +394,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
               (chatroom.lastConversation?.state == 10 &&
                   chatroom.lastConversation?.deletedByUserId == null)
           ? getChatItemAttachmentTile(
+              context,
               message,
               prefix:
                   getUserHomePrefixPreviewMessage(chatroom.lastConversation!),
