@@ -34,6 +34,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
         highlightColor: style.highlightColor ??
             LMChatTheme.theme.onContainer.withOpacity(0.5),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
@@ -42,43 +43,45 @@ class LMChatDocumentShimmer extends StatelessWidget {
               color: LMChatTheme.theme.container,
             ),
             kHorizontalPaddingLarge,
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: style.titleHeight ?? 16, // Default title height
-                  width: style.titleWidth ?? 28.w, // Default title width
-                  color: LMChatTheme.theme.container,
-                ),
-                kVerticalPaddingMedium,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      height:
-                          style.subtitleHeight ?? 12, // Default subtitle height
-                      width:
-                          style.subtitleWidth ?? 16.w, // Default subtitle width
-                      color: LMChatTheme.theme.container,
-                    ),
-                    kHorizontalPaddingXSmall,
-                    Text(
-                      '·',
-                      style: TextStyle(
-                        fontSize: kFontSmall,
-                        color: LMChatTheme.theme.disabledColor,
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: style.titleHeight ?? 16, // Default title height
+                    width: style.titleWidth ?? 28.w, // Default title width
+                    color: LMChatTheme.theme.container,
+                  ),
+                  kVerticalPaddingMedium,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        height: style.subtitleHeight ??
+                            12, // Default subtitle height
+                        width: style.subtitleWidth ??
+                            16.w, // Default subtitle width
+                        color: LMChatTheme.theme.container,
                       ),
-                    ),
-                    kHorizontalPaddingXSmall,
-                    Container(
-                      height: style.subtitleHeight,
-                      width: style.subtitleWidth,
-                      color: LMChatTheme.theme.container,
-                    ),
-                  ],
-                )
-              ],
+                      kHorizontalPaddingXSmall,
+                      Text(
+                        '·',
+                        style: TextStyle(
+                          fontSize: kFontSmall,
+                          color: LMChatTheme.theme.disabledColor,
+                        ),
+                      ),
+                      kHorizontalPaddingXSmall,
+                      Container(
+                        height: style.subtitleHeight,
+                        width: style.subtitleWidth,
+                        color: LMChatTheme.theme.container,
+                      ),
+                    ],
+                  )
+                ],
+              ),
             )
           ],
         ),
