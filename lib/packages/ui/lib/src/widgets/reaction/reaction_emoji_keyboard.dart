@@ -30,9 +30,9 @@ class LMChatReactionKeyboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveStyle = style ?? LMChatTheme.theme.reactionKeyboardStyle;
-
+    final height = MediaQuery.sizeOf(context).height;
     return SizedBox(
-      height: 35.h,
+      height: height * 0.35,
       child: EmojiPicker(
         onEmojiSelected: (category, emoji) async {
           onEmojiSelected?.call(emoji.emoji);

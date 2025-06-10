@@ -274,9 +274,9 @@ class _CredScreenState extends State<CredScreen> {
 
   Future<void> _onSubmit() async {
     await LMChatLocalPreference.instance.clearLocalData();
-    String apiKey = _apiKeyController.text;
-    String username = _usernameController.text;
-    String userId = _userIdController.text;
+    String apiKey = _apiKeyController.text.trim();
+    String username = _usernameController.text.trim();
+    String userId = _userIdController.text.trim();
     // Ensure all data is fetched correctly
     if (apiKey.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

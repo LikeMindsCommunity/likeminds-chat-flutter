@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 /// {@endtemplate}
 class LMChatLinkPreviewBar extends StatelessWidget {
   /// {@macro chat_link_preview_bar}
-  const LMChatLinkPreviewBar({
+  LMChatLinkPreviewBar({
     super.key,
     required this.ogTags,
     this.onCanceled,
@@ -50,6 +50,8 @@ class LMChatLinkPreviewBar extends StatelessWidget {
   /// The style configuration for the link preview bar.
   final LMChatLinkPreviewBarStyle? style;
 
+  late Size _size;
+
   /// Creates a copy of the current LMChatLinkPreviewBar instance with the provided values.
   /// If no values are provided, the current values are used.
   LMChatLinkPreviewBar copyWith({
@@ -79,6 +81,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = LMChatTheme.theme;
+    _size = MediaQuery.sizeOf(context);
     return GestureDetector(
       onTap: () {
         if (onTap != null) {
@@ -88,7 +91,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
         }
       },
       child: Container(
-        width: style?.width ?? 80.w,
+        width: style?.width ?? double.infinity,
         height: style?.height,
         decoration: style?.decoration?.copyWith(
               color: themeData.container,
@@ -99,7 +102,10 @@ class LMChatLinkPreviewBar extends StatelessWidget {
                 top: Radius.circular(8),
               ),
             ),
-        margin: style?.margin,
+        margin: style?.margin ??
+            EdgeInsets.only(
+              right: _size.width * 0.044,
+            ),
         padding: style?.padding,
         child: Container(
           decoration: style?.decoration ??
@@ -158,7 +164,9 @@ class LMChatLinkPreviewBar extends StatelessWidget {
       link,
       style: style?.linkTextStyle ??
           LMChatTextStyle(
-            padding: EdgeInsets.symmetric(horizontal: 1.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: _size.width * 0.01,
+            ),
             textStyle: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
@@ -198,7 +206,9 @@ class LMChatLinkPreviewBar extends StatelessWidget {
       ogTags.title ?? "",
       style: style?.titleStyle ??
           LMChatTextStyle(
-            padding: EdgeInsets.symmetric(horizontal: 1.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: _size.width * 0.01,
+            ),
             textStyle: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -214,7 +224,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
       ogTags.description ?? "",
       style: style?.subtitleStyle ??
           LMChatTextStyle(
-            padding: EdgeInsets.symmetric(horizontal: 1.w),
+            padding: EdgeInsets.symmetric(horizontal: _size.width * 0.01),
             textStyle: const TextStyle(
               fontSize: 14,
               color: Colors.grey,
@@ -339,9 +349,8 @@ class LMChatLinkPreviewBarStyle {
         left: 8,
         right: 30,
       ),
-      width: 80.w,
       linkTextStyle: LMChatTextStyle(
-        padding: EdgeInsets.symmetric(horizontal: 1.w),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         textStyle: TextStyle(
           fontSize: 12,
           color: inActiveColor,
@@ -366,9 +375,9 @@ class LMChatLinkPreviewBarStyle {
           ),
         ),
       ),
-      titleStyle: LMChatTextStyle(
-        padding: EdgeInsets.symmetric(horizontal: 1.w),
-        textStyle: const TextStyle(
+      titleStyle: const LMChatTextStyle(
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        textStyle: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           overflow: TextOverflow.ellipsis,
@@ -376,7 +385,7 @@ class LMChatLinkPreviewBarStyle {
         maxLines: 2,
       ),
       subtitleStyle: LMChatTextStyle(
-        padding: EdgeInsets.symmetric(horizontal: 1.w),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         textStyle: TextStyle(
           fontSize: 14,
           color: inActiveColor,

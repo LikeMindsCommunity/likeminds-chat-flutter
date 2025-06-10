@@ -38,11 +38,18 @@ class _LMChatroomParticipantsPageState
   final LMChatParticipantBuilderDelegate _screenBuilder =
       LMChatCore.config.participantConfig.builder;
   final _webConfiguration = LMChatCore.config.webConfiguration;
+  late Size size;
 
   @override
   void initState() {
     super.initState();
     _addPaginationListener();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
   }
 
   @override
@@ -127,14 +134,14 @@ class _LMChatroomParticipantsPageState
         height: 72,
         gap: 4,
         backgroundColor: LMChatTheme.theme.container,
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
       ),
       title: ValueListenableBuilder(
         valueListenable: _showSearchBarTextField,
         builder: (context, value, __) {
           return Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: 4.w,
+              horizontal: size.width * 0.04,
             ),
             child: _showSearchBarTextField.value
                 ? TextField(

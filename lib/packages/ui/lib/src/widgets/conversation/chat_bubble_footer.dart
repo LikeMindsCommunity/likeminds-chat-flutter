@@ -20,8 +20,10 @@ class LMChatBubbleFooter extends StatelessWidget {
   /// Optional timestamp text widget.
   final Widget? voiceDuration;
 
+  late double _screenWidth;
+
   /// Creates an instance of [LMChatBubbleFooter].
-  const LMChatBubbleFooter({
+  LMChatBubbleFooter({
     super.key,
     required this.conversation, // Required conversation data.
     this.textWidth, // Accept the width.
@@ -33,6 +35,8 @@ class LMChatBubbleFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _screenWidth = MediaQuery.sizeOf(context).width;
+
     // Builds the footer widget.
     return SizedBox(
       width: calculateFooterWidth(),
@@ -89,6 +93,20 @@ class LMChatBubbleFooter extends StatelessWidget {
 
   /// Calculates the width of the footer based on its content.
   double calculateFooterWidth() {
+    // if the conversation is of poll type, return the max width.
+    final _relativeWidth = _screenWidth < 500 ? _screenWidth * 0.55 : _screenWidth * 0.35;
+    if (conversation.state == 10) {
+      return _relativeWidth * 0.75;
+    }
+    if (conversation.attachmentCount == 1 || conversation.replyConversationObject != null) {
+      return _relativeWidth * 0.75;
+    }
+    if ((conversation.attachmentCount??0) > 1) {
+      return _relativeWidth * 0.80;
+    }
+    if (conversation.ogTags != null) {
+      return _relativeWidth;
+    }
     double? timestamp, edited, result = 0;
     // Measure the footer text width
     final footerPainter = TextPainter(

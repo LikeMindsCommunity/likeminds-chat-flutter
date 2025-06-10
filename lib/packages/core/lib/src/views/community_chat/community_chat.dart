@@ -58,6 +58,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
           LMCommunityChatListStyle.basic(LMChatTheme.theme.scaffold);
 
   String get _tag => widget.chatroomTag ?? _homeScreenSettings.tag ?? '';
+  late Size size;
 
   @override
   void initState() {
@@ -78,6 +79,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
   }
 
   @override
@@ -187,11 +189,11 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
       },
       style: LMChatTileStyle.basic().copyWith(
         margin: EdgeInsets.only(
-          top: 2.h,
-          bottom: 2.h,
+          top: size.height * 0.02,
+          bottom: size.height * 0.02,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 6.w),
-        height: 4.5.h,
+        padding: EdgeInsets.symmetric(horizontal: size.width * 0.06),
+        height: size.height * 0.045,
       ),
       leading: LMChatIcon(
         type: LMChatIconType.svg,
@@ -204,7 +206,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
       ),
       title: Padding(
         padding: EdgeInsets.only(
-          left: 4.w,
+          left: size.width * 0.04,
           right: 4,
         ),
         child: LMChatText(
@@ -250,8 +252,8 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
         backgroundColor: LMChatTheme.theme.primaryColor,
         padding: EdgeInsets.zero,
         labelPadding: EdgeInsets.only(
-          left: 2.w,
-          right: 2.w,
+          left: size.width * 0.02,
+          right: size.width * 0.02,
         ),
         side: BorderSide.none,
       ),
@@ -392,6 +394,7 @@ class _LMCommunityChatScreenState extends State<LMCommunityChatScreen>
               (chatroom.lastConversation?.state == 10 &&
                   chatroom.lastConversation?.deletedByUserId == null)
           ? getChatItemAttachmentTile(
+              context,
               message,
               prefix:
                   getUserHomePrefixPreviewMessage(chatroom.lastConversation!),

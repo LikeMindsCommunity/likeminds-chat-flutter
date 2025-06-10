@@ -42,6 +42,6 @@ class LMChatStringConstants {
   /// Default error message shown when an unexpected error occurs
   static const String errorFallback = "Something went wrong, please try again!";
 
-  /// Core version of the LikeMinds Chat SDK
-  static const String coreVersion = "1.1.1";
+  /// Core version of LikeMinds Chat SDK
+  static const String coreVersion = "1.2.0";
 }

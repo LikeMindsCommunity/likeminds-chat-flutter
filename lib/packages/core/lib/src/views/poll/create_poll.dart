@@ -265,6 +265,12 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
   }
 
   @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
@@ -276,8 +282,12 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
             builder: (context, _, child) {
               return _screenBuilder.scaffold(
                 backgroundColor: theme.container,
-                appBar: _screenBuilder.appBarBuilder(context, _defAppBar(context),
-                    _isValidatedController, validatePoll, onPollSubmit),
+                appBar: _screenBuilder.appBarBuilder(
+                    context,
+                    _defAppBar(context),
+                    _isValidatedController,
+                    validatePoll,
+                    onPollSubmit),
                 body: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -425,7 +435,8 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
                                   ),
                                   decoration: InputDecoration(
                                     constraints: BoxConstraints(
-                                        minWidth: 40.w, maxWidth: 40.w),
+                                        minWidth: screenSize.width * .40,
+                                        maxWidth: screenSize.width * .40),
                                   ),
                                   items: [
                                     DropdownMenuItem(
@@ -469,7 +480,8 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
                                         value: value,
                                         decoration: InputDecoration(
                                           constraints: BoxConstraints(
-                                              minWidth: 40.w, maxWidth: 40.w),
+                                              minWidth: screenSize.width * .40,
+                                              maxWidth: screenSize.width * .40),
                                         ),
                                         items: [
                                           // create dropdown items based on current options length min 1 and max options.length

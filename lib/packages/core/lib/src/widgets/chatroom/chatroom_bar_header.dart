@@ -76,10 +76,11 @@ class LMChatBarHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LMChatThemeData themeData = LMChatTheme.theme;
+    final Size size = MediaQuery.sizeOf(context);
 
     return Container(
-      height: style?.height ?? 8.h,
-      width: style?.width ?? 80.w,
+      height: style?.height ?? size.height * 0.08,
+      width: style?.width ?? size.width * 0.80,
       padding: style?.padding ?? const EdgeInsets.all(8),
       decoration: style?.decoration ??
           BoxDecoration(
@@ -100,7 +101,7 @@ class LMChatBarHeader extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 1.w,
+                  width: size.width * 0.01,
                   color: LMChatTheme.instance.themeData.primaryColor,
                   padding: const EdgeInsets.all(4),
                 ),
@@ -115,8 +116,8 @@ class LMChatBarHeader extends StatelessWidget {
                         _defTitleBuilder(themeData),
                     kVerticalPaddingSmall,
                     SizedBox(
-                      width: 55.w,
-                      height: 2.h,
+                      width: size.width * 0.55,
+                      height: size.height * 0.02,
                       child: subtitle,
                     ),
                   ],
@@ -194,9 +195,10 @@ class LMChatBarHeaderStyle {
 
   /// A basic style for the chat bar header.
   factory LMChatBarHeaderStyle.basic() {
+    final Size size = MediaQueryData.fromWindow(WidgetsBinding.instance.window).size;
     return LMChatBarHeaderStyle(
-      height: 8.h,
-      width: 80.w,
+      height: 0.08 * size.height,
+      width: 0.80 * size.width,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: LMChatTheme.theme.container,

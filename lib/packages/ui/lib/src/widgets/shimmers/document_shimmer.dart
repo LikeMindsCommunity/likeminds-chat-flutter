@@ -14,10 +14,13 @@ class LMChatDocumentShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+     final relativeWidth = width < 500 ? width * 0.55 : width * 0.35;
+    final double height = MediaQuery.of(context).size.height;
     final style = this.style ?? LMChatDocumentShimmerStyle.basic();
     return Container(
       height: style.height ?? 80, // Default height
-      width: style.width ?? 55.w, // Default width
+      width: style.width ?? relativeWidth , // Default width
       margin: style.margin,
       decoration: BoxDecoration(
         border: Border.all(
@@ -34,6 +37,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
         highlightColor: style.highlightColor ??
             LMChatTheme.theme.onContainer.withOpacity(0.5),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Container(
@@ -48,7 +52,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
               children: [
                 Container(
                   height: style.titleHeight ?? 16, // Default title height
-                  width: style.titleWidth ?? 28.w, // Default title width
+                  width: style.titleWidth ?? relativeWidth * 0.5, // Default title width
                   color: LMChatTheme.theme.container,
                 ),
                 kVerticalPaddingMedium,
@@ -59,7 +63,7 @@ class LMChatDocumentShimmer extends StatelessWidget {
                       height:
                           style.subtitleHeight ?? 12, // Default subtitle height
                       width:
-                          style.subtitleWidth ?? 16.w, // Default subtitle width
+                          style.subtitleWidth ?? relativeWidth * 0.25, // Default subtitle width
                       color: LMChatTheme.theme.container,
                     ),
                     kHorizontalPaddingXSmall,

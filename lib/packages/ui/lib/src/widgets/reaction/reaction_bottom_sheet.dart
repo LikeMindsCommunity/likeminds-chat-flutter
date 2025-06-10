@@ -83,12 +83,14 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     initialiseBottomSheetData();
     return Container(
       clipBehavior: Clip.none,
       padding: style.padding ??
           const EdgeInsets.symmetric(horizontal: 18.0), // Use style padding
-      height: style.height ?? 60.h, // Use style height
+      height: style.height ?? height * 0.6, // Use style height
       decoration: BoxDecoration(
         color: style.backgroundColor ??
             LMChatTheme.theme.container, // Use style background color
@@ -105,7 +107,7 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
           kVerticalPaddingLarge,
           _buildTitle(), // Refactored title section
           kVerticalPaddingXLarge,
-          _buildTabBar(), // Refactored tab bar section
+          _buildTabBar(width), // Refactored tab bar section
           kVerticalPaddingLarge,
           _buildReactionList(), // Refactored reaction list section
         ],
@@ -125,7 +127,7 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
   }
 
   // New method to build the tab bar
-  Widget _buildTabBar() {
+  Widget _buildTabBar(double width) {
     return SizedBox(
       height: 40,
       child: Row(
@@ -141,7 +143,7 @@ class _LMChatReactionBottomSheetState extends State<LMChatReactionBottomSheet> {
                 ),
               ),
             ),
-            width: 100.w - 40,
+            width: width - 40,
             height: 40,
             child: ListView.builder(
               itemCount: mappedReactions!.keys.length,

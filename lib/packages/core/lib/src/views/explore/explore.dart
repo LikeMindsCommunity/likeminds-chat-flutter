@@ -33,6 +33,7 @@ class LMChatExplorePage extends StatefulWidget {
 }
 
 class _LMChatExplorePageState extends State<LMChatExplorePage> {
+  late Size size;
   final LMChatExploreBloc exploreBloc = LMChatExploreBloc.instance;
   LMChatSpace _space = LMChatSpace.newest;
 
@@ -59,7 +60,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       size: 28,
       color: LMChatTheme.theme.onContainer,
     ),
-    menuBoxWidth: 52.w,
+    menuBoxWidth: 400,
     menuBoxDecoration: BoxDecoration(
       color: LMChatTheme.theme.container,
       borderRadius: BorderRadius.circular(10),
@@ -83,6 +84,12 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
+  }
+
+  @override
   void dispose() {
     exploreBloc.close();
     exploreFeedPagingController.dispose();
@@ -101,10 +108,10 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
             builder: (context, _, child) {
               return _screenBuilder.scaffold(
                 backgroundColor: LMChatTheme.theme.scaffold,
-                appBar:
-                    _screenBuilder.appBarBuilder(context, _defaultExploreAppBar()),
+                appBar: _screenBuilder.appBarBuilder(
+                    context, _defaultExploreAppBar()),
                 body: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w),
+                  padding: EdgeInsets.symmetric(horizontal: size.width * 0.02),
                   child: _defaultExploreBody(),
                 ),
               );
@@ -118,7 +125,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       children: [
         kVerticalPaddingSmall,
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 2.w),
+          padding: EdgeInsets.symmetric(horizontal: size.width * 0.02),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -139,7 +146,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
         Expanded(
           child: _defaultExploreBlocConsumer(),
         ),
-        SizedBox(height: 2.h),
+        SizedBox(height: size.height * 0.02),
       ],
     );
   }
@@ -161,8 +168,11 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
     return LMChatAppBar(
       style: LMChatTheme.theme.appBarStyle.copyWith(
         height: 76,
-        gap: 4.w,
-        padding: EdgeInsets.all(4.w),
+        gap: size.width * 0.04,
+        padding: EdgeInsets.symmetric(
+          horizontal: size.width * 0.04,
+          vertical: size.height * 0.01,
+        ),
       ),
       title: LMChatText(
         'Explore Chatrooms',
@@ -214,7 +224,7 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
 
   Container _defaultExploreMenuBox() {
     return Container(
-      width: _popUpMenuStyle().menuBoxWidth ?? 52.w,
+      width: _popUpMenuStyle().menuBoxWidth ?? size.width * 0.52,
       height: _popUpMenuStyle().menuBoxHeight,
       decoration: _popUpMenuStyle().menuBoxDecoration ??
           BoxDecoration(
@@ -336,8 +346,8 @@ class _LMChatExplorePageState extends State<LMChatExplorePage> {
       style: LMChatTheme.theme.chatTileStyle.copyWith(
         gap: 6,
         padding: EdgeInsets.symmetric(
-          horizontal: 4.w,
-          vertical: 1.h,
+          horizontal: size.width * 0.04,
+          vertical: size.height * 0.01,
         ),
       ),
       chatroom: item.toChatRoomViewData(),

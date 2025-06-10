@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:likeminds_chat_flutter_ui/likeminds_chat_flutter_ui.dart';
 import 'package:open_file/open_file.dart';
-import 'package:pdf_render/pdf_render_widgets.dart';
+import 'package:pdfrx/pdfrx.dart';
 
 ///{@template lm_chat_document}
 /// A widget that displays a thumbnail for a document.
@@ -85,6 +85,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return FutureBuilder(
       future: loadedFile,
       builder: (context, snapshot) {
@@ -102,6 +103,8 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
               child: Stack(
                 children: [
                   SizedBox(
+                    width: style?.width ??
+                        (width < 500 ? width * 0.45 : width * 0.27),
                     child: documentFile!,
                   ),
                   widget.showOverlay
@@ -113,7 +116,9 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                               style: style?.overlayStyle ??
                                   LMChatDocumentTileStyle(
                                     padding: EdgeInsets.zero,
-                                    width: 52.w,
+                                    width: width < 500
+                                        ? width * 0.45
+                                        : width * 0.27,
                                     backgroundColor:
                                         LMChatTheme.theme.container,
                                   ),
@@ -149,32 +154,59 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
     }
 
     // _fileSize = getFileSizeString(bytes: widget.media.size ?? 0);
-    documentFile = PdfDocumentLoader.openFile(
+    documentFile = PdfDocumentViewBuilder.file(
       file!.path,
-      pageNumber: 1,
-      pageBuilder: (context, textureBuilder, pageSize) => SizedBox(
-        child: Container(
+      builder: (context, document) {
+        if (document == null) {
+          // While loading, show a placeholder
+          return SizedBox(
+            height: style?.height,
+            width: style?.width,
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              padding: style?.padding,
+              decoration: BoxDecoration(
+                borderRadius: style?.borderRadius ??
+                    const BorderRadius.all(
+                        Radius.circular(kBorderRadiusMedium)),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+
+        // When document is loaded
+        final page = document.pages[0]; // 0-based index
+
+        return SizedBox(
           height: style?.height,
           width: style?.width,
-          clipBehavior: Clip.hardEdge,
-          padding: style?.padding,
-          decoration: BoxDecoration(
-            borderRadius: style?.borderRadius ??
-                const BorderRadius.all(
-                  Radius.circular(kBorderRadiusMedium),
+          child: Container(
+            clipBehavior: Clip.hardEdge,
+            padding: style?.padding,
+            decoration: BoxDecoration(
+              borderRadius: style?.borderRadius ??
+                  const BorderRadius.all(Radius.circular(kBorderRadiusMedium)),
+            ),
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              child: SizedBox(
+                height: page.height,
+                width: page.width,
+                child: PdfPageView(
+                  document: document,
+                  pageNumber: 1,
+                  alignment: Alignment.center,
                 ),
-          ),
-          child: FittedBox(
-            fit: BoxFit.fitWidth,
-            child: textureBuilder(
-              allowAntialiasingIOS: true,
-              backgroundFill: true,
-              size: Size(pageSize.width, pageSize.height),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
+
     return file;
   }
 }
