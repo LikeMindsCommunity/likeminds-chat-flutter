@@ -14,6 +14,7 @@ class LMChatMediaShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Shimmer.fromColors(
       baseColor: style?.baseColor ?? Colors.grey.shade100,
       highlightColor: style?.highlightColor ?? Colors.grey.shade200,
@@ -23,8 +24,8 @@ class LMChatMediaShimmerWidget extends StatelessWidget {
           ? const CircleAvatar(backgroundColor: Colors.white)
           : Container(
               color: Colors.white,
-              width: width ?? 55.w,
-              height: height ?? 55.w,
+              width: width ?? screenWidth * 0.55,
+              height: height ?? screenWidth * 0.55,
             ),
     );
   }

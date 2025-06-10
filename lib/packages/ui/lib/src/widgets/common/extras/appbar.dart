@@ -111,8 +111,8 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                                   boxSize: 28,
                                                 ),
                                               ),
-                                              backgroundColor: LMChatTheme
-                                                  .theme.container,
+                                              backgroundColor:
+                                                  LMChatTheme.theme.container,
                                             ),
                                           )
                                         : const SizedBox.shrink()),
@@ -156,7 +156,8 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           type: LMChatIconType.icon,
                                           icon: Icons.arrow_back,
                                           style: LMChatIconStyle(
-                                            color: LMChatTheme.theme.onContainer,
+                                            color:
+                                                LMChatTheme.theme.onContainer,
                                             size: 24,
                                             boxSize: 28,
                                           ),
@@ -180,7 +181,8 @@ class LMChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                               children: [
                                 Container(
                                   constraints: BoxConstraints(
-                                    minWidth: 80.w,
+                                    minWidth:
+                                        MediaQuery.sizeOf(context).width * 0.8,
                                   ),
                                   child: titleBuilder?.call(
                                           title ?? const SizedBox.shrink()) ??

@@ -40,6 +40,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   late ValueNotifier<int> _currentPosition;
   List<LMChatMediaModel> mediaList = [];
   late CarouselSliderController _carouselController;
+  late Size size;
 
   final LMChatMediaPreviewBuilderDelegate _screenBuilder =
       LMChatCore.config.mediaPreviewConfig.builder;
@@ -68,6 +69,12 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
   void deactivate() {
     LMChatMediaHandler.instance.clearPickedMedia();
     super.deactivate();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    size = MediaQuery.sizeOf(context);
   }
 
   @override
@@ -129,7 +136,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         backgroundColor: LMChatTheme.isThemeDark
             ? LMChatTheme.theme.container.withOpacity(0.5)
             : LMChatTheme.theme.onContainer.withOpacity(0.5),
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
       ),
       leading: LMChatButton(
         onTap: () {
@@ -217,7 +224,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
         carouselController: _carouselController,
         itemCount: mediaList.length,
         options: CarouselOptions(
-          height: 90.h,
+          height: size.height * 0.90,
           viewportFraction: 1.0,
           enlargeCenterPage: false,
           animateToClosest: false,
@@ -233,7 +240,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
                 ? LMChatTheme.theme.container
                 : LMChatTheme.theme.onContainer,
             child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 2.h),
+              padding: EdgeInsets.symmetric(vertical: size.height * 0.02),
               child: Center(
                 child: media.mediaType == LMChatMediaType.image
                     ? _screenBuilder.image(
@@ -265,13 +272,13 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
             ),
           )),
       padding: EdgeInsets.only(
-        left: 2.w,
+        left: size.width * 0.02,
         right: 5.0,
-        top: 2.h,
-        bottom: 4.h,
+        top: size.height * 0.02,
+        bottom: size.height * 0.04,
       ),
       child: SizedBox(
-        height: 15.w,
+        height: size.width * 0.15,
         child: _defPreviewList(),
       ),
     );
@@ -306,8 +313,8 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
                       )
                     : null,
               ),
-              width: 15.w,
-              height: 15.w,
+              width: size.width * 0.15,
+              height: size.width * 0.15,
               child: mediaList[index].mediaType == LMChatMediaType.image
                   ? _buildThumbnailImage(mediaList[index])
                   : _buildThumbnailVideo(mediaList[index]),
@@ -337,7 +344,7 @@ class _LMChatMediaPreviewScreenState extends State<LMChatMediaPreviewScreen> {
       style: LMChatImageStyle(
         boxFit: BoxFit.cover,
         borderRadius: BorderRadius.circular(8.0),
-        width: 100.w,
+        width: size.width * 1.00,
       ),
     );
   }

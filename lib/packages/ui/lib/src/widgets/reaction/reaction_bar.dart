@@ -37,6 +37,8 @@ class LMChatReactionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
     LMChatReactionBarStyle effectiveStyle = style ??
         (LMChatTheme.theme.reactionBarStyle as LMChatReactionBarStyle?) ??
         LMChatReactionBarStyle.basic();
@@ -54,8 +56,8 @@ class LMChatReactionBar extends StatelessWidget {
             )
           ],
         ),
-        width: effectiveStyle.width ?? 80.w,
-        height: effectiveStyle.height ?? 6.h,
+        width: effectiveStyle.width ?? width * 0.8,
+        height: effectiveStyle.height ?? height * 0.06,
         child: getListOfReactions(
           onTap: onReaction,
           effectiveStyle: effectiveStyle, // Pass effectiveStyle here

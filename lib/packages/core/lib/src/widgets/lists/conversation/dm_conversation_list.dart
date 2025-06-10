@@ -351,7 +351,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         return oldWidget.copyWith(
           subtitle: ((reply.attachmentsUploaded ?? false) &&
                   reply.deletedByUserId == null)
-              ? getChatItemAttachmentTile(message,
+              ? getChatItemAttachmentTile(context, message,
                   conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
               : LMChatText(
                   reply.state != 0
@@ -511,7 +511,7 @@ class _LMChatDMConversationListState extends State<LMChatDMConversationList> {
         return oldWidget.copyWith(
           subtitle: ((reply.attachmentsUploaded ?? false) &&
                   reply.deletedByUserId == null)
-              ? getChatItemAttachmentTile(message,
+              ? getChatItemAttachmentTile(context, message,
                   conversationAttachmentsMeta[reply.id.toString()] ?? [], reply)
               : LMChatText(
                   reply.state != 0

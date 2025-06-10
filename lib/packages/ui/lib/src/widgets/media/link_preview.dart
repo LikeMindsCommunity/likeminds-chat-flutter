@@ -60,6 +60,7 @@ class LMChatLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
     return ClipRRect(
       borderRadius: style?.decoration?.borderRadius ?? BorderRadius.circular(8),
       child: GestureDetector(
@@ -151,14 +152,15 @@ class LMChatLinkPreview extends StatelessWidget {
       imageUrl: ogTags.imageUrl,
       style: style?.imageStyle ??
           const LMChatImageStyle(
-            height: 190,
-            width: 225,
+            height: 20,
+            width: 20,
             boxFit: BoxFit.fill,
             errorWidget: LMChatIcon(
               type: LMChatIconType.icon,
               icon: Icons.link,
               style: LMChatIconStyle(
                 size: 32,
+                boxSize: 20,
               ),
             ),
           ),
@@ -271,7 +273,6 @@ class LMChatLinkPreviewStyle {
         left: 8,
         right: 30,
       ),
-      width: double.infinity,
       imageStyle: const LMChatImageStyle(
         height: 190,
         width: double.infinity,
@@ -280,7 +281,8 @@ class LMChatLinkPreviewStyle {
           type: LMChatIconType.icon,
           icon: Icons.link,
           style: LMChatIconStyle(
-            size: 32,
+            size: 24,
+            boxSize: 32,
           ),
         ),
       ),

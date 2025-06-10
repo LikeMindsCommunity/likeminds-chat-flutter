@@ -48,6 +48,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
   final LMChatPollResultBuilderDelegate _screenBuilder =
       LMChatCore.config.pollConfig.pollResultBuilder;
   final _webConfiguration = LMChatCore.config.webConfiguration;
+  late double width;
 
   @override
   initState() {
@@ -77,6 +78,12 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         });
       }
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    width = MediaQuery.sizeOf(context).width;
   }
 
   @override
@@ -189,7 +196,7 @@ class _LMChatPollResultScreenState extends State<LMChatPollResultScreen>
         centerTitle: true,
         height: 72,
         padding: const EdgeInsets.symmetric(horizontal: 18),
-        gap: 3.w,
+        gap: width * 0.03,
         backgroundColor: theme.container,
         border: Border.all(
           color: Colors.transparent,

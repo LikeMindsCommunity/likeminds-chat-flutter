@@ -80,6 +80,7 @@ class LMChatBubbleMedia extends StatelessWidget {
   }
 
   Widget? getContent(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     Widget? mediaWidget;
     if (count > 0 &&
         conversation.deletedByUserId == null &&
@@ -95,7 +96,8 @@ class LMChatBubbleMedia extends StatelessWidget {
           case 1:
             mediaWidget = LMChatDocumentThumbnail(
               media: attachments.first.toMediaModel(),
-              style: LMChatDocumentThumbnailStyle(height: 140, width: 55.w),
+              style: LMChatDocumentThumbnailStyle(
+                  height: 140, width: width * 0.55),
               showOverlay: true,
             );
           default:
@@ -103,7 +105,7 @@ class LMChatBubbleMedia extends StatelessWidget {
               mediaList: attachments.map((e) => e.toMediaModel()).toList(),
               style: LMChatDocumentTilePreviewStyle(
                 tileStyle: LMChatDocumentTileStyle(
-                  width: 55.w,
+                  width: width * 0.55,
                 ),
               ),
             );
@@ -147,7 +149,7 @@ class LMChatBubbleMedia extends StatelessWidget {
 
   Widget _defaultMediaWidget(BuildContext context) {
     if (attachments.first.attachmentFile != null ||
-        attachments.first.attachmentBytes != null ) {
+        attachments.first.attachmentBytes != null) {
       return getImageFileMessage(context, attachments, imageBuilder);
     }
     return getImageMessage(context, attachments, imageBuilder);

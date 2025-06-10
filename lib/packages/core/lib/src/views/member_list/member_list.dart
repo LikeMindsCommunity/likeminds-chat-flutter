@@ -80,8 +80,8 @@ class _LMChatMemberListState extends State<LMChatMemberList> {
 
   void didudUpdateWidget(LMChatMemberList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    ScreenSize.init(context,
-        setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
+    // ScreenSize.init(context,
+    //     setWidth: kIsWeb ? _webConfiguration.maxWidth : null);
   }
 
   @override

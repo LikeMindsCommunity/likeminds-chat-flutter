@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_chat_flutter_ui/src/widgets/widgets.dart';
 
@@ -897,23 +896,7 @@ class LMChatDefaultTheme {
       SizedBox(height: kPaddingMedium);
 }
 
-/// Converts a percentage to screen height
-extension ScreenHeight on num {
-  /// Converts a percentage to screen height
-  double get h => (this / 100) * ScreenSize.height;
-}
-
-/// Convert integer or double to screen width percentage (w)
-extension ScreenWidth on num {
-  /// Converts a percentage to screen width
-  double get w => (this / 100) * ScreenSize.width;
-}
-
-/// Extension to convert double to scaled text size
-extension ScreenPoints on double {
-  /// Converts a value to scaled text size
-  double get sp => ScreenSize.textScale.scale(this);
-}
+@Deprecated('This class is deprecated and will be removed in future versions')
 
 /// Class to initialize the screen size
 class ScreenSize {
@@ -947,6 +930,7 @@ class ScreenSize {
   /// Safe block size for vertical layout
   static late double safeBlockVertical;
 
+  @Deprecated('This method is deprecated and will be removed in future versions, currently not being used anywhere')
   /// Initializes the screen size based on the provided context
   static init(
     BuildContext context, {

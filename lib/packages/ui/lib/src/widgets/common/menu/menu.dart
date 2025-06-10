@@ -179,9 +179,9 @@ class LMChatMenuStyle {
           borderRadius: BorderRadius.circular(8),
         ),
         color: Colors.white,
-        constraints: BoxConstraints(
-          minWidth: 12.w,
-          maxWidth: 60.w,
+        constraints: const BoxConstraints(
+          minWidth: 120,
+          maxWidth: 300,
         ),
         clipBehavior: Clip.none,
         itemPadding: EdgeInsets.zero,

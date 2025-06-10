@@ -85,6 +85,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return FutureBuilder(
       future: loadedFile,
       builder: (context, snapshot) {
@@ -102,6 +103,7 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
               child: Stack(
                 children: [
                   SizedBox(
+                    width: width < 500 ? width * 0.45 : width * 0.27,
                     child: documentFile!,
                   ),
                   widget.showOverlay
@@ -113,7 +115,9 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
                               style: style?.overlayStyle ??
                                   LMChatDocumentTileStyle(
                                     padding: EdgeInsets.zero,
-                                    width: 52.w,
+                                    width: width < 500
+                                        ? width * 0.45
+                                        : width * 0.27,
                                     backgroundColor:
                                         LMChatTheme.theme.container,
                                   ),
