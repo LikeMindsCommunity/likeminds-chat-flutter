@@ -265,6 +265,12 @@ class _LMChatCreatePollScreenState extends State<LMChatCreatePollScreen> {
   }
 
   @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(

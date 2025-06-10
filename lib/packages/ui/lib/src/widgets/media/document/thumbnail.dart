@@ -103,7 +103,8 @@ class _LMChatDocumentThumbnailState extends State<LMChatDocumentThumbnail> {
               child: Stack(
                 children: [
                   SizedBox(
-                    width: width < 500 ? width * 0.45 : width * 0.27,
+                    width: style?.width ??
+                        (width < 500 ? width * 0.45 : width * 0.27),
                     child: documentFile!,
                   ),
                   widget.showOverlay

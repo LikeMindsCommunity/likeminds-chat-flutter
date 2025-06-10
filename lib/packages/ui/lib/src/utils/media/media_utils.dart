@@ -766,12 +766,13 @@ Widget getImageFileMessage(
   LMChatImageBuilder? imageBuilder,
 ) {
   final width = MediaQuery.sizeOf(context).width;
+  final imageWidth = width < 500 ? width * 0.45 : width * 0.27;
   if (mediaFiles.length == 1) {
     return GestureDetector(
       child: getFileImageTile(
         mediaFiles.first,
-        height: width * 0.55,
-        width: width * 0.55,
+        height: imageWidth,
+        width: imageWidth,
       ),
     );
   } else if (mediaFiles.length == 2) {
@@ -781,14 +782,14 @@ Widget getImageFileMessage(
         children: <Widget>[
           getFileImageTile(
             mediaFiles[0],
-            height: width * 0.35,
-            width: width * 0.35,
+            height: imageWidth * 0.5,
+            width: imageWidth * 0.5,
           ),
           LMChatDefaultTheme.kHorizontalPaddingSmall,
           getFileImageTile(
             mediaFiles[1],
-            height: width * 0.25,
-            width: width * 0.25,
+            height: imageWidth * 0.5,
+            width: imageWidth * 0.5,
           )
         ],
       ),
@@ -800,13 +801,13 @@ Widget getImageFileMessage(
         children: <Widget>[
           getFileImageTile(
             mediaFiles[0],
-            height: width * 0.25,
-            width: width * 0.25,
+            height: imageWidth * 0.5,
+            width: imageWidth * 0.5,
           ),
           LMChatDefaultTheme.kHorizontalPaddingSmall,
           Container(
-            height: width * 0.25,
-            width: width * 0.25,
+            height: imageWidth * 0.5,
+            width: imageWidth * 0.5,
             clipBehavior: Clip.hardEdge,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6.0),
@@ -815,13 +816,13 @@ Widget getImageFileMessage(
               children: [
                 getFileImageTile(
                   mediaFiles[1],
-                  height: width * 0.25,
-                  width: width * 0.25,
+                  height: imageWidth * 0.5,
+                  width: imageWidth * 0.5,
                 ),
                 Positioned(
                   child: Container(
-                    height: width * 0.25,
-                    width: width * 0.25,
+                    height: imageWidth * 0.5,
+                    width: imageWidth * 0.5,
                     alignment: Alignment.center,
                     color: LMChatDefaultTheme.blackColor.withOpacity(0.5),
                     child: const LMChatText(
@@ -851,14 +852,14 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[0],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               getFileImageTile(
                 mediaFiles[1],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
             ],
           ),
@@ -868,14 +869,14 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[2],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               getFileImageTile(
                 mediaFiles[3],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
             ],
           ),
@@ -892,14 +893,14 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[0],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               getFileImageTile(
                 mediaFiles[1],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
             ],
           ),
@@ -909,8 +910,8 @@ Widget getImageFileMessage(
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[2],
-                height: width * 0.25,
-                width: width * 0.25,
+                height: imageWidth * 0.5,
+                width: imageWidth * 0.5,
               ),
               LMChatDefaultTheme.kHorizontalPaddingSmall,
               Container(
@@ -923,13 +924,13 @@ Widget getImageFileMessage(
                   children: [
                     getFileImageTile(
                       mediaFiles[3],
-                      height: width * 0.25,
-                      width: width * 0.25,
+                      height: imageWidth * 0.5,
+                      width: imageWidth * 0.5,
                     ),
                     Positioned(
                       child: Container(
-                        height: width * 0.25,
-                        width: width * 0.25,
+                        height: imageWidth * 0.5,
+                        width: imageWidth * 0.5,
                         alignment: Alignment.center,
                         color: LMChatDefaultTheme.blackColor.withOpacity(0.5),
                         child: LMChatText(

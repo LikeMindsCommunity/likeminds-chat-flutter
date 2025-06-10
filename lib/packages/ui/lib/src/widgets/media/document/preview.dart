@@ -56,6 +56,7 @@ class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
   @override
   Widget build(BuildContext context) {
     final style = widget.style ?? LMChatDocumentPreviewStyle.basic();
+    final size = MediaQuery.sizeOf(context);
     return Column(
       children: [
         Expanded(
@@ -72,7 +73,11 @@ class _LMChatDocumentPreviewState extends State<LMChatDocumentPreview> {
                 Expanded(
                   child: LMChatDocumentThumbnail(
                     media: media!,
-                    style: style.thumbnailStyle,
+                    style: style.thumbnailStyle ??
+                        LMChatDocumentThumbnailStyle.basic().copyWith(
+                          width: size.width,
+                          height: size.height * 0.8,
+                        ),
                   ),
                 ),
                 kVerticalPaddingXLarge,

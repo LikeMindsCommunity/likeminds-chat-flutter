@@ -91,7 +91,7 @@ class LMChatLinkPreviewBar extends StatelessWidget {
         }
       },
       child: Container(
-        width: style?.width ?? _size.width * 0.8,
+        width: style?.width ?? double.infinity,
         height: style?.height,
         decoration: style?.decoration?.copyWith(
               color: themeData.container,
@@ -102,7 +102,10 @@ class LMChatLinkPreviewBar extends StatelessWidget {
                 top: Radius.circular(8),
               ),
             ),
-        margin: style?.margin,
+        margin: style?.margin ??
+            EdgeInsets.only(
+              right: _size.width * 0.044,
+            ),
         padding: style?.padding,
         child: Container(
           decoration: style?.decoration ??
@@ -346,7 +349,6 @@ class LMChatLinkPreviewBarStyle {
         left: 8,
         right: 30,
       ),
-      width: 200,
       linkTextStyle: LMChatTextStyle(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         textStyle: TextStyle(
