@@ -104,3 +104,8 @@
 ## 1.1.1
 
 - Fixed missing package in data layer
+
+## 1.2.0
+
+- Added resonsive size to fix flutter web size issues
+- Migrate sdk to 35 
