@@ -46,6 +46,10 @@ class LMChatTextField extends StatefulWidget {
   ///Keyboard visibility
   final void Function(bool)? onKeyboardFocusChange;
 
+  /// Determines if "@participants" tagging is shown.
+  /// 
+  final bool showParticipantsTagging;
+
   const LMChatTextField(
       {super.key,
       required this.isDown,
@@ -60,7 +64,9 @@ class LMChatTextField extends StatefulWidget {
       this.onChange,
       this.scrollPhysics,
       this.textFieldStyle,
-      this.onKeyboardFocusChange});
+      this.onKeyboardFocusChange,
+      this.showParticipantsTagging = true,
+      });
 
   /// Creates a copy of this widget with the given fields replaced with new values.
   LMChatTextField copyWith({
@@ -77,6 +83,7 @@ class LMChatTextField extends StatefulWidget {
     ScrollPhysics? scrollPhysics,
     LMChatTextFieldStyle? textFieldStyle,
     void Function(bool)? onKeyboardFocusChange,
+    bool? showParticipantsTagging,
   }) {
     return LMChatTextField(
       isDown: isDown ?? this.isDown,
@@ -93,6 +100,8 @@ class LMChatTextField extends StatefulWidget {
       textFieldStyle: textFieldStyle ?? this.textFieldStyle,
       onKeyboardFocusChange:
           onKeyboardFocusChange ?? this.onKeyboardFocusChange,
+      showParticipantsTagging:
+          showParticipantsTagging ?? this.showParticipantsTagging,
     );
   }
 
@@ -144,6 +153,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
             .addAll(taggingData.members!.map((e) => e.toLMChatTagViewData()));
       });
     }
+    if (taggingData.participants?.isNotEmpty == true) {
+      setState(() {
+        _tagViewData.addAll(
+            taggingData.participants!.map((e) => e.toLMChatTagViewData()));
+      });
+    }  
   }
 
   Future<TagResponseModel> _fetchTaggingData(int page,
@@ -177,7 +192,9 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
   List<LMChatTagViewData> _processTaggingData(TagResponseModel taggingData) {
     List<LMChatTagViewData> result = [];
 
-    if (!widget.isSecret) {
+    // If the chat is not secret and participants tagging is enabled,
+    // include group tags if available.
+    if (!widget.isSecret && widget.showParticipantsTagging == true) {
       if (taggingData.groupTags != null && taggingData.groupTags!.isNotEmpty) {
         result
             .addAll(taggingData.groupTags!.map((e) => e.toLMChatTagViewData()));
@@ -186,6 +203,12 @@ class _LMChatTextFieldState extends State<LMChatTextField> {
 
     if (taggingData.members != null && taggingData.members!.isNotEmpty) {
       result.addAll(taggingData.members!.map((e) => e.toLMChatTagViewData()));
+    }
+
+    if (taggingData.participants != null &&
+        taggingData.participants!.isNotEmpty) {
+      result.addAll(
+          taggingData.participants!.map((e) => e.toLMChatTagViewData()));
     }
 
     return result;

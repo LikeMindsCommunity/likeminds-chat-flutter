@@ -68,15 +68,7 @@ class LMChatBubbleFooter extends StatelessWidget {
             ),
           ],
           conversation.createdAt.isNotEmpty
-              ? LMChatText(
-                  conversation.createdAt,
-                  style: LMChatTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 12,
-                      color: LMChatTheme.theme.onContainer.withOpacity(0.6),
-                    ),
-                  ),
-                )
+              ? _defTimeStamp()
               : LMChatIcon(
                   type: LMChatIconType.icon,
                   icon: Icons.timer_outlined,
@@ -91,17 +83,32 @@ class LMChatBubbleFooter extends StatelessWidget {
     );
   }
 
+  LMChatText _defTimeStamp() {
+    return timeStamp ??
+        LMChatText(
+          conversation.createdAt,
+          style: LMChatTextStyle(
+            textStyle: TextStyle(
+              fontSize: 12,
+              color: LMChatTheme.theme.onContainer.withOpacity(0.6),
+            ),
+          ),
+        );
+  }
+
   /// Calculates the width of the footer based on its content.
   double calculateFooterWidth() {
     // if the conversation is of poll type, return the max width.
-    final _relativeWidth = _screenWidth < 500 ? _screenWidth * 0.55 : _screenWidth * 0.35;
+    final _relativeWidth =
+        _screenWidth < 500 ? _screenWidth * 0.55 : _screenWidth * 0.35;
     if (conversation.state == 10) {
       return _relativeWidth * 0.75;
     }
-    if (conversation.attachmentCount == 1 || conversation.replyConversationObject != null) {
+    if (conversation.attachmentCount == 1 ||
+        conversation.replyConversationObject != null) {
       return _relativeWidth * 0.75;
     }
-    if ((conversation.attachmentCount??0) > 1) {
+    if ((conversation.attachmentCount ?? 0) > 1) {
       return _relativeWidth * 0.80;
     }
     if (conversation.ogTags != null) {
