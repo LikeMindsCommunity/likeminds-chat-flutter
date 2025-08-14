@@ -109,3 +109,7 @@
 
 - Added resonsive size to fix flutter web size issues
 - Migrate sdk to 35 
+
+## 1.2.1
+
+- Fixed no tagging data in secret chatroom

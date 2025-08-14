@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: crypto
-      sha256: ec30d999af904f33454ba22ed9a86162b35e52b44ac4807d1d93c288041d7d27
+      sha256: "1e445881f28f22d6140f181e07737b22f1e099a5e1ff94b0af2f9e4a463f4855"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "3.0.6"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -806,11 +806,12 @@ packages:
     source: hosted
     version: "3.0.1"
   likeminds_chat_fl:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../LikeMinds-Flutter-GroupChat-SDK"
-      relative: true
-    source: path
+      name: likeminds_chat_fl
+      sha256: "3f8d86ef9958e0924a67f7ee1493f4750f1f9465820701d79e5a39fcbec403b3"
+      url: "https://pub.dev"
+    source: hosted
     version: "1.16.1"
   likeminds_chat_flutter_core:
     dependency: "direct main"
@@ -818,14 +819,14 @@ packages:
       path: "../lib/packages/core"
       relative: true
     source: path
-    version: "1.1.1"
+    version: "1.2.1"
   likeminds_chat_flutter_ui:
     dependency: "direct overridden"
     description:
       path: "../lib/packages/ui"
       relative: true
     source: path
-    version: "1.1.1"
+    version: "1.2.1"
   lints:
     dependency: transitive
     description:
@@ -1146,14 +1147,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  pdf_render:
+  pdfrx:
     dependency: transitive
     description:
-      name: pdf_render
-      sha256: bacd2ad8f4f4c9821827003065f5c2f9ca474dd418ff29c68272aab4c0e1e88b
+      name: pdfrx
+      sha256: "472bb03646980879a348bc1f7a28de710534ec861bca1a35cbd461c43643425a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.12"
+    version: "1.0.103"
   permission_handler:
     dependency: transitive
     description:
@@ -1499,10 +1500,10 @@ packages:
     dependency: transitive
     description:
       name: synchronized
-      sha256: "539ef412b170d65ecdafd780f924e5be3f60032a1128df156adad6c5b373d558"
+      sha256: "69fe30f3a8b04a0be0c15ae6490fc859a78ef4c43ae2dd5e8a623d45bfcf9225"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0+1"
+    version: "3.3.0+3"
   term_glyph:
     dependency: transitive
     description:
@@ -1555,10 +1556,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher
-      sha256: "21b704ce5fa560ea9f3b525b43601c678728ba46725bab9b01187b4831377ed3"
+      sha256: "9d06212b1362abc2f0f0d78e6f09f726608c74e3b9462e8368bb03314aa8d603"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.0"
+    version: "6.3.1"
   url_launcher_android:
     dependency: transitive
     description:
@@ -1752,5 +1753,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
+  dart: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
