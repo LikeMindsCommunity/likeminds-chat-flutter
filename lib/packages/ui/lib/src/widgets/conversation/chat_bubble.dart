@@ -433,59 +433,11 @@ class _LMChatBubbleState extends State<LMChatBubble> {
   Widget _defChatBubbleBuilder(
       LMChatBubbleStyle inStyle, BuildContext context, double finalWidth) {
     return GestureDetector(
+      behavior: HitTestBehavior.deferToChild,
       onLongPress: () {
-        if (_isDeleted) return;
-        // Only handle long press if not already selected
-        if (!_isSelected) {
-          setState(() {
-            _isSelected = true;
-          });
-          widget.onLongPress?.call(_isSelected, this);
-          reactionBarController.showMenu();
-
-          final RenderBox renderBox = context.findRenderObject() as RenderBox;
-          final Offset bubblePosition = renderBox.localToGlobal(Offset.zero);
-          final Size bubbleSize = renderBox.size;
-
-          // Calculate menu position based on bubble width and alignment
-          const double menuWidth = 180.0; // Fixed menu width
-          double menuX;
-
-          if (isSent) {
-            // For sent messages (right aligned), position from right edge
-            menuX = bubblePosition.dx + bubbleSize.width - menuWidth;
-          } else {
-            // For received messages (left aligned), position from left edge
-            menuX = bubblePosition.dx;
-          }
-
-          final Offset offset = Offset(
-            menuX,
-            bubblePosition.dy + bubbleSize.height + 4, // 4px gap below bubble
-          );
-
-          widget.actionHelper?.showSelectionMenu(
-            context,
-            offset,
-          );
-        }
+        _onLongPress(context);
       },
-      onTap: () {
-        if (_isDeleted) return;
-
-        setState(() {
-          if (_isSelected) {
-            _isSelected = false;
-            widget.onTap?.call(_isSelected, this);
-          } else {
-            // Only allow selection on tap if explicitly enabled
-            if (widget.isSelectableOnTap?.call() ?? false) {
-              _isSelected = true;
-              widget.onTap?.call(_isSelected, this);
-            }
-          }
-        });
-      },
+      onTap: _onTap,
       child: Stack(
         children: [
           AnimatedContainer(
@@ -542,6 +494,61 @@ class _LMChatBubbleState extends State<LMChatBubble> {
         ],
       ),
     );
+  }
+
+  void _onLongPress(BuildContext context) {
+    if (_isDeleted) return;
+    // Only handle long press if not already selected
+    if (!_isSelected) {
+      setState(() {
+        _isSelected = true;
+      });
+      widget.onLongPress?.call(_isSelected, this);
+      reactionBarController.showMenu();
+
+      final RenderBox renderBox = context.findRenderObject() as RenderBox;
+      final Offset bubblePosition = renderBox.localToGlobal(Offset.zero);
+      final Size bubbleSize = renderBox.size;
+
+      // Calculate menu position based on bubble width and alignment
+      const double menuWidth = 180.0; // Fixed menu width
+      double menuX;
+
+      if (isSent) {
+        // For sent messages (right aligned), position from right edge
+        menuX = bubblePosition.dx + bubbleSize.width - menuWidth;
+      } else {
+        // For received messages (left aligned), position from left edge
+        menuX = bubblePosition.dx;
+      }
+
+      final Offset offset = Offset(
+        menuX,
+        bubblePosition.dy + bubbleSize.height + 4, // 4px gap below bubble
+      );
+
+      widget.actionHelper?.showSelectionMenu(
+        context,
+        offset,
+      );
+    }
+  }
+
+  void _onTap() {
+    if (_isDeleted) return;
+
+    setState(() {
+      if (_isSelected) {
+        _isSelected = false;
+        widget.onTap?.call(_isSelected, this);
+      } else {
+        // Only allow selection on tap if explicitly enabled
+        if (widget.isSelectableOnTap?.call() ?? false) {
+          _isSelected = true;
+          widget.onTap?.call(_isSelected, this);
+        }
+      }
+    });
   }
 
   Column _defChatContainer(
@@ -720,6 +727,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                               : conversation,
                           onTagTap: widget.onTagTap,
                           style: theme.contentStyle,
+                          onLongPress: () {
+                            _onLongPress(context);
+                          },
+                          onTextTap: _onTap,
                         ),
                       ) ??
                       LMChatBubbleContent(
@@ -728,6 +739,10 @@ class _LMChatBubbleState extends State<LMChatBubble> {
                             : conversation,
                         onTagTap: widget.onTagTap,
                         style: theme.contentStyle,
+                        onLongPress: () {
+                          _onLongPress(context);
+                        },
+                        onTextTap: _onTap,
                       ),
           if (conversation.deletedByUserId == null &&
               inStyle.showFooter == true)

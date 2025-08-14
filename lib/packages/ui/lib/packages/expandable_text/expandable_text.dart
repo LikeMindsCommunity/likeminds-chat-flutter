@@ -47,6 +47,8 @@ class LMChatExpandableText extends StatefulWidget {
     this.semanticsLabel,
     required this.onTagTap,
     this.enableSelection = true,
+    this.onLongPress,
+    this.onTextTap,
   })  : assert(maxLines > 0),
         super(key: key);
 
@@ -81,6 +83,8 @@ class LMChatExpandableText extends StatefulWidget {
   final String? semanticsLabel;
   final Function(String) onTagTap;
   final bool enableSelection;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onTextTap;
 
   /// Creates a copy of this [LMChatExpandableText] but with the given fields
   /// updated to the new values.
@@ -116,40 +120,42 @@ class LMChatExpandableText extends StatefulWidget {
     String? semanticsLabel,
     Function(String)? onTagTap,
     bool? enableSelection,
+    VoidCallback? onLongPress,
+    VoidCallback? onTextTap,
   }) {
-    return LMChatExpandableText(
-      text ?? this.text,
-      expandText: expandText ?? this.expandText,
-      collapseText: collapseText ?? this.collapseText,
-      expanded: expanded ?? this.expanded,
-      onExpandedChanged: onExpandedChanged ?? this.onExpandedChanged,
-      onLinkTap: onLinkTap ?? this.onLinkTap,
-      linkColor: linkColor ?? this.linkColor,
-      linkEllipsis: linkEllipsis ?? this.linkEllipsis,
-      linkStyle: linkStyle ?? this.linkStyle,
-      prefixText: prefixText ?? this.prefixText,
-      prefixStyle: prefixStyle ?? this.prefixStyle,
-      onPrefixTap: onPrefixTap ?? this.onPrefixTap,
-      urlStyle: urlStyle ?? this.urlStyle,
-      onUrlTap: onUrlTap ?? this.onUrlTap,
-      hashtagStyle: hashtagStyle ?? this.hashtagStyle,
-      onHashtagTap: onHashtagTap ?? this.onHashtagTap,
-      mentionStyle: mentionStyle ?? this.mentionStyle,
-      onMentionTap: onMentionTap ?? this.onMentionTap,
-      expandOnTextTap: expandOnTextTap ?? this.expandOnTextTap,
-      collapseOnTextTap: collapseOnTextTap ?? this.collapseOnTextTap,
-      style: style ?? this.style,
-      textDirection: textDirection ?? this.textDirection,
-      textAlign: textAlign ?? this.textAlign,
-      textScaleFactor: textScaleFactor ?? this.textScaleFactor,
-      maxLines: maxLines ?? this.maxLines,
-      animation: animation ?? this.animation,
-      animationDuration: animationDuration ?? this.animationDuration,
-      animationCurve: animationCurve ?? this.animationCurve,
-      semanticsLabel: semanticsLabel ?? this.semanticsLabel,
-      onTagTap: onTagTap ?? this.onTagTap,
-      enableSelection: enableSelection ?? this.enableSelection,
-    );
+    return LMChatExpandableText(text ?? this.text,
+        expandText: expandText ?? this.expandText,
+        collapseText: collapseText ?? this.collapseText,
+        expanded: expanded ?? this.expanded,
+        onExpandedChanged: onExpandedChanged ?? this.onExpandedChanged,
+        onLinkTap: onLinkTap ?? this.onLinkTap,
+        linkColor: linkColor ?? this.linkColor,
+        linkEllipsis: linkEllipsis ?? this.linkEllipsis,
+        linkStyle: linkStyle ?? this.linkStyle,
+        prefixText: prefixText ?? this.prefixText,
+        prefixStyle: prefixStyle ?? this.prefixStyle,
+        onPrefixTap: onPrefixTap ?? this.onPrefixTap,
+        urlStyle: urlStyle ?? this.urlStyle,
+        onUrlTap: onUrlTap ?? this.onUrlTap,
+        hashtagStyle: hashtagStyle ?? this.hashtagStyle,
+        onHashtagTap: onHashtagTap ?? this.onHashtagTap,
+        mentionStyle: mentionStyle ?? this.mentionStyle,
+        onMentionTap: onMentionTap ?? this.onMentionTap,
+        expandOnTextTap: expandOnTextTap ?? this.expandOnTextTap,
+        collapseOnTextTap: collapseOnTextTap ?? this.collapseOnTextTap,
+        style: style ?? this.style,
+        textDirection: textDirection ?? this.textDirection,
+        textAlign: textAlign ?? this.textAlign,
+        textScaleFactor: textScaleFactor ?? this.textScaleFactor,
+        maxLines: maxLines ?? this.maxLines,
+        animation: animation ?? this.animation,
+        animationDuration: animationDuration ?? this.animationDuration,
+        animationCurve: animationCurve ?? this.animationCurve,
+        semanticsLabel: semanticsLabel ?? this.semanticsLabel,
+        onTagTap: onTagTap ?? this.onTagTap,
+        enableSelection: enableSelection ?? this.enableSelection,
+        onLongPress: onLongPress ?? this.onLongPress,
+        onTextTap: onTextTap ?? this.onTextTap);
   }
 
   @override
@@ -356,12 +362,11 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
           textSpan = content;
         }
 
-        final richText = SelectableText.rich(
+        final richText = Text.rich(
           textSpan,
           textDirection: textDirection,
           textAlign: textAlign,
           textScaleFactor: textScaleFactor,
-          enableInteractiveSelection: widget.enableSelection,
           style: widget.style,
         );
 
@@ -503,6 +508,9 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
           textSpans.add(TextSpan(
             text: text.substring(startIndex, endIndex),
             style: widget.style,
+            recognizer: TapLongPressGestureRecognizer()
+              ..onLongPress = widget.onLongPress
+              ..onTap = widget.onTextTap,
           ));
           lastIndex = endIndex;
           continue;
@@ -557,9 +565,37 @@ class LMChatExpandableTextState extends State<LMChatExpandableText>
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
         style: widget.style,
+        recognizer: TapLongPressGestureRecognizer()
+          ..onLongPress = widget.onLongPress
+          ..onTap = widget.onTextTap,
       ));
     }
 
     return textSpans;
+  }
+}
+
+class TapLongPressGestureRecognizer extends TapGestureRecognizer {
+  VoidCallback? onLongPress;
+
+  late final LongPressGestureRecognizer _longPressRecognizer;
+
+  TapLongPressGestureRecognizer() {
+    _longPressRecognizer = LongPressGestureRecognizer()
+      ..onLongPress = () {
+        if (onLongPress != null) onLongPress!();
+      };
+  }
+
+  @override
+  void addPointer(PointerDownEvent event) {
+    super.addPointer(event);
+    _longPressRecognizer.addPointer(event);
+  }
+
+  @override
+  void dispose() {
+    _longPressRecognizer.dispose();
+    super.dispose();
   }
 }

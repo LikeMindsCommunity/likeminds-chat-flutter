@@ -10,6 +10,8 @@ class LMChatBubbleContent extends StatelessWidget {
     required this.onTagTap,
     this.style,
     this.textBuilder,
+    this.onLongPress,
+    this.onTextTap,
   });
 
   final LMChatConversationViewData conversation;
@@ -17,6 +19,8 @@ class LMChatBubbleContent extends StatelessWidget {
   final LMChatBubbleContentStyle? style;
   final Widget Function(BuildContext context, LMChatExpandableText text)?
       textBuilder;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onTextTap;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +37,8 @@ class LMChatBubbleContent extends StatelessWidget {
 
   LMChatExpandableText _defText(LMChatBubbleContentStyle inStyle) {
     return LMChatExpandableText(
+      onLongPress: onLongPress,
+      onTextTap: onTextTap,
       conversation.answer,
       expandText: "see more",
       enableSelection: inStyle.enableSelection ?? false,
@@ -62,12 +68,16 @@ class LMChatBubbleContent extends StatelessWidget {
     LMChatBubbleContentStyle? style,
     Widget Function(BuildContext context, LMChatExpandableText text)?
         textBuilder,
+    VoidCallback? onLongPress,
+    VoidCallback? onTextTap,
   }) {
     return LMChatBubbleContent(
       conversation: conversation ?? this.conversation,
       onTagTap: onTagTap ?? this.onTagTap,
       style: style ?? this.style,
       textBuilder: textBuilder ?? this.textBuilder,
+      onLongPress: onLongPress ?? this.onLongPress,
+      onTextTap: onTextTap ?? this.onTextTap,
     );
   }
 }

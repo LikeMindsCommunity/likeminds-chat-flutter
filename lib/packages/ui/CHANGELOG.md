@@ -35,36 +35,36 @@
 - Added retry mechanism
 - Added Analytics support
 
-### 0.9.0
+## 0.9.0
 
 - Added support for poll
 - Fixed Deleted text and link preview ui
 
-### 0.10.0
+## 0.10.0
 
 - Added support for voice notes
 
-### 0.11.0
+## 0.11.0
 
 - Added support for chatbot
 - Added support for custom user roles
 
-### 0.12.0
+## 0.12.0
 
 - Added support for poll configuration
 - Added support for dark theme
 - Added loads of UI/UX improvements
 
-### 0.12.1
+## 0.12.1
 
 - Replaced `open_filex` with `open_file` plugin
 - Removed `flutter_keyboard_visibility` plugin
 
-### 0.13.0
+## 0.13.0
 
 - Added Custom Widget support in Chatroom
 
-### 0.14.0
+## 0.14.0
 
 - Fixed Customization misses across the SDK
 - Added support for .svg `fileUrl` in `LMChatImage`
@@ -113,3 +113,7 @@
 ## 1.2.1
 
 - Fixed no tagging data in secret chatroom
+
+## 1.2.2
+
+- Fixed no click recogniser on text in chat bubble
