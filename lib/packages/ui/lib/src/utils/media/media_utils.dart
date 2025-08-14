@@ -120,7 +120,7 @@ Widget getChatItemAttachmentTile(
           ),
         ),
         SizedBox(
-          width: width * 0.5,
+          width: width * 0.42,
           child: LMChatText(
             answerText,
             style: LMChatTextStyle(
