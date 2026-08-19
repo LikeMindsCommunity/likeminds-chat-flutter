@@ -58,8 +58,8 @@ amazon_cognito_identity_dart_2
 
 ## Contributing
 
-See the org-wide [contributing guide](https://github.com/LikeMindsCommunity/.github/blob/master/.github/CONTRIBUTING.md).
-Security issues go to **hi@likeminds.community**, not the issue tracker.
+See the org-wide [contributing guide](https://github.com/LikeMindsCommunity/.github/blob/main/.github/CONTRIBUTING.md).
+Security issues go to **natesh@likeminds.community**, not the issue tracker.
 
 ## License
 
